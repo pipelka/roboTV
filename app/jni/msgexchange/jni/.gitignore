@@ -1,0 +1,5 @@
+.built
+*.jar
+msgexchange_wrap.cpp
+msgexchange_wrap.h
+msgexchange_wrap_android.cpp

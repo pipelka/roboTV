@@ -1,0 +1,10 @@
+*.o
+client
+listener
+server
+.libs
+.deps
+ping
+unittest
+json
+jsonserver

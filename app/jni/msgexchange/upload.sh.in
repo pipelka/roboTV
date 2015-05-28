@@ -1,0 +1,4 @@
+#!/bin/sh
+
+make dist
+scp @PACKAGE@-@PACKAGE_VERSION@.tar.gz root@packages:/srv/packages/deathray/sources

@@ -1,0 +1,16 @@
+@startuml
+
+(*) -down-> "create listener"
+-down-> "wait for connection"
+-right-> [all connections closed] shutdown
+-right-> (*)
+
+partition "Message Handler" {
+  "wait for connection" -down-> [new connection] "create handler"
+  -right-> "wait for message"
+  -down-> "handle message"
+  -up-> "wait for message"
+  "handle message" -left-> [close] "delete handler"
+}
+
+@enduml

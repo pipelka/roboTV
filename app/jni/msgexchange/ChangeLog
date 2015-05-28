@@ -1,0 +1,920 @@
+commit 20c3cec8a4fa87e6b91c65799fc3e5d40ba7b744
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Oct 14 11:04:07 2014 +0200
+
+    Version 0.5.4, refs #1297
+    
+    Change-Id: I27361ac018f0cc80a44eca82c9f7307da1311c2c
+    Reviewed-on: http://gerrit.bms-austria.com:8080/1161
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 78592e599698b5010dd540b60a8a2b799c18b9b5
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Oct 13 10:09:10 2014 +0200
+
+    do not try to transmit messages on closed connections, closes #1290
+    
+    Change-Id: I2b1a7a3864ebe78791b55474346fb4548cda6a58
+    Reviewed-on: http://gerrit.bms-austria.com:8080/1151
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit bb157d55a7e347ccaba8fd68f7b270e8674132ba
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Sep 25 09:24:26 2014 +0200
+
+    added support for autoreconf, closes #1273
+    
+    - removed the ugly autogen.sh logic
+    - using autoreconf now
+    
+    Change-Id: I5aa2467a3641ea0cf1485fdeeed45ec76b8a0db6
+    Reviewed-on: http://gerrit.bms-austria.com:8080/1130
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 14734775c7756f5feef6b96259940bea58617f9f
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Sep 2 16:54:03 2014 +0200
+
+    Version 0.5.3, refs #1229
+    
+    Change-Id: I368a9caccd4e1047c2d0bdbc6db0e58cec733316
+    Reviewed-on: http://gerrit.bms-austria.com:8080/1067
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit c4a89ca0047f966bf588647d47c43c450684a4eb
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Sep 2 10:50:03 2014 +0200
+
+    assign socket after a successful connection attempt, closes #1226
+    
+    Change-Id: Ie6b89610800788605b108e394c6c9b1d86cb0d0d
+    Reviewed-on: http://gerrit.bms-austria.com:8080/1066
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 11bc7cbfc0ba00f269f37ef0d4ec0358b5540d1b
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Sep 2 10:49:08 2014 +0200
+
+    do not push server notifications if the client is disconnected, closes #1227
+    
+    Change-Id: I2e3a58da29f1fe3856ce090790edebdb4be33031
+    Reviewed-on: http://gerrit.bms-austria.com:8080/1065
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 289907edfe633b585a5fa5170c238638a632179f
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Sep 2 10:48:19 2014 +0200
+
+    fixed "const" correctness of getter function, closes #1228
+    
+    Change-Id: I00200b39be8ea59aab52822f4dd42513599bfb5a
+    Reviewed-on: http://gerrit.bms-austria.com:8080/1064
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit ae8b4428a89849d2cd47b3a05b859f04b72e7729
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Fri May 30 12:42:21 2014 +0200
+
+    Version 0.5.2, refs #1099
+    
+    Change-Id: I03291c95ebdcd8fe93de35e5bed1522383f703b3
+    Reviewed-on: http://gerrit.bms-austria.com:8080/956
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 8ca0abab2b380f730c3a0162cc1f0ca87f2bc50d
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Fri May 30 12:15:57 2014 +0200
+
+    fixed reading and writing of 64bit values, closes #1098
+    
+    Change-Id: I4b3a2976292ab898a39ec6bd2849cc95b4539b82
+    Reviewed-on: http://gerrit.bms-austria.com:8080/955
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit c3e7684edc622c217378e8b7480c89fe8632e6c3
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Mar 26 14:51:31 2014 +0100
+
+    Version 0.5.1, closes #887
+    
+    Change-Id: Ieef2d54cd2ee5f1a61fdd7256c3e6af76977bee5
+    Reviewed-on: http://gerrit.bms-austria.com:8080/763
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit eb53e4e0dbd9701e88b02b3a4c5f85c13846ae73
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Mar 26 14:50:14 2014 +0100
+
+    register client handler before starting the client, closes #886
+    
+    this fixes sending of notifications on client handler startup.
+    
+    Change-Id: I9fafad79848508a24930f46d86b6a5df7d6b86df
+    Reviewed-on: http://gerrit.bms-austria.com:8080/762
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit bb5af36ff876f5a2d4d6ae227b32ee1a359325cd
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Jan 29 16:51:46 2014 +0100
+
+    Version 0.5.0, closes #812
+    
+    Change-Id: I73fe94e623b7d42485fc9f36e3df53e6de161040
+    Reviewed-on: http://gerrit.bms-austria.com:8080/712
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit cb86ad750c77cba41c03bc7c432e593e47564b4c
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Jan 29 16:50:38 2014 +0100
+
+    fixed possible memoryleak in MsgPacket, closes #813
+    
+    Change-Id: I9170529664c1926c648b1c546777f99c420c1921
+    Reviewed-on: http://gerrit.bms-austria.com:8080/711
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 39c255dd2c5a02e920f87d183cd34549f61e733f
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Jan 16 14:19:11 2014 +0100
+
+    added MsgConnection::GetHostname(), closes #792
+    
+    Change-Id: Ie6ac6ee5155c14a4aded4f64222e814b963e6a89
+    Reviewed-on: http://gerrit.bms-austria.com:8080/660
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 9eeccf9e1e86c1e089b5bf2278e444e53f0746af
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Fri Jan 10 12:46:27 2014 +0100
+
+    version 0.4.0
+    
+    Change-Id: I8855404ea818e9906f8401352614c36c10f95040
+    Reviewed-on: http://gerrit.bms-austria.com:8080/649
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 4c2f4f8defb041e17cd3f4bbc453aaf548fdfdea
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Sep 23 09:16:01 2013 +0200
+
+    check if server is still running in MsgServer::foreach, closes #698
+    
+    Change-Id: I76f65abc902ac5c8e9ee42f6fb02a99766bc4ddb
+    Reviewed-on: http://gerrit.bms-austria.com:8080/578
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 22049952ce697704e1e3874aea96326678e4f887
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Sep 18 13:11:37 2013 +0200
+
+    remove possible dead-lock on MsgServer::Stop(), closes #690
+    
+    Change-Id: Ia350f4f5d1332f8e6db3adbab6f88574ee33edf6
+    Reviewed-on: http://gerrit.bms-austria.com:8080/568
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 1ccf3ae199498aefa6fd5f3145c8b2be21a1a4e8
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Jul 16 12:51:00 2013 +0200
+
+    Version 0.3.0, closes #584
+    
+    Change-Id: Ic88a355ee11b2bc42c079f6815c70094d926086b
+    Reviewed-on: http://gerrit.bms-austria.com:8080/492
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 9f443a204f53c614d20f41a505a51ec9fe74350e
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Jun 26 14:44:49 2013 +0200
+
+    advanced server persistance method, refs #518
+    
+    Change-Id: Ib06ac2ef92873a6b90834d50ff580410e32cd424
+    Reviewed-on: http://gerrit.bms-austria.com:8080/484
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit f887adbe3d851d97b523130617cf93749d39bab5
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon May 27 16:32:07 2013 +0200
+
+    foreach iterator, closes #557
+    
+    * MsgServer::foreach(Function) iterates over all registered MsgHandler objects
+    * made MsgHandler::QueueNotification "public"
+    
+    Change-Id: Iec476fc25de7689cce5fd3b9c164219487897cab
+    Reviewed-on: http://gerrit.bms-austria.com:8080/482
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Tested-by: Jenkins Integration Server
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit c632e4d77a6e78c60a1b07da5b437ce7a9cb22ab
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu May 2 13:32:38 2013 +0200
+
+    close syslog on server destruction, closes #536
+    
+    Valgrind Meldung:
+    ==19353==
+    ==19353== FILE DESCRIPTORS: 4 open at exit.
+    ==19353== Open AF_UNIX socket 3: <unknown>
+    ==19353==    at 0x5870F67: socket (syscall-template.S:82)
+    ==19353==    by 0x586B349: openlog_internal (syslog.c:355)
+    ==19353==    by 0x586BA36: __vsyslog_chk (syslog.c:274)
+    ==19353==    by 0x586BC51: __syslog_chk (syslog.c:131)
+    ==19353==    by 0x416DCB: MsgServer::Start() (syslog.h:32)
+    ==19353==    by 0x40EA94: ClientServerTest_SessionTest_Test::TestBody() (unittest.cpp:199)
+    
+    Change-Id: I04cc0756221bd3cc2cc321fc7950cf1ced5aae8c
+    Reviewed-on: http://gerrit.bms-austria.com:8080/455
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit eb7565ce7a4cab594481fe81a54a7b0bfba5a724
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu May 2 12:08:54 2013 +0200
+
+    fix connection lost regression, closes #535
+    
+    Change-Id: Ic0b5c81cd5359d1e14e3266c6eaab45f322beab9
+    Reviewed-on: http://gerrit.bms-austria.com:8080/454
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit ad1e86b5f33452da9548eb1405edf8b5dac7aa8c
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Fri Apr 26 10:51:41 2013 +0200
+
+    close socket if connection fails, closes #525
+    
+    Change-Id: Iaabbd6488a324b6e2e7c162fac99021145cda658
+    Reviewed-on: http://gerrit.bms-austria.com:8080/447
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 3fd9684f3233b6aabee78aff366e54b1f2792b33
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Apr 25 15:52:49 2013 +0200
+
+    notification queue, closes #524
+    
+    Change-Id: I991dd42b6dc9881982fab6242027d984441a8d9e
+    Reviewed-on: http://gerrit.bms-austria.com:8080/445
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit d606b54fa11a9b3029274d6b249fd930ecaf77bb
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Apr 24 10:56:59 2013 +0200
+
+    persistent connection fixes, closes #520
+    
+    use getpeername() to figure out the connected peer.
+    
+    Change-Id: Ib441f4787faf55a99cb3575d21bbc11348c66a09
+    Reviewed-on: http://gerrit.bms-austria.com:8080/441
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 1a444bd693d7c2e710315494057cfea8b0415821
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Apr 23 14:47:18 2013 +0200
+
+    added missing include, closes #519
+    
+    Change-Id: I56dc4e310e947a3dbf98084a1173d96a1f0c76aa
+    Reviewed-on: http://gerrit.bms-austria.com:8080/439
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 8795a1c6e947fc1d6eb6cc3ef25889342711d3bf
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Apr 23 11:57:24 2013 +0200
+
+    persistent connections, closes #518
+    
+    Change-Id: If1c8899da96a9b49007b69d2109f0343f150ac17
+    Reviewed-on: http://gerrit.bms-austria.com:8080/438
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit ea0d12567709940a1114993eed94113379e128af
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Apr 11 15:04:56 2013 +0200
+
+    added SetPort(int) method to MsgServer, closes #495
+    
+    Change-Id: If41077c3aba8902a22dcb78553c3e4022440b615
+    Reviewed-on: http://gerrit.bms-austria.com:8080/406
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 2669c8e9ecafafe20bcbe0a52e1cd9729d503939
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Apr 15 10:35:49 2013 +0200
+
+    do not report a "Connection Lost" on aborting, closes #496
+    
+    Change-Id: I5d87c9d984a292474665b30b30b28f2a67c112d3
+    Reviewed-on: http://gerrit.bms-austria.com:8080/409
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 9ac5a7c1dc33c19d35a62a3bd048856eb32f4c90
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Jan 21 12:11:51 2013 +0100
+
+    version 0.2.0, closes #448
+    
+    Change-Id: I09cbfec283ba518e95b3bf3fb5b224fc33bc5a91
+    Reviewed-on: http://gerrit.bms-austria.com:8080/386
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 6c9e82de38b95978919e4dd5b43137300624a6a1
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Nov 28 14:43:46 2012 +0100
+
+    use SO_KEEPALIVE for connection lost detection, closes #370
+    
+    Change-Id: Ic9de788d339c9e0984882de14237bd64e357b8c0
+    Reviewed-on: http://gerrit.bms-austria.com:8080/373
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 234dc1e6e3921f458b877e21736f5cfa41819958
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Oct 9 13:58:48 2012 +0200
+
+    API generalization, closes #329
+    
+    Change-Id: I57f3c0cdc5fc62def646320b7decd650db9afb57
+    Reviewed-on: http://gerrit.bms-austria.com:8080/314
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit bc157b94e11c4eebf57098e4e52b63df78bf79f2
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Sep 25 11:02:23 2012 +0200
+
+    mingw32: abstracted OS specific functions, closes #311
+    
+    * compiles now on MinGW32, Linux, Android
+    * unittest: also check failing connection attempts
+    * MinGW32 DLL's
+    
+    Change-Id: Ib8dbda4054379c6f3154afc2e40e1256cf971a0e
+    Reviewed-on: http://gerrit.bms-austria.com:8080/309
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 0349e593709a87d8f1bb5fcfac9229d6d89f60ef
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Sep 25 10:18:18 2012 +0200
+
+    json: added configure option to enable json support, closes #310
+    
+    Change-Id: I6a0f231af1d2b4ad5e6cc84ff4790dd8c9691794
+    Reviewed-on: http://gerrit.bms-austria.com:8080/308
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit b6b8993d13cdfe12dcd47b884901e6d5aadc7dbe
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Sep 18 10:11:20 2012 +0200
+
+    msghandler: send explicit ping responses, closes #309
+    
+    Change-Id: I122f681bb345bbfc8128ee5c05b4373f77c77d21
+    Reviewed-on: http://gerrit.bms-austria.com:8080/301
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 1f5406dd24244a9bcc326e3f2cdc561b7a4d589a
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Aug 27 15:52:57 2012 +0200
+
+    unittest: added client / server communication test, closes #290
+    
+    Change-Id: I3803229b1810ab71cbd350b1c7986d1255362710
+    Reviewed-on: http://gerrit.bms-austria.com:8080/288
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit be4efa3ffc0aaf8d64770bf119bfe9e4e24ff3da
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Fri Aug 24 11:34:44 2012 +0200
+
+    support for JSON encoded messages, closes #287
+    
+    Change-Id: I3e3597e9ce8888cd5b8b13534c2e90c33d18f7cf
+    Reviewed-on: http://gerrit.bms-austria.com:8080/292
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 28e3b691648acf34826273a6e1ef032ab46979e0
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Aug 28 15:43:09 2012 +0200
+
+    doc: automatically generate class-diagram, closes #293
+    
+    Change-Id: Ia5f2cbe43cdbf8164c5f7470934b631657b9e54a
+    Reviewed-on: http://gerrit.bms-austria.com:8080/291
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 153cf6b7310ccca17b0d3181291aa51065eea162
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Aug 27 15:59:34 2012 +0200
+
+    MsgPacket: fixed memory leak, closes #291
+    
+    Change-Id: Id14fa67733e03148edc13983e144ce79ee26ef33
+    Reviewed-on: http://gerrit.bms-austria.com:8080/289
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 75459555758ee8b386ea80b970687ee35c5bd2a3
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Fri Aug 24 11:40:34 2012 +0200
+
+    disabled JNI wrapping of operator functions, fixes #281
+    
+    Change-Id: I339027b4e8c4993c1064c246da23ebda6973f517
+    Reviewed-on: http://gerrit.bms-austria.com:8080/286
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit f1fb8a0822d255e1fbd53d2704bb80555a27a952
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Aug 22 09:57:10 2012 +0200
+
+    msgpacket: added missing include, closes #281
+    
+    Change-Id: I34ffc3c47334d02b051280aed47a1fdf65621f9c
+    Reviewed-on: http://gerrit.bms-austria.com:8080/273
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 7ce6d13efbe55abd8d7aa23e160c5c1d95a8fda7
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Aug 1 11:35:26 2012 +0200
+
+    MsgPacket: C++ stream operators, closes #264
+    
+    Change-Id: Id0c6f6f8f3290923580115c9c35603490bc8ce37
+    Reviewed-on: http://gerrit.bms-austria.com:8080/260
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 9f11d98ddb87dd15149084ea036d1ddce8ccded6
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Jul 31 15:49:31 2012 +0200
+
+    msgpacket: make write() also work for files, closes #263
+    
+    Change-Id: Iae3f1180908840649887946ae586fb4c191ddf9b
+    Reviewed-on: http://gerrit.bms-austria.com:8080/258
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Simon Pirker <pirker@bms-austria.com>
+    Tested-by: Simon Pirker <pirker@bms-austria.com>
+
+commit b69698cfcb3352f3d66bcbd6008fe77256af4ebd
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Jun 26 13:38:04 2012 +0200
+
+    UML generation fix
+    
+    Change-Id: I9b739d27731987b95366f3c8cf19d07b7e5d76fe
+    Reviewed-on: http://gerrit:8080/190
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 24b14b095c529c678450888ccc170e92da4706e8
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Apr 17 14:59:05 2012 +0200
+
+    classdiagram fixes
+    
+    Change-Id: I3d6c11420df16060d3193082faa47ebdeda5ddb1
+    Reviewed-on: http://gerrit:8080/142
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 84925062ebdbe76db25aad8fb65fed0a4a1a536f
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Fri Apr 13 13:18:47 2012 +0200
+
+    msgpacket: added option to disable payload-checksum generation
+    
+    - this makes it possible to save CPU-cycles on very large packets
+    
+    Change-Id: I850389b7c9080062eafe22af0ba5446d9b424372
+    Reviewed-on: http://gerrit:8080/140
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 5a92ea606f6587ba1c28ed96e2e9dec62733fd2a
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Apr 11 11:55:21 2012 +0200
+
+    MsgCallbacks: added support for client notifications
+    
+    Change-Id: If88ed3605b5bb1b101ac349cbb17f55f9f210ce6
+    Reviewed-on: http://gerrit:8080/139
+    Tested-by: Alexander Pipelka <pipelka@bms-austria.com>
+    Reviewed-by: Alexander Pipelka <pipelka@bms-austria.com>
+
+commit 7c1c96222ad245728530395d0f130c2bdb478422
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Apr 11 09:58:18 2012 +0200
+
+    code cleanup
+    
+    Change-Id: I714149e90954d53524a1968a68d80ce442ab8ae1
+
+commit 1c2bf8ad7a8a5f451efdd994fa41b2a289fba378
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Apr 11 09:57:37 2012 +0200
+
+    MsgHandler: made Run() protected
+    
+    Change-Id: Ic21028deeeabe6af0dde94069b68c9079d9d3694
+
+commit aea2907b73461aa297702e73ea702b60445145c8
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Apr 11 09:56:34 2012 +0200
+
+    added activity diagram, updated classdiagram
+    
+    Change-Id: I1e8d0cddd402e0702ecf3033d8828d297256b602
+
+commit 957514f8e08be71f47b122bfd0b309f143832ee5
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Apr 11 09:54:36 2012 +0200
+
+    added MsgCallbacks class
+    
+    Change-Id: Idbb574e8561f17fb5a7b0103d3e8f09e66f6d92b
+
+commit afef767b9684ade261e5581e199dab04007a3aff
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Apr 10 09:31:33 2012 +0200
+
+    renamed OwnerID to ClientID
+    
+    Change-Id: Id794f6ab007c69581aa8abc81adf4e9075100ff1
+
+commit fbe50cbb530b9f2c8da7c0bcd841bd166e6d1112
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Apr 10 09:23:26 2012 +0200
+
+    added MsgHandler::SendNotification
+    
+    Change-Id: I20de7fbcaac52c4a8cdadf6439361202022d3731
+
+commit 4cc0420dacd0ab55d8508dfb1a0ede2d818d14c0
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 27 12:22:54 2012 +0200
+
+    JNI fixes
+    
+    Change-Id: I4374265cd6ca14bf1f038efdf9bc0be4f2166c0e
+
+commit 392cba8fc2cd0d84f1ca76067971f2c10fc9c809
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 27 12:22:17 2012 +0200
+
+    added OnMessageListener java interface
+    
+    Change-Id: I0495191e868efb30fda9a3ba5ef3847ecc0437b8
+
+commit 6d84c4c6ee662be97eb63ff0cd397babc3411a44
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 27 09:53:10 2012 +0200
+
+    threading fix - only detach thread if needed
+    
+    Change-Id: I81094d2efa0998443f86cdde05ee77bb623f5478
+
+commit 2b78f691a5c75a7a583dc48a2f691622499f82d3
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Fri Mar 23 10:26:14 2012 +0100
+
+    library configuration fixes
+    
+    Change-Id: I04f310e23fa9fa93d9c19f50764128066aa3e98e
+
+commit e114dc811ee41daaee8553f01486d3b566f372c1
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 16:43:32 2012 +0100
+
+    added version information to jar archive
+    
+    Change-Id: I103609e6a83045e2b43d77879523601d41bb4fea
+
+commit 92eed23374e922bdbe6c269ac4af9b6262a69d6e
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 16:17:33 2012 +0100
+
+    fixed deadlock on thread startup
+    
+    Change-Id: I0cb74b07e67107841d5bae4347b7f55bd0a97df7
+
+commit 7aa5cac28ba0cae067bf5f75d431e356d0f26368
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 15:58:50 2012 +0100
+
+    fixed possible inefficient checking for 'm_queue' emptiness
+    
+    Change-Id: Icba956fa1190e360739dd97958e5a1f8eabfc94d
+
+commit fa98ea9fb3c971d139c11c3bc9067e2b448927f5
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 15:57:33 2012 +0100
+
+    fixed cppcheck "postfixOperator" warning
+    
+    Change-Id: Iac6226611b302c8d765c6858763d6c4f4eb6f2df
+
+commit 6ea91c3fc59036cf5ca0a7329b0a6866f36d1195
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 15:55:41 2012 +0100
+
+    made MsgHandler::GetSocket const
+    
+    Change-Id: I8a63d575d8d08f423ca7b33216817d677695ec52
+
+commit bd315c276df715b482442ea6c1bf7c2d3f70b13e
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 15:33:17 2012 +0100
+
+    documentation updates and distribution fixes
+    
+    Change-Id: If7ddf803d012eed1e0b253d9b4b951492da866d8
+
+commit 78ea3498c3dfddc5f09bf20338092dd855dc5463
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 15:13:38 2012 +0100
+
+    added sequence-diagram and README
+    
+    Change-Id: Idd252f8550550da0bb2072ae103e968d306ef190
+
+commit 6ce1c04f572dcaa5c1515602961597415abf3ab8
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 14:57:24 2012 +0100
+
+    added documentation for MsgSession
+    
+    Change-Id: I31958adcc179d9f0c38ec991b9c8a7c52724b733
+
+commit 9c88e871bc27a243273797f58269612b647cb0d8
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 14:44:24 2012 +0100
+
+    rename class MsgListener to MsgSession
+    
+    Change-Id: I022f022b6395560f0b31f1d9b401bf8432e3297b
+
+commit 78a6e9267370c1a99ef2f856f5ea86c6405932dc
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 13:32:57 2012 +0100
+
+    updated doxygen configuration file and header docs
+    
+    Change-Id: I3f5f20886063a9a5c8842ad4b46d238902e3ee2e
+
+commit 57df0a5d6b2de994f2a62134be9ffa23936771ea
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 12:11:41 2012 +0100
+
+    documentation fixes for MsgPacket
+    
+    Change-Id: I9ef27c31aedc88907f250468484cd9321f4989fe
+
+commit 3d9aba0aa9346eb63279040218428d0642ae9337
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 12:11:24 2012 +0100
+
+    documented class MsgConnection
+    
+    Change-Id: Ice4e2eb5f8338c5a41111a42a4a7f130a0a3f432
+
+commit 6ffa1dfbd9e79752690435bd922f7e48001c0ef6
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 11:27:54 2012 +0100
+
+    fix compiler warnings about too large long types
+    
+    Change-Id: Ifecc029b2c068d47fabe97dda671fa5928ad2718
+
+commit d6630d43619d670dea820b993ff37fbc9a416331
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 11:25:03 2012 +0100
+
+    removed "ping" from makefile
+    
+    Change-Id: I63b980a944c59b70652cea936a3f32665b0ac4bf
+
+commit f60ff387766fb156d1ad5cf92a7c3779d5432d34
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 22 10:27:42 2012 +0100
+
+    added connection lost handling
+    
+    Change-Id: I2cd453b159a1285efa23429fda970c76c8603af6
+
+commit 44bd112338de33cc836617e38c4566847d74478e
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 15 10:41:35 2012 +0100
+
+    start message handler when ready
+
+commit f093608a7e22536e51ff15afce20c293a486c7da
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 15 10:23:04 2012 +0100
+
+    fixed return-type of MsgListener::Close()
+
+commit 38771694a58ac2833bf384cc8324e00455fc4ffc
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Thu Mar 15 09:46:05 2012 +0100
+
+    fixed wrong status on establishing a connection
+
+commit eeb52d0cfb8b8b05c87eb4eb6465337b004f5af0
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Mar 14 16:43:37 2012 +0100
+
+    removed debug messages
+
+commit 16d1863675e1451c55d6c030760409af68cb5ed3
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Mar 14 16:43:17 2012 +0100
+
+    added uml class diagrams
+
+commit 624fdc3dd522cf5070f890fef391be17013b39bf
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Mar 14 11:38:41 2012 +0100
+
+    added full duplex packet transmission in MsgListener
+
+commit 87a785b7b2c9ff2d159cb3021bb52270b2a417fe
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 13 15:36:48 2012 +0100
+
+    added packet compression
+
+commit f81ef92155b116f66c503eaffb55cbb8ac5b7e5e
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 13 09:57:23 2012 +0100
+
+    code cleanup
+
+commit 721af9ea8ab5170bdb867de79586b7b8c28a24f1
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 16:47:24 2012 +0100
+
+    close log after last logmessage
+
+commit 1130a5620b1f17f2c72f5f4e6d850438e93bb248
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 16:44:56 2012 +0100
+
+    actually stop the thread on MsgServer::Stop()
+
+commit b6867bba6f6bac3f7662f26517267816419b93e6
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 16:36:07 2012 +0100
+
+    SWIG and JNI fixes
+
+commit ee75ffc9a03b287baf95640fbe96cdd4aafd4da2
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 16:15:41 2012 +0100
+
+    renamed packet access functions
+
+commit 1aece53f1316fc6eb91e43e58c12aa6ff495e2f3
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 16:03:32 2012 +0100
+
+    added copyright / license headers
+
+commit a8efd7b33b59370885149cea47e139bc65833e69
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 15:57:18 2012 +0100
+
+    replaced threading class
+
+commit 849a84f05fc87ed1bad4a616bc0d1ee38321e4d1
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 14:48:06 2012 +0100
+
+    small code fix
+
+commit eeffff5c4c384858164f4e73bc8cf3c5d84f8b97
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 14:47:25 2012 +0100
+
+    added static link version of the library
+
+commit 73770c86fad4f3a57d45d83c6aef10154f5da14e
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 14:21:41 2012 +0100
+
+    code formatting
+
+commit e5cb6f3cf099bca484cbc324c28e231b7ce9c675
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 14:18:54 2012 +0100
+
+    android fixes
+
+commit 61b2c12a7340425c3a4e4f134cd82f3d9b92512d
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 14:13:41 2012 +0100
+
+    removed third-party code
+
+commit d8a9977513952ed14331964751efad3b6569cc32
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 11:58:22 2012 +0100
+
+    even more code cleanup
+
+commit 08028ccff1cdaf92f3b2b336ac6a517934ddf443
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 10:29:00 2012 +0100
+
+    added .gitignore files
+
+commit 0a39cc674913cee555bb62420071dc56c1287d42
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 10:17:45 2012 +0100
+
+    added missing listener test app
+
+commit b46fd7f45b5813cfdac46d2b5aea4dea487b4f08
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 12 10:15:01 2012 +0100
+
+    code cleanup
+
+commit 8311aa9cafb2c0b27ce8bbe2915ca18bb7817397
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Wed Mar 7 14:41:55 2012 +0100
+
+    packet header fix
+
+commit 56d58653f9439996689e37b91408ac485c3783a8
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 6 12:44:26 2012 +0100
+
+    distcheck makefile fixes
+
+commit 9840fa22ddb2ad89893cbbcf57188add98b0a5cb
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 6 12:37:06 2012 +0100
+
+    added MsgPacket documentation
+
+commit 6b2a399b550643c4775878ca8e65f6c594357cbf
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 6 12:36:49 2012 +0100
+
+    fixed object ownership
+
+commit a45f5678d1217d76df052ac0fc01d5b72bf22bcc
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Tue Mar 6 09:53:01 2012 +0100
+
+    source code fixes to make swig happy
+
+commit 288345bd0d6a7c17c29382754e48eea5af265312
+Author: Alexander Pipelka <pipelka@bms-austria.com>
+Date:   Mon Mar 5 12:37:18 2012 +0100
+
+    initial commit

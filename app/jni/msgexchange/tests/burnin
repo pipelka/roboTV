@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd `dirname $0`
+
+while ./unittest ; do
+  echo
+done
+

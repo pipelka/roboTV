@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: msgexchange
+Description: BMS Socket Communication C++ Toolkit
+Version: @VERSION@
+Libs: -L@prefix@/lib @MSGEXCHANGE_LIBS@
+Cflags: @MSGEXCHANGE_CFLAGS@ -I@prefix@/include/msgexchange

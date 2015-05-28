@@ -1,0 +1,75 @@
+@startuml
+
+box "Clients" #LightBlue
+  participant "Client A"
+  participant "Client B"
+end box
+
+box "Server" #LightGreen
+participant Server
+participant "Handler A"
+participant "Handler B"
+end box
+
+"Client A" -> Server: Open Connection
+activate Server
+
+create "Handler A"
+Server -> "Handler A" : Create Message Handler
+
+activate "Handler A"
+deactivate Server
+
+"Client B" -> Server: Open Connection
+activate Server
+
+create "Handler B"
+Server -> "Handler B" : Create Message Handler
+activate "Handler B"
+deactivate Server
+
+"Client A" -> "Handler A": Message
+note left
+  The message consist of a
+  header and payload data.
+  The header defines a message
+  message id and type.
+end note
+
+...
+
+"Client A" <- "Handler A": Notification
+note right
+  Server may send notification
+  asynchronously
+end note
+
+...
+
+"Handler A" --> "Client A": Response
+note right
+  The response contains the message id
+  and type of the message.
+end note
+
+...
+
+"Client A" <- "Handler A": Notification
+note right
+  Server may send notification
+end note
+
+...
+
+"Client A" -> "Handler A": Close Connection
+destroy "Handler A"
+
+"Client B" -> "Handler B": Message
+
+"Handler B" --> "Client B": Response
+
+"Client B" -> "Handler B": Close Connection
+destroy "Handler B"
+
+@enduml
+

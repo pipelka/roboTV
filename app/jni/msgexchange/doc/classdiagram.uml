@@ -1,0 +1,327 @@
+@startuml
+package "libmsgexchange" #DDDDDD {
+
+note top of MsgCallbacks
+ <b>Function Callback Handler</b>
+ Registers function callbacks for
+ message ids.
+
+ <b>Sources</b>
+ libmsgexchange/include/msgcallbacks.h
+end note
+
+MsgCallbacks --|> MsgHandler
+
+class MsgCallbacks<ClientHandlerClass>
+class MsgCallbacks {
+#void RegisterMessageHandler(uint16_t msgid, MSGFPTR handler)
+#void RegisterNotificationHandler(uint16_t msgid, NTFFPTR handler)
+#bool OnMessage(MsgPacket* request, MsgPacket* response)
+#void OnNotification(MsgPacket* notification)
+-MSGHANDLERS m_msg
+-NTFHANDLERS m_ntf
+}
+
+class MsgCondition {
++MsgCondition()
+{abstract}+~MsgCondition()
++bool Wait(int timeout_ms = 0)
++void Signal()
+-std::condition_variable m_cond
+-std::mutex m_lock
+-bool m_signaled
+}
+
+
+note top of MsgConnection
+ <b>Synchronous Communication Client</b>
+ Send a request to the server and
+ expects a synchronous message response
+
+ <b>Sources</b>
+ libmsgexchange/include/msgconnection.h
+ libmsgexchange/src/msgconnection.cpp
+end note
+
+class MsgConnection {
++bool Open(const char* hostname, int port)
++void Abort()
++void Close()
++bool IsOpen()
++bool IsAborting()
++bool SendRequest(MsgPacket* request)
++MsgPacket* ReadResponse()
++MsgPacket* TransmitMessage(MsgPacket* message)
++void SetTimeout(int timeout_ms)
++{static}bool pollfd(int fd, int timeout_ms, bool in)
+#const std::string& GetHostname()
+#{abstract}void OnDisconnect()
+#{abstract}void OnReconnect()
+#bool Reconnect()
+#void SetConnectionLost()
+#bool GetConnectionLost()
+#int m_socket
+#int m_timeout
+-bool m_connectionlost
+-std::string m_hostname
+-int m_port
+-bool m_aborting
+}
+
+
+note top of MsgHandlerBase
+ <b>Connection Handler Base</b>
+ Handles the a socket connection.
+
+ <b>Sources</b>
+ libmsgexchange/include/msghandlerbase.h
+ libmsgexchange/src/msghandlerbase.cpp
+end note
+
+MsgHandlerBase --|> MsgThread
+MsgHandlerBase *--> PersistanceMethod : m_persistance
+
+class MsgHandlerBase {
++MsgHandlerBase(int sock)
++{abstract}~MsgHandlerBase()
++bool Stop()
++void SetTimeout(int timeout_ms)
++bool GetPersist()
++bool SetClientID(uint64_t id)
++uint64_t GetClientID()
+#void SetSocket(int sock)
+#int m_sock
+#int m_timeout
+#bool m_persist
+#PersistanceMethod m_persistance
+#uint64_t m_clientid
+}
+
+
+note top of MsgHandler
+ <b>Connection Handler</b>
+ Handles the communcation for a socket
+ connection.
+
+ <b>Sources</b>
+ libmsgexchange/include/msghandler.h
+ libmsgexchange/src/msghandler.cpp
+end note
+
+MsgHandler --|> MsgHandlerBase
+
+class MsgHandler {
+#void Run()
+#{abstract}bool OnMessage(MsgPacket* request, MsgPacket* response)
+#bool SendNotification(MsgPacket* packet)
+-std::mutex m_mutex
+}
+
+
+note top of MsgHandlerJSON
+ <b>JSON Connection Handler</b>
+ Handles JSON messages.
+
+ <b>Sources</b>
+ libmsgexchange/include/msghandlerjson.h
+ libmsgexchange/src/msghandlerjson.cpp
+end note
+
+MsgHandlerJSON --|> MsgHandler
+
+class MsgHandlerJSON {
++void SetMessageType(int msgtype)
+#void Run()
+#bool OnMessage(MsgPacket* request, MsgPacket* response)
+#bool OnResponseFormat(MsgPacket* response, std::string& jsonformat)
+#bool OnCustomJSONResponse(MsgPacket* response, std::string& result)
+-bool WaitForData()
+-bool ReceiveString(std::string& str)
+-bool SendString(const std::string& str, bool bTerminate = true)
+-int m_msgtype
+-bool m_closed
+}
+
+
+note left of MsgPacket
+ <b>Message Packet</b>
+ The primary interface for messages passed
+ between communication endpoints.
+
+ <b>Sources:</b>
+ libmsgexchange/include/msgpacket.h
+ libmsgexchange/src/msgpacket.cpp
+end note
+
+class MsgPacket {
+.. data putters ..
++bool put_String(const char* string)
++bool put_U8(uint8_t c)
++bool put_U16(uint16_t us)
++bool put_S16(int16_t s)
++bool put_U32(uint32_t ul)
++bool put_S32(int32_t l)
++bool put_U64(uint64_t ull)
++bool put_S64(int64_t ll)
++bool put_Blob(uint8_t source[], uint32_t length)
+.. data getters ..
++const char* get_String()
++uint8_t get_U8()
++uint16_t get_U16()
++int16_t get_S16()
++uint32_t get_U32()
++int32_t get_S32()
++uint64_t get_U64()
++int64_t get_S64()
++bool get_Blob(uint8_t dest[], uint32_t length)
+.. memory allocation ..
++uint8_t* reserve(uint32_t length, bool fill, unsigned char c)
++uint8_t* consume(uint32_t length)
++void clear()
+.. compression ..
++bool compress(int level)
++bool uncompress()
+.. transport ..
++{static} MsgPacket* read(int fd, bool& closed, int timeout_ms)
++bool write(int fd, int timeout_ms)
+--
+-{static} uint32_t globalUID
+-uint8_t* m_packet;
+-uint32_t m_size;
+-uint32_t m_usage;
+-uint32_t m_readposition;
+}
+
+note top of MsgServer
+ <b>Communication Server</b>
+ Waits for incoming connections and
+ creates a message handlers for every
+ connection.
+
+ <b>Sources</b>
+ libmsgexchange/include/msgserver.h
+ libmsgexchange/src/msgserver.cpp
+end note
+
+MsgServer --|> MsgThread
+MsgServer o--> "many" MsgHandlerBase : m_handlers
+
+enum PersistanceMethod {
+PERSIST_CONNECTION_NONE,
+PERSIST_CONNECTION_IP
+}
+
+MsgServer *--> PersistanceMethod : m_persistance
+
+class MsgServer {
++bool Start()
++bool Stop()
+#void Run()
+#void Cleanup()
+#int CreateServerSocket()
+#{abstract}MsgHandlerBase* CreateHandler(int sock)
+-int m_port
+-int m_server
+-std::mutex m_mutex
+-std::list<MsgHandler*> m_handlers
+-PersistanceMethod m_persistance
+}
+
+
+note top of MsgSession
+ <b>Asynchronous Communication Client</b>
+ Send a request to the server and
+ waits for response message. Other
+ messages may be sent from the server to
+ the client at any time.
+
+ <b>Sources</b>
+ libmsgexchange/include/msglistener.h
+ libmsgexchange/src/msglistener.cpp
+end note
+
+note left of MsgResponseCondition
+ <b>Response Wait Condition</b>
+ This class is used for asynchronous
+ response signaling.
+
+ <b>Sources</b>
+ libmsgexchange/include/msglistener.h
+ libmsgexchange/src/msglistener.cpp
+end note
+
+MsgSession --|> MsgConnection
+MsgSession --|> MsgThread
+
+MsgSession o--> "many" MsgResponseCondition : m_queue
+MsgResponseCondition o--> "packet" MsgPacket
+
+class MsgSession {
++bool Open(const char* hostname, int port)
++bool Close()
++MsgPacket* TransmitMessage(MsgPacket* message)
+#void Run()
+#{abstract}void OnNotification(MsgPacket* notification)
+-MsgCondition* find(MsgPacket* p)
+-std::mutex m_mutex
+-std::map<uint64_t, MsgResponseCondition*> m_queue
+}
+
+MsgResponseCondition --|> MsgCondition
+
+class MsgResponseCondition {
++void Signal(MsgPacket* p)
+
++MsgPacket* packet
+}
+
+
+note top of MsgThread
+ <b>Threading Class</b>
+
+ <b>Sources</b>
+ libmsgexchange/include/msgthread.h
+ libmsgexchange/src/msgthread.cpp
+end note
+
+class MsgThread {
++{abstract}bool Start()
++{abstract}bool Stop()
++bool IsRunning()
++bool IsStopped()
++bool Awake()
++void SetID(uint64_t id)
++uint64_t GetID() const
+#{abstract}void Run()
+#bool Sleep()
+#bool IsSleeping() const
+-bool m_running
+-bool m_stopped
+-bool m_sleeping
+-std::thread m_worker
+-std::mutex m_mutex
+-MsgCondition m_startup
+-MsgCondition m_wakeup
+}
+
+
+MsgThreadQueue "1" *-- "n" MsgThread : holds
+
+class MsgThreadQueue {
++MsgThreadQueue()
++~MsgThreadQueue()
++bool Run(MsgThread* t)
++bool RunFunction(std::function<void()> fn)
++void StopAll()
++MsgThread* FindByID(uint64_t id)
++bool empty()
++void foreach(std::function<void(MsgThread*)> fn)
+#bool add(MsgThread* t)
+#bool remove(MsgThread* t)
+#void Run()
+-std::recursive_mutex m_mutex
+-std::set<MsgThread*> m_trash
+}
+
+}
+@enduml

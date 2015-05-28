@@ -1,0 +1,8 @@
+#!/bin/sh
+export CC=i586-mingw32msvc-gcc
+export CXX=i586-mingw32msvc-g++
+
+./configure \
+	--host=i586-mingw32msvc \
+	--prefix=/usr/mingw32
+

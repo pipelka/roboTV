@@ -1,0 +1,27 @@
+@startuml
+
+(*) --> "open connection"
+--> [connection established] "start message handler" 
+
+"start message handler" --> ===B1===
+
+partition "Asynchronous Message Handling" {
+--> "wait for message from server"
+
+-left-> [message received] "handle message"
+-down-> [response] "handle response"
+--> "wait for message from server"
+
+"handle message" -up-> [notification] "handle notification"
+--> "wait for message from server"
+}
+--> [shutdown] ===B2===
+
+===B1=== --> "send messages to server"
+--> ===B2===
+
+--> "close connection"
+
+"close connection" --> (*)
+
+@enduml
