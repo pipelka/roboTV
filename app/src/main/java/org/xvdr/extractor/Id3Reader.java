@@ -43,7 +43,7 @@ import com.google.android.exoplayer.util.ParsableByteArray;
 	}
 
 	@Override
-	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe) {
+	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe, long durationUs) {
 		writingSample = true;
 		sampleTimeUs = pesTimeUs;
 		sampleSize = 0;

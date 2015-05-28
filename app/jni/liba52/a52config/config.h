@@ -115,7 +115,7 @@
 
 /* Define as `__inline' if that's what the C compiler calls it, or to nothing
    if it is not supported. */
-#define inline __attribute__ ((__always_inline__))
+//#define inline __attribute__ ((__always_inline__))
 
 /* Define as `__restrict' if that's what the C compiler calls it, or to
    nothing if it is not supported. */

@@ -48,7 +48,7 @@ import com.google.android.exoplayer.util.ParsableByteArray;
 	 * @param pesTimeUs The timestamp associated with the payload.
 	 * @param isKeyframe True if this frame is a key frame. False otherwise.
 	 */
-	public abstract void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe);
+	public abstract void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe, long durationUs);
 
 	/**
 	 * Invoked once all of the payload data for a packet has been passed to

@@ -12,11 +12,9 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.example.android.sampletvinput.setup.SetupUtils;
-
 import org.xvdr.msgexchange.Packet;
-import org.xvdr.tv.ChannelList;
-import org.xvdr.tv.ServerConnection;
+import org.xvdr.robotv.tv.ChannelList;
+import org.xvdr.robotv.tv.ServerConnection;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -90,11 +88,11 @@ public class ChannelSyncAdapter {
 		mInputId = inputId;
 	}
 
-	public void SetProgressCallback(ProgressCallback callback) {
+	public void setProgressCallback(ProgressCallback callback) {
 		mProgressCallback = callback;
 	}
 
-	public void SyncChannels(boolean removeExisting) {
+	public void syncChannels(boolean removeExisting) {
 		final SparseArray<Long> existingChannels = new SparseArray<>();
 		final ContentResolver resolver = mContext.getContentResolver();
 
@@ -190,7 +188,7 @@ public class ChannelSyncAdapter {
 		mCancelChannelSync = true;
 	}
 
-	public void SyncChannelIcons() {
+	public void syncChannelIcons() {
 		final SparseArray<Long> existingChannels = new SparseArray<>();
 
 		getExistingChannels(mContext, mInputId, existingChannels);
@@ -228,7 +226,7 @@ public class ChannelSyncAdapter {
 		});
 	}
 
-	public void SyncEPG() {
+	public void syncEPG() {
 		SparseArray<Long> existingChannels = new SparseArray<>();
 		getExistingChannels(mContext, mInputId, existingChannels);
 
@@ -240,7 +238,7 @@ public class ChannelSyncAdapter {
 		int size = existingChannels.size();
 
 		for(int i = 0; i < size; ++i) {
-			FetchEPGForChannel(existingChannels.keyAt(i), existingChannels.valueAt(i), programs);
+			fetchEPGForChannel(existingChannels.keyAt(i), existingChannels.valueAt(i), programs);
 		}
 
 		Log.i(TAG, "populating database with " + programs.size() + " entries ...");
@@ -276,7 +274,7 @@ public class ChannelSyncAdapter {
 		Log.i(TAG, "synced schedule for " + existingChannels.size() + " channels");
 	}
 
-	private void FetchEPGForChannel(int uid, long channelId, List<ContentValues> programs) {
+	private void fetchEPGForChannel(int uid, long channelId, List<ContentValues> programs) {
 		ContentResolver resolver = mContext.getContentResolver();
 		long duration = 60 * 60 * 24 * 2; // EPG duration to fetch (2 days)
 		long start = System.currentTimeMillis() / 1000;

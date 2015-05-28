@@ -40,7 +40,7 @@ import com.google.android.exoplayer.util.ParsableByteArray;
 	}
 
 	@Override
-	public void consume(ParsableByteArray seiBuffer, long pesTimeUs, boolean isKeyframe) {
+	public void consume(ParsableByteArray seiBuffer, long pesTimeUs, boolean isKeyframe, long durationUs) {
 		// Skip the NAL prefix and type.
 		seiBuffer.skipBytes(4);
 
