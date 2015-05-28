@@ -1,5 +1,7 @@
 package org.xvdr.tv;
 
+import android.media.tv.TvTrackInfo;
+import android.net.Uri;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -13,6 +15,7 @@ import org.xvdr.msgexchange.Packet;
  */
 public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 	static final String TAG = "StreamBundle";
+    Uri mChannelUri;
 
 	public class Stream {
 
@@ -36,25 +39,49 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 		int index;
 		public int physicalId;
 		public String type;
-		String content;
-		long identifier = -1;
-		String language;
-		int channels;
-		int sampleRate;
-		long blockAlign;
-		long bitRate;
-		long bitsPerSample;
-		long fpsScale;
-		long fpsRate;
+        public String content;
+        public long identifier = -1;
+		public String language;
+        public int channels;
+        public int sampleRate;
+        public long blockAlign;
+        public long bitRate;
+        public long bitsPerSample;
+        public long fpsScale;
+        public long fpsRate;
 		public int width;
 		public int height;
 		public double aspect;
 		boolean synced = false;
 
+        TvTrackInfo trackInfo;
+
 		public String getMimeType() {
 			return getMimeTypeFromType(type);
 		}
+
+        final public TvTrackInfo getTrackInfo() {
+            return trackInfo;
+        }
 	}
+
+    public StreamBundle(Uri channelUri) {
+        mChannelUri = channelUri;
+    }
+
+    public Uri getChannelUri() {
+        return mChannelUri;
+    }
+
+    public Stream getVideoStream() {
+        for(int i = 0; i < size(); i++) {
+            if(valueAt(i).content.equals(Stream.CONTENT_VIDEO)) {
+                return valueAt(i);
+            }
+        }
+
+        return  null;
+    }
 
 	private static String getContentFromType(String type) {
 		if(type.equals(Stream.TYPE_AUDIO_AC3)) {
@@ -139,6 +166,12 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 				stream.blockAlign = p.getU32();
 				stream.bitRate = p.getU32();
 				stream.bitsPerSample = p.getU32();
+
+                stream.trackInfo = new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, Integer.toString(stream.physicalId))
+                        .setAudioChannelCount(stream.channels)
+                        .setAudioSampleRate(stream.sampleRate)
+                        .setLanguage(stream.language)
+                        .build();
 			}
 			else if(stream.content == Stream.CONTENT_VIDEO) {
 				stream.fpsScale = p.getU32();
@@ -146,6 +179,12 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 				stream.height = (int) p.getU32();
 				stream.width = (int) p.getU32();
 				stream.aspect = (float)(p.getS64() / 10000.0);
+
+                stream.trackInfo = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, Integer.toString(stream.physicalId))
+                        .setVideoFrameRate(stream.fpsRate / stream.fpsScale)
+                        .setVideoWidth(stream.width)
+                        .setVideoHeight(stream.height)
+                        .build();
 			}
 			else if(stream.content == Stream.CONTENT_SUBTITLE) {
 				stream.language = p.getString();
