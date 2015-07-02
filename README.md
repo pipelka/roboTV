@@ -26,6 +26,10 @@ or use AndroidStudio
 - [x] Watching Live TV
 - [x] Channel Icons
 - [x] EPG
+- [x] H264 Video support
+- [x] decoding of AC3 streams
+- [ ] MPEG Audio support
+- [ ] Support for EAC3 audio streams
 - [ ] Schedule / Watch Recordings
 - [ ] Movie Database integration
 
