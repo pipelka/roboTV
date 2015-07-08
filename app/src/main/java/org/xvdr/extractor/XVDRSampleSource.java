@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * A {@link XVDRSampleSource} that extracts sample data from a {@link XVDRLiveExtractor}
  */
-public final class XVDRSampleSource implements SampleSource, ExtractorOutput {
+public final class XVDRSampleSource implements SampleSource, SampleSource.SampleSourceReader, ExtractorOutput {
     private static final String TAG = "XVDRSampleSource";
 
 	private static final int BUFFER_FRAGMENT_LENGTH = 1024 * 1024;
@@ -54,10 +54,8 @@ public final class XVDRSampleSource implements SampleSource, ExtractorOutput {
 
 	/**
 	 * @param extractor An {@link Extractor} to extract the media stream.
-	 * @param downstreamRendererCount Number of track renderers dependent on this sample source.
 	 */
-	public XVDRSampleSource(XVDRLiveExtractor extractor, int downstreamRendererCount) {
-		remainingReleaseCount = downstreamRendererCount;
+	public XVDRSampleSource(XVDRLiveExtractor extractor) {
 		sampleQueues = new SparseArray<>();
 		allocator = new DefaultAllocator(BUFFER_FRAGMENT_LENGTH);
 		pendingResetPositionUs = NO_RESET_PENDING;
@@ -66,6 +64,12 @@ public final class XVDRSampleSource implements SampleSource, ExtractorOutput {
         mExtractor = extractor;
         mExtractor.init(this);
 	}
+
+    @Override
+    public SampleSourceReader register() {
+        remainingReleaseCount++;
+        return this;
+    }
 
 	@Override
     synchronized public boolean prepare(long positionUs) throws IOException {

@@ -210,11 +210,17 @@ public class RoboTvInputService extends TvInputService {
             // remove callbacks
             mConnection.removeAllCallbacks();
 
+            if(mVideoRenderer != null) {
+                mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, null);
+                mPlayer.setRendererEnabled(0, false);
+                mPlayer.setRendererEnabled(1, false);
+            }
+
             // create extractor / samplesource
             mExtractor = new XVDRLiveExtractor();
             mExtractor.setCallback(this);
 
-            mSampleSource = new XVDRSampleSource(mExtractor, 2);
+            mSampleSource = new XVDRSampleSource(mExtractor);
 
             mConnection.addCallback(this);
             mConnection.addCallback(mExtractor);
@@ -311,12 +317,6 @@ public class RoboTvInputService extends TvInputService {
             if(mPlayer.getPlaybackState() == ExoPlayer.STATE_READY) {
                 mPlayer.stop();
                 mPlayer.seekTo(0);
-            }
-
-            if(mVideoRenderer != null) {
-                mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, null);
-                mPlayer.setRendererEnabled(0, false);
-                mPlayer.setRendererEnabled(1, false);
             }
 
             mVideoRenderer = new MediaCodecVideoTrackRenderer(
