@@ -1,12 +1,16 @@
 # roboTV
-Android TV frontend for XVDR
-
-## About
 
 roboTV is a Android TV based frontend for XVDR.
 Now you can use your Android TV Box (or your TV running Android) to stream LiveTV channels from your VDR backend (xvdr-plugin must be installed).
 
-##  Building
+## Screenshots
+
+<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv.jpg" width="200" />
+<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg.jpg" width="200" />
+<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg-genre.jpg" width="200" />
+<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/multiaudio.jpg" width="200" />
+
+## Building
 
 1. Build the ndk part:
 ```bash
@@ -21,13 +25,16 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 ```
 or use AndroidStudio
 
-## Features
+## Current Features
 
 - [x] Watching Live TV
 - [x] Channel Icons
 - [x] EPG
 - [x] H264 Video support
 - [x] decoding of AC3 streams
+
+# Planned Features
+
 - [ ] MPEG Audio support
 - [ ] Support for EAC3 audio streams
 - [ ] Schedule / Watch Recordings
