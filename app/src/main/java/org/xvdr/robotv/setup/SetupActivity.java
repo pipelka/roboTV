@@ -5,9 +5,12 @@ import android.media.tv.TvInputInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +26,8 @@ public class SetupActivity extends Activity implements ChannelSyncAdapter.Progre
     private ServerConnection mConnection;
     private ProgressBar mProgress;
     private TextView mTextImport;
-    private Button mButtonImport;
-    private Button mButtonCancel;
     private EditText mServer;
+    private Spinner mSpinner;
 
     private ChannelSyncAdapter channelSync;
 
@@ -39,7 +41,7 @@ public class SetupActivity extends Activity implements ChannelSyncAdapter.Progre
         mProgress = (ProgressBar) findViewById(R.id.progress);
         mTextImport = (TextView) findViewById(R.id.textImportChannels);
 
-        mButtonImport = (Button) findViewById(R.id.btnImport);
+        Button mButtonImport = (Button) findViewById(R.id.btnImport);
         mButtonImport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,7 +50,7 @@ public class SetupActivity extends Activity implements ChannelSyncAdapter.Progre
             }
         });
 
-        mButtonCancel = (Button) findViewById(R.id.btnCancel);
+        Button mButtonCancel = (Button) findViewById(R.id.btnCancel);
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,6 +60,33 @@ public class SetupActivity extends Activity implements ChannelSyncAdapter.Progre
 
         mServer = (EditText) findViewById(R.id.server);
         mServer.setText(SetupUtils.getServer(this));
+
+        final String[] isoCodeArray = getResources().getStringArray(R.array.iso639_code1);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.languages_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        mSpinner = (Spinner) findViewById(R.id.language);
+        mSpinner.setAdapter(adapter);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                SetupUtils.setLanguage(SetupActivity.this, isoCodeArray[i]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        // set current language
+        mSpinner.post(new Runnable() {
+            @Override
+            public void run() {
+                mSpinner.setSelection(SetupUtils.getLanguageIndex(SetupActivity.this));
+            }
+        });
 
         Log.i(TAG, "creating XVDR connection ...");
         mConnection = new ServerConnection("AndroidTV Settings");

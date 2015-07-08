@@ -155,7 +155,7 @@ public class RoboTvInputService extends TvInputService {
 
             // create live tv connection
             if(mConnection == null) {
-                mConnection = new ServerConnection("Android TVInputService");
+                mConnection = new ServerConnection("Android TVInputService", SetupUtils.getLanguageISO3(mContext));
                 if(!mConnection.open(SetupUtils.getServer(mContext))) {
                     mConnection = null;
                     return false;

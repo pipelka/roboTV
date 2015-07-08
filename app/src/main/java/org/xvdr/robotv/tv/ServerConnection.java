@@ -74,7 +74,12 @@ public class ServerConnection extends Session {
 		mSessionName = sessionname;
 	}
 
-	public boolean open(String hostname) {
+    public ServerConnection(String sessionname, String language) {
+        mSessionName = sessionname;
+        mLanguage = language;
+    }
+
+    public boolean open(String hostname) {
 		if(!super.open(hostname, 34891)) {
 			Log.e(TAG, "failed to open server connection");
 			return false;
