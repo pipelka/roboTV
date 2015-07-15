@@ -10,6 +10,12 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 <img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg-genre.jpg" width="200" />
 <img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/multiaudio.jpg" width="200" />
 
+## System requirements
+
+* Android TV 5.1 (API Level 22)
+
+The Google Nexus Player is used for development.
+
 ## Building
 
 1. Build the ndk part:
@@ -25,7 +31,7 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 ```
 or use AndroidStudio
 
-## Current Features
+# Current Features
 
 - [x] Watching Live TV
 - [x] Channel Icons
