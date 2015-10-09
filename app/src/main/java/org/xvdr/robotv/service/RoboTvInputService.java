@@ -34,18 +34,17 @@ import org.xvdr.robotv.tv.StreamBundle;
 import java.util.List;
 
 public class RoboTvInputService extends TvInputService {
+    static final String TAG = "RoboTvInputService";
 
     @Override
     public void onCreate() {
         super.onCreate();
-        setTheme(android.R.style.Theme_Holo_Light_NoActionBar);
+        setTheme(android.R.style.Theme_DeviceDefault);
     }
 
     @Override
     public final Session onCreateSession(String inputId) {
         Session session = new SimpleSessionImpl(this, inputId);
-        session.setOverlayViewEnabled(true);
-
         return session;
     }
 
@@ -75,7 +74,6 @@ public class RoboTvInputService extends TvInputService {
         private XVDRSampleSource mSampleSource;
 
         private Uri mCurrentChannelUri;
-        private ProgressBar mTuningProgress;
         private String mInputId;
 
         ServerConnection mConnection = null;
@@ -106,6 +104,7 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onSetSurface(Surface surface) {
+            Log.d(TAG, "onSetSurface()");
             mSurface = surface;
 
             if(mPlayer == null) {
@@ -115,30 +114,6 @@ public class RoboTvInputService extends TvInputService {
             mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);
 
             return true;
-        }
-
-        @Override
-        public View onCreateOverlayView() {
-            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.overlayview, null);
-
-            //mVideoView720p = (TextureView) view.findViewById(R.id.videoView720p);
-            //mSurface720p = new Surface(mVideoView720p.getSurfaceTexture());
-
-            mTuningProgress = (ProgressBar) view.findViewById(R.id.tuning);
-
-            //mSubtitleView = (SubtitleView) view.findViewById(R.id.subtitles);
-
-            // Configure the subtitle view.
-            /*CaptionStyleCompat captionStyle;
-            float captionTextSize = getCaptionFontSize();
-            captionStyle = CaptionStyleCompat.createFromCaptionStyle(
-                    mCaptioningManager.getUserStyle());
-            captionTextSize *= mCaptioningManager.getFontScale();
-            mSubtitleView.setStyle(captionStyle);
-            mSubtitleView.setTextSize(captionTextSize);*/
-
-            return view;
         }
 
         @Override
@@ -156,29 +131,11 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onTune(final Uri channelUri) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mTuningProgress.setVisibility(View.VISIBLE);
-                }
-            });
+            Log.i(TAG, "onTune: " + channelUri);
 
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    tuneChannel(channelUri);
-                }
-            });
-
-            return true;
-        }
-
-        private synchronized boolean tuneChannel(Uri channelUri) {
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
             String[] projection = {TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID};
             int uid = 0;
-
-            Log.i(TAG, "onTune: " + channelUri);
 
             Cursor cursor = null;
             try {
@@ -346,13 +303,7 @@ public class RoboTvInputService extends TvInputService {
         public void onPlayerStateChanged(boolean b, int i) {
             Log.i(TAG, "onPlayerStateChanged " + b + " " + i);
             if(b && i == 4) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        notifyVideoAvailable();
-                        mTuningProgress.setVisibility(View.GONE);
-                    }
-                });
+                notifyVideoAvailable();
             }
         }
 
@@ -408,7 +359,7 @@ public class RoboTvInputService extends TvInputService {
                 @Override
                 public void run() {
                     mConnection.login();
-                    tuneChannel(mCurrentChannelUri);
+                    onTune(mCurrentChannelUri);
                 }
             });
         }
@@ -488,8 +439,8 @@ public class RoboTvInputService extends TvInputService {
         }
 
         @Override
-        public void onVideoSizeChanged(int i, int i1, float v) {
-
+        public void onVideoSizeChanged(int i, int i1, int i2, float v) {
+            Log.i(TAG, "onVideoSizeChanged" + i + " " + i1 + " " + i2 + " " + v);
         }
 
         @Override

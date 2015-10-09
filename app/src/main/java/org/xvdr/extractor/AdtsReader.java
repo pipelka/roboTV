@@ -32,7 +32,16 @@ final class AdtsReader extends ElementaryStreamReader {
 	@Override
 	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe, long durationUs) {
         if(!hasOutputFormat) {
-            output.format(MediaFormat.createAudioFormat(MimeTypes.AUDIO_AAC, -1, channels, sampleRate, null));
+            output.format(MediaFormat.createAudioFormat(
+                    MediaFormat.NO_VALUE, // < trackId
+                    MimeTypes.AUDIO_AAC,
+                    MediaFormat.NO_VALUE, // << bitrate
+                    MediaFormat.NO_VALUE,
+                    MediaFormat.NO_VALUE, // < duration
+                    channels,
+                    sampleRate,
+                    null,
+                    null)); // < language
             hasOutputFormat = true;
         }
 

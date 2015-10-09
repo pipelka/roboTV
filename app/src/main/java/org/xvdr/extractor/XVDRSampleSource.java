@@ -5,7 +5,6 @@ import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
 import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.SampleSource;
-import com.google.android.exoplayer.TrackInfo;
 import com.google.android.exoplayer.drm.DrmInitData;
 import com.google.android.exoplayer.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer.extractor.Extractor;
@@ -39,8 +38,6 @@ public final class XVDRSampleSource implements SampleSource, SampleSource.Sample
 
 	private boolean prepared;
 	private int enabledTrackCount;
-	private TrackInfo[] trackInfos;
-	private long maxTrackDurationUs;
 	private boolean[] pendingMediaFormat;
 	private boolean[] pendingDiscontinuities;
 	private boolean[] trackEnabledStates;
@@ -71,40 +68,29 @@ public final class XVDRSampleSource implements SampleSource, SampleSource.Sample
         return this;
     }
 
-	@Override
-    synchronized public boolean prepare(long positionUs) throws IOException {
+    @Override
+    public void maybeThrowError() throws IOException {
+
+    }
+
+    @Override
+    synchronized public boolean prepare(long positionUs) {
 		if(prepared) {
 			return true;
 		}
 
-		continueBufferingInternal();
+        continueBufferingInternal();
 
-		// TODO: Support non-seekable content? Or at least avoid getting stuck here if a seekMap doesn't
-		// arrive (we may end up filling the sample buffers whilst we're still not prepared, and then
-		// getting stuck).
 		if(seekMap != null && tracksBuilt && haveFormatsForAllTracks()) {
 			int trackCount = sampleQueues.size();
 			trackEnabledStates = new boolean[trackCount];
 			pendingDiscontinuities = new boolean[trackCount];
 			pendingMediaFormat = new boolean[trackCount];
-			trackInfos = new TrackInfo[trackCount];
-			maxTrackDurationUs = C.UNKNOWN_TIME_US;
-
-			for(int i = 0; i < trackCount; i++) {
-				MediaFormat format = sampleQueues.valueAt(i).getFormat();
-				trackInfos[i] = new TrackInfo(format.mimeType, format.durationUs);
-
-				if(format.durationUs != C.UNKNOWN_TIME_US && format.durationUs > maxTrackDurationUs) {
-					maxTrackDurationUs = format.durationUs;
-				}
-			}
-
 			prepared = true;
 			return true;
 		}
-		else {
-			return false;
-		}
+
+        return false;
 	}
 
 	@Override
@@ -112,12 +98,10 @@ public final class XVDRSampleSource implements SampleSource, SampleSource.Sample
 		return sampleQueues.size();
 	}
 
-	@Override
-	public TrackInfo getTrackInfo(int track) {
-		Assertions.checkState(prepared);
-		return trackInfos[track];
-	}
-
+    @Override
+    public MediaFormat getFormat(int i) {
+        return sampleQueues.valueAt(i).getFormat();
+    }
 
     synchronized public String selectAudioTrack(String id) {
         Log.d(TAG, "selectAudioTrack: " + id);
@@ -149,7 +133,7 @@ public final class XVDRSampleSource implements SampleSource, SampleSource.Sample
 		}
 	}
 
-	@Override
+    @Override
 	public void disable(int track) {
 		Assertions.checkState(prepared);
 		Assertions.checkState(trackEnabledStates[track]);
@@ -164,7 +148,7 @@ public final class XVDRSampleSource implements SampleSource, SampleSource.Sample
 	}
 
 	@Override
-	public boolean continueBuffering(long playbackPositionUs) throws IOException {
+	public boolean continueBuffering(int var1, long playbackPositionUs)  {
 		Assertions.checkState(prepared);
 		Assertions.checkState(enabledTrackCount > 0);
 		downstreamPositionUs = playbackPositionUs;
@@ -174,7 +158,7 @@ public final class XVDRSampleSource implements SampleSource, SampleSource.Sample
 
 	@Override
     synchronized public int readData(int track, long playbackPositionUs, MediaFormatHolder formatHolder,
-	                    SampleHolder sampleHolder, boolean onlyReadDiscontinuity) throws IOException {
+	                    SampleHolder sampleHolder, boolean onlyReadDiscontinuity)  {
 		downstreamPositionUs = playbackPositionUs;
 
 		if(pendingDiscontinuities[track]) {
@@ -295,7 +279,7 @@ public final class XVDRSampleSource implements SampleSource, SampleSource.Sample
 
 	// Internal stuff.
 
-	private boolean continueBufferingInternal() throws IOException {
+	private boolean continueBufferingInternal() {
 		if(isPendingReset()) {
 			return false;
 		}
@@ -345,12 +329,4 @@ public final class XVDRSampleSource implements SampleSource, SampleSource.Sample
 	private boolean isPendingReset() {
 		return pendingResetPositionUs != NO_RESET_PENDING;
 	}
-
-	private long getRetryDelayMillis(long errorCount) {
-		return Math.min((errorCount - 1) * 1000, 5000);
-	}
-
-    public boolean isPrepared() {
-        return prepared;
-    }
 }

@@ -89,6 +89,7 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
     public void setChannelUri(Uri channelUri) {
         mChannelUri = channelUri;
     }
+
 	// Extractor implementation.
 
 	@Override
@@ -97,7 +98,12 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
 		output.seekMap(this);
 	}
 
-	@Override
+    @Override
+    public boolean sniff(ExtractorInput extractorInput) throws IOException, InterruptedException {
+        return true;
+    }
+
+    @Override
     synchronized public void seek() {
 		timestampOffsetUs = 0;
 		lastPts = Long.MIN_VALUE;
@@ -140,27 +146,12 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
 	 */
 	/* package */ long ptsToTimeUs(long pts) {
 		long timeUs = pts;
-		/*pts = (timeUs * 90000) / C.MICROS_PER_SECOND;
 
-		if(lastPts != Long.MIN_VALUE) {
-			// The wrap count for the current PTS may be closestWrapCount or (closestWrapCount - 1),
-			// and we need to snap to the one closest to lastPts.
-			long closestWrapCount = (lastPts + (MAX_PTS / 2)) / MAX_PTS;
-			long ptsWrapBelow = pts + (MAX_PTS * (closestWrapCount - 1));
-			long ptsWrapAbove = pts + (MAX_PTS * closestWrapCount);
-			pts = Math.abs(ptsWrapBelow - lastPts) < Math.abs(ptsWrapAbove - lastPts)
-			      ? ptsWrapBelow : ptsWrapAbove;
-		}
-
-		// Calculate the corresponding timestamp.
-		timeUs = (pts * C.MICROS_PER_SECOND) / 90000;*/
-
-		// If we haven't done the initial timestamp adjustment, do it now.
+		// initial timestamp adjustment
 		if(lastPts == Long.MIN_VALUE) {
 			timestampOffsetUs = firstSampleTimestampUs - timeUs;
 		}
 
-		// Record the adjusted PTS to adjust for wraparound next time.
 		lastPts = pts;
 		return timeUs + timestampOffsetUs;
 	}
@@ -381,11 +372,9 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
 
 	@Override
 	public void onDisconnect() {
-
 	}
 
 	@Override
 	public void onReconnect() {
-
 	}
 }

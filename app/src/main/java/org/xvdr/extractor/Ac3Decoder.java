@@ -42,7 +42,16 @@ final class Ac3Decoder extends ElementaryStreamReader {
         }
 
         if(!hasOutputFormat) {
-            MediaFormat format = MediaFormat.createAudioFormat(MimeTypes.AUDIO_RAW, -1, durationUs, channels, sampleRate, null);
+            MediaFormat format = MediaFormat.createAudioFormat(
+                    MediaFormat.NO_VALUE, // < trackId
+                    MimeTypes.AUDIO_RAW,
+                    MediaFormat.NO_VALUE,
+                    MediaFormat.NO_VALUE,
+                    durationUs,
+                    channels,
+                    sampleRate,
+                    null,
+                    null); // < language
             output.format(format);
             hasOutputFormat = true;
         }

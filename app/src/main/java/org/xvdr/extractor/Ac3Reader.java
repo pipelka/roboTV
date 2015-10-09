@@ -27,7 +27,7 @@ final class Ac3Reader extends ElementaryStreamReader {
 	@Override
 	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe, long durationUs) {
         if(!hasOutputFormat) {
-            output.format(Ac3Util.parseFrameAc3Format(new ParsableBitArray(data.data)));
+            output.format(Ac3Util.parseFrameAc3Format(new ParsableBitArray(data.data), MediaFormat.NO_VALUE, C.UNKNOWN_TIME_US, null));
             hasOutputFormat = true;
         }
 
