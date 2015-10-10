@@ -57,8 +57,8 @@ public class RoboTvInputService extends TvInputService {
     private class SimpleSessionImpl extends TvInputService.Session implements ExoPlayer.Listener, org.xvdr.msgexchange.Session.Callback, LiveTvExtractor.Callback, MediaCodecVideoTrackRenderer.EventListener {
         static final String TAG = "TVSession";
         private static final int RENDERER_COUNT = 2;
-        private static final int MIN_BUFFER_MS = 200;
-        private static final int MIN_REBUFFER_MS = 1500;
+        private static final int MIN_BUFFER_MS = 1000;
+        private static final int MIN_REBUFFER_MS = 2000;
 
         private android.os.Handler mHandler;
 
@@ -167,8 +167,6 @@ public class RoboTvInputService extends TvInputService {
 
             if(mVideoRenderer != null) {
                 mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, null);
-                mPlayer.setRendererEnabled(0, false);
-                mPlayer.setRendererEnabled(1, false);
             }
 
             // create extractor / samplesource
@@ -238,13 +236,13 @@ public class RoboTvInputService extends TvInputService {
             }
 
             mPlayer.setPlayWhenReady(false);
-            mPlayer.setRendererEnabled(1, false);
+            mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DISABLED);
 
             String audioTrackId = selectAudioTrack(trackId);
 
             Log.d(TAG, "new audio track: " + audioTrackId);
 
-            mPlayer.setRendererEnabled(1, true);
+            mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DEFAULT);
             mPlayer.setPlayWhenReady(true);
 
             notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, audioTrackId);
@@ -295,8 +293,8 @@ public class RoboTvInputService extends TvInputService {
 
             mPlayer.prepare(mVideoRenderer, mAudioRenderer);
 
-            mPlayer.setRendererEnabled(0, true);
-            mPlayer.setRendererEnabled(1, true);
+            mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DEFAULT);
+            mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DEFAULT);
 
             mPlayer.setPlayWhenReady(true);
             return true;
@@ -447,8 +445,8 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onVideoTrackChanged() {
             mPlayer.setPlayWhenReady(false);
-            mPlayer.setRendererEnabled(0, false);
-            mPlayer.setRendererEnabled(0, true);
+            mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DISABLED);
+            mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DEFAULT);
             mPlayer.setPlayWhenReady(true);
         }
 
