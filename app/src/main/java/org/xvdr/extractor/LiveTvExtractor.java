@@ -7,6 +7,8 @@ import com.google.android.exoplayer.extractor.ExtractorInput;
 import com.google.android.exoplayer.extractor.ExtractorOutput;
 import com.google.android.exoplayer.extractor.PositionHolder;
 import com.google.android.exoplayer.extractor.SeekMap;
+import com.google.android.exoplayer.upstream.DataSource;
+import com.google.android.exoplayer.upstream.DataSpec;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.ParsableByteArray;
 
@@ -28,7 +30,7 @@ import org.xvdr.robotv.tv.StreamBundle;
 /**
  * Facilitates the extraction of stream data from the XVDR connection
  */
-public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Callback {
+public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callback {
 
     public interface Callback {
 
@@ -40,7 +42,7 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
 
     }
 
-	private static final String TAG = "XVDRLiveExtractor";
+	private static final String TAG = "LiveTvExtractor";
 
 	private static final int TS_STREAM_TYPE_AAC = 0x0F;
 	private static final int TS_STREAM_TYPE_ATSC_AC3 = 0x81;
@@ -69,11 +71,11 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
     Callback mCallback = null;
     Uri mChannelUri;
 
-	public XVDRLiveExtractor() {
+	public LiveTvExtractor() {
 		this(0, null);
 	}
 
-	public XVDRLiveExtractor(long firstSampleTimestampUs, AudioCapabilities audioCapabilities) {
+	public LiveTvExtractor(long firstSampleTimestampUs, AudioCapabilities audioCapabilities) {
 		this.firstSampleTimestampUs = firstSampleTimestampUs;
 		streamTypes = new SparseBooleanArray();
 		allowedPassthroughStreamTypes = getPassthroughStreamTypes(audioCapabilities);
@@ -138,22 +140,15 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
 
 	// Internals.
 
-	/**
-	 * Adjusts a PTS value to the corresponding time in microseconds, accounting for PTS wraparound.
-	 *
-	 * @param pts The raw PTS value.
-	 * @return The corresponding time in microseconds.
-	 */
-	/* package */ long ptsToTimeUs(long pts) {
-		long timeUs = pts;
+	long ptsToTimeUs(long pts) {
 
 		// initial timestamp adjustment
 		if(lastPts == Long.MIN_VALUE) {
-			timestampOffsetUs = firstSampleTimestampUs - timeUs;
+			timestampOffsetUs = firstSampleTimestampUs - pts;
 		}
 
 		lastPts = pts;
-		return timeUs + timestampOffsetUs;
+		return pts + timestampOffsetUs;
 	}
 
 	/**
@@ -214,11 +209,7 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
             return false;
         }
 
-        if(previousAudioStream.equals(mBundle.get(currentAudioPid))) {
-            return false;
-        }
-
-        return true;
+        return !previousAudioStream.equals(mBundle.get(currentAudioPid));
     }
 
     private boolean checkVideoTrackChanged() {
@@ -230,11 +221,8 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
         StreamBundle.Stream previous = mPreviousBundle.getVideoStream();
         StreamBundle.Stream current = mBundle.getVideoStream();
 
-        if(current.equals(previous)) {
-            return false;
-        }
+        return !current.equals(previous);
 
-        return true;
     }
 
     synchronized void createStreamReaders(Packet p) {
@@ -307,7 +295,7 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
                 return;
             }
 
-            if(stream.content == StreamBundle.CONTENT_AUDIO && currentAudioPid == 0) {
+            if(stream.content == StreamBundle.CONTENT_AUDIO) {
                 currentAudioPid = stream.physicalId;
             }
 
@@ -345,7 +333,7 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
 		}
 
 		// read pid of packet
-		int pid = (int) notification.getU16();
+		int pid = notification.getU16();
 		ElementaryStreamReader reader = streamReaders.get(pid);
 
 		if(reader == null) {
@@ -377,4 +365,22 @@ public final class XVDRLiveExtractor implements Extractor, SeekMap, Session.Call
 	@Override
 	public void onReconnect() {
 	}
+
+    public DataSource dataSource() {
+        return new DataSource() {
+            @Override
+            public long open(DataSpec dataSpec) throws IOException {
+                return 0;
+            }
+
+            @Override
+            public void close() throws IOException {
+            }
+
+            @Override
+            public int read(byte[] bytes, int i, int i1) throws IOException {
+                return 0;
+            }
+        };
+    }
 }

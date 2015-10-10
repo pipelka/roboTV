@@ -11,22 +11,20 @@ import android.media.tv.TvTrackInfo;
 import android.net.Uri;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Surface;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.xvdr.robotv.R;
+import org.xvdr.extractor.LiveTvExtractor;
 import org.xvdr.robotv.setup.SetupUtils;
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.SampleSource;
+import com.google.android.exoplayer.extractor.ExtractorSampleSource;
+import com.google.android.exoplayer.upstream.DefaultAllocator;
 
-import org.xvdr.extractor.XVDRLiveExtractor;
-import org.xvdr.extractor.XVDRSampleSource;
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.tv.ServerConnection;
 import org.xvdr.robotv.tv.StreamBundle;
@@ -56,7 +54,7 @@ public class RoboTvInputService extends TvInputService {
     /**
      * Simple session implementation which plays local videos on the application's tune request.
      */
-    private class SimpleSessionImpl extends TvInputService.Session implements ExoPlayer.Listener, org.xvdr.msgexchange.Session.Callback, XVDRLiveExtractor.Callback, MediaCodecVideoTrackRenderer.EventListener {
+    private class SimpleSessionImpl extends TvInputService.Session implements ExoPlayer.Listener, org.xvdr.msgexchange.Session.Callback, LiveTvExtractor.Callback, MediaCodecVideoTrackRenderer.EventListener {
         static final String TAG = "TVSession";
         private static final int RENDERER_COUNT = 2;
         private static final int MIN_BUFFER_MS = 200;
@@ -70,8 +68,8 @@ public class RoboTvInputService extends TvInputService {
 
         private Surface mSurface;
 
-        private XVDRLiveExtractor mExtractor;
-        private XVDRSampleSource mSampleSource;
+        private LiveTvExtractor mExtractor;
+        private SampleSource mSampleSource;
 
         private Uri mCurrentChannelUri;
         private String mInputId;
@@ -174,10 +172,15 @@ public class RoboTvInputService extends TvInputService {
             }
 
             // create extractor / samplesource
-            mExtractor = new XVDRLiveExtractor();
+            mExtractor = new LiveTvExtractor();
             mExtractor.setCallback(this);
 
-            mSampleSource = new XVDRSampleSource(mExtractor);
+            mSampleSource = new ExtractorSampleSource(
+                    channelUri,
+                    mExtractor.dataSource(), // this is just a dummy data source
+                    new DefaultAllocator(512), // dummy allocator
+                    0, // the data source doesn't read any data
+                    mExtractor);
 
             mConnection.addCallback(this);
             mConnection.addCallback(mExtractor);
@@ -237,7 +240,7 @@ public class RoboTvInputService extends TvInputService {
             mPlayer.setPlayWhenReady(false);
             mPlayer.setRendererEnabled(1, false);
 
-            String audioTrackId = mSampleSource.selectAudioTrack(trackId);
+            String audioTrackId = selectAudioTrack(trackId);
 
             Log.d(TAG, "new audio track: " + audioTrackId);
 
@@ -372,6 +375,23 @@ public class RoboTvInputService extends TvInputService {
                     Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+
+        private String selectAudioTrack(String id) {
+            Log.d(TAG, "selectAudioTrack: " + id);
+            String currentAudioTrackId = mExtractor.getCurrentAudioTrackId();
+
+            if(currentAudioTrackId.equals(id)) {
+                return currentAudioTrackId;
+            }
+
+            String newAudioTrack = mExtractor.selectAudioTrack(id);
+            if(newAudioTrack.equals(currentAudioTrackId)) {
+                return currentAudioTrackId;
+            }
+
+            //sampleQueues.remove(Integer.parseInt(currentAudioTrackId));
+            return newAudioTrack;
         }
 
         // XVDRExtractor.Callback implementation
