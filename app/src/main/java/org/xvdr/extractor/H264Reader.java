@@ -18,22 +18,11 @@ final class H264Reader extends ElementaryStreamReader {
 	private static final String TAG = "H264Reader";
 
     private boolean hasOutputFormat;
-
-	// Mediaformat
-	private int frameWidth;
-	private int frameHeight;
-	private float pixelAspectRatio;
+    private StreamBundle.Stream mStream;
 
 	public H264Reader(TrackOutput output, StreamBundle.Stream stream) {
         super(output);
-		frameWidth = stream.width;
-		frameHeight = stream.height;
-
-		// XVDR sends the picture aspect ratio
-		// we have to convert it to the pixel aspect ratio
-        double value = (stream.aspect * frameHeight) / (double)frameWidth;
-        pixelAspectRatio = (float)Math.round(value * 1000) / 1000;
-
+        mStream = stream;
 	}
 
 	@Override
@@ -43,20 +32,26 @@ final class H264Reader extends ElementaryStreamReader {
 	@Override
     public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe, long durationUs) {
         if(!hasOutputFormat && isKeyframe) {
+
+            // XVDR sends the picture aspect ratio
+            // we have to convert it to the pixel aspect ratio
+            double value = (mStream.aspect * mStream.height) / (double)mStream.width;
+            float pixelAspectRatio = (float)Math.round(value * 1000) / 1000;
+
             output.format(MediaFormat.createVideoFormat(
-                    MediaFormat.NO_VALUE, // << trackId
+                    mStream.physicalId, // << trackId
                     MimeTypes.VIDEO_H264,
                     MediaFormat.NO_VALUE,
                     MediaFormat.NO_VALUE,
                     durationUs,
-                    frameWidth,
-                    frameHeight,
+                    mStream.width,
+                    mStream.height,
                     null/*decoderInitData*/,
                     MediaFormat.NO_VALUE,
                     pixelAspectRatio));
 
             hasOutputFormat = true;
-            Log.i(TAG, "MediaFormat: " + frameWidth + "x" + frameHeight + " aspect: " + pixelAspectRatio);
+            Log.i(TAG, "MediaFormat: " + mStream.width + "x" + mStream.height + " aspect: " + pixelAspectRatio);
         }
 
         while(data.bytesLeft() > 0) {

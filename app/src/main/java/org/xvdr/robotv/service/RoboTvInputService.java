@@ -390,7 +390,6 @@ public class RoboTvInputService extends TvInputService {
                 return currentAudioTrackId;
             }
 
-            //sampleQueues.remove(Integer.parseInt(currentAudioTrackId));
             return newAudioTrack;
         }
 

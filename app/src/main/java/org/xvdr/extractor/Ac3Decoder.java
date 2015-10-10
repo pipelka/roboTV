@@ -9,6 +9,7 @@ import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.ParsableByteArray;
 
 import org.xvdr.audio.AC3DecoderNative;
+import org.xvdr.robotv.tv.StreamBundle;
 
 final class Ac3Decoder extends ElementaryStreamReader {
 
@@ -16,11 +17,13 @@ final class Ac3Decoder extends ElementaryStreamReader {
 
     boolean hasOutputFormat = false;
 
+    StreamBundle.Stream mStream;
     AC3DecoderNative mDecoder;
 
-    public Ac3Decoder(TrackOutput output) {
+    public Ac3Decoder(TrackOutput output, StreamBundle.Stream stream) {
         super(output);
         mDecoder = new AC3DecoderNative(AC3DecoderNative.layoutStereo);
+        mStream = stream;
     }
 
     @Override
@@ -43,15 +46,15 @@ final class Ac3Decoder extends ElementaryStreamReader {
 
         if(!hasOutputFormat) {
             MediaFormat format = MediaFormat.createAudioFormat(
-                    MediaFormat.NO_VALUE, // < trackId
+                    mStream.physicalId, // < trackId
                     MimeTypes.AUDIO_RAW,
-                    MediaFormat.NO_VALUE,
+                    mStream.bitRate,
                     MediaFormat.NO_VALUE,
                     durationUs,
                     channels,
                     sampleRate,
                     null,
-                    null); // < language
+                    mStream.language);
             output.format(format);
             hasOutputFormat = true;
         }

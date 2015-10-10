@@ -281,10 +281,10 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 
 			case MimeTypes.AUDIO_AC3:
 				if(allowedPassthroughStreamTypes.get(TS_STREAM_TYPE_ATSC_AC3)) {
-					reader = new Ac3Reader(output.track(TS_STREAM_TYPE_ATSC_AC3));
+					reader = new Ac3Reader(output.track(TS_STREAM_TYPE_ATSC_AC3), stream);
 				}
 				else {
-					reader = new Ac3Decoder(output.track(TS_STREAM_TYPE_ATSC_AC3));
+					reader = new Ac3Decoder(output.track(TS_STREAM_TYPE_ATSC_AC3), stream);
 				}
 				streamTypes.put(TS_STREAM_TYPE_ATSC_AC3, true);
 				break;

@@ -15,14 +15,11 @@ final class AdtsReader extends ElementaryStreamReader {
 
 	private boolean hasOutputFormat;
 
-    private int sampleRate;
-
-    private int channels;
+    private StreamBundle.Stream mStream;
 
 	public AdtsReader(TrackOutput output, StreamBundle.Stream stream) {
 		super(output);
-        sampleRate = stream.sampleRate;
-        channels = stream.channels;
+        mStream = stream;
 	}
 
 	@Override
@@ -35,13 +32,13 @@ final class AdtsReader extends ElementaryStreamReader {
             output.format(MediaFormat.createAudioFormat(
                     MediaFormat.NO_VALUE, // < trackId
                     MimeTypes.AUDIO_AAC,
-                    MediaFormat.NO_VALUE, // << bitrate
+                    mStream.bitRate,
                     MediaFormat.NO_VALUE,
                     MediaFormat.NO_VALUE, // < duration
-                    channels,
-                    sampleRate,
+                    mStream.channels,
+                    mStream.sampleRate,
                     null,
-                    null)); // < language
+                    mStream.language));
             hasOutputFormat = true;
         }
 

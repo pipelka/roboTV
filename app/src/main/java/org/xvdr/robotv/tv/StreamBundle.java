@@ -81,13 +81,13 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
         public int channels;
         public int sampleRate;
         public long blockAlign;
-        public long bitRate;
+        public int bitRate;
         public long bitsPerSample;
         public long fpsScale;
         public long fpsRate;
 		public int width;
 		public int height;
-		public double aspect;
+		public float aspect;
 
 		public String getMimeType() {
 			return getMimeTypeFromType(type);
@@ -210,7 +210,7 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 				stream.channels = (int) p.getU32();
 				stream.sampleRate = (int) p.getU32();
 				stream.blockAlign = p.getU32();
-				stream.bitRate = p.getU32();
+				stream.bitRate = (int)p.getU32();
 				stream.bitsPerSample = p.getU32();
 			}
 			else if(stream.content == CONTENT_VIDEO) {
