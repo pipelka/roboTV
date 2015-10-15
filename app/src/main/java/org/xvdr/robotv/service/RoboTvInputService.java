@@ -82,6 +82,9 @@ public class RoboTvInputService extends TvInputService {
             mContext = context;
             mHandler = new android.os.Handler();
             mInputId = inputId;
+
+            mPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT, MIN_BUFFER_MS, MIN_REBUFFER_MS);
+            mPlayer.addListener(this);
         }
 
         @Override
@@ -93,9 +96,11 @@ public class RoboTvInputService extends TvInputService {
                 mPlayer = null;
             }
 
-            mConnection.close();
+            if(mConnection != null) {
+                mConnection.close();
+                mConnection = null;
+            }
 
-            mConnection = null;
             mVideoRenderer = null;
             mAudioRenderer = null;
         }
@@ -129,6 +134,19 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onTune(final Uri channelUri) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if(tune(channelUri)) {
+                        startPlayback();
+                    }
+                }
+            });
+
+            return true;
+        }
+
+        synchronized boolean tune(Uri channelUri) {
             Log.i(TAG, "onTune: " + channelUri);
 
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
@@ -140,7 +158,7 @@ public class RoboTvInputService extends TvInputService {
                 cursor = getContentResolver().query(channelUri, projection, null, null, null);
                 if (cursor == null || cursor.getCount() == 0) {
                     toastNotification("channel not found.");
-                    return true;
+                    return false;
                 }
                 cursor.moveToNext();
                 uid = cursor.getInt(0);
@@ -164,10 +182,6 @@ public class RoboTvInputService extends TvInputService {
 
             // remove callbacks
             mConnection.removeAllCallbacks();
-
-            if(mVideoRenderer != null) {
-                mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, null);
-            }
 
             // create extractor / samplesource
             mExtractor = new LiveTvExtractor();
@@ -194,7 +208,7 @@ public class RoboTvInputService extends TvInputService {
             Packet resp = mConnection.transmitMessage(req);
             if(resp == null) {
                 toastNotification("unable to tune channel (no response from server)");
-                return true;
+                return false;
             }
 
             long status = resp.getU32();
@@ -204,10 +218,9 @@ public class RoboTvInputService extends TvInputService {
             }
             else {
                 toastNotification("failed to tune channel (status: " + status + ")");
-                return true;
+                return false;
             }
 
-            startPlayback();
             return true;
         }
 
@@ -267,11 +280,6 @@ public class RoboTvInputService extends TvInputService {
         }
 
         private synchronized boolean startPlayback() {
-            if (mPlayer == null) {
-                mPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT, MIN_BUFFER_MS, MIN_REBUFFER_MS);
-                mPlayer.addListener(this);
-            }
-
             if(mPlayer.getPlaybackState() == ExoPlayer.STATE_READY) {
                 mPlayer.stop();
                 mPlayer.seekTo(0);
@@ -281,7 +289,7 @@ public class RoboTvInputService extends TvInputService {
                     mSampleSource,
                     MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING,
                     50,
-                    null,
+                    mHandler,
                     this,
                     20);
 
