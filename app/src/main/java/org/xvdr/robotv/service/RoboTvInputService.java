@@ -42,7 +42,7 @@ public class RoboTvInputService extends TvInputService {
 
     @Override
     public final Session onCreateSession(String inputId) {
-        Session session = new SimpleSessionImpl(this, inputId);
+        Session session = new RoboTvSession(this, inputId);
         return session;
     }
 
@@ -54,7 +54,7 @@ public class RoboTvInputService extends TvInputService {
     /**
      * Simple session implementation which plays local videos on the application's tune request.
      */
-    private class SimpleSessionImpl extends TvInputService.Session implements ExoPlayer.Listener, org.xvdr.msgexchange.Session.Callback, LiveTvExtractor.Callback, MediaCodecVideoTrackRenderer.EventListener {
+    private class RoboTvSession extends TvInputService.Session implements ExoPlayer.Listener, org.xvdr.msgexchange.Session.Callback, LiveTvExtractor.Callback, MediaCodecVideoTrackRenderer.EventListener {
         static final String TAG = "TVSession";
         private static final int RENDERER_COUNT = 2;
         private static final int MIN_BUFFER_MS = 1000;
@@ -77,7 +77,7 @@ public class RoboTvInputService extends TvInputService {
         ServerConnection mConnection = null;
         Context mContext;
 
-        SimpleSessionImpl(Context context, String inputId) {
+        RoboTvSession(Context context, String inputId) {
             super(context);
             mContext = context;
             mHandler = new android.os.Handler();
@@ -111,11 +111,10 @@ public class RoboTvInputService extends TvInputService {
             mSurface = surface;
 
             if(mPlayer == null || mVideoRenderer == null) {
-                return false;
+                return true;
             }
 
             mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);
-
             return true;
         }
 
@@ -137,7 +136,7 @@ public class RoboTvInputService extends TvInputService {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if(tune(channelUri)) {
+                    if (tune(channelUri)) {
                         startPlayback();
                     }
                 }
@@ -183,7 +182,7 @@ public class RoboTvInputService extends TvInputService {
             // remove callbacks
             mConnection.removeAllCallbacks();
 
-            // create extractor / samplesource
+            // create extractor
             mExtractor = new LiveTvExtractor();
             mExtractor.setCallback(this);
 

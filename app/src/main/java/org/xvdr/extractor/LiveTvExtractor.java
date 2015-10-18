@@ -351,11 +351,11 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 		byte[] buffer = new byte[length];
 		notification.readBuffer(buffer, 0, length);
 
-		int frameType = (int) notification.getClientID();
+		int frameType = notification.getClientID();
 
         long timeUs = ptsToTimeUs(pts);
 
-        reader.consume(new ParsableByteArray(buffer, length), timeUs, (frameType == 2), duration);
+        reader.consume(new ParsableByteArray(buffer), timeUs, (frameType == 2), duration);
 	}
 
 	@Override

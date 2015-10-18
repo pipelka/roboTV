@@ -54,12 +54,10 @@ final class H264Reader extends ElementaryStreamReader {
             Log.i(TAG, "MediaFormat: " + mStream.width + "x" + mStream.height + " aspect: " + pixelAspectRatio);
         }
 
-        while(data.bytesLeft() > 0) {
-            output.sampleData(data, data.bytesLeft());
-        }
+        output.sampleData(data, data.capacity());
 
         int flags = isKeyframe ? C.SAMPLE_FLAG_SYNC : 0;
-        output.sampleMetadata(pesTimeUs, flags, data.limit(), 0, null);
+        output.sampleMetadata(pesTimeUs, flags, data.capacity(), 0, null);
     }
 
 	@Override
