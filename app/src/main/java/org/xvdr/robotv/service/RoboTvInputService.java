@@ -58,7 +58,7 @@ public class RoboTvInputService extends TvInputService {
         static final String TAG = "TVSession";
         private static final int RENDERER_COUNT = 2;
         private static final int MIN_BUFFER_MS = 1000;
-        private static final int MIN_REBUFFER_MS = 2000;
+        private static final int MIN_REBUFFER_MS = 5000;
 
         private android.os.Handler mHandler;
 
@@ -286,9 +286,10 @@ public class RoboTvInputService extends TvInputService {
             }
 
             mVideoRenderer = new MediaCodecVideoTrackRenderer(
+                    mContext,
                     mSampleSource,
                     MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING,
-                    50,
+                    5000,
                     mHandler,
                     this,
                     20);
