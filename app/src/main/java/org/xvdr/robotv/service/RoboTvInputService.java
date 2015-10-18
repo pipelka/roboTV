@@ -110,7 +110,7 @@ public class RoboTvInputService extends TvInputService {
             Log.d(TAG, "onSetSurface()");
             mSurface = surface;
 
-            if(mPlayer == null) {
+            if(mPlayer == null || mVideoRenderer == null) {
                 return false;
             }
 
