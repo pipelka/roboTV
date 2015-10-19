@@ -36,8 +36,9 @@ public class Session extends SessionProxy {
     }
 
     @Override
-    protected void onNotification(final Packet notification) {
+    protected void onNotification(Packet notification) {
         for(Callback cb : mCallbacks) {
+            notification.rewind();
             cb.onNotification(notification);
         }
     }
