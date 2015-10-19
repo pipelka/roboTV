@@ -73,6 +73,7 @@ public class RoboTvInputService extends TvInputService {
 
         private Uri mCurrentChannelUri;
         private String mInputId;
+        private Runnable mLastTuneRunnable;
 
         ServerConnection mConnection = null;
         Context mContext;
@@ -85,6 +86,9 @@ public class RoboTvInputService extends TvInputService {
 
             mPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT, MIN_BUFFER_MS, MIN_REBUFFER_MS);
             mPlayer.addListener(this);
+
+            mExtractor = new LiveTvExtractor();
+            mExtractor.setCallback(this);
         }
 
         @Override
@@ -133,14 +137,27 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onTune(final Uri channelUri) {
-            mHandler.post(new Runnable() {
+            Runnable tuneRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    if (tune(channelUri)) {
+                    // tune to new channel
+                    if (!tune(channelUri)) {
+                        return;
+                    }
+
+                    // start playback if we are the last tune request
+                    if(this == mLastTuneRunnable) {
                         startPlayback();
                     }
                 }
-            });
+            };
+
+            // remove pending tune request
+            mHandler.removeCallbacks(mLastTuneRunnable);
+            mLastTuneRunnable = tuneRunnable;
+
+            // post new tune request
+            mHandler.postAtFrontOfQueue(tuneRunnable);
 
             return true;
         }
@@ -170,31 +187,30 @@ public class RoboTvInputService extends TvInputService {
 
             mCurrentChannelUri = channelUri;
 
+            // stop playback
+            mExtractor.reset();
+            mPlayer.seekTo(0);
+
             // create live tv connection
             if(mConnection == null) {
                 mConnection = new ServerConnection("Android TVInputService", SetupUtils.getLanguageISO3(mContext));
+
                 if(!mConnection.open(SetupUtils.getServer(mContext))) {
                     mConnection = null;
                     return false;
                 }
+
+                mConnection.addCallback(this);
+                mConnection.addCallback(mExtractor);
             }
 
-            // remove callbacks
-            mConnection.removeAllCallbacks();
-
-            // create extractor
-            mExtractor = new LiveTvExtractor();
-            mExtractor.setCallback(this);
-
+            // create samplesource
             mSampleSource = new ExtractorSampleSource(
                     channelUri,
                     mExtractor.dataSource(), // this is just a dummy data source
                     new DefaultAllocator(512), // dummy allocator
                     0, // the data source doesn't read any data
                     mExtractor);
-
-            mConnection.addCallback(this);
-            mConnection.addCallback(mExtractor);
 
             mExtractor.setChannelUri(mCurrentChannelUri);
 
@@ -279,10 +295,6 @@ public class RoboTvInputService extends TvInputService {
         }
 
         private synchronized boolean startPlayback() {
-            if(mPlayer.getPlaybackState() == ExoPlayer.STATE_READY) {
-                mPlayer.stop();
-                mPlayer.seekTo(0);
-            }
 
             mVideoRenderer = new MediaCodecVideoTrackRenderer(
                     mContext,
@@ -311,7 +323,9 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onPlayerStateChanged(boolean b, int i) {
             Log.i(TAG, "onPlayerStateChanged " + b + " " + i);
-            if(b && i == 4) {
+
+            // we're ready to go
+            if(b && i == ExoPlayer.STATE_READY) {
                 notifyVideoAvailable();
             }
         }
@@ -325,7 +339,11 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onPlayerError(ExoPlaybackException e) {
+            Log.e(TAG, "onPlayerError");
             e.printStackTrace();
+
+            mPlayer.setPlayWhenReady(false);
+            mPlayer.setPlayWhenReady(true);
         }
 
         // org.xvdr.msgexchange.Session.Callback implementation
@@ -475,17 +493,17 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onDecoderInitializationError(MediaCodecTrackRenderer.DecoderInitializationException e) {
-
+            Log.e(TAG, "onDecoderInitializationError");
+            Log.e(TAG, e.getMessage());
         }
 
         @Override
         public void onCryptoError(MediaCodec.CryptoException e) {
-
         }
 
         @Override
         public void onDecoderInitialized(String s, long l, long l1) {
-
+            Log.i(TAG, "onDecoderInitialized");
         }
     }
 }
