@@ -54,9 +54,9 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 	private static final long MAX_PTS = 0x1FFFFFFFFL;
 
 	private long firstSampleTimestampUs;
-	final SparseBooleanArray streamTypes;
-	final SparseBooleanArray allowedPassthroughStreamTypes;
-	final SparseArray<ElementaryStreamReader> streamReaders; // Indexed by pid
+	SparseBooleanArray streamTypes;
+	SparseBooleanArray allowedPassthroughStreamTypes;
+	SparseArray<ElementaryStreamReader> streamReaders; // Indexed by pid
 
 	private ExtractorOutput output;
 	private long timestampOffsetUs;
@@ -76,12 +76,8 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 	}
 
 	public LiveTvExtractor(long firstSampleTimestampUs, AudioCapabilities audioCapabilities) {
-		this.firstSampleTimestampUs = firstSampleTimestampUs;
-		streamTypes = new SparseBooleanArray();
-		allowedPassthroughStreamTypes = getPassthroughStreamTypes(audioCapabilities);
-		streamReaders = new SparseArray<>();
-		lastPts = Long.MIN_VALUE;
-        currentAudioPid = 0;
+        allowedPassthroughStreamTypes = getPassthroughStreamTypes(audioCapabilities);
+        reset();
     }
 
     public void setCallback(Callback callback) {
@@ -110,15 +106,25 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 		timestampOffsetUs = 0;
 		lastPts = Long.MIN_VALUE;
 
-		for(int i = 0; i < streamReaders.size(); i++) {
-			streamReaders.valueAt(i).seek();
-		}
+        synchronized (streamReaders) {
+            for(int i = 0; i < streamReaders.size(); i++) {
+                streamReaders.valueAt(i).seek();
+
+            }
+        }
 	}
 
     synchronized public void reset() {
-        streamReaders.clear();
-        timestampOffsetUs = 0;
-        lastPts = Long.MIN_VALUE;
+        streamReaders = new SparseArray<>();
+        synchronized (streamReaders) {
+            streamReaders.clear();
+            timestampOffsetUs = 0;
+            lastPts = Long.MIN_VALUE;
+            streamTypes = new SparseBooleanArray();
+            this.firstSampleTimestampUs = 0;
+            lastPts = Long.MIN_VALUE;
+            currentAudioPid = 0;
+        }
     }
 
 	@Override
@@ -175,6 +181,11 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
     synchronized public String selectAudioTrack(String id) {
         Log.d(TAG, "selectAudioTrack: " + id);
         int pid = Integer.parseInt(id);
+
+        if(mBundle == null) {
+            return "";
+        }
+
         StreamBundle.Stream stream = mBundle.get(pid);
 
         if(stream == null) {
@@ -185,7 +196,9 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
             return "";
         }
 
-        streamReaders.remove(currentAudioPid);
+        synchronized (streamReaders) {
+            streamReaders.remove(currentAudioPid);
+        }
 
         currentAudioPid = 0;
         addStreamReader(stream);
@@ -263,7 +276,7 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
             Log.d(TAG, "video track changed");
             mCallback.onVideoTrackChanged();
         }
-	}
+    }
 
 	synchronized void addStreamReader(StreamBundle.Stream stream) {
 		ElementaryStreamReader reader = null;
@@ -301,7 +314,9 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 
 
             Log.i(TAG, "added stream " + stream.physicalId + " (" + stream.type + ")");
-			streamReaders.put(stream.physicalId, reader);
+            synchronized (streamReaders) {
+                streamReaders.put(stream.physicalId, reader);
+            }
 		}
 	}
 
@@ -320,7 +335,7 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 	// Session.Callback
 
 	@Override
-	public void onNotification(Packet notification) {
+    synchronized public void onNotification(Packet notification) {
 		// process STREAMCHANGE notification
 		if(notification.getMsgID() == ServerConnection.XVDR_STREAM_CHANGE) {
 			createStreamReaders(notification);
@@ -334,7 +349,11 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 
 		// read pid of packet
 		int pid = notification.getU16();
-		ElementaryStreamReader reader = streamReaders.get(pid);
+
+        ElementaryStreamReader reader = null;
+        synchronized (streamReaders) {
+             reader = streamReaders.get(pid);
+        }
 
 		if(reader == null) {
 			return;
@@ -346,15 +365,19 @@ public final class LiveTvExtractor implements Extractor, SeekMap, Session.Callba
 		long dts = notification.getS64();
 		int duration = (int) notification.getU32();
 		int length = (int) notification.getU32();
+        int frameType = notification.getClientID();
+        long timeUs = ptsToTimeUs(pts);
+
+        // skip empty packet
+        if(length == 0) {
+            return;
+        }
 
 		// read buffer
 		byte[] buffer = new byte[length];
 		notification.readBuffer(buffer, 0, length);
 
-		int frameType = notification.getClientID();
-
-        long timeUs = ptsToTimeUs(pts);
-
+        // push buffer to reader
         reader.consume(new ParsableByteArray(buffer), timeUs, (frameType == 2), duration);
 	}
 
