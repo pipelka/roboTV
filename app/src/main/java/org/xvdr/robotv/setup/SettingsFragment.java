@@ -69,7 +69,7 @@ public class SettingsFragment extends BrowseFragment {
         GridItemPresenter mGridPresenter = new GridItemPresenter();
 
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
-        HeaderItem gridHeader = new HeaderItem(0, "Settings", null);
+        HeaderItem gridHeader = new HeaderItem(0, "Settings");
 
         ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
         gridRowAdapter.add(new SettingsItem(1, "Server", android.R.drawable.ic_menu_preferences));
