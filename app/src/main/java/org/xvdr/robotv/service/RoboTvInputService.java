@@ -93,16 +93,18 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onRelease() {
+            if(mConnection != null) {
+                mConnection.close();
+                mConnection.removeAllCallbacks();
+                mConnection = null;
+            }
+
             if (mPlayer != null) {
+                mExtractor.reset();
                 mPlayer.removeListener(this);
                 mPlayer.stop();
                 mPlayer.release();
                 mPlayer = null;
-            }
-
-            if(mConnection != null) {
-                mConnection.close();
-                mConnection = null;
             }
 
             mVideoRenderer = null;
@@ -134,7 +136,6 @@ public class RoboTvInputService extends TvInputService {
             }
         }
 
-
         @Override
         public boolean onTune(final Uri channelUri) {
             Runnable tuneRunnable = new Runnable() {
@@ -162,7 +163,7 @@ public class RoboTvInputService extends TvInputService {
             return true;
         }
 
-        synchronized boolean tune(Uri channelUri) {
+        boolean tune(Uri channelUri) {
             Log.i(TAG, "onTune: " + channelUri);
 
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
@@ -188,8 +189,8 @@ public class RoboTvInputService extends TvInputService {
             mCurrentChannelUri = channelUri;
 
             // stop playback
+            mPlayer.stop();
             mExtractor.reset();
-            mPlayer.seekTo(0);
 
             // create live tv connection
             if(mConnection == null) {
@@ -209,7 +210,7 @@ public class RoboTvInputService extends TvInputService {
                     channelUri,
                     mExtractor.dataSource(), // this is just a dummy data source
                     new DefaultAllocator(512), // dummy allocator
-                    0, // the data source doesn't read any data
+                    512, // the data source doesn't read any data
                     mExtractor);
 
             mExtractor.setChannelUri(mCurrentChannelUri);
@@ -248,7 +249,7 @@ public class RoboTvInputService extends TvInputService {
         }
 
         @Override
-        synchronized public boolean onSelectTrack (int type, String trackId) {
+        public boolean onSelectTrack (int type, String trackId) {
             if(type == TvTrackInfo.TYPE_AUDIO) {
                 changeAudioTrack(trackId);
                 return true;
@@ -257,7 +258,7 @@ public class RoboTvInputService extends TvInputService {
             return false;
         }
 
-        synchronized public void changeAudioTrack(String trackId) {
+        public void changeAudioTrack(String trackId) {
             Log.d(TAG, "changeAudioTrack: " + trackId);
             if(mExtractor.getCurrentAudioTrackId().equals(trackId)) {
                 return;
@@ -294,7 +295,7 @@ public class RoboTvInputService extends TvInputService {
             return false;
         }
 
-        private synchronized boolean startPlayback() {
+        boolean startPlayback() {
 
             mVideoRenderer = new MediaCodecVideoTrackRenderer(
                     mContext,
