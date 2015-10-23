@@ -141,15 +141,8 @@ public class RoboTvInputService extends TvInputService {
             Runnable tuneRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    // tune to new channel
-                    if (!tune(channelUri)) {
-                        return;
-                    }
-
-                    // start playback if we are the last tune request
-                    if(this == mLastTuneRunnable) {
-                        startPlayback();
-                    }
+                    tune(channelUri);
+                    startPlayback();
                 }
             };
 
