@@ -1,7 +1,6 @@
 package org.xvdr.robotv.tv;
 
 import android.media.tv.TvTrackInfo;
-import android.net.Uri;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
@@ -10,12 +9,8 @@ import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.msgexchange.Packet;
 
-/**
- * Created by pipelka on 22.05.15.
- */
 public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 	static final String TAG = "StreamBundle";
-    Uri mChannelUri;
 
     static private final SparseArray<String> typeMapping = new SparseArray<String>() {
         {
@@ -113,17 +108,12 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
         }
 	}
 
-    public StreamBundle(Uri channelUri) {
-        mChannelUri = channelUri;
-    }
-
-    public Uri getChannelUri() {
-        return mChannelUri;
+    public StreamBundle() {
     }
 
     public boolean isTypeSupported(int type) {
-        for(int i = 0; i < supportedTypes.length; i++) {
-            if(supportedTypes[i] == type) {
+        for (int supportedType : supportedTypes) {
+            if (supportedType == type) {
                 return true;
             }
         }
@@ -139,26 +129,6 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
         }
 
         return -1;
-    }
-
-    public Stream getVideoStream() {
-        for(int i = 0; i < size(); i++) {
-            if(valueAt(i).content == CONTENT_VIDEO) {
-                return valueAt(i);
-            }
-        }
-
-        return  null;
-    }
-
-    public Stream getDefaultAudioStream() {
-        for(int i = 0; i < size(); i++) {
-            if(valueAt(i).content == CONTENT_AUDIO) {
-                return valueAt(i);
-            }
-        }
-
-        return  null;
     }
 
     private static String getMimeTypeFromType(int type) {
@@ -197,6 +167,7 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 		}
 
         clear();
+        int index = 0;
 
 		while(!p.eop()) {
 			Stream stream = new Stream();
@@ -244,10 +215,57 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
             }
 
             Log.i(TAG, "new " + contentMapping.get(stream.content) + " " + typeMapping.get(stream.type) + " stream (" + stream.physicalId + ")");
-			put(stream.physicalId, stream);
+			put(index++, stream);
 		}
 
 	}
 
+    public int getStreamCount(int contentType) {
+        int count = 0;
 
+        for(int i = 0; i < size(); i++) {
+            Stream stream = valueAt(i);
+            if(stream.content == contentType) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public TvTrackInfo getTrackInfo(int contentType, int streamIndex) {
+        if(streamIndex < 0) {
+            return null;
+        }
+
+        int count = 0;
+
+        for(int i = 0; i < size(); i++) {
+            Stream stream = valueAt(i);
+            if(stream.content == contentType) {
+                if(count == streamIndex) {
+                    return stream.getTrackInfo();
+                }
+                count++;
+            }
+        }
+
+        return null;
+    }
+
+    public int findIndexByPhysicalId(int contentType, int physicalId) {
+        int index = 0;
+
+        for(int i = 0; i < size(); i++) {
+            Stream stream = valueAt(i);
+            if(stream.content == contentType) {
+                if (stream.physicalId == physicalId) {
+                    return index;
+                }
+                index++;
+            }
+        }
+
+        return -1;
+    }
 }

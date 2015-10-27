@@ -5,9 +5,6 @@ import android.util.Log;
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.msgexchange.Session;
 
-/**
- * Created by pipelka on 30.04.15.
- */
 public class ServerConnection extends Session {
 
 	private static final String TAG = "XVDR";
@@ -16,6 +13,9 @@ public class ServerConnection extends Session {
 	private short mCompressionLevel = 0;
 	private int mAudioType = StreamBundle.TYPE_AUDIO_AC3;
 	private String mLanguage = "deu";
+
+    /** Frame types */
+    public static final int IFRAME = 2;
 
 	/** Packet types */
 	public static final int XVDR_CHANNEL_REQUEST_RESPONSE = 1;
