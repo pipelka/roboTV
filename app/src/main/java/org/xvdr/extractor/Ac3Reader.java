@@ -57,9 +57,6 @@ final class Ac3Reader extends StreamReader {
             return;
         }
 
-        int channels = mDecoder.getChannels();
-        int sampleRate = mDecoder.getSampleRate();
-
         ParsableByteArray audioChunk = new ParsableByteArray(decodedLength);
 
         if(!mDecoder.getOutput(audioChunk.data, 0, audioChunk.capacity())) {
@@ -71,11 +68,11 @@ final class Ac3Reader extends StreamReader {
             MediaFormat format = MediaFormat.createAudioFormat(
                     stream.physicalId, // < trackId
                     MimeTypes.AUDIO_RAW,
-                    stream.bitRate,
+                    mDecoder.getBitRate(),
                     MediaFormat.NO_VALUE,
                     C.UNKNOWN_TIME_US,
-                    channels,
-                    sampleRate,
+                    mDecoder.getChannels(),
+                    mDecoder.getSampleRate(),
                     null,
                     stream.language);
             output.format(format);

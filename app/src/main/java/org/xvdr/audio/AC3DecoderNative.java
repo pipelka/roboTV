@@ -63,6 +63,10 @@ public class AC3DecoderNative {
     return audiodecoderJNI.AC3DecoderNative_getSampleRate(swigCPtr, this);
   }
 
+  public int getBitRate() {
+    return audiodecoderJNI.AC3DecoderNative_getBitRate(swigCPtr, this);
+  }
+
   public final static int layoutStereo = audiodecoderJNI.AC3DecoderNative_layoutStereo_get();
   public final static int layoutDolby = audiodecoderJNI.AC3DecoderNative_layoutDolby_get();
   public final static int layout50 = audiodecoderJNI.AC3DecoderNative_layout50_get();

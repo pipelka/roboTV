@@ -21,6 +21,7 @@ public class audiodecoderJNI {
   public final static native boolean AC3DecoderNative_getOutput(long jarg1, AC3DecoderNative jarg1_, byte[] jarg2, int jarg3, int jarg4);
   public final static native int AC3DecoderNative_getChannels(long jarg1, AC3DecoderNative jarg1_);
   public final static native int AC3DecoderNative_getSampleRate(long jarg1, AC3DecoderNative jarg1_);
+  public final static native int AC3DecoderNative_getBitRate(long jarg1, AC3DecoderNative jarg1_);
 
 
 static {

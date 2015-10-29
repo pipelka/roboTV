@@ -29,16 +29,22 @@ public:
 		return mChannels;
 	}
 
-	int getSampleRate() {
-		return mSampleRate;
-	}
+    int getSampleRate() {
+        return mSampleRate;
+    }
+
+    int getBitRate() {
+        return mBitRate;
+    }
 
 private:
 
 	int mChannels;
 
-	int mSampleRate;
-	
+    int mSampleRate;
+
+    int mBitRate;
+
 	a52_state_t* mState;
 
 	int mOutputBufferLength;

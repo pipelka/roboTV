@@ -1026,6 +1026,21 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1ge
 }
 
 
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1getBitRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  AC3Decoder *arg1 = (AC3Decoder *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(AC3Decoder **)&jarg1; 
+  result = (int)(arg1)->getBitRate();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 #ifdef __cplusplus
 }
 #endif

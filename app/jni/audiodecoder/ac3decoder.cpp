@@ -33,7 +33,6 @@ AC3Decoder::~AC3Decoder() {
 int AC3Decoder::decode(char* BYTE, int offset, int length) {
 	sample_t level = 32767;
 	sample_t bias = 0;
-	int bitRate;
 	int flags;
 
 	uint8_t* inputBuffer = (uint8_t*)&BYTE[offset];
@@ -44,7 +43,7 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 	}
 
 	// check frame
-	int frameLength = a52_syncinfo(inputBuffer, &flags, &mSampleRate, &bitRate);
+	int frameLength = a52_syncinfo(inputBuffer, &flags, &mSampleRate, &mBitRate);
 
 	if(frameLength <= 0) {
 		ALOG("a52_syncinfo: invalid frame !");
