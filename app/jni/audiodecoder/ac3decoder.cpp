@@ -127,7 +127,7 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 	return mOutputBufferLength;
 }
 
-bool AC3Decoder::getOutput(char* BYTE, int offset, int length) {
+bool AC3Decoder::read(char* BYTE, int offset, int length) {
 	if(length < mOutputBufferLength) {
 		ALOG("output buffer too small !");
 		return false;

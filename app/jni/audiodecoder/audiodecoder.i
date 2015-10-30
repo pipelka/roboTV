@@ -8,11 +8,9 @@
 %include "stdint.i"
 %include "various.i"
 
-%rename("%(lowercamelcase)s") "";
-%rename (AC3DecoderNative) AC3Decoder;
-
 %{
 #include "ac3decoder.h"
+#include "mpadecoder.h"
 %}
 
 
@@ -21,6 +19,12 @@
 //
 
 %include "ac3decoder.h"
+
+//
+// MpegAudioDecoder
+//
+
+%include "mpadecoder.h"
 
 %pragma(java) jniclasscode=%{
 

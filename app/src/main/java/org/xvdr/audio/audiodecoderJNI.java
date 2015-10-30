@@ -9,19 +9,25 @@
 package org.xvdr.audio;
 
 public class audiodecoderJNI {
-  public final static native int AC3DecoderNative_layoutStereo_get();
-  public final static native int AC3DecoderNative_layoutDolby_get();
-  public final static native int AC3DecoderNative_layout50_get();
-  public final static native int AC3DecoderNative_layout51_get();
-  public final static native void AC3DecoderNative_channelLayout_set(long jarg1, AC3DecoderNative jarg1_, int jarg2);
-  public final static native int AC3DecoderNative_channelLayout_get(long jarg1, AC3DecoderNative jarg1_);
-  public final static native long new_AC3DecoderNative(int jarg1);
-  public final static native void delete_AC3DecoderNative(long jarg1);
-  public final static native int AC3DecoderNative_decode(long jarg1, AC3DecoderNative jarg1_, byte[] jarg2, int jarg3, int jarg4);
-  public final static native boolean AC3DecoderNative_getOutput(long jarg1, AC3DecoderNative jarg1_, byte[] jarg2, int jarg3, int jarg4);
-  public final static native int AC3DecoderNative_getChannels(long jarg1, AC3DecoderNative jarg1_);
-  public final static native int AC3DecoderNative_getSampleRate(long jarg1, AC3DecoderNative jarg1_);
-  public final static native int AC3DecoderNative_getBitRate(long jarg1, AC3DecoderNative jarg1_);
+  public final static native int AC3Decoder_LayoutStereo_get();
+  public final static native int AC3Decoder_LayoutDolby_get();
+  public final static native int AC3Decoder_Layout50_get();
+  public final static native int AC3Decoder_Layout51_get();
+  public final static native void AC3Decoder_ChannelLayout_set(long jarg1, AC3Decoder jarg1_, int jarg2);
+  public final static native int AC3Decoder_ChannelLayout_get(long jarg1, AC3Decoder jarg1_);
+  public final static native long new_AC3Decoder(int jarg1);
+  public final static native void delete_AC3Decoder(long jarg1);
+  public final static native int AC3Decoder_decode(long jarg1, AC3Decoder jarg1_, byte[] jarg2, int jarg3, int jarg4);
+  public final static native boolean AC3Decoder_read(long jarg1, AC3Decoder jarg1_, byte[] jarg2, int jarg3, int jarg4);
+  public final static native int AC3Decoder_getChannels(long jarg1, AC3Decoder jarg1_);
+  public final static native int AC3Decoder_getSampleRate(long jarg1, AC3Decoder jarg1_);
+  public final static native int AC3Decoder_getBitRate(long jarg1, AC3Decoder jarg1_);
+  public final static native long new_MpegAudioDecoder();
+  public final static native void delete_MpegAudioDecoder(long jarg1);
+  public final static native int MpegAudioDecoder_decode(long jarg1, MpegAudioDecoder jarg1_, byte[] jarg2, int jarg3, int jarg4);
+  public final static native boolean MpegAudioDecoder_read(long jarg1, MpegAudioDecoder jarg1_, byte[] jarg2, int jarg3, int jarg4);
+  public final static native int MpegAudioDecoder_getChannels(long jarg1, MpegAudioDecoder jarg1_);
+  public final static native int MpegAudioDecoder_getSampleRate(long jarg1, MpegAudioDecoder jarg1_);
 
 
 static {

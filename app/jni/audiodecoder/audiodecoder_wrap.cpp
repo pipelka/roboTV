@@ -836,13 +836,14 @@ static jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize
 
 
 #include "ac3decoder.h"
+#include "mpadecoder.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1layoutStereo_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1LayoutStereo_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -854,7 +855,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1la
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1layoutDolby_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1LayoutDolby_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -866,7 +867,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1la
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1layout50_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1Layout50_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -878,7 +879,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1la
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1layout51_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1Layout51_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -890,7 +891,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1la
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1channelLayout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1ChannelLayout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   AC3Decoder *arg1 = (AC3Decoder *) 0 ;
   int arg2 ;
   
@@ -903,7 +904,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1ch
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1channelLayout_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1ChannelLayout_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   AC3Decoder *arg1 = (AC3Decoder *) 0 ;
   int result;
@@ -918,7 +919,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1ch
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_audio_audiodecoderJNI_new_1AC3DecoderNative(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_audio_audiodecoderJNI_new_1AC3Decoder(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int arg1 ;
   AC3Decoder *result = 0 ;
@@ -932,7 +933,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_audio_audiodecoderJNI_new_1AC3DecoderNati
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_audio_audiodecoderJNI_delete_1AC3DecoderNative(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_xvdr_audio_audiodecoderJNI_delete_1AC3Decoder(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   AC3Decoder *arg1 = (AC3Decoder *) 0 ;
   
   (void)jenv;
@@ -942,7 +943,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_audio_audiodecoderJNI_delete_1AC3DecoderNa
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
   jint jresult = 0 ;
   AC3Decoder *arg1 = (AC3Decoder *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -969,7 +970,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1de
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1getOutput(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1read(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
   jboolean jresult = 0 ;
   AC3Decoder *arg1 = (AC3Decoder *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -986,7 +987,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative
   }
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
-  result = (bool)(arg1)->getOutput(arg2,arg3,arg4);
+  result = (bool)(arg1)->read(arg2,arg3,arg4);
   jresult = (jboolean)result; 
   {
     jenv->ReleaseByteArrayElements(jarg2, (jbyte *) arg2, 0); 
@@ -996,7 +997,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   AC3Decoder *arg1 = (AC3Decoder *) 0 ;
   int result;
@@ -1011,7 +1012,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1ge
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   AC3Decoder *arg1 = (AC3Decoder *) 0 ;
   int result;
@@ -1026,7 +1027,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1ge
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1getBitRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3Decoder_1getBitRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   AC3Decoder *arg1 = (AC3Decoder *) 0 ;
   int result;
@@ -1036,6 +1037,112 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_AC3DecoderNative_1ge
   (void)jarg1_;
   arg1 = *(AC3Decoder **)&jarg1; 
   result = (int)(arg1)->getBitRate();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_xvdr_audio_audiodecoderJNI_new_1MpegAudioDecoder(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  MpegAudioDecoder *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (MpegAudioDecoder *)new MpegAudioDecoder();
+  *(MpegAudioDecoder **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_xvdr_audio_audiodecoderJNI_delete_1MpegAudioDecoder(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(MpegAudioDecoder **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_MpegAudioDecoder_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
+  jint jresult = 0 ;
+  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MpegAudioDecoder **)&jarg1; 
+  {
+    arg2 = (char *) jenv->GetByteArrayElements(jarg2, 0); 
+  }
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
+  result = (int)(arg1)->decode(arg2,arg3,arg4);
+  jresult = (jint)result; 
+  {
+    jenv->ReleaseByteArrayElements(jarg2, (jbyte *) arg2, 0); 
+  }
+  
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_audio_audiodecoderJNI_MpegAudioDecoder_1read(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
+  jboolean jresult = 0 ;
+  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MpegAudioDecoder **)&jarg1; 
+  {
+    arg2 = (char *) jenv->GetByteArrayElements(jarg2, 0); 
+  }
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
+  result = (bool)(arg1)->read(arg2,arg3,arg4);
+  jresult = (jboolean)result; 
+  {
+    jenv->ReleaseByteArrayElements(jarg2, (jbyte *) arg2, 0); 
+  }
+  
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_MpegAudioDecoder_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MpegAudioDecoder **)&jarg1; 
+  result = (int)(arg1)->getChannels();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_xvdr_audio_audiodecoderJNI_MpegAudioDecoder_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MpegAudioDecoder **)&jarg1; 
+  result = (int)(arg1)->getSampleRate();
   jresult = (jint)result; 
   return jresult;
 }

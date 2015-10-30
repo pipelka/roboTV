@@ -63,7 +63,8 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
     private final static int supportedTypes[] = {
             TYPE_VIDEO_H264,
             TYPE_AUDIO_AC3,
-            TYPE_AUDIO_AAC
+            TYPE_AUDIO_AAC,
+            TYPE_AUDIO_MPEG2
     };
 
     public class Stream {

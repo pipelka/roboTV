@@ -141,7 +141,6 @@ public class RoboTvInputService extends TvInputService {
                 @Override
                 public void run() {
                     tune(channelUri);
-                    startPlayback();
                 }
             };
 
@@ -186,6 +185,7 @@ public class RoboTvInputService extends TvInputService {
             // open live tv connection
             if(!mConnection.isOpen()) {
                 if(!mConnection.open(SetupUtils.getServer(mContext))) {
+                    toastNotification("failed to connect to server");
                     return false;
                 }
             }
@@ -201,6 +201,9 @@ public class RoboTvInputService extends TvInputService {
             };
 
             Log.i(TAG, "successfully switched channel");
+
+            // start player
+            startPlayback();
             return true;
         }
 

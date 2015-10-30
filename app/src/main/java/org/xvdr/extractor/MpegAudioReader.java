@@ -8,60 +8,29 @@ import com.google.android.exoplayer.extractor.TrackOutput;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.ParsableByteArray;
 
-import org.xvdr.audio.AC3Decoder;
+import org.xvdr.audio.MpegAudioDecoder;
 import org.xvdr.robotv.tv.StreamBundle;
 
 /**
- * Processes a XVDR AC3 stream.
+ * Processes a XVDR MPEG Audio stream.
  */
-final class Ac3Reader extends StreamReader {
+final class MpegAudioReader extends StreamReader {
 
-    private static final String TAG = "Ac3Reader";
-    private boolean ac3PassThrough;
+    private static final String TAG = "MpegAudioReader";
     boolean hasOutputFormat = false;
 
-    AC3Decoder mDecoder;
+    MpegAudioDecoder mDecoder;
 
-    public Ac3Reader(TrackOutput output, StreamBundle.Stream stream) {
-        this(output, stream, false);
-    }
-
-    public Ac3Reader(TrackOutput output, StreamBundle.Stream stream, boolean ac3PassThrough) {
-        this(output, stream, ac3PassThrough, AC3Decoder.LayoutStereo);
-    }
-
-	public Ac3Reader(TrackOutput output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelMode) {
+	public MpegAudioReader(TrackOutput output, StreamBundle.Stream stream) {
 		super(output, stream);
-        this.ac3PassThrough = ac3PassThrough;
-
-        if(ac3PassThrough) {
-            output.format(MediaFormat.createAudioFormat(
-                    stream.physicalId,
-                    MimeTypes.AUDIO_AC3,
-                    stream.bitRate,
-                    -1,
-                    C.UNKNOWN_TIME_US,
-                    stream.channels,
-                    stream.sampleRate,
-                    null,
-                    stream.language));
-            return;
-        }
-
-        mDecoder = new AC3Decoder(channelMode);
+        mDecoder = new MpegAudioDecoder();
 	}
 
 	@Override
 	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe) {
-        if(ac3PassThrough) {
-            output.sampleData(data, data.capacity());
-            output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, data.capacity(), 0, null);
-            return;
-        }
-
         int length = mDecoder.decode(data.data, 0, data.capacity());
+
         if(length == 0) {
-            Log.e(TAG, "Unable to decode frame data");
             return;
         }
 
@@ -76,7 +45,7 @@ final class Ac3Reader extends StreamReader {
             MediaFormat format = MediaFormat.createAudioFormat(
                     stream.physicalId, // < trackId
                     MimeTypes.AUDIO_RAW,
-                    mDecoder.getBitRate(),
+                    MediaFormat.NO_VALUE,
                     MediaFormat.NO_VALUE,
                     C.UNKNOWN_TIME_US,
                     mDecoder.getChannels(),

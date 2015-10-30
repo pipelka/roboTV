@@ -283,6 +283,10 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
             case MimeTypes.AUDIO_AC3:
                 reader = new Ac3Reader(outputTrack, stream, false);
                 break;
+
+            case MimeTypes.AUDIO_MPEG:
+                reader = new MpegAudioReader(outputTrack, stream);
+                break;
         }
 
         if(reader != null) {

@@ -23,7 +23,7 @@ public:
 
 	int decode(char* BYTE, int offset, int length);
 
-	bool getOutput(char* BYTE, int offset, int length);
+	bool read(char* BYTE, int offset, int length);
 
 	int getChannels() {
 		return mChannels;

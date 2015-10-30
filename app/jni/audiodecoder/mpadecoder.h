@@ -1,49 +1,56 @@
-#ifndef AC3_DECODER_H
-#define AC3_DECODER_H
+#ifndef MPEGAUDIO_DECODER_H
+#define MPEGAUDIO_DECODER_H
 
 #include "decoder.h"
 
 extern "C" {
-#include "a52.h"
+#include "mad.h"
 }
 
-class AC3Decoder : public Decoder {
+class MpegAudioDecoder : public Decoder {
 public:
 
-	enum {
-		LayoutStereo = A52_STEREO,
-		LayoutDolby = A52_DOLBY,
-		Layout50 = A52_3F2R,
-		Layout51 = A52_3F2R | A52_LFE
-	} ChannelLayout;
+    MpegAudioDecoder();
 
-	AC3Decoder(int flags);
-
-	virtual ~AC3Decoder();
+	virtual ~MpegAudioDecoder();
 
 	int decode(char* BYTE, int offset, int length);
 
-	bool getOutput(char* BYTE, int offset, int length);
+	bool read(char* BYTE, int offset, int length);
 
 	int getChannels() {
 		return mChannels;
 	}
 
-	int getSampleRate() {
+    int getSampleRate() {
 		return mSampleRate;
 	}
 
 private:
 
+    void init();
+
+    void finish();
+
+    void prepareBuffer(struct mad_header const *header, struct mad_pcm *pcm);
+
 	int mChannels;
 
 	int mSampleRate;
-	
-	a52_state_t* mState;
 
-	int mOutputBufferLength;
+    struct mad_stream mStream;
 
-	uint8_t* mDecodeBuffer;
+    struct mad_frame mFrame;
+
+    struct mad_synth mSynth;
+
+    struct mad_header mHeader;
+
+    uint8_t mInputBuffer[4096];
+
+    int mInputLength;
+
+    int8_t mBuffer[1152*4];
 };
 
-#endif // AC3_DECODER_H
+#endif // MPEGAUDIO_DECODER_H
