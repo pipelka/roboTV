@@ -38,10 +38,11 @@ or use AndroidStudio
 - [x] EPG
 - [x] H264 Video support
 - [x] decoding of AC3 streams
+- [x] MPEG Audio support
 
 # Planned Features
 
-- [ ] MPEG Audio support
+- [ ] Full timeshift support
 - [ ] Support for EAC3 audio streams
 - [ ] Schedule / Watch Recordings
 - [ ] Movie Database integration
