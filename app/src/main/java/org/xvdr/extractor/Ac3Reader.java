@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.extractor.TrackOutput;
+import com.google.android.exoplayer.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.ParsableByteArray;
 
@@ -22,15 +22,15 @@ final class Ac3Reader extends StreamReader {
 
     AC3Decoder mDecoder;
 
-    public Ac3Reader(TrackOutput output, StreamBundle.Stream stream) {
+    public Ac3Reader(DefaultTrackOutput output, StreamBundle.Stream stream) {
         this(output, stream, false);
     }
 
-    public Ac3Reader(TrackOutput output, StreamBundle.Stream stream, boolean ac3PassThrough) {
+    public Ac3Reader(DefaultTrackOutput output, StreamBundle.Stream stream, boolean ac3PassThrough) {
         this(output, stream, ac3PassThrough, AC3Decoder.LayoutStereo);
     }
 
-	public Ac3Reader(TrackOutput output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelMode) {
+	public Ac3Reader(DefaultTrackOutput output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelMode) {
 		super(output, stream);
         this.ac3PassThrough = ac3PassThrough;
 

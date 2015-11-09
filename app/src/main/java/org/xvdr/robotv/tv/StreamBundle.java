@@ -9,7 +9,9 @@ import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.msgexchange.Packet;
 
-public class StreamBundle extends SparseArray<StreamBundle.Stream> {
+import java.util.ArrayList;
+
+public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 	static final String TAG = "StreamBundle";
 
     static private final SparseArray<String> typeMapping = new SparseArray<String>() {
@@ -85,6 +87,16 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 		public int height;
 		public float aspect;
 
+        public boolean isEqualTo(Stream s) {
+            return
+                this.channels == s.channels &&
+                this.sampleRate == s.sampleRate &&
+                this.width == s.width &&
+                this.height == s.height &&
+                this.aspect == s.aspect &&
+                this.type == s.type;
+        }
+
 		public String getMimeType() {
 			return getMimeTypeFromType(type);
 		}
@@ -110,6 +122,25 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
 	}
 
     public StreamBundle() {
+    }
+
+    public boolean isEqualTo(StreamBundle b) {
+        if(size() != b.size()) {
+            return false;
+        }
+
+        for(int i = 0; i < size(); i++) {
+            Stream stream = b.get(i);
+            if(stream == null) {
+                return false;
+            }
+
+            if(!this.get(i).isEqualTo(stream)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public boolean isTypeSupported(int type) {
@@ -215,8 +246,9 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
                 continue;
             }
 
-            Log.i(TAG, "new " + contentMapping.get(stream.content) + " " + typeMapping.get(stream.type) + " stream (" + stream.physicalId + ")");
-			put(index++, stream);
+            Log.i(TAG, "new " + stream.content + " " + typeMapping.get(stream.type) + " stream (" + stream.physicalId + ")");
+			add(stream);
+            index++;
 		}
 
 	}
@@ -225,7 +257,7 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
         int count = 0;
 
         for(int i = 0; i < size(); i++) {
-            Stream stream = valueAt(i);
+            Stream stream = get(i);
             if(stream.content == contentType) {
                 count++;
             }
@@ -242,7 +274,7 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
         int count = 0;
 
         for(int i = 0; i < size(); i++) {
-            Stream stream = valueAt(i);
+            Stream stream = get(i);
             if(stream.content == contentType) {
                 if(count == streamIndex) {
                     return stream.getTrackInfo();
@@ -254,11 +286,45 @@ public class StreamBundle extends SparseArray<StreamBundle.Stream> {
         return null;
     }
 
+    public Stream getStream(int contentType, int streamIndex) {
+        if(streamIndex < 0) {
+            return null;
+        }
+
+        int count = 0;
+
+        for(int i = 0; i < size(); i++) {
+            Stream stream = get(i);
+            if(stream == null) {
+                continue;
+            }
+            if(stream.content == contentType) {
+                if(count == streamIndex) {
+                    return stream;
+                }
+                count++;
+            }
+        }
+
+        return null;
+    }
+
+    public Stream getStreamOfPid(int pid) {
+        for(int i = 0; i < size(); i++) {
+            Stream stream = get(i);
+            if(stream.physicalId == pid) {
+                return stream;
+            }
+        }
+
+        return null;
+    }
+
     public int findIndexByPhysicalId(int contentType, int physicalId) {
         int index = 0;
 
         for(int i = 0; i < size(); i++) {
-            Stream stream = valueAt(i);
+            Stream stream = get(i);
             if(stream.content == contentType) {
                 if (stream.physicalId == physicalId) {
                     return index;

@@ -2,7 +2,7 @@ package org.xvdr.extractor;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.extractor.TrackOutput;
+import com.google.android.exoplayer.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.ParsableByteArray;
 
@@ -15,7 +15,7 @@ final class H264Reader extends StreamReader {
 
 	private static final String TAG = "H264Reader";
 
-	public H264Reader(TrackOutput output, StreamBundle.Stream stream) {
+	public H264Reader(DefaultTrackOutput output, StreamBundle.Stream stream) {
         super(output, stream);
 
         // XVDR sends the picture aspect ratio

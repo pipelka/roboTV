@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.extractor.TrackOutput;
+import com.google.android.exoplayer.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.ParsableByteArray;
 
@@ -21,7 +21,7 @@ final class MpegAudioReader extends StreamReader {
 
     MpegAudioDecoder mDecoder;
 
-	public MpegAudioReader(TrackOutput output, StreamBundle.Stream stream) {
+	public MpegAudioReader(DefaultTrackOutput output, StreamBundle.Stream stream) {
 		super(output, stream);
         mDecoder = new MpegAudioDecoder();
 	}

@@ -1,8 +1,9 @@
 package org.xvdr.extractor;
 
-import android.util.Log;
+import android.os.Handler;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
+import android.util.SparseIntArray;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
@@ -32,18 +33,33 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
 
         void onTracksChanged(StreamBundle streamBundle);
 
+        void onAudioTrackChanged(StreamBundle.Stream stream);
+
+        void onVideoTrackChanged(StreamBundle.Stream stream);
     }
 
     final static private String TAG = "LiveTvSource";
+    final static private int TRACK_COUNT = 3;
+    final static private int TRACK_VIDEO = 0;
+    final static private int TRACK_AUDIO = 1;
+    final static private int TRACK_SUBTITLE = 2;
 
     private ServerConnection mConnection;
     private StreamBundle mBundle;
     private Listener mListener;
+    private Handler mHandler;
 
-    private SparseArray<DefaultTrackOutput> mSampleQueues = new SparseArray<>(16);
-    private SparseArray<StreamReader> mSampleReaders = new SparseArray<>(16);
-    private SparseBooleanArray mFormatSent = new SparseBooleanArray();
-    private SparseBooleanArray mTrackEnabled = new SparseBooleanArray();
+
+    final private SparseIntArray mPids = new SparseIntArray(TRACK_COUNT);
+    final private SparseArray<StreamReader> mTracks = new SparseArray(TRACK_COUNT);
+    final private SparseBooleanArray mFormatSent = new SparseBooleanArray(TRACK_COUNT);
+    final private SparseBooleanArray mTrackEnabled = new SparseBooleanArray(TRACK_COUNT);
+
+    final private int mTrackContentMapping[] = {
+            StreamBundle.CONTENT_VIDEO,
+            StreamBundle.CONTENT_AUDIO,
+            StreamBundle.CONTENT_SUBTITLE
+    };
 
     private long offsetTimeUs = C.UNKNOWN_TIME_US;
 
@@ -52,7 +68,13 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
      * @param connection the server connection to use
      */
     public LiveTvSource(ServerConnection connection) {
+        this(connection, new Handler());
+    }
+
+    public LiveTvSource(ServerConnection connection, Handler handler) {
         mConnection = connection;
+        mHandler = handler;
+        mBundle = new StreamBundle();
     }
 
     /**
@@ -113,44 +135,35 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     }
 
     @Override
-    public boolean prepare(long position) {
+    synchronized public boolean prepare(long position) {
         int trackCount = 0;
 
-        synchronized (mSampleQueues) {
-            if (mSampleQueues.size() == 0) {
+        if (mTracks.size() == 0) {
+            return false;
+        }
+
+        for (int i = 0; i < mTracks.size(); i++) {
+            DefaultTrackOutput outputTrack = mTracks.valueAt(i).output;
+
+            if (!outputTrack.hasFormat() || outputTrack.isEmpty()) {
                 return false;
             }
 
-            for (int i = 0; i < mSampleQueues.size(); i++) {
-                DefaultTrackOutput outputTrack = mSampleQueues.valueAt(i);
-
-                if (!outputTrack.hasFormat() || outputTrack.isEmpty()) {
-                    return false;
-                }
-
-                trackCount++;
-            }
+            trackCount++;
         }
 
-        return (trackCount != 0);
+        return (trackCount == mTracks.size());
     }
 
     @Override
-    public int getTrackCount() {
-        synchronized (mSampleQueues) {
-            return mSampleQueues.size();
-        }
+    synchronized public int getTrackCount() {
+        return mTracks.size();
     }
 
     @Override
-    public MediaFormat getFormat(int track) {
-        DefaultTrackOutput outputTrack;
-
-        synchronized (mSampleQueues) {
-            outputTrack = mSampleQueues.get(track);
-        }
-
-        if(outputTrack == null || !outputTrack.hasFormat()) {
+    synchronized public MediaFormat getFormat(int track) {
+        DefaultTrackOutput outputTrack = mTracks.get(track).output;
+        if(!outputTrack.hasFormat()) {
             return null;
         }
 
@@ -158,47 +171,37 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     }
 
     @Override
-    public void enable(int track, long positionUs) {
-        synchronized (mSampleQueues) {
-            mFormatSent.put(track, false);
-            mTrackEnabled.put(track, true);
-        }
+    synchronized public void enable(int track, long positionUs) {
+        mFormatSent.put(track, false);
+        mTrackEnabled.put(track, true);
     }
 
     @Override
-    public boolean continueBuffering(int track, long positionUs) {
-        DefaultTrackOutput outputTrack;
-
-        synchronized (mSampleQueues) {
-            outputTrack = mSampleQueues.get(track);
-            return outputTrack == null || !outputTrack.isEmpty();
-        }
+    synchronized  public boolean continueBuffering(int track, long positionUs) {
+        return !mTracks.get(track).output.isEmpty();
     }
 
     @Override
-    public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder, boolean onlyReadDiscontinuity) {
+    synchronized public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder, boolean onlyReadDiscontinuity) {
         if(onlyReadDiscontinuity) {
             return NOTHING_READ;
         }
 
-        synchronized (mSampleQueues) {
+        // get output track
+        DefaultTrackOutput outputTrack = mTracks.get(track).output;
+        if(outputTrack == null) {
+            return NOTHING_READ;
+        }
 
-            // get output track
-            DefaultTrackOutput outputTrack = mSampleQueues.get(track);
-            if(outputTrack == null) {
-                return NOTHING_READ;
-            }
+        // check if we should send a format change
+        if (!mFormatSent.get(track, false) && outputTrack.hasFormat()) {
+            formatHolder.format = outputTrack.getFormat();
+            mFormatSent.put(track, true);
+            return FORMAT_READ;
+        }
 
-            // check if we should send a format change
-            if (!mFormatSent.get(track, false) && outputTrack.hasFormat()) {
-                formatHolder.format = outputTrack.getFormat();
-                mFormatSent.put(track, true);
-                return FORMAT_READ;
-            }
-
-            if (outputTrack.getSample(sampleHolder)) {
-                return SAMPLE_READ;
-            }
+        if (outputTrack.getSample(sampleHolder) && mFormatSent.get(track, false)) {
+            return SAMPLE_READ;
         }
 
         return NOTHING_READ;
@@ -214,16 +217,13 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     }
 
     @Override
-    public void disable(int track) {
-        synchronized (mSampleQueues) {
-            mTrackEnabled.put(track, false);
+    synchronized public void disable(int track) {
+        mTrackEnabled.put(track, false);
+        DefaultTrackOutput output = mTracks.get(track).output;
 
-            DefaultTrackOutput output = mSampleQueues.get(track);
-            if (output != null) {
-                output.clear();
-            }
+        if(output != null) {
+            output.clear();
         }
-
     }
 
     @Override
@@ -232,11 +232,20 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     }
 
     @Override
-    public void onNotification(Packet packet) {
+    synchronized public void onNotification(Packet packet) {
 
         switch(packet.getMsgID()) {
             case ServerConnection.XVDR_STREAM_CHANGE:
-                createOutputTracks(packet);
+                final StreamBundle newBundle = new StreamBundle();
+                newBundle.updateFromPacket(packet);
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        createOutputTracks(newBundle);
+
+                    }
+                });
                 break;
             case ServerConnection.XVDR_STREAM_MUXPKT:
                 writeData(packet);
@@ -261,7 +270,7 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         mListener = listener;
     }
 
-    public StreamBundle getStreamBundle() {
+    synchronized public StreamBundle getStreamBundle() {
         return mBundle;
     }
 
@@ -290,41 +299,92 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         }
 
         if(reader != null) {
-            mSampleReaders.put(track, reader);
-            mSampleQueues.put(track, outputTrack);
+            mTracks.put(track, reader);
         }
     }
 
-    private void createOutputTracks(Packet p) {
-        mBundle = new StreamBundle();
-        mBundle.updateFromPacket(p);
+    synchronized private void createOutputTracks(StreamBundle newBundle) {
 
-        Log.d(TAG, "createOutputTracks:" + mBundle.size() + " tracks");
+        // exit if the bundles are equal
+        if(mBundle.isEqualTo(newBundle)) {
+            return;
+        }
 
-        synchronized (mSampleQueues) {
+        // post notification
+        postTracksChanged(newBundle);
 
-            mSampleQueues.clear();
-            mSampleReaders.clear();
-            mFormatSent.clear();
+        // check for changed streams
+        for(int i = 0; i < TRACK_COUNT; i++) {
+            int pid = mPids.get(i, -1);
+            int index = newBundle.findIndexByPhysicalId(mTrackContentMapping[i], pid);
 
-            for (int i = 0; i < mBundle.size(); i++) {
-                addReader(i, mBundle.valueAt(i));
+            if (index < 0) {
+                index = 0;
+            }
+
+            // get old stream
+            StreamBundle.Stream oldStream = mBundle.getStreamOfPid(mPids.get(i, -1));
+
+            // get new stream
+            StreamBundle.Stream stream = newBundle.getStream(mTrackContentMapping[i], index);
+
+            // skip missing streams
+            if(stream == null) {
+                // disable if track was enabled
+                if(mTrackEnabled.get(i, false)) {
+                    mTrackEnabled.put(i, false);
+                }
+                continue;
+            }
+
+            // old stream did not exist -> create new stream
+            if(oldStream == null) {
+                addReader(i, stream);
+                mFormatSent.put(i, false);
+            }
+
+            // check if the stream has changed
+            else if (!stream.isEqualTo(oldStream)){
+                addReader(i, stream);
+                mFormatSent.put(i, false);
+            }
+
+            mPids.put(i, stream.physicalId);
+
+            if(i == TRACK_AUDIO) {
+                postAudioTrackChanged(stream);
             }
         }
 
-        Log.d(TAG, mSampleReaders.size() + " readers created");
+        mBundle = newBundle;
+    }
 
-        if(mListener != null) {
-            mListener.onTracksChanged(mBundle);
+    synchronized public boolean selectAudioTrack(int pid) {
+        // pid already selected
+        if (mPids.get(TRACK_AUDIO, -1) == pid) {
+            return true;
         }
+
+        StreamBundle.Stream stream = mBundle.getStreamOfPid(pid);
+
+        if (stream == null) {
+            return false;
+        }
+
+        mPids.put(TRACK_AUDIO, stream.physicalId);
+        addReader(TRACK_AUDIO, stream);
+        mFormatSent.put(TRACK_AUDIO, false);
+
+        postAudioTrackChanged(stream);
+        return true;
     }
 
     private int findSampleReaderIndex(int physicalId) {
 
-        for(int i = 0; i < mSampleReaders.size(); i++) {
-            StreamReader reader = mSampleReaders.valueAt(i);
+        for(int i = 0; i < mTracks.size(); i++) {
+            StreamReader reader = mTracks.valueAt(i);
             if(reader.stream.physicalId == physicalId) {
-                return mSampleReaders.keyAt(i);
+                return mTracks.keyAt(i);
             }
         }
 
@@ -334,16 +394,18 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     private void writeData(Packet p) {
         // read pid of packet
         int pid = p.getU16();
-
         int track = findSampleReaderIndex(pid);
 
-        synchronized (mSampleQueues) {
-            if (mTrackEnabled.size() != 0 && !mTrackEnabled.get(track, false)) {
-                return;
-            }
+        if(track == -1) {
+            return;
         }
 
-        StreamReader reader = mSampleReaders.get(track);
+        if (mTrackEnabled.size() != 0 && !mTrackEnabled.get(track, false)) {
+            return;
+        }
+
+        StreamReader reader = mTracks.get(track);
+
         if(reader == null) {
             return;
         }
@@ -371,11 +433,48 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         }
 
         // push buffer to reader
-        synchronized (mSampleQueues) {
-            reader.consume(
-                    new ParsableByteArray(buffer),
-                    pts - offsetTimeUs,
-                    isKeyFrame);
+        reader.consume(
+                new ParsableByteArray(buffer),
+                pts - offsetTimeUs,
+                isKeyFrame);
+    }
+
+    private void postTracksChanged(final StreamBundle bundle) {
+        if(mListener == null) {
+            return;
         }
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onTracksChanged(bundle);
+            }
+        });
+    }
+
+    private void postAudioTrackChanged(final StreamBundle.Stream stream) {
+        if(mListener == null) {
+            return;
+        }
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onAudioTrackChanged(stream);
+            }
+        });
+    }
+
+    private void postVideoTrackChanged(final StreamBundle.Stream stream) {
+        if(mListener == null) {
+            return;
+        }
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onVideoTrackChanged(stream);
+            }
+        });
     }
 }

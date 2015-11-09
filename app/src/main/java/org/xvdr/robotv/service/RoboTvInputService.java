@@ -112,7 +112,6 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onSetSurface(Surface surface) {
-            Log.d(TAG, "onSetSurface()");
             mSurface = surface;
 
             if(mPlayer == null || mVideoRenderer == null) {
@@ -191,14 +190,14 @@ public class RoboTvInputService extends TvInputService {
             }
 
             // create samplesource
-            mSampleSource = new LiveTvSource(mConnection);
+            mSampleSource = new LiveTvSource(mConnection, mHandler);
             mSampleSource.setListener(this);
 
             // stream channel
             if(mSampleSource.openStream(uid) == LiveTvSource.ERROR) {
                 toastNotification("failed to tune channel");
                 return false;
-            };
+            }
 
             Log.i(TAG, "successfully switched channel");
 
@@ -213,44 +212,11 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onSelectTrack (int type, String trackId) {
-            Log.d(TAG, "onSelectTrack " + trackId);
-            StreamBundle bundle = mSampleSource.getStreamBundle();
-
             if(type == TvTrackInfo.TYPE_AUDIO) {
-                int physicalId = Integer.parseInt(trackId);
-                int index = bundle.findIndexByPhysicalId(StreamBundle.CONTENT_AUDIO, physicalId);
-
-                if(index == -1) {
-                    Log.d(TAG, "track not found !");
-                    return false;
-                }
-
-                changeAudioTrack(index);
-                return true;
+                return mSampleSource.selectAudioTrack(Integer.parseInt(trackId));
             }
 
             return false;
-        }
-
-        private int changeAudioTrack(int index) {
-            Log.d(TAG, "changeAudioTrack: " + index);
-
-            mPlayer.setSelectedTrack(RENDERER_AUDIO, index);
-            int newIndex = mPlayer.getSelectedTrack(RENDERER_AUDIO);
-
-            if(newIndex == ExoPlayer.TRACK_DISABLED && index != ExoPlayer.TRACK_DEFAULT) {
-                mPlayer.setSelectedTrack(RENDERER_AUDIO, ExoPlayer.TRACK_DEFAULT);
-                newIndex = mPlayer.getSelectedTrack(RENDERER_AUDIO);
-            }
-
-            StreamBundle bundle = mSampleSource.getStreamBundle();
-            TvTrackInfo info = bundle.getTrackInfo(StreamBundle.CONTENT_AUDIO, newIndex);
-
-            if (info != null) {
-                notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, info.getId());
-            }
-
-            return newIndex;
         }
 
         private boolean startPlayback() {
@@ -411,7 +377,7 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onVideoSizeChanged(int i, int i1, int i2, float v) {
-            Log.i(TAG, "onVideoSizeChanged" + i + " " + i1 + " " + i2 + " " + v);
+            Log.i(TAG, "onVideoSizeChanged " + i + " " + i1 + " " + i2 + " " + v);
         }
 
         @Override
@@ -436,8 +402,6 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onTracksChanged(StreamBundle bundle) {
-            Log.d(TAG, "onTracksChanged");
-
             final List<TvTrackInfo> tracks = new ArrayList<>(16);
 
             // create video track
@@ -448,32 +412,25 @@ public class RoboTvInputService extends TvInputService {
 
             // create audio tracks
             int audioTrackCount = bundle.getStreamCount(StreamBundle.CONTENT_AUDIO);
-            Log.d(TAG, "adding " + audioTrackCount + " audio tracks");
 
             for(int i = 0; i < audioTrackCount; i++) {
                 info = bundle.getTrackInfo(StreamBundle.CONTENT_AUDIO, i);
                 if(info != null) {
-                    Log.d(TAG, "added audio track " + i);
                     tracks.add(info);
                 }
             }
 
-            // change tracks
-            Log.d(TAG, "changing tracks");
-            mPlayer.setSelectedTrack(RENDERER_VIDEO, ExoPlayer.TRACK_DEFAULT);
-            final int currentAudioTrack = mPlayer.getSelectedTrack(RENDERER_AUDIO);
-            Log.d(TAG, "selected audio track: " + currentAudioTrack);
+            notifyTracksChanged(tracks);
+        }
 
-            // notify about changed tracks
-            Log.d(TAG, "notifyTracksChanged");
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    notifyTracksChanged(tracks);
-                    int newAudioTrack = changeAudioTrack(currentAudioTrack);
-                    Log.i(TAG, "new audio track: " + newAudioTrack);
-                }
-            });
+        @Override
+        public void onAudioTrackChanged(StreamBundle.Stream stream) {
+            notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, Integer.toString(stream.physicalId));
+        }
+
+        @Override
+        public void onVideoTrackChanged(StreamBundle.Stream stream) {
+            notifyTrackSelected(TvTrackInfo.TYPE_VIDEO, Integer.toString(stream.physicalId));
         }
     }
 }

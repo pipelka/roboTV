@@ -2,7 +2,7 @@ package org.xvdr.extractor;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.extractor.TrackOutput;
+import com.google.android.exoplayer.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.ParsableByteArray;
 
@@ -13,7 +13,7 @@ import org.xvdr.robotv.tv.StreamBundle;
  */
 final class AdtsReader extends StreamReader {
 
-	public AdtsReader(TrackOutput output, StreamBundle.Stream stream) {
+	public AdtsReader(DefaultTrackOutput output, StreamBundle.Stream stream) {
 		super(output, stream);
 
         output.format(MediaFormat.createAudioFormat(
