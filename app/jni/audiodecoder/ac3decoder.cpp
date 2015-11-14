@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "ac3decoder.h"
 #include <android/log.h>
 
@@ -42,17 +43,22 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 		return false;
 	}
 
+    // zero output buffer (if already initialized)
+    if(mOutputBufferLength != 0 && mDecodeBuffer != NULL) {
+        memchr(mDecodeBuffer, 0, mOutputBufferLength);
+    }
+
 	// check frame
 	int frameLength = a52_syncinfo(inputBuffer, &flags, &mSampleRate, &mBitRate);
 
 	if(frameLength <= 0) {
 		ALOG("a52_syncinfo: invalid frame !");
-		return false;
+		return mOutputBufferLength;
 	}
 
 	if(length != frameLength) {
 		ALOG("a52_syncinfo: framelength doesn't match (%i / %i)", length, frameLength);
-		return false;
+		return mOutputBufferLength;
 	}
 
 	if(mDecodeBuffer == NULL) {
@@ -66,7 +72,7 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 
 	if(a52_frame(mState, inputBuffer, &flags, &level, bias) != 0) {
 		ALOG("a52_frame: failed to feed frame !");
-		return false;
+		return mOutputBufferLength;
 	}
 
 	// check channel count
@@ -99,7 +105,7 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 		// get block
 		if(a52_block(mState) != 0) {
 			ALOG("failed to decode block %i", i);
-			return 0;
+			return mOutputBufferLength;
 		}
 
 		float* sample = (float*)a52_samples(mState);
