@@ -64,7 +64,7 @@ public class RoboTvInputService extends TvInputService {
 
         private static final int RENDERER_COUNT = 2;
         private static final int MIN_BUFFER_MS = 1000;
-        private static final int MIN_REBUFFER_MS = 5000;
+        private static final int MIN_REBUFFER_MS = 2000;
 
         private static final int RENDERER_VIDEO = 0;
         private static final int RENDERER_AUDIO = 1;
@@ -231,7 +231,7 @@ public class RoboTvInputService extends TvInputService {
                     mContext,
                     mSampleSource,
                     MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING,
-                    5000,
+                    50, // joining time
                     null,
                     true,
                     mHandler,
@@ -259,7 +259,6 @@ public class RoboTvInputService extends TvInputService {
 
             // we're ready to go
             if(b && i == ExoPlayer.STATE_READY) {
-                notifyVideoAvailable();
             }
         }
 
@@ -388,6 +387,7 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onDrawnToSurface(Surface surface) {
             Log.i(TAG, "onDrawnToSurface()");
+            notifyVideoAvailable();
         }
 
         @Override

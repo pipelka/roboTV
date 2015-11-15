@@ -77,7 +77,7 @@ final class Ac3Reader extends StreamReader {
                     stream.physicalId, // < trackId
                     MimeTypes.AUDIO_RAW,
                     mDecoder.getBitRate(),
-                    MediaFormat.NO_VALUE,
+                    length,
                     C.UNKNOWN_TIME_US,
                     mDecoder.getChannels(),
                     mDecoder.getSampleRate(),

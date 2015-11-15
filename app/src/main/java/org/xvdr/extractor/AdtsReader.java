@@ -17,7 +17,7 @@ final class AdtsReader extends StreamReader {
 		super(output, stream);
 
         output.format(MediaFormat.createAudioFormat(
-                MediaFormat.NO_VALUE, // < trackId
+                stream.physicalId, // < trackId
                 MimeTypes.AUDIO_AAC,
                 stream.bitRate,
                 MediaFormat.NO_VALUE,

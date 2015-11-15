@@ -89,6 +89,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 
         public boolean isEqualTo(Stream s) {
             return
+                this.physicalId == s.physicalId &&
                 this.channels == s.channels &&
                 this.sampleRate == s.sampleRate &&
                 this.width == s.width &&
@@ -110,6 +111,11 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
                         .build();
             }
             else if(content == CONTENT_VIDEO) {
+                if(fpsScale == 0) {
+                    fpsRate = 0;
+                    fpsScale = 1;
+                }
+
                 return new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, Integer.toString(physicalId))
                         .setVideoFrameRate(fpsRate / fpsScale)
                         .setVideoWidth(width)
