@@ -11,6 +11,7 @@ import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.SampleSource;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.extractor.DefaultTrackOutput;
+import com.google.android.exoplayer.extractor.ts.PtsTimestampAdjuster;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.ParsableByteArray;
@@ -47,6 +48,7 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     private StreamBundle mBundle;
     private Listener mListener;
     private Handler mHandler;
+    private PtsTimestampAdjuster mTimestampAdjuster;
 
     final private int[] mPids = new int[TRACK_COUNT];
     final private DefaultTrackOutput[] mOutputTracks = new DefaultTrackOutput[TRACK_COUNT];
@@ -61,8 +63,6 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
             StreamBundle.CONTENT_SUBTITLE
     };
 
-    private long offsetTimeUs = C.UNKNOWN_TIME_US;
-
     /**
      * Create a LiveTv SampleSource
      * @param connection the server connection to use
@@ -75,6 +75,8 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         mConnection = connection;
         mHandler = handler;
         mBundle = new StreamBundle();
+
+        mTimestampAdjuster = new PtsTimestampAdjuster(0);
 
         // create output tracks
         for(int i = 0; i < TRACK_COUNT; i++) {
@@ -112,7 +114,8 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         Packet req = mConnection.CreatePacket(ServerConnection.XVDR_CHANNELSTREAM_OPEN, ServerConnection.XVDR_CHANNEL_REQUEST_RESPONSE);
         req.putU32(channelUid);
         req.putS32(priority); // priority 50
-        req.putU8((short)(waitForKeyFrame ? 1 : 0)); // start with IFrame
+        req.putU8((short) (waitForKeyFrame ? 1 : 0)); // start with IFrame
+        req.putU8((short)1); // raw PTS values
 
         Packet resp = mConnection.transmitMessage(req);
 
@@ -254,7 +257,6 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
                     @Override
                     public void run() {
                         createOutputTracks(newBundle);
-
                     }
                 });
                 break;
@@ -279,10 +281,6 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
      */
     public void setListener(Listener listener) {
         mListener = listener;
-    }
-
-    synchronized public StreamBundle getStreamBundle() {
-        return mBundle;
     }
 
     private void addReader(int track, StreamBundle.Stream stream) {
@@ -436,12 +434,8 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         byte[] buffer = new byte[length];
         p.readBuffer(buffer, 0, length);
 
-        // set time offset
-        if(offsetTimeUs == C.UNKNOWN_TIME_US) {
-            offsetTimeUs = pts;
-        }
-
-        long timeUs = pts - offsetTimeUs;
+        // adject timestamp
+        long timeUs = mTimestampAdjuster.adjustTimestamp(pts);
 
         // skip all packets before our starttime
         if(timeUs < 0) {
