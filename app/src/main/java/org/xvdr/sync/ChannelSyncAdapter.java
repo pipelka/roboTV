@@ -11,8 +11,14 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xvdr.msgexchange.Packet;
+import org.xvdr.robotv.setup.SetupUtils;
+import org.xvdr.robotv.tmdb.TheMovieDatabase;
 import org.xvdr.robotv.tv.ChannelList;
 import org.xvdr.robotv.tv.ServerConnection;
 
@@ -23,7 +29,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -42,12 +50,15 @@ public class ChannelSyncAdapter {
 
 	static final String TAG = "ChannelSyncAdapter";
 	private static final int BATCH_OPERATION_COUNT = 100;
+    private final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
 	private Context mContext;
 	private ServerConnection mConnection;
 	private String mInputId;
 	private ScheduledThreadPoolExecutor mExecutor = new ScheduledThreadPoolExecutor(10);
 	private boolean mCancelChannelSync = false;
+    private TheMovieDatabase mMovieDb;
+
 	private static final SparseArray<String> mBroadcastGenre = new SparseArray<String>() {
 		{
 			append(0x10, "Movie,Drama");
@@ -86,6 +97,7 @@ public class ChannelSyncAdapter {
 		mContext = context;
 		mConnection = connection;
 		mInputId = inputId;
+        mMovieDb = new TheMovieDatabase(TMDB_APIKEY, SetupUtils.getLanguage(context));
 	}
 
 	public void setProgressCallback(ProgressCallback callback) {
@@ -195,35 +207,34 @@ public class ChannelSyncAdapter {
 
 		ChannelList list = new ChannelList();
 		list.load(mConnection, new ChannelList.Callback() {
-			@Override
-			public void onChannel(final ChannelList.Entry entry) {
-				Long channelId = existingChannels.get(entry.uid);
+            @Override
+            public void onChannel(final ChannelList.Entry entry) {
+                Long channelId = existingChannels.get(entry.uid);
 
-				if(channelId == null) {
-					return;
-				}
+                if (channelId == null) {
+                    return;
+                }
 
-				final Uri uri = TvContract.buildChannelUri(channelId);
+                final Uri uri = TvContract.buildChannelUri(channelId);
 
-				Thread t = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						entry.iconURL = entry.iconURL.replace("darth", "192.168.16.10");
-						fetchChannelLogo(uri, entry.iconURL);
-					}
-				});
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        entry.iconURL = entry.iconURL.replace("darth", "192.168.16.10");
+                        fetchChannelLogo(uri, entry.iconURL);
+                    }
+                });
 
-				t.start();
+                t.start();
 
-				try {
-					t.join();
-				}
-				catch(InterruptedException e) {
-					e.printStackTrace();
-				}
+                try {
+                    t.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-			}
-		});
+            }
+        });
 	}
 
 	public void syncEPG() {
@@ -281,6 +292,9 @@ public class ChannelSyncAdapter {
 		long end = start + duration;
 
 		Uri channelUri = TvContract.buildChannelUri(channelId);
+        Uri channelLogoUri = TvContract.buildChannelLogoUri(channelUri);
+
+        SparseArray<String> cache = new SparseArray<>();
 
 		long last = getLastProgramEndTimeMillis(resolver, channelUri) / 1000;
 
@@ -322,6 +336,8 @@ public class ChannelSyncAdapter {
 			String title = resp.getString();
 			String plotOutline = resp.getString();
 			String plot = resp.getString();
+            String posterUrl = resp.getString();
+            String backgroundUrl = resp.getString();
 
 			ContentValues values = new ContentValues();
 			values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
@@ -333,6 +349,67 @@ public class ChannelSyncAdapter {
 			values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_DATA, eventId);
 			values.put(TvContract.Programs.COLUMN_BROADCAST_GENRE, mBroadcastGenre.get(genreType));
 			values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(genreType));
+
+            // TRY TO FETCH ARTWORK
+            JSONArray o = null;
+
+            // request artwork from server (if there isn't any yet)
+            if(backgroundUrl.equals("x")) {
+                Packet areq = mConnection.CreatePacket(ServerConnection.XVDR_ARTWORK_GET);
+                areq.putString(title);
+                areq.putU32(content);
+
+                Packet aresp = mConnection.transmitMessage(areq);
+
+                if (!aresp.eop()) {
+                    posterUrl = aresp.getString();
+                    backgroundUrl = aresp.getString();
+                }
+            }
+
+            if(!backgroundUrl.equals("x")) {
+                if(!backgroundUrl.isEmpty()) {
+                    Log.d(TAG, "found artwork for '" + title + "': " + backgroundUrl);
+                }
+            }
+            else {
+                // search tv series
+                if (content == 0x15 || genreType == 0x50) {
+                    o = mMovieDb.searchTv(title);
+                }
+                // skip adult movies
+                else if (content == 0x18) {
+                    o = null;
+                }
+                // search movies
+                else if(genreType == 0x10) {
+                    o = mMovieDb.searchMovie(title);
+                }
+
+                if(o != null) {
+                    posterUrl = mMovieDb.getPosterUrl(o);
+                    backgroundUrl = mMovieDb.getBackgroundUrl(o);
+
+                    // register artwork on server
+                    Packet areq = mConnection.CreatePacket(ServerConnection.XVDR_ARTWORK_SET);
+                    areq.putString(title);
+                    areq.putU32(content);
+                    areq.putString(posterUrl);
+                    areq.putString(backgroundUrl);
+                    areq.putU32(0);
+
+                    mConnection.transmitMessage(areq);
+
+                    if (!backgroundUrl.isEmpty()) {
+                        Log.d(TAG, "putting artwork for '" + title + "' into db (0x" + Integer.toHexString((int) content) + "): " + backgroundUrl);
+                    }
+                }
+            }
+
+            if(!backgroundUrl.isEmpty()) {
+                values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, backgroundUrl);
+            }
+
 			programs.add(values);
 		}
 	}

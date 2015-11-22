@@ -42,6 +42,21 @@ public class ServerConnection extends Session {
 	public static final int XVDR_CHANNELGROUP_LIST = 66;
 	public static final int XVDR_CHANNELGROUP_MEMBERS = 67;
 
+    /* OPCODE 100 - 119: XVDR network functions for recording access */
+    public static final int XVDR_RECORDINGS_DISKSIZE = 100;
+    public static final int XVDR_RECORDINGS_GETCOUNT = 101;
+    public static final int XVDR_RECORDINGS_GETLIST = 102;
+    public static final int XVDR_RECORDINGS_RENAME = 103;
+    public static final int XVDR_RECORDINGS_DELETE = 104;
+    public static final int XVDR_RECORDINGS_SETPLAYCOUNT = 105;
+    public static final int XVDR_RECORDINGS_SETPOSITION = 106;
+    public static final int XVDR_RECORDINGS_GETPOSITION = 107;
+    public static final int XVDR_RECORDINGS_GETMARKS = 108;
+    public static final int XVDR_RECORDINGS_SETURLS = 109;
+
+    public static final int XVDR_ARTWORK_SET = 110;
+    public static final int XVDR_ARTWORK_GET = 111;
+
 	/* OPCODE 120 - 139: XVDR network functions for epg access and manipulating */
 	public static final int XVDR_EPG_GETFORCHANNEL = 120;
 
