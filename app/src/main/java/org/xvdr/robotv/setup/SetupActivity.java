@@ -27,7 +27,7 @@ public class SetupActivity extends Activity implements ChannelSyncAdapter.Progre
     private ProgressBar mProgress;
     private TextView mTextImport;
     private EditText mServer;
-    private Spinner mSpinner;
+    private Spinner mLanguageSpinner;
 
     private ChannelSyncAdapter channelSync;
 
@@ -63,12 +63,12 @@ public class SetupActivity extends Activity implements ChannelSyncAdapter.Progre
 
         final String[] isoCodeArray = getResources().getStringArray(R.array.iso639_code1);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.languages_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> languageAdapter = ArrayAdapter.createFromResource(this, R.array.languages_array, android.R.layout.simple_spinner_item);
+        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        mSpinner = (Spinner) findViewById(R.id.language);
-        mSpinner.setAdapter(adapter);
-        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mLanguageSpinner = (Spinner) findViewById(R.id.language);
+        mLanguageSpinner.setAdapter(languageAdapter);
+        mLanguageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 SetupUtils.setLanguage(SetupActivity.this, isoCodeArray[i]);
@@ -81,10 +81,44 @@ public class SetupActivity extends Activity implements ChannelSyncAdapter.Progre
         });
 
         // set current language
-        mSpinner.post(new Runnable() {
+        mLanguageSpinner.post(new Runnable() {
             @Override
             public void run() {
-                mSpinner.setSelection(SetupUtils.getLanguageIndex(SetupActivity.this));
+                mLanguageSpinner.setSelection(SetupUtils.getLanguageIndex(SetupActivity.this));
+            }
+        });
+
+        // refresh rate
+        String[] array = getResources().getStringArray(R.array.refresh_rate_value_array);
+
+        final float[] refreshRateValueArray = new float[array.length];
+        for(int i = 0; i < array.length; i++) {
+            refreshRateValueArray[i] = Float.parseFloat(array[i]);
+        }
+
+        ArrayAdapter<CharSequence> refreshRateAdapter = ArrayAdapter.createFromResource(this, R.array.refresh_rate_name_array, android.R.layout.simple_spinner_item);
+        refreshRateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        final Spinner refreshRateSpinner = (Spinner) findViewById(R.id.refresh_rate);
+        refreshRateSpinner.setAdapter(refreshRateAdapter);
+        refreshRateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d(TAG, "set refresh rate: " + refreshRateValueArray[i]);
+                SetupUtils.setRefreshRate(SetupActivity.this, refreshRateValueArray[i]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        // set current refresh rate
+        refreshRateSpinner.post(new Runnable() {
+            @Override
+            public void run() {
+                refreshRateSpinner.setSelection(SetupUtils.getRefreshRateIndex(SetupActivity.this));
             }
         });
 

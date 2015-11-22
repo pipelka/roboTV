@@ -354,6 +354,9 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
             if(i == TRACK_AUDIO) {
                 postAudioTrackChanged(stream);
             }
+            else if(i == TRACK_VIDEO) {
+                postVideoTrackChanged(stream);
+            }
         }
 
         mBundle = newBundle;

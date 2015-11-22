@@ -34,7 +34,7 @@
         android:layout_height="60dp">
 
         <TextView
-            android:layout_width="70dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/server"
@@ -59,14 +59,15 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="60dp">
 
         <TextView
-            android:layout_width="70dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/language"
             android:id="@+id/textView2"
-            android:layout_gravity="center_vertical"/>
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         <Spinner
             android:layout_width="wrap_content"
@@ -75,6 +76,26 @@
             android:layout_gravity="center_vertical"
             android:spinnerMode="dialog"/>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/refresh_rate"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_vertical"/>
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/refresh_rate"
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
     <TextView

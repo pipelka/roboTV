@@ -52,4 +52,33 @@ public class SetupUtils {
         e.apply();
     }
 
+    public static int getRefreshRateIndex(Context context) {
+        String[] array = context.getResources().getStringArray(R.array.refresh_rate_value_array);
+
+        float[] refreshRateValueArray = new float[array.length];
+        for(int i = 0; i < array.length; i++) {
+            refreshRateValueArray[i] = Float.parseFloat(array[i]);
+        }
+        float rate = getRefreshRate(context);
+
+        for(int i = 0; i < array.length; i++) {
+            if(refreshRateValueArray[i] == getRefreshRate(context)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public static float getRefreshRate(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        return prefs.getFloat("refreshrate", 50f);
+    }
+
+    public static void setRefreshRate(Context context, float refreshRate) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        SharedPreferences.Editor e = prefs.edit();
+        e.putFloat("refreshrate", refreshRate);
+        e.apply();
+    }
 }

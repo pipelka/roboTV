@@ -20,6 +20,8 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -50,6 +52,9 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
+        <service android:name=".service.DisplayModeService" android:enabled="true">
+        </service>
 
         <!-- TV input sample which includes minimal implementation for seeing a video on the TV app.
         Requires "android.permission.BIND_TV_INPUT" to ensure that only system services can bind.

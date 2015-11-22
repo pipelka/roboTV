@@ -12,15 +12,17 @@ import android.util.Log;
 import android.view.Surface;
 import android.widget.Toast;
 
-import org.xvdr.extractor.LiveTvSource;
-import org.xvdr.robotv.setup.SetupUtils;
+
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 
+import org.xvdr.extractor.LiveTvSource;
 import org.xvdr.msgexchange.Packet;
+import org.xvdr.robotv.setup.SetupUtils;
+import org.xvdr.robotv.tv.DisplayModeSetter;
 import org.xvdr.robotv.tv.ServerConnection;
 import org.xvdr.robotv.tv.StreamBundle;
 
@@ -28,29 +30,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RoboTvInputService extends TvInputService {
-    static final String TAG = "RoboTvInputService";
+
+    private DisplayModeSetter mDisplayModeSetter;
 
     @Override
     public void onCreate() {
         super.onCreate();
         setTheme(android.R.style.Theme_DeviceDefault);
+
+        float mRefreshRate = SetupUtils.getRefreshRate(this);
+
+        mDisplayModeSetter = new DisplayModeSetter(this);
+        mDisplayModeSetter.setRefreshRate(mRefreshRate);
     }
 
     @Override
     public final Session onCreateSession(String inputId) {
-        Session session = new RoboTvSession(this, inputId);
-        return session;
+        return new RoboTvSession(this, inputId);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mDisplayModeSetter.release();
     }
 
     /**
      * Simple session implementation which plays local videos on the application's tune request.
      */
     private class RoboTvSession extends TvInputService.Session implements ExoPlayer.Listener, org.xvdr.msgexchange.Session.Callback, LiveTvSource.Listener, MediaCodecVideoTrackRenderer.EventListener {
+
         private static final String TAG = "TVSession";
 
         private static final int RENDERER_COUNT = 2;
@@ -212,11 +221,8 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onSelectTrack (int type, String trackId) {
-            if(type == TvTrackInfo.TYPE_AUDIO) {
-                return mSampleSource.selectAudioTrack(Integer.parseInt(trackId));
-            }
+            return type == TvTrackInfo.TYPE_AUDIO && mSampleSource.selectAudioTrack(Integer.parseInt(trackId));
 
-            return false;
         }
 
         private boolean startPlayback() {
@@ -226,6 +232,8 @@ public class RoboTvInputService extends TvInputService {
                     mSampleSource,
                     MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING,
                     5000,
+                    null,
+                    true,
                     mHandler,
                     this,
                     20);
@@ -266,9 +274,6 @@ public class RoboTvInputService extends TvInputService {
         public void onPlayerError(ExoPlaybackException e) {
             Log.e(TAG, "onPlayerError");
             e.printStackTrace();
-
-            mPlayer.setPlayWhenReady(false);
-            mPlayer.setPlayWhenReady(true);
         }
 
         // org.xvdr.msgexchange.Session.Callback implementation

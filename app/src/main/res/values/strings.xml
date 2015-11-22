@@ -8,14 +8,25 @@
     <string name="import_channels">Importing channels</string>
     <string name="import_do">Import</string>
     <string name="importing_channels">Importing channels ...</string>
-    <string name="setup_channels">Channels Setup</string>
+    <string name="setup_channels">robo.TV Setup</string>
     <string name="server">Server</string>
     <string name="connect_unable">Unable to connect to server !</string>
     <string name="language">Language</string>
+    <string name="refresh_rate">Display refresh rate</string>
 
     <string-array name="languages_array">
         <item>English</item>
         <item>German</item>
+    </string-array>
+
+    <string-array name="refresh_rate_name_array" translatable="false">
+        <item>50 Hz</item>
+        <item>60 Hz</item>
+    </string-array>
+
+    <string-array name="refresh_rate_value_array">
+        <item>50</item>
+        <item>60</item>
     </string-array>
 
     <string-array name="iso639_code1" translatable="false">
