@@ -19,25 +19,22 @@ final class MpegAudioReader extends StreamReader {
     private static final String TAG = "MpegAudioReader";
     boolean hasOutputFormat = false;
 
+    private static final int MAX_CHUNK_SIZE = 64 * 1024;
+    private byte[] mAudioBuffer= new byte[MAX_CHUNK_SIZE];
+
     MpegAudioDecoder mDecoder;
 
 	public MpegAudioReader(DefaultTrackOutput output, StreamBundle.Stream stream) {
 		super(output, stream);
         mDecoder = new MpegAudioDecoder();
+        mDecoder.setDecodeBuffer(mAudioBuffer, 0, MAX_CHUNK_SIZE);
 	}
 
 	@Override
 	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe) {
-        int length = mDecoder.decode(data.data, 0, data.capacity());
+        int length = mDecoder.decode(data.data, 0, data.limit());
 
         if(length == 0) {
-            return;
-        }
-
-        ParsableByteArray audioChunk = new ParsableByteArray(length);
-
-        if(!mDecoder.read(audioChunk.data, 0, audioChunk.capacity())) {
-            Log.e(TAG, "failed to read audio chunk");
             return;
         }
 
@@ -56,8 +53,8 @@ final class MpegAudioReader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(audioChunk, audioChunk.capacity());
-        output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, audioChunk.capacity(), 0, null);
+        output.sampleData(new ParsableByteArray(mAudioBuffer, length), length);
+        output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, length, 0, null);
 	}
 
 }

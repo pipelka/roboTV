@@ -20,6 +20,9 @@ final class Ac3Reader extends StreamReader {
     private boolean ac3PassThrough;
     boolean hasOutputFormat = false;
 
+    private static final int MAX_CHUNK_SIZE = 64 * 1024;
+    private byte[] mAudioBuffer= new byte[MAX_CHUNK_SIZE];
+
     AC3Decoder mDecoder;
 
     public Ac3Reader(DefaultTrackOutput output, StreamBundle.Stream stream) {
@@ -49,26 +52,20 @@ final class Ac3Reader extends StreamReader {
         }
 
         mDecoder = new AC3Decoder(channelMode);
+        mDecoder.setDecodeBuffer(mAudioBuffer, 0, mAudioBuffer.length);
 	}
 
 	@Override
 	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe) {
         if(ac3PassThrough) {
-            output.sampleData(data, data.capacity());
-            output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, data.capacity(), 0, null);
+            output.sampleData(data, data.limit());
+            output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, data.limit(), 0, null);
             return;
         }
 
-        int length = mDecoder.decode(data.data, 0, data.capacity());
+        int length = mDecoder.decode(data.data, 0, data.limit());
         if(length == 0) {
             Log.e(TAG, "Unable to decode frame data");
-            return;
-        }
-
-        ParsableByteArray audioChunk = new ParsableByteArray(length);
-
-        if(!mDecoder.read(audioChunk.data, 0, audioChunk.capacity())) {
-            Log.e(TAG, "failed to read audio chunk");
             return;
         }
 
@@ -87,8 +84,8 @@ final class Ac3Reader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(audioChunk, audioChunk.capacity());
-        output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, audioChunk.capacity(), 0, null);
+        output.sampleData(new ParsableByteArray(mAudioBuffer, length), length);
+        output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, length, 0, null);
 	}
 
 }

@@ -28,7 +28,10 @@ AC3Decoder::AC3Decoder(int flags) : Decoder(flags) {
 
 AC3Decoder::~AC3Decoder() {
 	a52_free(mState);
-	free(mDecodeBuffer);
+}
+
+void AC3Decoder::setDecodeBuffer(char* BYTE, int offset, int length) {
+    mDecodeBuffer = (uint8_t*)&BYTE[offset];
 }
 
 int AC3Decoder::decode(char* BYTE, int offset, int length) {
@@ -61,18 +64,13 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 		return mOutputBufferLength;
 	}
 
-	if(mDecodeBuffer == NULL) {
-		int decodeBufferSize = sizeof(int16_t) * 256 * 6 * 12;
-		mDecodeBuffer = (uint8_t*)memalign(16, decodeBufferSize);
-	}
-
 	// feed frame data
 
 	flags = mFlags | A52_ADJUST_LEVEL;
 
 	if(a52_frame(mState, inputBuffer, &flags, &level, bias) != 0) {
 		ALOG("a52_frame: failed to feed frame !");
-		return mOutputBufferLength;
+		return 0;
 	}
 
 	// check channel count
@@ -108,7 +106,7 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 			return mOutputBufferLength;
 		}
 
-		float* sample = (float*)a52_samples(mState);
+        float* sample = (float*)a52_samples(mState);
 
 		// copy block data for each channel
 		for(int c = 0; c < mChannels; c++) {
@@ -131,14 +129,4 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 	}
 
 	return mOutputBufferLength;
-}
-
-bool AC3Decoder::read(char* BYTE, int offset, int length) {
-	if(length < mOutputBufferLength) {
-		ALOG("output buffer too small !");
-		return false;
-	}
-
-	memcpy(&BYTE[offset], mDecodeBuffer, mOutputBufferLength);
-	return true;
 }

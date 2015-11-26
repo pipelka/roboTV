@@ -30,8 +30,8 @@ final class AdtsReader extends StreamReader {
 
 	@Override
 	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe) {
-        output.sampleData(data, data.capacity());
-        output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, data.capacity(), 0, null);
+        output.sampleData(data, data.limit());
+        output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, data.limit(), 0, null);
 	}
 
 }

@@ -11,9 +11,9 @@ public:
 
 	virtual ~Decoder() {};
 
-	virtual int decode(char* BYTE, int offset, int length) = 0;
+    virtual void setDecodeBuffer(char* BYTE, int offset, int length) = 0;
 
-	virtual bool read(char* BYTE, int offset, int length) = 0;
+	virtual int decode(char* BYTE, int offset, int length) = 0;
 
     virtual int getChannels() = 0;
 
