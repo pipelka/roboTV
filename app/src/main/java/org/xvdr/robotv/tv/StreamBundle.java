@@ -180,7 +180,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 			return MimeTypes.AUDIO_AAC;
 		}
 		else if(type == TYPE_AUDIO_EAC3) {
-			return MimeTypes.AUDIO_EC3;
+			return MimeTypes.AUDIO_E_AC3;
 		}
 		else if(type == TYPE_VIDEO_MPEG2) {
 			return "video/mpeg";

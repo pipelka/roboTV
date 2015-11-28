@@ -40,7 +40,7 @@ final class MpegAudioReader extends StreamReader {
 
         if(!hasOutputFormat) {
             MediaFormat format = MediaFormat.createAudioFormat(
-                    stream.physicalId, // < trackId
+                    Integer.toString(stream.physicalId), // < trackId
                     MimeTypes.AUDIO_RAW,
                     MediaFormat.NO_VALUE,
                     MediaFormat.NO_VALUE,

@@ -39,7 +39,7 @@ final class Ac3Reader extends StreamReader {
 
         if(ac3PassThrough) {
             output.format(MediaFormat.createAudioFormat(
-                    stream.physicalId,
+                    Integer.toString(stream.physicalId),
                     MimeTypes.AUDIO_AC3,
                     stream.bitRate,
                     -1,
@@ -71,7 +71,7 @@ final class Ac3Reader extends StreamReader {
 
         if(!hasOutputFormat) {
             MediaFormat format = MediaFormat.createAudioFormat(
-                    stream.physicalId, // < trackId
+                    Integer.toString(stream.physicalId), // < trackId
                     MimeTypes.AUDIO_RAW,
                     mDecoder.getBitRate(),
                     length,
