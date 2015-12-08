@@ -31,7 +31,7 @@ final class Ac3Reader extends StreamReader {
     }
 
     public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough) {
-        this(output, stream, ac3PassThrough, AC3Decoder.LayoutStereo);
+        this(output, stream, ac3PassThrough, AC3Decoder.LayoutDolby);
     }
 
 	public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelMode) {
@@ -72,6 +72,7 @@ final class Ac3Reader extends StreamReader {
         }
 
         if(!hasOutputFormat) {
+            Log.i(TAG, "channels: " + mDecoder.getChannels());
             MediaFormat format = MediaFormat.createAudioFormat(
                     Integer.toString(stream.physicalId), // < trackId
                     MimeTypes.AUDIO_RAW,
