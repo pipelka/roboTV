@@ -86,6 +86,10 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 		public int width;
 		public int height;
 		public float aspect;
+        public int spsLength;
+        public byte[] sps = new byte[128];
+        public int ppsLength;
+        public byte[] pps = new byte[128];
 
         public boolean isEqualTo(Stream s) {
             return
@@ -228,6 +232,14 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 				stream.height = (int) p.getU32();
 				stream.width = (int) p.getU32();
 				stream.aspect = (float)(p.getS64() / 10000.0);
+                stream.spsLength = p.getU8();
+                if(stream.spsLength > 0) {
+                    p.readBuffer(stream.sps, 0, stream.spsLength);
+                }
+                stream.ppsLength = p.getU8();
+                if(stream.ppsLength > 0) {
+                    p.readBuffer(stream.pps, 0, stream.ppsLength);
+                }
 			}
 			else if(stream.content == CONTENT_SUBTITLE) {
 				stream.language = p.getString();

@@ -11,6 +11,8 @@ import com.google.android.exoplayer.util.ParsableByteArray;
 import org.xvdr.audio.AC3Decoder;
 import org.xvdr.robotv.tv.StreamBundle;
 
+import java.util.Queue;
+
 /**
  * Processes a XVDR AC3 stream.
  */
@@ -21,19 +23,18 @@ final class Ac3Reader extends StreamReader {
     boolean hasOutputFormat = false;
 
     private static final int MAX_CHUNK_SIZE = 64 * 1024;
-    private byte[] mAudioBuffer= new byte[MAX_CHUNK_SIZE];
 
     AC3Decoder mDecoder;
 
-    public Ac3Reader(DefaultTrackOutput output, StreamBundle.Stream stream) {
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream) {
         this(output, stream, false);
     }
 
-    public Ac3Reader(DefaultTrackOutput output, StreamBundle.Stream stream, boolean ac3PassThrough) {
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough) {
         this(output, stream, ac3PassThrough, AC3Decoder.LayoutStereo);
     }
 
-	public Ac3Reader(DefaultTrackOutput output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelMode) {
+	public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelMode) {
 		super(output, stream);
         this.ac3PassThrough = ac3PassThrough;
 
@@ -52,18 +53,19 @@ final class Ac3Reader extends StreamReader {
         }
 
         mDecoder = new AC3Decoder(channelMode);
-        mDecoder.setDecodeBuffer(mAudioBuffer, 0, mAudioBuffer.length);
 	}
 
 	@Override
-	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe) {
+	public void consume(byte[] data, long pesTimeUs, boolean isKeyframe) {
         if(ac3PassThrough) {
-            output.sampleData(data, data.limit());
-            output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, data.limit(), 0, null);
+            output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
             return;
         }
 
-        int length = mDecoder.decode(data.data, 0, data.limit());
+        byte[] buffer = new byte[MAX_CHUNK_SIZE];
+        mDecoder.setDecodeBuffer(buffer, 0, buffer.length);
+
+        int length = mDecoder.decode(data, 0, data.length);
         if(length == 0) {
             Log.e(TAG, "Unable to decode frame data");
             return;
@@ -84,8 +86,7 @@ final class Ac3Reader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(new ParsableByteArray(mAudioBuffer, length), length);
-        output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, length, 0, null);
+        output.sampleData(buffer, length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
 	}
 
 }

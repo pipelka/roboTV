@@ -13,7 +13,7 @@ import org.xvdr.robotv.tv.StreamBundle;
  */
 final class AdtsReader extends StreamReader {
 
-	public AdtsReader(DefaultTrackOutput output, StreamBundle.Stream stream) {
+	public AdtsReader(PacketQueue output, StreamBundle.Stream stream) {
 		super(output, stream);
 
         output.format(MediaFormat.createAudioFormat(
@@ -29,9 +29,8 @@ final class AdtsReader extends StreamReader {
 	}
 
 	@Override
-	public void consume(ParsableByteArray data, long pesTimeUs, boolean isKeyframe) {
-        output.sampleData(data, data.limit());
-        output.sampleMetadata(pesTimeUs, C.SAMPLE_FLAG_SYNC, data.limit(), 0, null);
+	public void consume(byte[] data, long pesTimeUs, boolean isKeyframe) {
+        output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
 	}
 
 }

@@ -36,4 +36,24 @@
         <item>de</item>
     </string-array>
 
+    <string name="browse_title">roboTV Recordings</string>
+    <string name="related_movies">Related Videos</string>
+    <string name="ok">OK</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="stop">Stop</string>
+    <string name="init_text">00:00</string>
+    <string name="play_pause_description">Play Pause Button</string>
+    <string name="loading">Loading…</string>
+    <string name="setup_activity">Setup</string>
+    <string name="watch">Watch</string>
+    <string name="edit">Edit</string>
+    <string name="move_folder">Move to folder</string>
+    <string name="watch_subtext">Free</string>
+    <string name="video_error_media_load_timeout">Media loading timed out</string>
+    <string name="video_error_server_unaccessible">Media server was not reachable</string>
+    <string name="oops">Oops</string>
+    <string name="recordings">Recordings</string>
+    <string name="player_error">player error</string>
+
 </resources>

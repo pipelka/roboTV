@@ -60,7 +60,7 @@ public class ServerConnection extends Session {
 	public static final int XVDR_STATUS_RECORDINGSCHANGE = 5;
 	public static final int XVDR_STATUS_CHANNELSCAN = 6;
 
-	public static final int XVDRPROTOCOLVERSION = 5;
+	public static final int XVDRPROTOCOLVERSION = 6;
 
 	public Packet CreatePacket(int msgid, int type) {
 		return new Packet(msgid, type);
