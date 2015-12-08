@@ -73,6 +73,7 @@ public class RoboTvInputService extends TvInputService {
         private static final int RENDERER_COUNT = 2;
         private static final int MIN_BUFFER_MS = 2000;
         private static final int MIN_REBUFFER_MS = 3000;
+        private static final int DISCONTINUITY_MS = 20000;
 
         private static final int RENDERER_VIDEO = 0;
         private static final int RENDERER_AUDIO = 1;
@@ -245,7 +246,7 @@ public class RoboTvInputService extends TvInputService {
             mVideoRenderer = new MediaCodecVideoTrackRenderer(
                     mContext,
                     mSampleSource,
-                    MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING,
+                    MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
                     5000, // joining time
                     null,
                     true,
@@ -261,7 +262,7 @@ public class RoboTvInputService extends TvInputService {
                     this,
                     null,
                     AudioManager.STREAM_MUSIC,
-                    500000);
+                    DISCONTINUITY_MS);
 
             if(mSurface != null) {
                 mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);
@@ -401,11 +402,8 @@ public class RoboTvInputService extends TvInputService {
             Runnable reset = new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "audio track reset");
-                    mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DISABLED);
-                    mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DISABLED);
-                    mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DEFAULT);
-                    mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DEFAULT);
+                    Log.d(TAG, "track reset");
+                    doReset();
                     scheduleReset();
                 }
             };
@@ -414,6 +412,13 @@ public class RoboTvInputService extends TvInputService {
 
             mHandler.postDelayed(reset, 12 * 60 * 1000); // 12 minutes
             mLastResetRunnable = reset;
+        }
+
+        private void doReset() {
+            mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DISABLED);
+            mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DISABLED);
+            mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DEFAULT);
+            mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DEFAULT);
         }
 
         @Override
@@ -503,7 +508,9 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onAudioTrackUnderrun(int i, long l, long l1) {
             Log.e(TAG, "audio track underrun");
-            toastNotification("audio track underrun");
+            cancelReset();
+            doReset();
+            scheduleReset();
         }
     }
 }
