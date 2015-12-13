@@ -25,6 +25,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
             append(TYPE_VIDEO_H264,  "H264");
             append(TYPE_SUBTITLE,    "DVBSUB");
             append(TYPE_TELETEXT,    "TELETEXT");
+            append(TYPE_VIDEO_H265,  "H265");
         }
     };
 
@@ -37,6 +38,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
             append(TYPE_AUDIO_LATM,  CONTENT_AUDIO);
             append(TYPE_VIDEO_MPEG2, CONTENT_VIDEO);
             append(TYPE_VIDEO_H264,  CONTENT_VIDEO);
+            append(TYPE_VIDEO_H265,  CONTENT_VIDEO);
             append(TYPE_SUBTITLE,    CONTENT_SUBTITLE);
             append(TYPE_TELETEXT,    CONTENT_TELETEXT);
         }
@@ -58,12 +60,14 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 
     public final static int TYPE_VIDEO_MPEG2 = 6;
     public final static int TYPE_VIDEO_H264 = 7;
+    public final static int TYPE_VIDEO_H265 = 10;
 
     public final static int TYPE_SUBTITLE = 8;
     public final static int TYPE_TELETEXT = 9;
 
     private final static int supportedTypes[] = {
             TYPE_VIDEO_H264,
+            TYPE_VIDEO_H265,
             TYPE_AUDIO_AC3,
             TYPE_AUDIO_AAC,
             TYPE_AUDIO_MPEG2
@@ -90,6 +94,8 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         public byte[] sps = new byte[128];
         public int ppsLength;
         public byte[] pps = new byte[128];
+        public int vpsLength;
+        public byte[] vps = new byte[128];
 
         public boolean isEqualTo(Stream s) {
             return
@@ -189,9 +195,12 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 		else if(type == TYPE_VIDEO_MPEG2) {
 			return "video/mpeg";
 		}
-		else if(type == TYPE_VIDEO_H264) {
-			return MimeTypes.VIDEO_H264;
-		}
+        else if(type == TYPE_VIDEO_H264) {
+            return MimeTypes.VIDEO_H264;
+        }
+        else if(type == TYPE_VIDEO_H265) {
+            return MimeTypes.VIDEO_H265;
+        }
 		else if(type == TYPE_SUBTITLE) {
 			return "text/vnd.dvb.subtitle";
 		}
@@ -239,6 +248,10 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
                 stream.ppsLength = p.getU8();
                 if(stream.ppsLength > 0) {
                     p.readBuffer(stream.pps, 0, stream.ppsLength);
+                }
+                stream.vpsLength = p.getU8();
+                if(stream.vpsLength > 0) {
+                    p.readBuffer(stream.vps, 0, stream.vpsLength);
                 }
 			}
 			else if(stream.content == CONTENT_SUBTITLE) {

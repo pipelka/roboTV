@@ -309,6 +309,10 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
                 reader = new H264Reader(outputTrack, stream);
                 break;
 
+            case MimeTypes.VIDEO_H265:
+                reader = new H265Reader(outputTrack, stream);
+                break;
+
             case MimeTypes.AUDIO_AAC:
                 reader = new AdtsReader(outputTrack, stream);
                 break;

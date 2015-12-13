@@ -2,9 +2,7 @@ package org.xvdr.extractor;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer.util.MimeTypes;
-import com.google.android.exoplayer.util.ParsableByteArray;
 
 import org.xvdr.robotv.tv.StreamBundle;
 
@@ -12,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Processes a XVDR H264 byte stream
+ * Processes a XVDR H265 byte stream
  */
-final class H264Reader extends StreamReader {
+final class H265Reader extends StreamReader {
 
-	private static final String TAG = "H264Reader";
+	private static final String TAG = "H265Reader";
 
-	public H264Reader(PacketQueue output, StreamBundle.Stream stream) {
+	public H265Reader(PacketQueue output, StreamBundle.Stream stream) {
         super(output, stream);
 
         // XVDR sends the picture aspect ratio
@@ -36,10 +34,10 @@ final class H264Reader extends StreamReader {
 
         output.format(MediaFormat.createVideoFormat(
                 Integer.toString(stream.physicalId), // << trackId
-                MimeTypes.VIDEO_H264,
+                MimeTypes.VIDEO_H265,
                 MediaFormat.NO_VALUE,
                 MediaFormat.NO_VALUE,
-                C.UNKNOWN_TIME_US       ,
+                C.UNKNOWN_TIME_US,
                 stream.width,
                 stream.height,
                 initializationData,
@@ -57,6 +55,7 @@ final class H264Reader extends StreamReader {
     private void assembleInitData(List<byte[]> data) {
         byte[] initSps = new byte[stream.spsLength + 4];
         byte[] initPps = new byte[stream.ppsLength + 4];
+        byte[] initVps = new byte[stream.vpsLength + 4];
 
         // http://developer.android.com/reference/android/media/MediaCodec.html
 
@@ -69,5 +68,10 @@ final class H264Reader extends StreamReader {
         initPps[3] = 0x01;
         System.arraycopy(stream.pps, 0, initPps, 4, stream.ppsLength);
         data.add(initPps);
+
+        // add header 0x00 0x00 0x00 0x01
+        initVps[3] = 0x01;
+        System.arraycopy(stream.vps, 0, initVps, 4, stream.vpsLength);
+        data.add(initVps);
     }
 }
