@@ -13,7 +13,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Surface;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -54,7 +59,10 @@ public class RoboTvInputService extends TvInputService {
 
     @Override
     public final Session onCreateSession(String inputId) {
-        return new RoboTvSession(this, inputId);
+        Session session = new RoboTvSession(this, inputId);
+        session.setOverlayViewEnabled(true);
+
+        return session;
     }
 
     @Override
@@ -96,6 +104,7 @@ public class RoboTvInputService extends TvInputService {
 
         private PriorityHandlerThread mHandlerThread;
         private Handler mHandler;
+        private final Toast mTuningToast;
 
         RoboTvSession(Context context, String inputId) {
             super(context);
@@ -113,6 +122,16 @@ public class RoboTvInputService extends TvInputService {
             // create connection
             mConnection = new ServerConnection("Android TVInputService", SetupUtils.getLanguageISO3(mContext));
             mConnection.addCallback(this);
+
+            mTuningToast = new Toast(mContext);
+            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View view = inflater.inflate(R.layout.layout_tuning, null);
+
+            mTuningToast.setView(view);
+            mTuningToast.setDuration(Toast.LENGTH_SHORT);
+            mTuningToast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
+
         }
 
         @Override
@@ -137,6 +156,14 @@ public class RoboTvInputService extends TvInputService {
             mVideoRenderer = null;
             mAudioRenderer = null;
             mSampleSource = null;
+        }
+
+        @Override
+        public View onCreateOverlayView() {
+            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View view = inflater.inflate(R.layout.overlayview, null);
+            return view;
         }
 
         @Override
@@ -197,7 +224,7 @@ public class RoboTvInputService extends TvInputService {
             try {
                 cursor = getContentResolver().query(channelUri, projection, null, null, null);
                 if (cursor == null || cursor.getCount() == 0) {
-                    toastNotification("channel not found.");
+                    errorNotification(getResources().getString(R.string.channel_not_found));
                     return false;
                 }
                 cursor.moveToNext();
@@ -217,9 +244,11 @@ public class RoboTvInputService extends TvInputService {
             // open live tv connection
             if(!mConnection.isOpen()) {
                 if(!mConnection.open(SetupUtils.getServer(mContext))) {
-                    toastNotification("failed to connect to server");
+                    errorNotification(getResources().getString(R.string.failed_connect));
                     return false;
                 }
+
+                mConnection.enableStatusInterface();
             }
 
             // create samplesource
@@ -270,7 +299,7 @@ public class RoboTvInputService extends TvInputService {
 
             // stream channel
             if(mSampleSource.openStream(uid) == LiveTvSource.ERROR) {
-                toastNotification("failed to tune channel");
+                errorNotification(getResources().getString(R.string.failed_tune));
                 return false;
             }
 
@@ -287,8 +316,12 @@ public class RoboTvInputService extends TvInputService {
         }
 
         @Override
-        public void onPlayerStateChanged(boolean b, int i) {
-            Log.i(TAG, "onPlayerStateChanged " + b + " " + i);
+        public void onPlayerStateChanged(boolean b, int state) {
+            Log.i(TAG, "onPlayerStateChanged " + b + " " + state);
+
+            if(state != ExoPlayer.STATE_READY) {
+                toastTuning(state);
+            }
         }
 
         // ExoPlayer.Listener implementation
@@ -311,37 +344,54 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onNotification(Packet notification) {
+            String message;
+
             // process only STATUS messages
             if(notification.getType() != ServerConnection.XVDR_CHANNEL_STATUS) {
                 return;
             }
 
             int id = notification.getMsgID();
+            Log.d(TAG, "notification id: " + id);
+
             switch(id) {
                 case ServerConnection.XVDR_STATUS_MESSAGE:
+                    Log.d(TAG, "status message");
                     notification.getU32(); // type
-                    toastNotification(notification.getString());
+                    message = notification.getString();
+                    toastNotification(message);
                     break;
                 case ServerConnection.XVDR_STATUS_RECORDING:
+                    Log.d(TAG, "recording status");
                     notification.getU32();
+
                     int on = (int) notification.getU32();
                     String recname = notification.getString();
-                    String message = "Recording '" + recname + "' ";
-                    message += (on == 1) ? "started" : "finished";
-                    toastNotification(message);
+
+                    message = mContext.getResources().getString(R.string.recording_text) + " ";
+                    message += (on == 1) ?
+                            mContext.getResources().getString(R.string.recording_started) :
+                            mContext.getResources().getString(R.string.recording_finished);
+
+                    toastNotification(recname, message, R.drawable.ic_movie_white_48dp);
                     break;
             }
         }
 
         @Override
         public void onDisconnect() {
-            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
-            toastNotification("Connection to backend lost");
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
+                    errorNotification(mContext.getResources().getString(R.string.connection_lost));
+                }
+            });
         }
 
         @Override
         public void onReconnect() {
-            toastNotification("Connection restored");
+            toastNotification(mContext.getResources().getString(R.string.connection_restored));
 
             mHandler.post(new Runnable() {
                 @Override
@@ -356,15 +406,63 @@ public class RoboTvInputService extends TvInputService {
             });
         }
 
-        private void toastNotification(final String message) {
-            Log.i(TAG, message);
+        private void toastNotification(String message) {
+            toastNotification(
+                    message,
+                    mContext.getResources().getString(R.string.toast_information),
+                    R.drawable.ic_info_outline_white_48dp);
+        }
 
+        private void toastNotification(String message, String title) {
+            toastNotification(message, title, R.drawable.ic_info_outline_white_48dp);
+        }
+
+        private void toastNotification(final String message, final String title, final int icon) {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+                    final Toast toast = new Toast(mContext);
+                    LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                    View view = inflater.inflate(R.layout.layout_toast, null);
+
+                    TextView titleView = (TextView) view.findViewById(R.id.title);
+                    titleView.setText(title);
+
+                    TextView messageView = (TextView) view.findViewById(R.id.message);
+                    messageView.setText(message);
+
+                    ImageView imageView = (ImageView) view.findViewById(R.id.icon);
+                    imageView.setImageResource(icon);
+
+                    toast.setView(view);
+                    toast.setDuration(Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.RIGHT | Gravity.BOTTOM, 0, 0);
+
+                    toast.show();
                 }
             });
+        }
+
+        private void toastTuning(final int state) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if(state == ExoPlayer.STATE_READY) {
+                        mTuningToast.cancel();
+                        return;
+                    }
+
+                    mTuningToast.show();
+                }
+            });
+        }
+
+        private void errorNotification(String message) {
+            toastNotification(
+                    message,
+                    mContext.getResources().getString(R.string.toast_error),
+                    R.drawable.ic_error_outline_white_48dp);
         }
 
         @Override
@@ -424,13 +522,11 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onDecoderInitializationError(MediaCodecTrackRenderer.DecoderInitializationException e) {
             Log.e(TAG, "onDecoderInitializationError");
-            toastNotification("decoder initialization error !");
             Log.e(TAG, e.getMessage());
         }
 
         @Override
         public void onCryptoError(MediaCodec.CryptoException e) {
-            toastNotification("crypto error !");
         }
 
         @Override

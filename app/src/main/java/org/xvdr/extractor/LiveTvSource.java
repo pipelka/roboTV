@@ -1,5 +1,6 @@
 package org.xvdr.extractor;
 
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
@@ -91,7 +92,7 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
      * @return returns the status of the operation
      */
     public int openStream(int channelUid) {
-        return openStream(channelUid, false);
+        return openStream(channelUid, Build.MODEL.equals("Nexus Player"));
     }
 
     /**
@@ -268,6 +269,10 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
 
     @Override
     synchronized public void onNotification(Packet packet) {
+        // process only STATUS messages
+        if(packet.getType() != ServerConnection.XVDR_CHANNEL_STREAM) {
+            return;
+        }
 
         switch(packet.getMsgID()) {
             case ServerConnection.XVDR_STREAM_CHANGE:

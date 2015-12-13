@@ -26,6 +26,7 @@ public class ServerConnection extends Session {
 
 	/* OPCODE 1 - 19: XVDR network functions for general purpose */
 	public static final int XVDR_LOGIN = 1;
+    public static final int XVDR_ENABLESTATUSINTERFACE = 3;
 
 	/* OPCODE 20 - 39: XVDR network functions for live streaming */
 	public static final int XVDR_CHANNELSTREAM_OPEN = 20;
@@ -121,4 +122,16 @@ public class ServerConnection extends Session {
 
 		return true;
 	}
+
+    public boolean enableStatusInterface() {
+        return enableStatusInterface(true);
+    }
+
+    public boolean enableStatusInterface(boolean enabled) {
+        Packet req = CreatePacket(XVDR_ENABLESTATUSINTERFACE);
+        req.putU8((short)(enabled ? 1 : 0));
+
+        Packet resp = transmitMessage(req);
+        return (resp != null);
+    }
 }

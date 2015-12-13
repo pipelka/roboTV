@@ -14,7 +14,6 @@ public class Session extends SessionProxy {
     public Session() {
         mCallbacks = new CopyOnWriteArraySet<>();
     }
-
     public void addCallback(Callback callback) {
         if(callback == null) {
             return;
@@ -45,14 +44,14 @@ public class Session extends SessionProxy {
 
     @Override
     protected void onDisconnect() {
-        for(Callback cb : mCallbacks) {
+        for(final Callback cb : mCallbacks) {
             cb.onDisconnect();
         }
     }
 
     @Override
     protected void onReconnect() {
-        for(Callback cb : mCallbacks) {
+        for(final Callback cb : mCallbacks) {
             cb.onReconnect();
         }
     }

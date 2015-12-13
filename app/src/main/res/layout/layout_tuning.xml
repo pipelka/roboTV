@@ -1,0 +1,23 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="40pt"
+        android:layout_height="40pt"
+        android:background="@drawable/toast_bg"
+        android:elevation="7dp">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="30pt"
+            android:layout_height="30pt"
+            android:id="@+id/progress"
+            android:visibility="visible"
+            android:indeterminate="true"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5pt"/>
+    </LinearLayout>
+
+</FrameLayout>

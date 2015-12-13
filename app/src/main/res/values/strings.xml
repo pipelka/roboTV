@@ -55,5 +55,15 @@
     <string name="oops">Oops</string>
     <string name="recordings">Recordings</string>
     <string name="player_error">player error</string>
+    <string name="toast_information">Information</string>
+    <string name="toast_error">Error</string>
+    <string name="recording_text">Recording</string>
+    <string name="recording_started">started</string>
+    <string name="recording_finished">finished</string>
+    <string name="connection_restored">Connection restored</string>
+    <string name="connection_lost">Connection to backend lost</string>
+    <string name="channel_not_found">channel not found</string>
+    <string name="failed_connect">failed to connect to server</string>
+    <string name="failed_tune">failed to tune channel</string>
 
 </resources>

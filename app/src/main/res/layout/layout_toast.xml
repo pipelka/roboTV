@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40pt"
+        android:background="@drawable/toast_bg"
+        android:layout_marginRight="20pt"
+        android:layout_marginBottom="20pt"
+        android:elevation="7dp">
+
+        <ImageView
+            android:layout_width="30pt"
+            android:layout_height="30pt"
+            android:id="@+id/icon"
+            android:src="@drawable/ic_info_outline_white_48dp"
+            android:layout_marginLeft="5pt"
+            android:layout_marginTop="5pt"
+            android:layout_marginBottom="5pt"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginRight="10pt">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Large Text"
+                android:id="@+id/title"
+                android:layout_marginLeft="5pt"
+                android:layout_marginTop="5pt"
+                android:layout_marginBottom="2pt"
+                android:textStyle="bold|italic"/>
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/message"
+                android:layout_marginLeft="5pt"
+                android:layout_marginBottom="5pt"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
