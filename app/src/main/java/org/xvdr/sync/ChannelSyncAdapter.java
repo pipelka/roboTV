@@ -55,7 +55,6 @@ public class ChannelSyncAdapter {
 	private Context mContext;
 	private ServerConnection mConnection;
 	private String mInputId;
-	private ScheduledThreadPoolExecutor mExecutor = new ScheduledThreadPoolExecutor(10);
 	private boolean mCancelChannelSync = false;
     private TheMovieDatabase mMovieDb;
 
@@ -243,44 +242,32 @@ public class ChannelSyncAdapter {
 
 		Log.i(TAG, "syncing epg ...");
 
-		List<ContentValues> programs = new ArrayList<>();
-
 		// fetch epg entries for each channel
 		int size = existingChannels.size();
 
 		for(int i = 0; i < size; ++i) {
-			fetchEPGForChannel(existingChannels.keyAt(i), existingChannels.valueAt(i), programs);
-		}
+            List<ContentValues> programs = new ArrayList<>();
 
-		Log.i(TAG, "populating database with " + programs.size() + " entries ...");
+            fetchEPGForChannel(existingChannels.keyAt(i), existingChannels.valueAt(i), programs);
 
-		// populate database
-		ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+            // populate database
+            ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
-		for(ContentValues values : programs) {
-			ops.add(ContentProviderOperation.newInsert(TvContract.Programs.CONTENT_URI).withValues(values).build());
+            for(ContentValues values : programs) {
+                ops.add(ContentProviderOperation.newInsert(TvContract.Programs.CONTENT_URI).withValues(values).build());
+            }
 
-			if(ops.size() == BATCH_OPERATION_COUNT) {
-				try {
-					mContext.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
-				}
-				catch(RemoteException | OperationApplicationException e) {
-					Log.e(TAG, "Failed to insert programs.", e);
-					return;
-				}
+            try {
+                mContext.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
+            }
+            catch(RemoteException | OperationApplicationException e) {
+                Log.e(TAG, "Failed to insert programs.", e);
+                return;
+            }
 
-				ops.clear();
-			}
-		}
-
-		// commit last part
-		try {
-			mContext.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
-		}
-		catch(RemoteException | OperationApplicationException e) {
-			Log.e(TAG, "Failed to insert programs.", e);
-			return;
-		}
+            Log.i(TAG, "populated database with " + programs.size() + " entries.");
+            ops.clear();
+        }
 
 		Log.i(TAG, "synced schedule for " + existingChannels.size() + " channels");
 	}
@@ -292,7 +279,8 @@ public class ChannelSyncAdapter {
 		long end = start + duration;
 
 		Uri channelUri = TvContract.buildChannelUri(channelId);
-        Uri channelLogoUri = TvContract.buildChannelLogoUri(channelUri);
+
+        Log.d(TAG, "feching epg for " + channelUri.toString() + " ...");
 
         SparseArray<String> cache = new SparseArray<>();
 
@@ -320,11 +308,12 @@ public class ChannelSyncAdapter {
 		Packet resp = mConnection.transmitMessage(req);
 
 		if(resp == null) {
+            Log.d(TAG, "error sending fetch epg request");
 			return;
 		}
 
 		// add schedule
-
+        int i = 0;
 		while(!resp.eop()) {
 			long eventId = resp.getU32();
 			long startTime = resp.getU32();
@@ -411,7 +400,10 @@ public class ChannelSyncAdapter {
             }
 
 			programs.add(values);
+            i++;
 		}
+
+        Log.d(TAG, "synced " + i + " epg events");
 	}
 
 	private void fetchChannelLogo(Uri channelUri, String address) {
