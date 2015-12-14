@@ -3,7 +3,6 @@ package org.xvdr.robotv.service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
@@ -81,7 +80,6 @@ public class RoboTvInputService extends TvInputService {
         private static final int RENDERER_COUNT = 2;
         private static final int MIN_BUFFER_MS = 2000;
         private static final int MIN_REBUFFER_MS = 3000;
-        private static final int DISCONTINUITY_MS = 20000;
 
         private static final int RENDERER_VIDEO = 0;
         private static final int RENDERER_AUDIO = 1;
@@ -289,9 +287,7 @@ public class RoboTvInputService extends TvInputService {
                     true,
                     mHandler,
                     this,
-                    null,
-                    AudioManager.STREAM_MUSIC,
-                    DISCONTINUITY_MS);
+                    null);
 
             if(mSurface != null) {
                 mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);
