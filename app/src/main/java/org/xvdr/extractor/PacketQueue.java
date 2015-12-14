@@ -7,6 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     private MediaFormat mFormat;
+    private int mMaxQueueSize = 300;
 
     public class PacketHolder {
         public byte[] data = null;
@@ -50,6 +51,10 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     public void sampleData(byte[] data, int length, long timeUs, int flags) {
         PacketHolder holder = new PacketHolder(data, length, timeUs, flags);
+
+        if(size() >= mMaxQueueSize) {
+            return;
+        }
 
         try {
             put(holder);
