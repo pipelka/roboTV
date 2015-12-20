@@ -263,7 +263,6 @@ public class ChannelSyncAdapter {
             if(channelId == null) {
                 resolver.insert(TvContract.Channels.CONTENT_URI, values);
             }
-
             // update existing channel
             else {
                 channelUri = TvContract.buildChannelUri(channelId);
