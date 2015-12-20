@@ -33,9 +33,11 @@ import org.xvdr.extractor.LiveTvSource;
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
+import org.xvdr.robotv.tv.ChannelList;
 import org.xvdr.robotv.tv.DisplayModeSetter;
 import org.xvdr.robotv.tv.ServerConnection;
 import org.xvdr.robotv.tv.StreamBundle;
+import org.xvdr.sync.ChannelSyncAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -274,7 +276,7 @@ public class RoboTvInputService extends TvInputService {
                     mContext,
                     mSampleSource,
                     MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-                    5000, // joining time
+                    2000, // joining time
                     null,
                     true,
                     mHandler,
@@ -359,10 +361,11 @@ public class RoboTvInputService extends TvInputService {
                     break;
                 case ServerConnection.XVDR_STATUS_RECORDING:
                     Log.d(TAG, "recording status");
-                    notification.getU32();
+                    notification.getU32(); // card index
+                    int on = (int) notification.getU32(); // on
 
-                    int on = (int) notification.getU32();
-                    String recname = notification.getString();
+                    String recname = notification.getString(); // name
+                    notification.getString(); // filename
 
                     message = mContext.getResources().getString(R.string.recording_text) + " ";
                     message += (on == 1) ?
