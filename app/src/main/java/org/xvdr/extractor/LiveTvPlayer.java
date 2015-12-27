@@ -1,0 +1,72 @@
+package org.xvdr.extractor;
+
+import android.content.Context;
+import android.os.Build;
+
+import org.xvdr.msgexchange.Packet;
+import org.xvdr.robotv.tv.ServerConnection;
+
+public class LiveTvPlayer extends Player {
+
+    public LiveTvPlayer(Context context, String server, String language, Listener listener) {
+        super(context, server, language, listener);
+    }
+
+    /**
+     * Start streaming of a LiveTV channel with a default priority, without waiting for the first keyframe
+     * @param channelUid the unique id of the channel
+     * @return returns the status of the operation
+     */
+    public int openStream(int channelUid) {
+        return openStream(channelUid, Build.MODEL.equals("Nexus Player"));
+    }
+
+    /**
+     * Start streaming of a LiveTV channel with a default priority
+     * @param channelUid the unique id of the channel
+     * @param waitForKeyFrame start streaming after the first IFRAME has been received
+     * @return returns the status of the operation
+     */
+    public int openStream(int channelUid, boolean waitForKeyFrame) {
+        return openStream(channelUid, waitForKeyFrame, 50);
+    }
+
+    /**
+     * Start streaming of a LiveTV channel
+     * @param channelUid the unique id of the channel
+     * @param waitForKeyFrame start streaming after the first IFRAME has been received
+     * @param priority priority of the received device on the server
+     * @return returns the status of the operation
+     */
+    public int openStream(int channelUid, boolean waitForKeyFrame, int priority) {
+        // stop playback
+        stop();
+
+        // open server connection
+        open();
+
+        Packet req = mConnection.CreatePacket(ServerConnection.XVDR_CHANNELSTREAM_OPEN, ServerConnection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        req.putU32(channelUid);
+        req.putS32(priority); // priority 50
+        req.putU8((short) (waitForKeyFrame ? 1 : 0)); // start with IFrame
+        req.putU8((short)1); // raw PTS values
+
+        Packet resp = mConnection.transmitMessage(req);
+
+        if(resp == null) {
+            return NORESPONSE;
+        }
+
+        int status = (int)resp.getU32();
+
+        if(status > 0) {
+            return ERROR;
+        }
+
+        start();
+
+        return SUCCESS;
+    }
+
+
+}

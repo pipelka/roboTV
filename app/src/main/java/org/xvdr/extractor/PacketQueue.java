@@ -1,13 +1,17 @@
 package org.xvdr.extractor;
 
+import android.util.Log;
+
 import com.google.android.exoplayer.MediaFormat;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
+    final private static String TAG = "PacketQueue";
+    final private static int mMaxQueueSize = 400;
+
     private MediaFormat mFormat;
-    private int mMaxQueueSize = 300;
 
     public class PacketHolder {
         public byte[] data = null;
@@ -37,6 +41,10 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     }
 
+    public PacketQueue() {
+        super(mMaxQueueSize);
+    }
+
     public void format(MediaFormat format) {
         PacketHolder holder = new PacketHolder(format);
         mFormat = format;
@@ -51,10 +59,6 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     public void sampleData(byte[] data, int length, long timeUs, int flags) {
         PacketHolder holder = new PacketHolder(data, length, timeUs, flags);
-
-        if(size() >= mMaxQueueSize) {
-            return;
-        }
 
         try {
             put(holder);

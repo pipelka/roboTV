@@ -3,7 +3,6 @@ package org.xvdr.robotv.service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.media.MediaCodec;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
@@ -23,21 +22,16 @@ import android.widget.Toast;
 
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
-import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
-import com.google.android.exoplayer.MediaCodecTrackRenderer;
-import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
-import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.util.PriorityHandlerThread;
 
-import org.xvdr.extractor.LiveTvSource;
+import org.xvdr.extractor.LiveTvPlayer;
+import org.xvdr.extractor.Player;
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
-import org.xvdr.robotv.tv.ChannelList;
 import org.xvdr.robotv.tv.DisplayModeSetter;
 import org.xvdr.robotv.tv.ServerConnection;
 import org.xvdr.robotv.tv.StreamBundle;
-import org.xvdr.sync.ChannelSyncAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,31 +69,16 @@ public class RoboTvInputService extends TvInputService {
     /**
      * Simple session implementation which plays local videos on the application's tune request.
      */
-    private class RoboTvSession extends TvInputService.Session implements ExoPlayer.Listener, org.xvdr.msgexchange.Session.Callback, LiveTvSource.Listener, MediaCodecVideoTrackRenderer.EventListener, MediaCodecAudioTrackRenderer.EventListener {
+    private class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         private static final String TAG = "TVSession";
-
-        private static final int RENDERER_COUNT = 2;
-        private static final int MIN_BUFFER_MS = 2000;
-        private static final int MIN_REBUFFER_MS = 3000;
-
-        private static final int RENDERER_VIDEO = 0;
-        private static final int RENDERER_AUDIO = 1;
-
-        private ExoPlayer mPlayer;
-        private LiveTvSource mSampleSource;
-
-        private MediaCodecVideoTrackRenderer mVideoRenderer = null;
-        private MediaCodecAudioTrackRenderer mAudioRenderer = null;
-
-        private Surface mSurface;
 
         private Uri mCurrentChannelUri;
         private String mInputId;
         private Runnable mLastTuneRunnable;
         private Runnable mLastResetRunnable;
 
-        private ServerConnection mConnection = null;
+        private LiveTvPlayer mPlayer;
         private Context mContext;
 
         private PriorityHandlerThread mHandlerThread;
@@ -116,12 +95,8 @@ public class RoboTvInputService extends TvInputService {
             mHandlerThread.start();
             mHandler = new Handler(mHandlerThread.getLooper());
 
-            mPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT, MIN_BUFFER_MS, MIN_REBUFFER_MS);
-            mPlayer.addListener(this);
-
-            // create connection
-            mConnection = new ServerConnection("Android TVInputService", SetupUtils.getLanguageISO3(mContext));
-            mConnection.addCallback(this);
+            // player init
+            mPlayer = new LiveTvPlayer(mContext, SetupUtils.getServer(mContext), SetupUtils.getLanguageISO3(mContext), this);
 
             mTuningToast = new Toast(mContext);
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -138,24 +113,7 @@ public class RoboTvInputService extends TvInputService {
         public void onRelease() {
 
             cancelReset();
-            mPlayer.stop();
-
-            mHandlerThread.quitSafely();
-            mHandler = null;
-
-            mPlayer.removeListener(this);
             mPlayer.release();
-            mPlayer = null;
-
-            if(mConnection != null) {
-                mConnection.close();
-                mConnection.removeAllCallbacks();
-                mConnection = null;
-            }
-
-            mVideoRenderer = null;
-            mAudioRenderer = null;
-            mSampleSource = null;
         }
 
         @Override
@@ -168,13 +126,7 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onSetSurface(Surface surface) {
-            mSurface = surface;
-
-            if(mPlayer == null || mVideoRenderer == null) {
-                return true;
-            }
-
-            mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);
+            mPlayer.setSurface(surface);
             return true;
         }
 
@@ -185,9 +137,7 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onSetStreamVolume(float volume) {
-            if (mAudioRenderer != null) {
-                mPlayer.sendMessage(mAudioRenderer, MediaCodecAudioTrackRenderer.MSG_SET_VOLUME, volume);
-            }
+            mPlayer.setStreamVolume(volume);
         }
 
         @Override
@@ -238,25 +188,14 @@ public class RoboTvInputService extends TvInputService {
 
             mCurrentChannelUri = channelUri;
 
-            // stop playback
-            mPlayer.stop();
-
-            // open live tv connection
-            if(!mConnection.isOpen()) {
-                if(!mConnection.open(SetupUtils.getServer(mContext))) {
-                    errorNotification(getResources().getString(R.string.failed_connect));
-                    return false;
-                }
-
-                mConnection.enableStatusInterface();
+            // start player
+            // stream channel
+            if(mPlayer.openStream(uid) == Player.ERROR) {
+                errorNotification(getResources().getString(R.string.failed_tune));
+                return false;
             }
 
-            // create samplesource
-            mSampleSource = new LiveTvSource(mConnection, mHandler);
-            mSampleSource.setListener(this);
-
-            // start player
-            startPlayback(uid);
+            Log.i(TAG, "successfully switched channel");
             return true;
         }
 
@@ -265,80 +204,30 @@ public class RoboTvInputService extends TvInputService {
         }
 
         @Override
-        public boolean onSelectTrack (int type, String trackId) {
-            return type == TvTrackInfo.TYPE_AUDIO && mSampleSource.selectAudioTrack(Integer.parseInt(trackId));
+        public boolean onSelectTrack(int type, String trackId) {
+            return type == TvTrackInfo.TYPE_AUDIO && mPlayer.selectAudioTrack(Integer.parseInt(trackId));
 
-        }
-
-        private boolean startPlayback(int uid) {
-
-            mVideoRenderer = new MediaCodecVideoTrackRenderer(
-                    mContext,
-                    mSampleSource,
-                    MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-                    2000, // joining time
-                    null,
-                    true,
-                    mHandler,
-                    this,
-                    50);
-
-            mAudioRenderer = new MediaCodecAudioTrackRenderer(
-                    mSampleSource,
-                    null,
-                    true,
-                    mHandler,
-                    this,
-                    null);
-
-            if(mSurface != null) {
-                mPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);
-            }
-
-            // stream channel
-            if(mSampleSource.openStream(uid) == LiveTvSource.ERROR) {
-                errorNotification(getResources().getString(R.string.failed_tune));
-                return false;
-            }
-
-            Log.i(TAG, "successfully switched channel");
-
-            // prepare player
-            mPlayer.prepare(mVideoRenderer, mAudioRenderer);
-
-            mPlayer.setSelectedTrack(RENDERER_AUDIO, ExoPlayer.TRACK_DEFAULT);
-            mPlayer.setSelectedTrack(RENDERER_VIDEO, ExoPlayer.TRACK_DEFAULT);
-
-            mPlayer.setPlayWhenReady(true);
-            return true;
         }
 
         @Override
-        public void onPlayerStateChanged(boolean b, int state) {
-            Log.i(TAG, "onPlayerStateChanged " + b + " " + state);
+        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
 
-            if(state != ExoPlayer.STATE_READY) {
-                toastTuning(state);
+            if(playbackState != ExoPlayer.STATE_READY) {
+                toastTuning(playbackState);
             }
         }
 
-        // ExoPlayer.Listener implementation
+        // Listener implementation
 
         @Override
-        public void onPlayWhenReadyCommitted() {
-            Log.i(TAG, "onPlayWhenReadyCommitted");
-        }
-
-        @Override
-        public void onPlayerError(ExoPlaybackException e) {
+        public void onPlayerError(Exception e) {
             toastNotification(getResources().getString(R.string.player_error));
             Log.e(TAG, "onPlayerError");
             e.printStackTrace();
 
             onTune(mCurrentChannelUri);
         }
-
-        // org.xvdr.msgexchange.Session.Callback implementation
 
         @Override
         public void onNotification(Packet notification) {
@@ -379,30 +268,14 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onDisconnect() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
-                    errorNotification(mContext.getResources().getString(R.string.connection_lost));
-                }
-            });
+            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
+            errorNotification(mContext.getResources().getString(R.string.connection_lost));
         }
 
         @Override
         public void onReconnect() {
             toastNotification(mContext.getResources().getString(R.string.connection_restored));
-
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (mConnection == null) {
-                        return;
-                    }
-
-                    mConnection.login();
-                    onTune(mCurrentChannelUri);
-                }
-            });
+            onTune(mCurrentChannelUri);
         }
 
         private void toastNotification(String message) {
@@ -447,7 +320,7 @@ public class RoboTvInputService extends TvInputService {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if(state == ExoPlayer.STATE_READY) {
+                    if (state == ExoPlayer.STATE_READY) {
                         mTuningToast.cancel();
                         return;
                     }
@@ -462,16 +335,6 @@ public class RoboTvInputService extends TvInputService {
                     message,
                     mContext.getResources().getString(R.string.toast_error),
                     R.drawable.ic_error_outline_white_48dp);
-        }
-
-        @Override
-        public void onDroppedFrames(int count, long elapsed) {
-            Log.i(TAG, "onDroppedFrames() - count: " + count + " / elapsed: " + elapsed);
-        }
-
-        @Override
-        public void onVideoSizeChanged(int i, int i1, int i2, float v) {
-            Log.i(TAG, "onVideoSizeChanged " + i + " " + i1 + " " + i2 + " " + v);
         }
 
         @Override
@@ -512,25 +375,7 @@ public class RoboTvInputService extends TvInputService {
         }
 
         private void doReset() {
-            mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DISABLED);
-            mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DISABLED);
-            mPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DEFAULT);
-            mPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DEFAULT);
-        }
-
-        @Override
-        public void onDecoderInitializationError(MediaCodecTrackRenderer.DecoderInitializationException e) {
-            Log.e(TAG, "onDecoderInitializationError");
-            Log.e(TAG, e.getMessage());
-        }
-
-        @Override
-        public void onCryptoError(MediaCodec.CryptoException e) {
-        }
-
-        @Override
-        public void onDecoderInitialized(String s, long l, long l1) {
-            Log.i(TAG, "onDecoderInitialized");
+            mPlayer.reset();
         }
 
         @Override
@@ -591,21 +436,11 @@ public class RoboTvInputService extends TvInputService {
         }
 
         @Override
-        public void onAudioTrackInitializationError(AudioTrack.InitializationException e) {
-            e.printStackTrace();
-        }
-
-        @Override
-        public void onAudioTrackWriteError(AudioTrack.WriteException e) {
-            e.printStackTrace();
-        }
-
-        @Override
         public void onAudioTrackUnderrun(int i, long l, long l1) {
             Log.e(TAG, "audio track underrun");
-            cancelReset();
+            /*cancelReset();
             doReset();
-            scheduleReset();
+            scheduleReset();*/
         }
     }
 }

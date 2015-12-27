@@ -1,6 +1,5 @@
 package org.xvdr.extractor;
 
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
@@ -19,13 +18,8 @@ import org.xvdr.robotv.tv.ServerConnection;
 import org.xvdr.robotv.tv.StreamBundle;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-public class LiveTvSource implements SampleSource, SampleSource.SampleSourceReader, Session.Callback {
-
-    public final static int NORESPONSE = -1;
-    public final static int SUCCESS = 0;
-    public final static int ERROR = 1;
+public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSourceReader, Session.Callback {
 
     public interface Listener {
 
@@ -36,7 +30,7 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         void onVideoTrackChanged(StreamBundle.Stream stream);
     }
 
-    final static private String TAG = "LiveTvSource";
+    final static private String TAG = "RoboTvSampleSource";
     final static private int TRACK_COUNT = 3;
     final static private int TRACK_VIDEO = 0;
     final static private int TRACK_AUDIO = 1;
@@ -69,11 +63,11 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
      * Create a LiveTv SampleSource
      * @param connection the server connection to use
      */
-    public LiveTvSource(ServerConnection connection) {
+    public RoboTvSampleSource(ServerConnection connection) {
         this(connection, new Handler());
     }
 
-    public LiveTvSource(ServerConnection connection, Handler handler) {
+    public RoboTvSampleSource(ServerConnection connection, Handler handler) {
         mConnection = connection;
         mHandler = handler;
         mBundle = new StreamBundle();
@@ -84,54 +78,6 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         for(int i = 0; i < TRACK_COUNT; i++) {
             mOutputTracks[i] = new PacketQueue();
         }
-    }
-
-    /**
-     * Start streaming of a LiveTV channel with a default priority, without waiting for the first keyframe
-     * @param channelUid the unique id of the channel
-     * @return returns the status of the operation
-     */
-    public int openStream(int channelUid) {
-        return openStream(channelUid, Build.MODEL.equals("Nexus Player"));
-    }
-
-    /**
-     * Start streaming of a LiveTV channel with a default priority
-     * @param channelUid the unique id of the channel
-     * @param waitForKeyFrame start streaming after the first IFRAME has been received
-     * @return returns the status of the operation
-     */
-    public int openStream(int channelUid, boolean waitForKeyFrame) {
-        return openStream(channelUid, waitForKeyFrame, 50);
-    }
-
-    /**
-     * Start streaming of a LiveTV channel
-     * @param channelUid the unique id of the channel
-     * @param waitForKeyFrame start streaming after the first IFRAME has been received
-     * @param priority priority of the received device on the server
-     * @return returns the status of the operation
-     */
-    public int openStream(int channelUid, boolean waitForKeyFrame, int priority) {
-        Packet req = mConnection.CreatePacket(ServerConnection.XVDR_CHANNELSTREAM_OPEN, ServerConnection.XVDR_CHANNEL_REQUEST_RESPONSE);
-        req.putU32(channelUid);
-        req.putS32(priority); // priority 50
-        req.putU8((short) (waitForKeyFrame ? 1 : 0)); // start with IFrame
-        req.putU8((short)1); // raw PTS values
-
-        Packet resp = mConnection.transmitMessage(req);
-
-        if(resp == null) {
-            return NORESPONSE;
-        }
-
-        int status = (int)resp.getU32();
-
-        if(status > 0) {
-            return ERROR;
-        }
-
-        return SUCCESS;
     }
 
     @Override
@@ -145,7 +91,7 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     }
 
     @Override
-    synchronized public boolean prepare(long position) {
+    public boolean prepare(long position) {
         // check if we have a video and a audio format
         for (int i = 0; i < 2; i++) {
             PacketQueue outputTrack = mOutputTracks[i];
@@ -159,7 +105,7 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     }
 
     @Override
-    synchronized public int getTrackCount() {
+    public int getTrackCount() {
         return mTrackCount;
     }
 
@@ -179,13 +125,13 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     // false - continue buffering
     // true - playback
     @Override
-    synchronized public boolean continueBuffering(int track, long positionUs) {
+    public boolean continueBuffering(int track, long positionUs) {
         streamPositionUs = positionUs;
         return !mOutputTracks[track].isEmpty();
     }
 
     @Override
-    synchronized public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder, boolean onlyReadDiscontinuity) {
+    public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder, boolean onlyReadDiscontinuity) {
         streamPositionUs = positionUs;
 
         if(onlyReadDiscontinuity || !mTrackEnabled.get(track, false)) {
@@ -196,13 +142,7 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         PacketQueue outputTrack = mOutputTracks[track];
 
         // get next packet
-        PacketQueue.PacketHolder p;
-        try {
-            p = outputTrack.poll(10, TimeUnit.MILLISECONDS);
-        }
-        catch (InterruptedException e) {
-            return NOTHING_READ;
-        }
+        PacketQueue.PacketHolder p = outputTrack.poll();
 
         if(p == null) {
             return NOTHING_READ;
@@ -245,6 +185,13 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     @Override
     public void seekToUs(long positionUs) {
         Log.d(TAG, "seekToUs: " + positionUs);
+
+        // empty packet queue
+        for(int i = 0; i < TRACK_COUNT; i++) {
+            mOutputTracks[i].clear();
+        }
+        streamPositionUs = positionUs;
+        mLargestParsedTimestampUs = Long.MIN_VALUE;
     }
 
     @Override
@@ -252,8 +199,12 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
         return (mLargestParsedTimestampUs == Long.MIN_VALUE) ? streamPositionUs : mLargestParsedTimestampUs;
     }
 
+    public long getStreamPositionUs() {
+        return streamPositionUs;
+    }
+
     @Override
-    synchronized public void disable(int track) {
+    public void disable(int track) {
         Log.d(TAG, "disable track: " + track);
         mTrackEnabled.put(track, false);
     }
@@ -268,7 +219,7 @@ public class LiveTvSource implements SampleSource, SampleSource.SampleSourceRead
     }
 
     @Override
-    synchronized public void onNotification(Packet packet) {
+    public void onNotification(Packet packet) {
         // process only STATUS messages
         if(packet.getType() != ServerConnection.XVDR_CHANNEL_STREAM) {
             return;
