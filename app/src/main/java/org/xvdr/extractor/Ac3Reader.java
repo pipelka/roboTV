@@ -25,10 +25,10 @@ final class Ac3Reader extends StreamReader {
     }
 
     public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough) {
-        this(output, stream, ac3PassThrough, AC3Decoder.LayoutDolby);
+        this(output, stream, ac3PassThrough, Player.CHANNELS_SURROUND);
     }
 
-	public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelMode) {
+	public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelConfiguration) {
 		super(output, stream);
         this.ac3PassThrough = ac3PassThrough;
 
@@ -46,7 +46,16 @@ final class Ac3Reader extends StreamReader {
             return;
         }
 
-        mDecoder = new AC3Decoder(channelMode);
+        int decoderMode = AC3Decoder.LayoutDolby;
+
+        if(channelConfiguration == Player.CHANNELS_DIGITAL51) {
+            decoderMode = AC3Decoder.Layout51;
+        }
+        else if(channelConfiguration == Player.CHANNELS_STEREO) {
+            decoderMode = AC3Decoder.LayoutStereo;
+        }
+
+        mDecoder = new AC3Decoder(decoderMode);
 	}
 
 	@Override

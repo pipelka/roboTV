@@ -1,5 +1,7 @@
 package org.xvdr.extractor;
 
+import android.media.AudioFormat;
+import android.media.MediaCodecInfo;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
@@ -9,6 +11,7 @@ import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
 import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.SampleSource;
+import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.extractor.ts.PtsTimestampAdjuster;
 import com.google.android.exoplayer.util.MimeTypes;
 
@@ -41,10 +44,12 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     private Listener mListener;
     private Handler mHandler;
     private PtsTimestampAdjuster mTimestampAdjuster;
+    private boolean mAudioPassthrough;
 
     private int mTrackCount = 0;
     private long mLargestParsedTimestampUs = Long.MIN_VALUE;
     private long streamPositionUs;
+    private int mChannelConfiguration;
 
     final private int[] mPids = new int[TRACK_COUNT];
     final private boolean[] mNeedFormatChange = new boolean[TRACK_COUNT];
@@ -59,6 +64,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             StreamBundle.CONTENT_SUBTITLE
     };
 
+    private AudioCapabilities mAudioCapabilities;
+
     /**
      * Create a LiveTv SampleSource
      * @param connection the server connection to use
@@ -68,9 +75,15 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     }
 
     public RoboTvSampleSource(ServerConnection connection, Handler handler) {
+        this(connection, handler, null, false, Player.CHANNELS_SURROUND);
+    }
+
+    public RoboTvSampleSource(ServerConnection connection, Handler handler, AudioCapabilities audioCapabilities, boolean audioPassthrough, int channelConfiguration) {
         mConnection = connection;
         mHandler = handler;
         mBundle = new StreamBundle();
+        mAudioPassthrough = audioPassthrough;
+        mChannelConfiguration = channelConfiguration;
 
         mTimestampAdjuster = new PtsTimestampAdjuster(0);
 
@@ -78,6 +91,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         for(int i = 0; i < TRACK_COUNT; i++) {
             mOutputTracks[i] = new PacketQueue();
         }
+
+        mAudioCapabilities = audioCapabilities;
+
+        logChannelConfiguration(mAudioPassthrough, mChannelConfiguration);
     }
 
     @Override
@@ -274,7 +291,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                 break;
 
             case MimeTypes.AUDIO_AC3:
-                reader = new Ac3Reader(outputTrack, stream, false);
+                boolean passthrough = mAudioPassthrough && mAudioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3);
+                reader = new Ac3Reader(outputTrack, stream, passthrough, mChannelConfiguration);
                 break;
 
             case MimeTypes.AUDIO_MPEG:
@@ -475,5 +493,11 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                 mListener.onVideoTrackChanged(stream);
             }
         });
+    }
+
+    private void logChannelConfiguration(boolean passthrough, int channelConfiguration) {
+        Log.i(TAG, "audio: " +
+                Player.nameOfChannelConfiguration(channelConfiguration) + " " +
+                "passthrough: " + (passthrough ? "enabled" : "disabled"));
     }
 }

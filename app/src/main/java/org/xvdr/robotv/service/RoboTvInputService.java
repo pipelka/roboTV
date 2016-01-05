@@ -96,7 +96,13 @@ public class RoboTvInputService extends TvInputService {
             mHandler = new Handler(mHandlerThread.getLooper());
 
             // player init
-            mPlayer = new LiveTvPlayer(mContext, SetupUtils.getServer(mContext), SetupUtils.getLanguageISO3(mContext), this);
+            mPlayer = new LiveTvPlayer(
+                    mContext,
+                    SetupUtils.getServer(mContext),
+                    SetupUtils.getLanguageISO3(mContext),
+                    this,
+                    false, // TODO - audio passthrough should be a configuration option
+                    Player.CHANNELS_DIGITAL51); // TODO - channel layout should be a configuration option
 
             mTuningToast = new Toast(mContext);
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -114,6 +120,7 @@ public class RoboTvInputService extends TvInputService {
 
             cancelReset();
             mPlayer.release();
+            mHandlerThread.interrupt();
         }
 
         @Override

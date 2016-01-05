@@ -10,6 +10,7 @@ import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.util.PriorityHandlerThread;
 
@@ -25,6 +26,11 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     public final static int NORESPONSE = -1;
     public final static int SUCCESS = 0;
     public final static int ERROR = 1;
+
+    public final static int CHANNELS_DEFAULT = 0;
+    public final static int CHANNELS_STEREO = 1;
+    public final static int CHANNELS_SURROUND = 2;
+    public final static int CHANNELS_DIGITAL51 = 3;
 
     public interface Listener  {
 
@@ -50,8 +56,8 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     private static final int RENDERER_COUNT = 2;
-    protected static final int MIN_BUFFER_MS = 2000;
-    protected static final int MIN_REBUFFER_MS = 3000;
+    protected static final int MIN_BUFFER_MS = 500;
+    protected static final int MIN_REBUFFER_MS = 2000;
 
     private static final int RENDERER_VIDEO = 0;
     private static final int RENDERER_AUDIO = 1;
@@ -69,10 +75,31 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     private Surface mSurface;
     private String mServer;
     private Context mContext;
+    private AudioCapabilities mAudioCapabilities;
+    private boolean mAudioPassthrough;
+    private int mChannelConfiguration;
 
     public Player(Context context, String server, String language, Listener listener) {
+        this(context, server, language, listener, false, CHANNELS_SURROUND);
+    }
+
+    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough) {
+        this(context, server, language, listener, audioPassthrough, CHANNELS_SURROUND);
+    }
+
+    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) {
         mServer = server;
         mContext = context;
+        mListener = listener;
+        mAudioPassthrough = audioPassthrough;
+        mAudioCapabilities = AudioCapabilities.getCapabilities(mContext);
+
+        if(wantedChannelConfiguration == CHANNELS_DIGITAL51 && mAudioCapabilities.getMaxChannelCount() < 6) {
+            mChannelConfiguration = CHANNELS_SURROUND;
+        }
+        else {
+            mChannelConfiguration = wantedChannelConfiguration;
+        }
 
         mExoPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT,MIN_BUFFER_MS,MIN_REBUFFER_MS);
         mExoPlayer.addListener(this);
@@ -81,16 +108,17 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mConnection = new ServerConnection("robo.TV Player", language);
         mConnection.addCallback(this);
 
-        mListener = listener;
         mHandlerThread = new PriorityHandlerThread("robotv:player", android.os.Process.THREAD_PRIORITY_DEFAULT);
         mHandlerThread.start();
+
         mHandler = new Handler(mHandlerThread.getLooper());
     }
 
     public void release() {
-        mExoPlayer.stop();
+        stop();
 
         mHandler = null;
+        mHandlerThread.interrupt();
 
         mExoPlayer.removeListener(this);
         mExoPlayer.release();
@@ -159,14 +187,14 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         }
 
         // create samplesource
-        mSampleSource = new RoboTvSampleSource(mConnection, mHandler);
+        mSampleSource = new RoboTvSampleSource(mConnection, mHandler, mAudioCapabilities, mAudioPassthrough, mChannelConfiguration);
         mSampleSource.setListener(this);
 
         mVideoRenderer = new MediaCodecVideoTrackRenderer(
                 mContext,
                 mSampleSource,
                 MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-                2000, // joining time
+                1000, // joining time
                 null,
                 true,
                 mHandler,
@@ -179,7 +207,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
                 true,
                 mHandler,
                 this,
-                null);
+                mAudioCapabilities);
 
         if(mSurface != null) {
             mExoPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);
@@ -217,6 +245,21 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     protected void onStopLoader() {
+    }
+
+    static public String nameOfChannelConfiguration(int channelConfiguration) {
+        switch(channelConfiguration) {
+            case CHANNELS_DEFAULT:
+                return "default (unknown)";
+            case CHANNELS_STEREO:
+                return "stereo";
+            case CHANNELS_SURROUND:
+                return "surround";
+            case CHANNELS_DIGITAL51:
+                return "digital51";
+        }
+
+        return "invalid configuration";
     }
 
     @Override
