@@ -278,7 +278,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                 break;
 
             case MimeTypes.AUDIO_MPEG:
-                reader = new MpegAudioReader(outputTrack, stream);
+                reader = new MpegAudioReader(outputTrack, stream, false);
                 break;
         }
 
