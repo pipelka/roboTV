@@ -21,11 +21,9 @@ public:
 
 	virtual ~AC3Decoder();
 
-    void setDecodeBuffer(char* BYTE, int offset, int length);
+	int decode(char* BYTE, int offset, int length);
 
-    int decode(char* BYTE, int offset, int length);
-
-	//bool read(char* BYTE, int offset, int length);
+	bool read(char* BYTE, int offset, int length);
 
 	int getChannels() {
 		return mChannels;

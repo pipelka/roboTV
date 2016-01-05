@@ -4,9 +4,7 @@ import android.util.Log;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer.util.MimeTypes;
-import com.google.android.exoplayer.util.ParsableByteArray;
 
 import org.xvdr.audio.MpegAudioDecoder;
 import org.xvdr.robotv.tv.StreamBundle;
@@ -19,8 +17,6 @@ final class MpegAudioReader extends StreamReader {
     private static final String TAG = "MpegAudioReader";
     boolean hasOutputFormat = false;
 
-    private static final int MAX_CHUNK_SIZE = 64 * 1024;
-
     MpegAudioDecoder mDecoder;
 
 	public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream) {
@@ -30,12 +26,16 @@ final class MpegAudioReader extends StreamReader {
 
 	@Override
 	public void consume(byte[] data, long pesTimeUs, boolean isKeyframe) {
-        byte[] buffer= new byte[MAX_CHUNK_SIZE];
-        mDecoder.setDecodeBuffer(buffer, 0, MAX_CHUNK_SIZE);
-
         int length = mDecoder.decode(data, 0, data.length);
 
         if(length == 0) {
+            return;
+        }
+
+        byte[] audioChunk = new byte[length];
+
+        if(!mDecoder.read(audioChunk, 0, audioChunk.length)) {
+            Log.e(TAG, "failed to read audio chunk");
             return;
         }
 
@@ -54,7 +54,7 @@ final class MpegAudioReader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(buffer, length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+        output.sampleData(audioChunk, audioChunk.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
 	}
 
 }

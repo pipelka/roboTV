@@ -39,12 +39,12 @@ public class MpegAudioDecoder {
     this(audiodecoderJNI.new_MpegAudioDecoder(), true);
   }
 
-  public void setDecodeBuffer(byte[] BYTE, int offset, int length) {
-    audiodecoderJNI.MpegAudioDecoder_setDecodeBuffer(swigCPtr, this, BYTE, offset, length);
-  }
-
   public int decode(byte[] BYTE, int offset, int length) {
     return audiodecoderJNI.MpegAudioDecoder_decode(swigCPtr, this, BYTE, offset, length);
+  }
+
+  public boolean read(byte[] BYTE, int offset, int length) {
+    return audiodecoderJNI.MpegAudioDecoder_read(swigCPtr, this, BYTE, offset, length);
   }
 
   public int getChannels() {

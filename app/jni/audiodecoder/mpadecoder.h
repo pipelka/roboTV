@@ -14,9 +14,9 @@ public:
 
 	virtual ~MpegAudioDecoder();
 
-    void setDecodeBuffer(char* BYTE, int offset, int length);
-
 	int decode(char* BYTE, int offset, int length);
+
+	bool read(char* BYTE, int offset, int length);
 
 	int getChannels() {
 		return mChannels;
@@ -50,7 +50,7 @@ private:
 
     int mInputLength;
 
-    uint8_t* mBuffer;
+    int8_t mBuffer[1152*4];
 };
 
 #endif // MPEGAUDIO_DECODER_H

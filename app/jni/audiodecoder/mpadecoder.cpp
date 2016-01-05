@@ -4,7 +4,6 @@
 
 #define LOG_TAG "MpegAudioDecoder"
 #define ALOG(...) __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
-#define CHUNKSIZE 1152*4
 
 inline int scale(mad_fixed_t sample) {
     sample += (1L << (MAD_F_FRACBITS - 16));
@@ -20,7 +19,6 @@ inline int scale(mad_fixed_t sample) {
 MpegAudioDecoder::MpegAudioDecoder() : Decoder(0) {
     init();
     mInputLength = 0;
-    mBuffer = NULL;
 }
 
 MpegAudioDecoder::~MpegAudioDecoder() {
@@ -38,10 +36,6 @@ void MpegAudioDecoder::finish() {
     mad_synth_finish(&mSynth);
     mad_frame_finish(&mFrame);
     mad_stream_finish(&mStream);
-}
-
-void MpegAudioDecoder::setDecodeBuffer(char* BYTE, int offset, int length) {
-    mBuffer = (uint8_t*)&BYTE[offset];
 }
 
 int MpegAudioDecoder::decode(char* BYTE, int offset, int length) {
@@ -81,7 +75,7 @@ int MpegAudioDecoder::decode(char* BYTE, int offset, int length) {
     memmove(mInputBuffer, &mInputBuffer[length], mInputLength - length);
     mInputLength -= length;
 
-    return CHUNKSIZE;
+    return sizeof(mBuffer);
 }
 
 void MpegAudioDecoder::prepareBuffer(const struct mad_header *header, struct mad_pcm *pcm) {
@@ -101,4 +95,15 @@ void MpegAudioDecoder::prepareBuffer(const struct mad_header *header, struct mad
         *buffer++ = scale(*left_ch++);
         *buffer++ = scale(*right_ch++);
     }
+}
+
+bool MpegAudioDecoder::read(char* BYTE, int offset, int length) {
+    if(length < sizeof(mBuffer)) {
+        ALOG("output buffer too small !");
+        return false;
+    }
+
+    // copy buffer
+    memcpy(&BYTE[offset], mBuffer, sizeof(mBuffer));
+    return true;
 }

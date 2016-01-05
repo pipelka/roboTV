@@ -4,14 +4,10 @@ import android.util.Log;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer.util.MimeTypes;
-import com.google.android.exoplayer.util.ParsableByteArray;
 
 import org.xvdr.audio.AC3Decoder;
 import org.xvdr.robotv.tv.StreamBundle;
-
-import java.util.Queue;
 
 /**
  * Processes a XVDR AC3 stream.
@@ -21,8 +17,6 @@ final class Ac3Reader extends StreamReader {
     private static final String TAG = "Ac3Reader";
     private boolean ac3PassThrough;
     boolean hasOutputFormat = false;
-
-    private static final int MAX_CHUNK_SIZE = 64 * 1024;
 
     AC3Decoder mDecoder;
 
@@ -43,7 +37,7 @@ final class Ac3Reader extends StreamReader {
                     Integer.toString(stream.physicalId),
                     MimeTypes.AUDIO_AC3,
                     stream.bitRate,
-                    -1,
+                    MediaFormat.NO_VALUE,
                     C.UNKNOWN_TIME_US,
                     stream.channels,
                     stream.sampleRate,
@@ -62,12 +56,17 @@ final class Ac3Reader extends StreamReader {
             return;
         }
 
-        byte[] buffer = new byte[MAX_CHUNK_SIZE];
-        mDecoder.setDecodeBuffer(buffer, 0, buffer.length);
-
         int length = mDecoder.decode(data, 0, data.length);
+
         if(length == 0) {
             Log.e(TAG, "Unable to decode frame data");
+            return;
+        }
+
+        byte[] audioChunk = new byte[length];
+
+        if(!mDecoder.read(audioChunk, 0, audioChunk.length)) {
+            Log.e(TAG, "failed to read audio chunk");
             return;
         }
 
@@ -77,7 +76,7 @@ final class Ac3Reader extends StreamReader {
                     Integer.toString(stream.physicalId), // < trackId
                     MimeTypes.AUDIO_RAW,
                     mDecoder.getBitRate(),
-                    length,
+                    MediaFormat.NO_VALUE,
                     C.UNKNOWN_TIME_US,
                     mDecoder.getChannels(),
                     mDecoder.getSampleRate(),
@@ -87,7 +86,7 @@ final class Ac3Reader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(buffer, length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+        output.sampleData(audioChunk, audioChunk.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
 	}
 
 }

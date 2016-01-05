@@ -26,8 +26,6 @@ ifeq ($(TARGET_ARCH),x86)
     LOCAL_CFLAGS   := -DFPM_INTEL
 else ifeq ($(TARGET_ARCH),arm)
     LOCAL_CFLAGS   := -DFPM_DEFAULT
-else ifeq ($(TARGET_ARCH),arm64)
-    LOCAL_CFLAGS   := -DFPM_DEFAULT
 else ifeq ($(TARGET_ARCH),x86_64)
     LOCAL_CFLAGS   := -DFPM_64BIT
 endif

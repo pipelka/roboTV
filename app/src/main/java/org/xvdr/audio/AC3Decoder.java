@@ -47,12 +47,12 @@ public class AC3Decoder {
     this(audiodecoderJNI.new_AC3Decoder(flags), true);
   }
 
-  public void setDecodeBuffer(byte[] BYTE, int offset, int length) {
-    audiodecoderJNI.AC3Decoder_setDecodeBuffer(swigCPtr, this, BYTE, offset, length);
-  }
-
   public int decode(byte[] BYTE, int offset, int length) {
     return audiodecoderJNI.AC3Decoder_decode(swigCPtr, this, BYTE, offset, length);
+  }
+
+  public boolean read(byte[] BYTE, int offset, int length) {
+    return audiodecoderJNI.AC3Decoder_read(swigCPtr, this, BYTE, offset, length);
   }
 
   public int getChannels() {
