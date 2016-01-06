@@ -78,11 +78,12 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 	// check channel count
 
 	mChannels = 0;
+    int channelFlags = flags & A52_CHANNEL_MASK;
 
-	if(flags & A52_STEREO || flags & A52_DOLBY) {
+	if(channelFlags == A52_STEREO || channelFlags == A52_DOLBY) {
 		mChannels = 2;
 	}
-	else if(flags & A52_3F2R) {
+	else if(channelFlags == A52_3F2R) {
 		mChannels = 5;
 		if(flags & A52_LFE) {
 			mChannels++;
