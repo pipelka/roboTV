@@ -116,35 +116,32 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
     }
 
     protected void updateMovieArtwork(Movie searchMovie, final ArrayObjectAdapter rowAdapter) {
-        JSONObject o = mMovieDb.searchMovie(searchMovie.getTitle());
-        if (o != null) {
-            try {
-                String url = mMovieDb.getPosterUrl(o);
-                searchMovie.setCardImageUrl(url);
-                searchMovie.setBackgroundImageUrl(mMovieDb.getBackgroundUrl(o));
-
-                // update item
-                final int index = rowAdapter.indexOf(searchMovie);
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        rowAdapter.notifyArrayItemRangeChanged(index, 1);
-                    }
-                });
-
-                // send new urls to server
-                Packet p = mConnection.CreatePacket(ServerConnection.XVDR_RECORDINGS_SETURLS);
-                p.putString(searchMovie.getId());
-                p.putString(searchMovie.getCardImageUrl());
-                p.putString(searchMovie.getBackgroundImageUrl());
-                p.putU32(0);
-
-                Packet response = mConnection.transmitMessage(p);
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
+        JSONArray o = mMovieDb.searchMovie(searchMovie.getTitle());
+        if (o == null) {
+            return;
         }
+
+        String url = mMovieDb.getPosterUrl(o);
+        searchMovie.setCardImageUrl(url);
+        searchMovie.setBackgroundImageUrl(mMovieDb.getBackgroundUrl(o));
+
+        // update item
+        final int index = rowAdapter.indexOf(searchMovie);
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                rowAdapter.notifyArrayItemRangeChanged(index, 1);
+            }
+        });
+
+        // send new urls to server
+        Packet p = mConnection.CreatePacket(ServerConnection.XVDR_RECORDINGS_SETURLS);
+        p.putString(searchMovie.getId());
+        p.putString(searchMovie.getCardImageUrl());
+        p.putString(searchMovie.getBackgroundImageUrl());
+        p.putU32(0);
+
+        Packet response = mConnection.transmitMessage(p);
     }
 }
