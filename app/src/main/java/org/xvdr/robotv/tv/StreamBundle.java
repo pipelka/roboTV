@@ -89,7 +89,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         public long fpsRate;
 		public int width;
 		public int height;
-		public float aspect;
+		public float pixelAspectRatio;
         public int spsLength;
         public byte[] sps = new byte[128];
         public int ppsLength;
@@ -104,7 +104,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
                 this.sampleRate == s.sampleRate &&
                 this.width == s.width &&
                 this.height == s.height &&
-                this.aspect == s.aspect &&
+                this.pixelAspectRatio == s.pixelAspectRatio &&
                 this.type == s.type;
         }
 
@@ -121,16 +121,17 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
                         .build();
             }
             else if(content == CONTENT_VIDEO) {
-                if(fpsScale == 0) {
-                    fpsRate = 0;
-                    fpsScale = 1;
+                TvTrackInfo.Builder builder = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, Integer.toString(physicalId));
+                if(fpsScale != 0 && fpsRate != 0) {
+                    builder.setVideoFrameRate(fpsRate / fpsScale);
                 }
 
-                return new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, Integer.toString(physicalId))
-                        .setVideoFrameRate(fpsRate / fpsScale)
-                        .setVideoWidth(width)
-                        .setVideoHeight(height)
-                        .build();
+                float stretchWidth = (float)width * pixelAspectRatio;
+
+                builder.setVideoWidth((int)stretchWidth);
+                builder.setVideoHeight(height);
+
+                return builder.build();
             }
 
             return null;
@@ -240,7 +241,14 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 				stream.fpsRate = p.getU32();
 				stream.height = (int) p.getU32();
 				stream.width = (int) p.getU32();
-				stream.aspect = (float)(p.getS64() / 10000.0);
+
+				float aspect = (float)(p.getS64() / 10000.0);
+
+                // XVDR sends the picture aspect ratio
+                // we have to convert it to the pixel aspect ratio
+                double value = (aspect * stream.height) / (double)stream.width;
+                stream.pixelAspectRatio = (float)Math.round(value * 1000) / 1000;
+
                 stream.spsLength = p.getU8();
                 if(stream.spsLength > 0) {
                     p.readBuffer(stream.sps, 0, stream.spsLength);

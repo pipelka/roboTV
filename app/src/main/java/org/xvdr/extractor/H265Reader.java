@@ -19,11 +19,6 @@ final class H265Reader extends StreamReader {
 	public H265Reader(PacketQueue output, StreamBundle.Stream stream) {
         super(output, stream);
 
-        // XVDR sends the picture aspect ratio
-        // we have to convert it to the pixel aspect ratio
-        double value = (stream.aspect * stream.height) / (double)stream.width;
-        float pixelAspectRatio = (float)Math.round(value * 1000) / 1000;
-
         // do we have the decoder init data ?
         List<byte[]> initializationData = null;
 
@@ -41,7 +36,7 @@ final class H265Reader extends StreamReader {
                 stream.height,
                 initializationData,
                 MediaFormat.NO_VALUE,
-                pixelAspectRatio));
+                stream.pixelAspectRatio));
 	}
 
 	@Override
