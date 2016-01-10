@@ -13,22 +13,16 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 ## System requirements
 
 * Android TV 5.1 (API Level 22)
+* VDR 2.2
+* vdr-plugin-xvdr (robotv branch)
 
-The Google Nexus Player is used for development.
+The Google Nexus Player and the NVIDIA Shield Android TV are used for development.
 
 ## Building
 
-1. Build the ndk part:
-```bash
-# cd roboTV/app
-# ndk-build
-```
+1. Set the SDK and NDK location in Android Studio or "local.properties"
+2. ./gradlew assembleDebug
 
-2. Build the Java part:
-```bash
-# cd roboTV
-# ./gradlew build
-```
 or use AndroidStudio
 
 # Current Features
@@ -39,11 +33,11 @@ or use AndroidStudio
 - [x] H264 Video support
 - [x] decoding of AC3 streams
 - [x] MPEG Audio support
+- [X] Movie Database integration for EPG
 
 # Planned Features
 
 - [ ] Full timeshift support
-- [ ] Support for EAC3 audio streams
 - [ ] Schedule / Watch Recordings
-- [ ] Movie Database integration
-
+- [ ] H265 (UHD) Support (partly done)
+- [ ] AC3 passthrough (config option missing)

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'com.android.application'
 
 android {
@@ -9,7 +11,8 @@ android {
         minSdkVersion 22
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0"
+        versionName "0.1.0.${gitAbbreviatedId}"
+        archivesBaseName = "robotv-" + gitBranch + "-" + gitAbbreviatedId
     }
 
     buildTypes {
@@ -23,6 +26,19 @@ android {
         main {
             jniLibs.srcDirs = ['libs']
         }
+    }
+
+    task ndkBuild(type: Exec) {
+        def ndkDir = project.plugins.findPlugin('com.android.application').sdkHandler.ndkFolder
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            commandLine "$ndkDir/ndk-build.cmd", '-C', file("$projectDir").absolutePath
+        } else {
+            commandLine "$ndkDir/ndk-build", '-C', file("$projectDir").absolutePath
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
     }
 }
 
