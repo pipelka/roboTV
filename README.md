@@ -12,11 +12,11 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 
 ## System requirements
 
-* Android TV 5.1 (API Level 22)
-* VDR 2.2
-* vdr-plugin-xvdr (robotv branch)
+* [Android TV 5.1](https://www.android.com/tv/) (API Level 22)
+* [VDR 2.2](http://www.vdr-wiki.de/)
+* [vdr-plugin-xvdr](https://github.com/pipelka/vdr-plugin-xvdr) ([robotv](https://github.com/pipelka/vdr-plugin-xvdr/tree/robotv) branch)
 
-The Google Nexus Player and the NVIDIA Shield Android TV are used for development.
+The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [Shield Android TV](https://shield.nvidia.com/android-tv) are used for development.
 
 ## Building
 
