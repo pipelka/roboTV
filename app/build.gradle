@@ -48,5 +48,5 @@ dependencies {
     compile 'com.android.support:leanback-v17:23.1.0'
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.squareup.picasso:picasso:2.3.2'
-    compile 'com.google.android.exoplayer:exoplayer:r1.5.3'
+    compile 'com.google.android.exoplayer:exoplayer:r1.5.4'
 }

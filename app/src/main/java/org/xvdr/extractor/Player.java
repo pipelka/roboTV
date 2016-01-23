@@ -1,6 +1,7 @@
 package org.xvdr.extractor;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.os.Handler;
 import android.view.Surface;
@@ -8,6 +9,7 @@ import android.view.Surface;
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
+import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
@@ -193,6 +195,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mVideoRenderer = new MediaCodecVideoTrackRenderer(
                 mContext,
                 mSampleSource,
+                MediaCodecSelector.DEFAULT,
                 MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
                 1000, // joining time
                 null,
@@ -203,11 +206,13 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
         mAudioRenderer = new MediaCodecAudioTrackRenderer(
                 mSampleSource,
+                MediaCodecSelector.DEFAULT,
                 null,
                 true,
                 mHandler,
                 this,
-                mAudioCapabilities);
+                mAudioCapabilities,
+                AudioManager.STREAM_MUSIC);
 
         if(mSurface != null) {
             mExoPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);

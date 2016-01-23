@@ -148,12 +148,13 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     }
 
     @Override
-    public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder, boolean onlyReadDiscontinuity) {
-        streamPositionUs = positionUs;
+    public long readDiscontinuity(int track) {
+        return SampleSource.NO_DISCONTINUITY;
+    }
 
-        if(onlyReadDiscontinuity || !mTrackEnabled.get(track, false)) {
-            return NOTHING_READ;
-        }
+    @Override
+    public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder) {
+        streamPositionUs = positionUs;
 
         // get output track
         PacketQueue outputTrack = mOutputTracks[track];
