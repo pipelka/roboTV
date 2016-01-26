@@ -160,7 +160,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         PacketQueue outputTrack = mOutputTracks[track];
 
         // get next packet
-        PacketQueue.PacketHolder p = outputTrack.poll();
+        PacketQueue.PacketHolder p = outputTrack.peek();
 
         if(p == null) {
             return NOTHING_READ;
@@ -168,6 +168,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         // check if we have a queued format change
         if(p.isFormat()) {
+            outputTrack.poll();
             formatHolder.format = p.format;
             mNeedFormatChange[track] = false;
             return FORMAT_READ;
@@ -187,6 +188,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         // check if we have sample data
         if(p.isSample()) {
+            outputTrack.poll();
             sampleHolder.timeUs = p.timeUs;
             sampleHolder.flags = p.flags;
             sampleHolder.size = p.length;
