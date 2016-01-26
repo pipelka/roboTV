@@ -18,7 +18,7 @@ public class LiveTvPlayer extends Player {
      * @return returns the status of the operation
      */
     public int openStream(int channelUid) {
-        return openStream(channelUid, Build.MODEL.equals("Nexus Player"));
+        return openStream(channelUid, false);
     }
 
     /**

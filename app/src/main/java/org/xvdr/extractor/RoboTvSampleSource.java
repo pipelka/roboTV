@@ -85,7 +85,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mAudioPassthrough = audioPassthrough;
         mChannelConfiguration = channelConfiguration;
 
-        mTimestampAdjuster = new PtsTimestampAdjuster(0);
+        mTimestampAdjuster = new PtsTimestampAdjuster(PtsTimestampAdjuster.DO_NOT_OFFSET);
 
         // create output tracks
         for(int i = 0; i < TRACK_COUNT; i++) {
@@ -440,11 +440,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         // adjust timestamp
         long timeUs = mTimestampAdjuster.adjustTimestamp(pts);
-
-        // skip all packets before our start time
-        if(timeUs < 0) {
-            return;
-        }
 
         // read buffer
         byte[] buffer = new byte[length];
