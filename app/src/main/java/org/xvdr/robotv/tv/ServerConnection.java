@@ -15,7 +15,7 @@ public class ServerConnection extends Session {
 	private String mLanguage = "deu";
 
     /** Frame types */
-    public static final int IFRAME = 2;
+    public static final int IFRAME = 1;
 
 	/** Packet types */
 	public static final int XVDR_CHANNEL_REQUEST_RESPONSE = 1;
