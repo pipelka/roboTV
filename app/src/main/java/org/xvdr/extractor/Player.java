@@ -197,7 +197,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
                 mSampleSource,
                 MediaCodecSelector.DEFAULT,
                 MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-                1000, // joining time
+                200, // joining time
                 null,
                 true,
                 mHandler,
