@@ -114,6 +114,10 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 		}
 
         final public TvTrackInfo getTrackInfo() {
+            return getTrackInfo(0, 0);
+        }
+
+        final public TvTrackInfo getTrackInfo(int displayWidth, int displayHeight) {
             if(content == CONTENT_AUDIO) {
                 return new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, Integer.toString(physicalId))
                         .setAudioChannelCount(channels)
@@ -128,9 +132,15 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
                 }
 
                 float stretchWidth = (float)width * pixelAspectRatio;
+                float factor = 1;
 
-                builder.setVideoWidth((int)stretchWidth);
-                builder.setVideoHeight(height);
+                // scale down picture (if larger than display)
+                if(width != 0 && stretchWidth > displayWidth) {
+                    factor = displayWidth / stretchWidth;
+                }
+
+                builder.setVideoWidth((int)(stretchWidth * factor));
+                builder.setVideoHeight((int)(height * factor));
 
                 return builder.build();
             }
@@ -310,6 +320,10 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
     }
 
     public TvTrackInfo getTrackInfo(int contentType, int streamIndex) {
+        return getTrackInfo(contentType, streamIndex, 0, 0);
+    }
+
+    public TvTrackInfo getTrackInfo(int contentType, int streamIndex, int width, int height) {
         if(streamIndex < 0) {
             return null;
         }
@@ -320,7 +334,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
             Stream stream = get(i);
             if(stream.content == contentType) {
                 if(count == streamIndex) {
-                    return stream.getTrackInfo();
+                    return stream.getTrackInfo(width, height);
                 }
                 count++;
             }

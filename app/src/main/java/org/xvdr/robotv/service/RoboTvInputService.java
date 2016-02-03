@@ -3,6 +3,7 @@ package org.xvdr.robotv.service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
@@ -11,10 +12,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,6 +88,8 @@ public class RoboTvInputService extends TvInputService {
         private Handler mHandler;
         private final Toast mTuningToast;
 
+        private Point mDisplaySize = new Point();
+
         RoboTvSession(Context context, String inputId) {
             super(context);
             mContext = context;
@@ -113,6 +118,11 @@ public class RoboTvInputService extends TvInputService {
             mTuningToast.setDuration(Toast.LENGTH_SHORT);
             mTuningToast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
 
+            // get display width / height
+            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+
+            display.getSize(mDisplaySize);
         }
 
         @Override
@@ -389,8 +399,14 @@ public class RoboTvInputService extends TvInputService {
         public void onTracksChanged(StreamBundle bundle) {
             final List<TvTrackInfo> tracks = new ArrayList<>(16);
 
-            // create video track
-            TvTrackInfo info = bundle.getTrackInfo(StreamBundle.CONTENT_VIDEO, 0);
+            // create video track (limit surface size to display size)
+            TvTrackInfo info = bundle.getTrackInfo(
+                    StreamBundle.CONTENT_VIDEO,
+                    0,
+                    mDisplaySize.x,
+                    mDisplaySize.y
+                    );
+
             if(info != null) {
                 tracks.add(info);
             }
