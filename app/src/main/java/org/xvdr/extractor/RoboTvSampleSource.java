@@ -281,6 +281,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         StreamReader reader = null;
 
         switch(stream.getMimeType()) {
+            case MimeTypes.VIDEO_MPEG2:
+                reader = new H262Reader(outputTrack, stream);
+                break;
+
             case MimeTypes.VIDEO_H264:
                 reader = new H264Reader(outputTrack, stream);
                 break;

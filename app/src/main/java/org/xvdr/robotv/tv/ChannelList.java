@@ -38,7 +38,7 @@ public class ChannelList extends ArrayList<ChannelList.Entry> {
 
 	private boolean loadChannelType(ServerConnection connection, boolean radio, Callback callback) {
 		Packet req = connection.CreatePacket(ServerConnection.XVDR_CHANNELS_GETCHANNELS);
-		req.putU32(radio ? 1 : 2);
+		req.putU32(radio ? 1 : 0);
 
 		Packet resp = connection.transmitMessage(req);
 

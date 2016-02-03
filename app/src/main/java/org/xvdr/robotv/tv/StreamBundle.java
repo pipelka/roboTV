@@ -66,6 +66,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
     public final static int TYPE_TELETEXT = 9;
 
     private final static int supportedTypes[] = {
+            TYPE_VIDEO_MPEG2,
             TYPE_VIDEO_H264,
             TYPE_VIDEO_H265,
             TYPE_AUDIO_AC3,
@@ -194,7 +195,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 			return MimeTypes.AUDIO_E_AC3;
 		}
 		else if(type == TYPE_VIDEO_MPEG2) {
-			return "video/mpeg";
+			return MimeTypes.VIDEO_MPEG2;
 		}
         else if(type == TYPE_VIDEO_H264) {
             return MimeTypes.VIDEO_H264;
@@ -243,6 +244,9 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 				stream.width = (int) p.getU32();
 
 				float aspect = (float)(p.getS64() / 10000.0);
+                if(aspect < 1) {
+                    aspect = 1;
+                }
 
                 // XVDR sends the picture aspect ratio
                 // we have to convert it to the pixel aspect ratio

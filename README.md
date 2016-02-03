@@ -31,6 +31,7 @@ or use AndroidStudio
 - [x] Channel Icons
 - [x] EPG
 - [x] H264 Video support
+- [x] MPEG2 Video support
 - [x] decoding of AC3 streams
 - [x] MPEG Audio support
 - [X] Movie Database integration for EPG
