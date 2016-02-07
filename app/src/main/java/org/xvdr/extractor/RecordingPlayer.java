@@ -80,7 +80,7 @@ public class RecordingPlayer extends Player {
             return ERROR;
         }
 
-        start();
+        prepare();
 
         resp.getU32(); // 0
         mLengthInBytes = resp.getU64().longValue(); // length in bytes
