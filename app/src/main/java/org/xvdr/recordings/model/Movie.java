@@ -9,7 +9,7 @@ public class Movie implements Serializable {
     private String title;
     private String description;
     private String outline;
-    private String videoUrl;
+    //private String videoUrl;
     private String category;
     private String cardImageUrl;
     private String backgroundImageUrl;
@@ -48,13 +48,13 @@ public class Movie implements Serializable {
         this.outline = outline;
     }
 
-    public String getVideoUrl() {
+    /*public String getVideoUrl() {
         return videoUrl;
     }
 
     public void setVideoUrl(String videoUrl) {
         this.videoUrl = videoUrl;
-    }
+    }*/
 
     public String getCategory() {
         return category;
@@ -156,7 +156,6 @@ public class Movie implements Serializable {
                     "title=\'" + title + "\'" +
                     ", description=\'" + description + "\'" +
                     ", outline=\'" + outline + "\'" +
-                    ", videoUrl=\'" + videoUrl + "\'" +
                     ", category=\'" + category + "\'" +
                     ", cardImageUrl=\'" + cardImageUrl + "\'" +
                     ", backgroundImageUrl=\'" + backgroundImageUrl + "\'" +

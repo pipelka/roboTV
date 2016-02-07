@@ -12,6 +12,7 @@ import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ClassPresenterSelector;
 import android.support.v17.leanback.widget.DetailsOverviewRow;
 import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
+import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
@@ -119,11 +120,10 @@ public class VideoDetailsFragment extends DetailsFragment {
                 return;
 
             ClassPresenterSelector ps = new ClassPresenterSelector();
-            DetailsOverviewRowPresenter dorPresenter =
-                    new DetailsOverviewRowPresenter( new DetailsDescriptionPresenter() );
+            FullWidthDetailsOverviewRowPresenter dorPresenter =
+                    new FullWidthDetailsOverviewRowPresenter( new DetailsDescriptionPresenter() );
             // set detail background and style
-            dorPresenter.setBackgroundColor( getResources().getColor( R.color.detail_background ) );
-            dorPresenter.setStyleLarge( true );
+            dorPresenter.setBackgroundColor(getResources().getColor(R.color.recordings_fastlane_background ) );
             dorPresenter.setOnActionClickedListener( new OnActionClickedListener() {
                 @Override
                 public void onActionClicked( Action action ) {
