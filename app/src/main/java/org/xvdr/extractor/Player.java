@@ -152,14 +152,12 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         }
     }
 
-    protected void start() {
+    protected void prepare() {
         // prepare player
         mExoPlayer.prepare(mVideoRenderer, mAudioRenderer);
 
         mExoPlayer.setSelectedTrack(RENDERER_AUDIO, ExoPlayer.TRACK_DEFAULT);
         mExoPlayer.setSelectedTrack(RENDERER_VIDEO, ExoPlayer.TRACK_DEFAULT);
-
-        play();
     }
 
     public void play() {

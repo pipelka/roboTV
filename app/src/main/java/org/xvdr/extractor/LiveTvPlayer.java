@@ -52,7 +52,9 @@ public class LiveTvPlayer extends Player {
             return status;
         }
 
-        start();
+        prepare();
+        play();
+
         return Connection.SUCCESS;
     }
 
