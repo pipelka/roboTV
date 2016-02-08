@@ -2,21 +2,35 @@
     <string name="app_name">robo.TV</string>
     <string name="robotv_input" translatable="false">robo.TV</string>
     <string name="robotv_input_label" translatable="false">robo.TV</string>
-    <string name="robotv_settings">robo.TV Settings</string>
-    <string name="robotv_import_channels_title">Import robo.TV channels</string>
-    <string name="robotv_setup_message">Do you want to register detected channels?</string>
-    <string name="import_channels">Importing channels</string>
-    <string name="import_do">Import</string>
-    <string name="importing_channels">Importing channels ...</string>
-    <string name="setup_channels">robo.TV Setup</string>
-    <string name="server">Server</string>
     <string name="connect_unable">Unable to connect to server !</string>
-    <string name="language">Language</string>
-    <string name="refresh_rate">Display refresh rate</string>
+
+    <string name="setup_root_server_desc">Enter the XVDR backend server address</string>
+    <string name="setup_root_language_title">Preferred audio language</string>
+    <string name="setup_root_refreshrate_title">TV refresh rate</string>
+    <string name="setup_root_import_title">Import channels</string>
+    <string name="setup_root_import_desc">Refresh TV channels</string>
+    <string name="setup_root_title">roboTV Setup</string>
+    <string name="setup_root_desc">Setup roboTV and import channels</string>
+    <string name="setup_language_title">Audio Language</string>
+    <string name="setup_language_desc">Set your preferred channel audio language</string>
+    <string name="setup_refreshrate_title">TV refresh rate</string>
+    <string name="setup_refreshrate_desc">For a smooth TV playback the refresh rate of your TV should match your content. In Europe this is usually 50Hz. In the US and UK 60Hz.</string>
+    <string name="setup_import_title">Refreshing channels ...</string>
 
     <string-array name="languages_array">
         <item>English</item>
         <item>German</item>
+        <item>French</item>
+        <item>Spanish</item>
+        <item>Czech</item>
+    </string-array>
+
+    <string-array name="iso639_code1" translatable="false">
+        <item>en</item>
+        <item>de</item>
+        <item>fr</item>
+        <item>es</item>
+        <item>cs</item>
     </string-array>
 
     <string-array name="refresh_rate_name_array" translatable="false">
@@ -29,11 +43,6 @@
         <item>-1</item>
         <item>50</item>
         <item>60</item>
-    </string-array>
-
-    <string-array name="iso639_code1" translatable="false">
-        <item>en</item>
-        <item>de</item>
     </string-array>
 
     <string name="browse_title">roboTV Recordings</string>

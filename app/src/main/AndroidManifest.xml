@@ -39,7 +39,9 @@
             android:theme="@style/Theme.Leanback" >
         <!-- Launched by the TV app before it uses RoboTvInputService to set up channels for this
         input. -->
-        <activity android:name=".setup.SetupActivity" >
+        <activity
+            android:name=".setup.SetupActivity"
+            android:theme="@style/Theme.Leanback.GuidedStep">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -47,11 +49,6 @@
         <!-- Launched by the TV app when user wants to change the settings for this input. The
         settings activity is expected to be used for the existing configuration. E.g. subscription
         change, fine tuning of the channels, etc. -->
-        <activity android:name=".setup.SettingsActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
 
         <!-- TV input sample which includes minimal implementation for seeing a video on the TV app.
         Requires "android.permission.BIND_TV_INPUT" to ensure that only system services can bind.
