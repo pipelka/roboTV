@@ -324,17 +324,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         mTrackCount = 0;
 
-        // create new streams
-        if(mBundle.size() != newBundle.size()) {
-            Log.d(TAG, "number of streams differ - resetting stream bundle");
-            mBundle.clear();
-            mStreamReaders.clear();
-
-            for(int i=0; i < TRACK_COUNT; i++) {
-                mPids[i] = 0;
-            }
-        }
-
         // check for changed streams
         for (int i = 0; i < TRACK_COUNT; i++) {
             int pid = mPids[i];
