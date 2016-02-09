@@ -18,6 +18,6 @@ abstract class StreamReader {
         this.stream = stream;
 	}
 
-	public abstract void consume(byte[] data, long pesTimeUs, boolean isKeyframe);
+	public abstract void consume(byte[] data, long pesTimeUs);
 
 }

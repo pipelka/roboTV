@@ -43,10 +43,8 @@ final class H264Reader extends StreamReader {
 	}
 
 	@Override
-    public void consume(byte[] data, long pesTimeUs, boolean isKeyframe) {
-        int flags = isKeyframe ? C.SAMPLE_FLAG_SYNC : 0;
-
-        output.sampleData(data, data.length, pesTimeUs, flags);
+    public void consume(byte[] data, long pesTimeUs) {
+        output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
     }
 
     private void assembleInitData(List<byte[]> data) {

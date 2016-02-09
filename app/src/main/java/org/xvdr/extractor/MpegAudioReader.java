@@ -33,9 +33,9 @@ final class MpegAudioReader extends StreamReader {
     }
 
     @Override
-    public void consume(byte[] data, long pesTimeUs, boolean isKeyframe) {
+    public void consume(byte[] data, long pesTimeUs) {
         if(mDecoder == null) {
-            consumeHw(data, pesTimeUs, isKeyframe);
+            consumeHw(data, pesTimeUs);
             return;
         }
 
@@ -70,7 +70,7 @@ final class MpegAudioReader extends StreamReader {
         output.sampleData(audioChunk, audioChunk.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
     }
 
-    private void consumeHw(byte[] data, long pesTimeUs, boolean isKeyframe) {
+    private void consumeHw(byte[] data, long pesTimeUs) {
         if (!hasOutputFormat) {
             int  header = ((data[0] << 24) | (data[1] << 16) | (data[2] <<  8) | data[3]);
             MpegAudioHeader mpegAudioHeader = new MpegAudioHeader();

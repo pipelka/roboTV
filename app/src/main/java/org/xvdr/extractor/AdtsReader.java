@@ -29,7 +29,7 @@ final class AdtsReader extends StreamReader {
 	}
 
 	@Override
-	public void consume(byte[] data, long pesTimeUs, boolean isKeyframe) {
+	public void consume(byte[] data, long pesTimeUs) {
         output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
 	}
 

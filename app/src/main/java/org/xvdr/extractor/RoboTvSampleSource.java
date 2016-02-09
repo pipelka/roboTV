@@ -430,7 +430,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         long dts = p.getS64(); // dts
         p.getU32(); // duration
         int length = (int) p.getU32();
-        boolean isKeyFrame = (p.getClientID() == ServerConnection.IFRAME);
 
         // skip empty packet
         if(length == 0) {
@@ -452,8 +451,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         // push buffer to reader
         reader.consume(
                 buffer,
-                timeUs,
-                isKeyFrame);
+                timeUs);
 
         mLargestParsedTimestampUs = Math.max(mLargestParsedTimestampUs, timeUs);
     }

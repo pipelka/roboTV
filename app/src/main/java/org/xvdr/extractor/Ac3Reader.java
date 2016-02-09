@@ -59,7 +59,7 @@ final class Ac3Reader extends StreamReader {
 	}
 
 	@Override
-	public void consume(byte[] data, long pesTimeUs, boolean isKeyframe) {
+	public void consume(byte[] data, long pesTimeUs) {
         if(ac3PassThrough) {
             output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
             return;
