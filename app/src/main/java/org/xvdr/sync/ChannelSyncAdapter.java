@@ -328,16 +328,24 @@ public class ChannelSyncAdapter {
             String posterUrl = resp.getString();
             String backgroundUrl = resp.getString();
 
-			ContentValues values = new ContentValues();
-			values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
-			values.put(TvContract.Programs.COLUMN_TITLE, title);
-			values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plotOutline);
-			values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, plot);
-			values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
-			values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endTime * 1000);
-			values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_DATA, eventId);
-			values.put(TvContract.Programs.COLUMN_BROADCAST_GENRE, mBroadcastGenre.get(genreType));
-			values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(genreType));
+            String description = plotOutline.trim();
+            if(!description.isEmpty() && !plot.isEmpty()) {
+                description += " - ";
+            };
+
+            description += plot;
+            description = description.substring(0, Math.min(description.length(), 400));
+
+            ContentValues values = new ContentValues();
+            values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
+            values.put(TvContract.Programs.COLUMN_TITLE, title);
+            values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description);
+            values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, plot);
+            values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
+            values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endTime * 1000);
+            values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_DATA, eventId);
+            values.put(TvContract.Programs.COLUMN_BROADCAST_GENRE, mBroadcastGenre.get(genreType));
+            values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(genreType));
 
             // TRY TO FETCH ARTWORK
             JSONArray o = null;
