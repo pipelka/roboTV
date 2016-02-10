@@ -24,7 +24,7 @@ OUTDIR := $(LOCAL_PATH)/../../src/main/java/org/xvdr/msgexchange
 $(JNI_MSGEXCHANGE__WRAP): $(JNI_MSGEXCHANGE__I) $(JNI_MSGEXCHANGE__DEPS)
 	#rm -Rf $(OUTDIR)
 	mkdir -p $(OUTDIR)
-	swig -v -c++ -java -package $(JNI_MSGEXCHANGE__PACKAGE) -I$(JNI_MSGEXCHANGE__INCLUDE) -outdir $(OUTDIR) -o $(JNI_MSGEXCHANGE__WRAP) $(JNI_MSGEXCHANGE__I)
+	swig -v -c++ -java -package $(JNI_MSGEXCHANGE__PACKAGE) -I$(JNI_MSGEXCHANGE__INCLUDE) -outdir $(OUTDIR) -o $(JNI_MSGEXCHANGE__WRAP) $(JNI_MSGEXCHANGE__I) || true
 
 LOCAL_SHARED_LIBRARIES := msgexchange
 

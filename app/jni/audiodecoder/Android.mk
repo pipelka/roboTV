@@ -28,7 +28,7 @@ JNI_AUDIO_OUTDIR := $(LOCAL_PATH)/../../src/main/java/org/xvdr/audio
 
 $(JNI_AUDIO_WRAP): $(JNI_AUDIO_I) $(JNI_AUDIO_DEPS)
 	mkdir -p $(JNI_AUDIO_OUTDIR)
-	swig -v -c++ -java -package $(JNI_AUDIO_PACKAGE) -I$(JNI_AUDIO_INCLUDE) -outdir $(JNI_AUDIO_OUTDIR) -o $(JNI_AUDIO_WRAP) $(JNI_AUDIO_I)
+	swig -v -c++ -java -package $(JNI_AUDIO_PACKAGE) -I$(JNI_AUDIO_INCLUDE) -outdir $(JNI_AUDIO_OUTDIR) -o $(JNI_AUDIO_WRAP) $(JNI_AUDIO_I) || true
 
 LOCAL_SHARED_LIBRARIES := a52 libmad
 
