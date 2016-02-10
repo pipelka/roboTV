@@ -180,13 +180,13 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     protected boolean open() {
         // open server connection
-        if(!mConnection.isOpen()) {
-            if(!mConnection.open(mServer)) {
-                return false;
-            }
+        mConnection.close();
 
-            mConnection.enableStatusInterface();
+        if(!mConnection.open(mServer)) {
+            return false;
         }
+
+        mConnection.enableStatusInterface();
 
         // create samplesource
         mSampleSource = new RoboTvSampleSource(mConnection, mHandler, mAudioCapabilities, mAudioPassthrough, mChannelConfiguration);

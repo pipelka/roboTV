@@ -43,7 +43,9 @@ public class LiveTvPlayer extends Player {
         stop();
 
         // open server connection
-        open();
+        if(!open()) {
+            return ERROR;
+        }
 
         Packet req = mConnection.CreatePacket(ServerConnection.XVDR_CHANNELSTREAM_OPEN, ServerConnection.XVDR_CHANNEL_REQUEST_RESPONSE);
         req.putU32(channelUid);
