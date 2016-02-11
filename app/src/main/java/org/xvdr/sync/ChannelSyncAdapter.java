@@ -6,18 +6,17 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
-import android.util.SparseIntArray;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.xvdr.msgexchange.Packet;
+import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.setup.SetupUtils;
+import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.tmdb.TheMovieDatabase;
 import org.xvdr.robotv.tv.ChannelList;
 import org.xvdr.robotv.tv.ServerConnection;
@@ -29,14 +28,92 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-/**
- * Created by pipelka on 05.05.15.
- */
+/*
+    DVB Content Genres
+
+    MovieDrama                          0x10
+      Detective/Thriller                0x11
+      Adventure/Western/War             0x12
+      SF/Fantasy/Horror                 0x13
+      Comedy                            0x14
+      Soap/Melodrama/Folk               0x15
+      Romance                           0x16
+      Religious/Historical              0x17
+      Adult Movie/Drama                 0x18
+
+    NewsCurrentAffairs                  0x20
+      News/Weather Report               0x21
+      News Magazine                     0x22
+      Documentary                       0x23
+      Discussion/Interview              0x24
+
+    Show                                0x30
+      Game Show/Quiz/Contest            0x31
+      Variety Show                      0x32
+      Talk Show                         0x33
+
+    Sports                              0x40
+      Special Event                     0x41
+      Sport Magazine                    0x42
+      Football/Soccer                   0x43
+      Tennis/Squash                     0x44
+      Team Sports                       0x45
+      Athletics                         0x46
+      Motor Sport                       0x47
+      Water Sport                       0x48
+      Winter Sports                     0x49
+      Equestrian                        0x4A
+      Martial Sports                    0x4B
+
+    ChildrenYouth                       0x50
+      Pre-school                        0x51
+      Entertainment for 6 to 14         0x52
+      Entertainment for 10 to 16        0x53
+      Informational/Educational/School  0x54
+      Cartoons/Puppets                  0x55
+
+    MusicBalletDance                    0x60
+    ArtsCulture                         0x70
+      Performing Arts                   0x71
+      Fine Arts                         0x72
+      Religion                          0x73
+      Popular Culture/Traditional Arts  0x74
+      Literature                        0x75
+      Film/Cinema                       0x76
+      Experimental Film/Video           0x77
+      Broadcasting/Press                0x78
+      New Media                         0x79
+      Arts/Culture Magazine             0x7A
+      Fashion                           0x7B
+
+    SocialPoliticalEconomics            0x80
+      Magazine/Report/Documentary       0x81
+      Economics/Social Advisory         0x82
+      Remarkable People                 0x83
+
+    EducationalScience                  0x90
+      Nature/Animals/Environment        0x91
+      Technology/Natural Sciences       0x92
+      Medicine/Physiology/Psychology    0x93
+      Foreign Countries/Expeditions     0x94
+      Social/Spiritual Sciences         0x95
+      Further Education                 0x96
+      Languages                         0x97
+
+    LeisureHobbies                      0xA0
+      Tourism/Travel                    0xA1
+      Handicraft                        0xA2
+      Motoring                          0xA3
+      Fitness & Health                  0xA4
+      Cooking                           0xA5
+      Advertisement/Shopping            0xA6
+      Gardening                         0xA7
+
+    Special                             0xB0
+    gUserDefined                        0xF0
+*/
 public class ChannelSyncAdapter {
 
 	public interface ProgressCallback {
@@ -49,44 +126,80 @@ public class ChannelSyncAdapter {
 	}
 
 	static final String TAG = "ChannelSyncAdapter";
-	private static final int BATCH_OPERATION_COUNT = 100;
     private final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
 	private Context mContext;
 	private ServerConnection mConnection;
+    private ArtworkFetcher mArtwork;
 	private String mInputId;
 	private boolean mCancelChannelSync = false;
     private TheMovieDatabase mMovieDb;
 
-	private static final SparseArray<String> mBroadcastGenre = new SparseArray<String>() {
-		{
-			append(0x10, "Movie,Drama");
-			append(0x20, "News,Current,Affairs");
-			append(0x30, "Show");
-			append(0x40, "Sports");
-			append(0x50, "Children,Youth");
-			append(0x60, "Music,Ballet,Dance");
-			append(0x70, "Arts,Culture");
-			append(0x80, "Social,Political,Economics");
-			append(0x90, "Educational,Science");
-			append(0xa0, "Leisure,Hobbies");
-			append(0xb0, "Special");
-		}
-	};
-
 	private static final SparseArray<String> mCanonicalGenre = new SparseArray<String>() {
 		{
-			append(0x10, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
-			append(0x20, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
-			append(0x30, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
-			append(0x40, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-			append(0x50, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
+            append(0x10, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
+            append(0x11, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
+            append(0x12, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
+            append(0x13, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
+            append(0x14, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.COMEDY));
+            append(0x15, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
+            append(0x16, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
+            append(0x17, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.DRAMA));
+            append(0x20, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
+            append(0x21, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
+            append(0x22, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
+            append(0x23, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
+            append(0x30, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
+            append(0x31, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
+            append(0x32, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
+            append(0x33, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
+            append(0x40, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x41, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x42, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x43, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x44, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x45, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x46, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x47, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x48, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x49, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x4A, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x4B, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
+            append(0x50, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
+            append(0x51, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.EDUCATION));
+            append(0x52, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
+            append(0x53, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
+            append(0x54, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.EDUCATION));
+            append(0x53, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
 			append(0x60, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
-			append(0x70, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
-			append(0x80, "");
-			append(0x90, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.EDUCATION));
-			append(0xa0, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
-			append(0xb0, "");
+            append(0x61, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
+            append(0x62, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
+            append(0x63, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
+            append(0x64, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
+            append(0x70, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
+            append(0x71, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
+            append(0x72, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
+            append(0x74, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
+            append(0x75, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
+            append(0x76, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
+            append(0x77, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
+            append(0x78, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
+            append(0x79, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
+            append(0x7A, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
+            append(0x81, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
+            append(0x90, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
+            append(0x91, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ANIMAL_WILDLIFE));
+            append(0x92, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
+            append(0x93, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
+            append(0x94, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TRAVEL));
+            append(0xA0, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
+            append(0xA1, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TRAVEL));
+            append(0xA2, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
+            append(0xA3, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
+            append(0xA4, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
+            append(0xA5, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
+            append(0xA6, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SHOPPING));
+            append(0xA7, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
 		}
 	};
 
@@ -97,6 +210,7 @@ public class ChannelSyncAdapter {
 		mConnection = connection;
 		mInputId = inputId;
         mMovieDb = new TheMovieDatabase(TMDB_APIKEY, SetupUtils.getLanguage(context));
+        mArtwork = new ArtworkFetcher(mConnection, mMovieDb);
 	}
 
 	public void setProgressCallback(ProgressCallback callback) {
@@ -146,7 +260,6 @@ public class ChannelSyncAdapter {
 			values.put(TvContract.Channels.COLUMN_SERVICE_TYPE, entry.radio ? TvContract.Channels.SERVICE_TYPE_AUDIO : TvContract.Channels.SERVICE_TYPE_AUDIO_VIDEO);
 			values.put(TvContract.Channels.COLUMN_TYPE, TvContract.Channels.TYPE_DVB_S2);
 			values.put(TvContract.Channels.COLUMN_SEARCHABLE, 1);
-			//values.put(TvContract.Channels.COLUMN_DESCRIPTION, "HD");
 
 			// insert new channel
 			if(channelId == null) {
@@ -282,8 +395,6 @@ public class ChannelSyncAdapter {
 
         Log.d(TAG, "feching epg for " + channelUri.toString() + " ...");
 
-        SparseArray<String> cache = new SparseArray<>();
-
 		long last = getLastProgramEndTimeMillis(resolver, channelUri) / 1000;
 
 		if(last > start) {
@@ -318,9 +429,7 @@ public class ChannelSyncAdapter {
 			long eventId = resp.getU32();
 			long startTime = resp.getU32();
 			long endTime = startTime + resp.getU32();
-			long content = resp.getU32();
-			int genreType = (int)content & 0xF0;
-			long genreSubType = content & 0x0F;
+			int content = (int)resp.getU32();
 			long parentalRating = resp.getU32();
 			String title = resp.getString();
 			String plotOutline = resp.getString();
@@ -331,82 +440,42 @@ public class ChannelSyncAdapter {
             String description = plotOutline.trim();
             if(!description.isEmpty() && !plot.isEmpty()) {
                 description += " - ";
-            };
+            }
 
             description += plot;
-            description = description.substring(0, Math.min(description.length(), 400));
 
             ContentValues values = new ContentValues();
             values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
             values.put(TvContract.Programs.COLUMN_TITLE, title);
-            values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description);
+            values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, Math.min(description.length(), 400)));
             values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, plot);
             values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
             values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endTime * 1000);
             values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_DATA, eventId);
-            values.put(TvContract.Programs.COLUMN_BROADCAST_GENRE, mBroadcastGenre.get(genreType));
-            values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(genreType));
+            values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(content));
 
-            // TRY TO FETCH ARTWORK
-            JSONArray o = null;
-
-            // request artwork from server (if there isn't any yet)
-            if(backgroundUrl.equals("x")) {
-                Packet areq = mConnection.CreatePacket(ServerConnection.XVDR_ARTWORK_GET);
-                areq.putString(title);
-                areq.putU32(content);
-
-                Packet aresp = mConnection.transmitMessage(areq);
-
-                if (!aresp.eop()) {
-                    posterUrl = aresp.getString();
-                    backgroundUrl = aresp.getString();
-                }
+            // content rating
+            if(parentalRating >= 4 && parentalRating <=18) {
+                TvContentRating rating = TvContentRating.createRating("com.android.tv", "DVB", "DVB_" + parentalRating);
+                values.put(TvContract.Programs.COLUMN_CONTENT_RATING, rating.flattenToString());
             }
 
-            if(!backgroundUrl.equals("x")) {
-                if(!backgroundUrl.isEmpty()) {
-                    Log.d(TAG, "found artwork for '" + title + "': " + backgroundUrl);
-                }
-            }
-            else {
-                // search tv series
-                if (content == 0x15 || genreType == 0x50) {
-                    o = mMovieDb.searchTv(title);
-                }
-                // skip adult movies
-                else if (content == 0x18) {
-                    o = null;
-                }
-                // search movies
-                else if(genreType == 0x10) {
-                    o = mMovieDb.searchMovie(title);
-                }
+            // artwork
+            if(posterUrl.equals("x")) {
+                ArtworkHolder art = mArtwork.fetch(content, title, plotOutline, plot);
 
-                if(o != null) {
-                    posterUrl = mMovieDb.getPosterUrl(o);
-                    backgroundUrl = mMovieDb.getBackgroundUrl(o);
-
-                    // register artwork on server
-                    Packet areq = mConnection.CreatePacket(ServerConnection.XVDR_ARTWORK_SET);
-                    areq.putString(title);
-                    areq.putU32(content);
-                    areq.putString(posterUrl);
-                    areq.putString(backgroundUrl);
-                    areq.putU32(0);
-
-                    mConnection.transmitMessage(areq);
-
-                    if (!backgroundUrl.isEmpty()) {
-                        Log.d(TAG, "putting artwork for '" + title + "' into db (0x" + Integer.toHexString((int) content) + "): " + backgroundUrl);
-                    }
+                if(art != null) {
+                    posterUrl = art.getPosterUrl();
+                    backgroundUrl = art.getBackgroundUrl();
                 }
             }
 
             if(!backgroundUrl.isEmpty()) {
+                Log.d(TAG, backgroundUrl);
                 values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, backgroundUrl);
             }
 
+            // add event
 			programs.add(values);
             i++;
 		}

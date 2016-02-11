@@ -1,6 +1,9 @@
 package org.xvdr.robotv.tmdb;
 
+import android.util.Log;
+
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -12,6 +15,8 @@ import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
 public class TheMovieDatabase {
+
+    private final static String TAG = "TheMovieDatabase";
 
     private String mApiKey;
     private String mLanguage;
@@ -27,8 +32,8 @@ public class TheMovieDatabase {
         URL jsonUrl = new URL(url);
         URLConnection dc = jsonUrl.openConnection();
 
-        dc.setConnectTimeout(5000);
-        dc.setReadTimeout(5000);
+        dc.setConnectTimeout(2000);
+        dc.setReadTimeout(2000);
 
         inputStream = new BufferedReader(new InputStreamReader(dc.getInputStream()));
 
@@ -44,11 +49,11 @@ public class TheMovieDatabase {
         return result;
     }
 
-    protected JSONArray search(String section, String title) {
-        return search(section, title, 0);
+    protected JSONArray search(String section, String title) throws IOException, JSONException {
+        return search(section, title, 0, "");
     }
 
-    protected JSONArray search(String section, String title, int year) {
+    protected JSONArray search(String section, String title, int year, String dateProperty) throws IOException, JSONException {
         String request;
 
         request = "http://api.themoviedb.org/3/search/" + section + "?api_key=" + mApiKey + "&query=" + URLEncoder.encode(title);
@@ -57,29 +62,55 @@ public class TheMovieDatabase {
             request += "&language=" + mLanguage;
         }
 
-        JSONObject o;
+        JSONObject o = new JSONObject(getJsonFromServer(request));
+        JSONArray results = o.optJSONArray("results");
 
-        try {
-            o = new JSONObject(getJsonFromServer(request));
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        // filter entries (search for year)
+        if(year > 0 && !dateProperty.isEmpty()) {
+            JSONArray a = new JSONArray();
+
+            for(int i = 0; i < results.length(); i++) {
+                JSONObject item = results.optJSONObject(i);
+
+                if (item == null) {
+                    continue;
+                }
+
+                String date = item.optString(dateProperty);
+                if(date == null || date.length() < 4) {
+                    continue;
+                }
+
+                int entryYear = Integer.parseInt(date.substring(0, 4));
+
+                // release year differ often
+                if(year == entryYear || year == entryYear -1 ) {
+                    a.put(item);
+                }
+            }
+
+            if(a.length() > 0) {
+                return a;
+            }
         }
 
-        return o.optJSONArray("results");
+        return results;
     }
 
-    public JSONArray searchMovie(String title) {
+    public JSONArray searchMovie(String title) throws IOException, JSONException {
         return searchMovie(title, 0);
     }
 
-    public JSONArray searchMovie(String title, int year) {
-        return search("movie", title, year);
+    public JSONArray searchMovie(String title, int releaseYear) throws IOException, JSONException {
+        return search("movie", title, releaseYear, "release_date");
     }
 
-    public JSONArray searchTv(String title) {
+    public JSONArray searchTv(String title) throws IOException, JSONException {
         return search("tv", title);
+    }
+
+    public JSONArray searchTv(String title, int firstAirYear) throws IOException, JSONException {
+        return search("tv", title, firstAirYear, "first_air_date");
     }
 
     protected String getUrl(JSONArray results, String property) {
@@ -96,16 +127,18 @@ public class TheMovieDatabase {
             }
 
             path = item.optString(property);
-            if (path.isEmpty() || path.equals("null")) {
-                continue;
+            Log.d(TAG, property + ": " +path);
+
+            if(path != null && !path.equals("null")) {
+                break;
             }
         }
 
-        if(path.isEmpty() || path.equals("null")) {
+        if(path == null || path.isEmpty() || path.equals("null")) {
             return "";
         }
 
-        return "http://image.tmdb.org/t/p/w500" + path;
+        return "http://image.tmdb.org/t/p/w600" + path;
     }
 
     public String getPosterUrl(JSONArray o) {
