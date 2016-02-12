@@ -2,10 +2,13 @@ package org.xvdr.robotv.setup;
 
 import android.app.FragmentManager;
 import android.graphics.drawable.Drawable;
+import android.media.AudioFormat;
 import android.os.Bundle;
 import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
+
+import com.google.android.exoplayer.audio.AudioCapabilities;
 
 import org.xvdr.robotv.R;
 
@@ -19,10 +22,12 @@ public class SetupFragmentRoot extends GuidedStepFragment {
     static final int ACTION_LANGUAGE = 2;
     static final int ACTION_REFRESHRATE = 3;
     static final int ACTION_IMPORT = 4;
+    static final int ACTION_PASSTHROUGH = 6;
 
     private GuidedAction mActionServer;
     private GuidedAction mActionLanguage;
     private GuidedAction mActionRefreshRate;
+    private GuidedAction mActionPassthrough;
 
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
@@ -57,9 +62,20 @@ public class SetupFragmentRoot extends GuidedStepFragment {
                 .hasNext(true)
                 .build();
 
+        mActionPassthrough = new GuidedAction.Builder()
+                .id(ACTION_PASSTHROUGH)
+                .title(getString(R.string.setup_root_passthrough_title))
+                .hasNext(true)
+                .build();
+
         actions.add(mActionServer);
         actions.add(mActionLanguage);
         actions.add(mActionRefreshRate);
+
+        AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(getActivity());
+        if(audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3)) {
+            actions.add(mActionPassthrough);
+        }
 
         actions.add(new GuidedAction.Builder()
                 .id(ACTION_IMPORT)
@@ -88,6 +104,10 @@ public class SetupFragmentRoot extends GuidedStepFragment {
         int refreshRateIndex = SetupUtils.getRefreshRateIndex(getActivity());
 
         mActionRefreshRate.setDescription(refreshRates[refreshRateIndex]);
+
+        boolean passthrough = SetupUtils.getPassthrough(getActivity());
+        mActionPassthrough.setDescription(
+                passthrough ? getString(R.string.setup_root_passthrough_enabled) : getString(R.string.setup_root_passthrough_disabled));
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
@@ -102,6 +122,9 @@ public class SetupFragmentRoot extends GuidedStepFragment {
                 break;
             case ACTION_REFRESHRATE:
                 GuidedStepFragment.add(fm, new SetupFragmentRefreshRate());
+                break;
+            case ACTION_PASSTHROUGH:
+                GuidedStepFragment.add(fm, new SetupFragmentPassthrough());
                 break;
             case ACTION_IMPORT:
                 importChannels();

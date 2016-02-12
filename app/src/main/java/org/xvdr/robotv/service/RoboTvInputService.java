@@ -106,8 +106,8 @@ public class RoboTvInputService extends TvInputService {
                     SetupUtils.getServer(mContext),
                     SetupUtils.getLanguageISO3(mContext),
                     this,
-                    false, // TODO - audio passthrough should be a configuration option
-                    Player.CHANNELS_DIGITAL51); // TODO - channel layout should be a configuration option
+                    SetupUtils.getPassthrough(mContext),    // AC3 passthrough
+                    Player.CHANNELS_DIGITAL51);             // TODO - channel layout should be a configuration option
 
             mTuningToast = new Toast(mContext);
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

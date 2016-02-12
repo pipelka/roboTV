@@ -81,4 +81,16 @@ public class SetupUtils {
         e.putFloat("refreshrate", refreshRate);
         e.apply();
     }
+
+    public static boolean getPassthrough(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        return prefs.getBoolean("passthrough", false);
+    }
+
+    public static void setPassthrough(Context context, boolean passthrough) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        SharedPreferences.Editor e = prefs.edit();
+        e.putBoolean("passthrough", passthrough);
+        e.apply();
+    }
 }
