@@ -194,6 +194,30 @@ public class ArtworkFetcher {
     }
 
     boolean setStockBackground(ArtworkHolder artwork) {
+        switch(artwork.getContentId()) {
+            // Football / Soccer
+            case 0x43:
+                artwork.setBackgroundUrl("https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-football.jpg");
+                return true;
+            // Tennis
+            case 0x44:
+                artwork.setBackgroundUrl("https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-tennis.jpg");
+                return true;
+            // Athletics
+            case 0x46:
+                artwork.setBackgroundUrl("https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-athletics.jpg");
+                return true;
+            // Wintersports
+            case 0x49:
+                artwork.setBackgroundUrl("https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-winter.jpg");
+                return true;
+            // Equestrian
+            case 0x4A:
+                artwork.setBackgroundUrl("https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-equestrian.jpg");
+                return true;
+        }
+
+
         return false;
     };
 }
