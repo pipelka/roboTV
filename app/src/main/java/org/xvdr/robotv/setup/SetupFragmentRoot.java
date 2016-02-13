@@ -23,11 +23,13 @@ public class SetupFragmentRoot extends GuidedStepFragment {
     static final int ACTION_REFRESHRATE = 3;
     static final int ACTION_IMPORT = 4;
     static final int ACTION_PASSTHROUGH = 6;
+    static final int ACTION_SPEAKERCONFIG = 7;
 
     private GuidedAction mActionServer;
     private GuidedAction mActionLanguage;
     private GuidedAction mActionRefreshRate;
     private GuidedAction mActionPassthrough;
+    private GuidedAction mActionSpeakerConfig;
 
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
@@ -68,13 +70,24 @@ public class SetupFragmentRoot extends GuidedStepFragment {
                 .hasNext(true)
                 .build();
 
+        mActionSpeakerConfig = new GuidedAction.Builder()
+                .id(ACTION_SPEAKERCONFIG)
+                .title(getString(R.string.setup_root_speakerconfig_title))
+                .hasNext(true)
+                .build();
+
         actions.add(mActionServer);
         actions.add(mActionLanguage);
-        actions.add(mActionRefreshRate);
 
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(getActivity());
         if(audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3)) {
             actions.add(mActionPassthrough);
+        }
+
+        actions.add(mActionSpeakerConfig);
+
+        if(SetupUtils.isRefreshRateChangeSupported()) {
+            actions.add(mActionRefreshRate);
         }
 
         actions.add(new GuidedAction.Builder()
@@ -107,7 +120,21 @@ public class SetupFragmentRoot extends GuidedStepFragment {
 
         boolean passthrough = SetupUtils.getPassthrough(getActivity());
         mActionPassthrough.setDescription(
-                passthrough ? getString(R.string.setup_root_passthrough_enabled) : getString(R.string.setup_root_passthrough_disabled));
+                passthrough ? getString(R.string.setup_root_passthrough_enabled) :
+                getString(R.string.setup_root_passthrough_disabled));
+
+        int speakerConfig = SetupUtils.getSpeakerConfiguration(getActivity());
+        mActionSpeakerConfig.setDescription(
+                (speakerConfig == 6) ? getString(R.string.setup_root_speakerconfig_digital_51) :
+                (speakerConfig == 4) ? getString(R.string.setup_root_speakerconfig_surround) :
+                (speakerConfig == 2) ? getString(R.string.setup_root_speakerconfig_stereo) :
+                "");
+        mActionSpeakerConfig.setEnabled(!passthrough);
+
+        if(passthrough) {
+            mActionSpeakerConfig.setDescription(getString(R.string.setup_root_speakerconfig_disabled));
+        }
+
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
@@ -125,6 +152,9 @@ public class SetupFragmentRoot extends GuidedStepFragment {
                 break;
             case ACTION_PASSTHROUGH:
                 GuidedStepFragment.add(fm, new SetupFragmentPassthrough());
+                break;
+            case ACTION_SPEAKERCONFIG:
+                GuidedStepFragment.add(fm, new SetupFragmentSpeakerConfig());
                 break;
             case ACTION_IMPORT:
                 importChannels();

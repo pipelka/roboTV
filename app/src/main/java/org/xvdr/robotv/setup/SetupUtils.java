@@ -2,6 +2,7 @@ package org.xvdr.robotv.setup;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 
 import org.xvdr.robotv.R;
@@ -70,6 +71,14 @@ public class SetupUtils {
         return -1;
     }
 
+    public static boolean isRefreshRateChangeSupported() {
+        if (Build.MODEL.equals("SHIELD Android TV")) {
+            return false;
+        }
+
+        return true;
+    }
+
     public static float getRefreshRate(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         return prefs.getFloat("refreshrate", 50f);
@@ -91,6 +100,18 @@ public class SetupUtils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         SharedPreferences.Editor e = prefs.edit();
         e.putBoolean("passthrough", passthrough);
+        e.apply();
+    }
+
+    public static int getSpeakerConfiguration(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        return prefs.getInt("speakerconfig", 6);
+    }
+
+    public static void setSpeakerConfiguration(Context context, int speakerConfig) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        SharedPreferences.Editor e = prefs.edit();
+        e.putInt("speakerconfig", speakerConfig);
         e.apply();
     }
 }

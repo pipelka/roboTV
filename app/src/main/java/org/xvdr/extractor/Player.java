@@ -30,9 +30,9 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     public final static int ERROR = 1;
 
     public final static int CHANNELS_DEFAULT = 0;
-    public final static int CHANNELS_STEREO = 1;
-    public final static int CHANNELS_SURROUND = 2;
-    public final static int CHANNELS_DIGITAL51 = 3;
+    public final static int CHANNELS_STEREO = 2;
+    public final static int CHANNELS_SURROUND = 4;
+    public final static int CHANNELS_DIGITAL51 = 6;
 
     public interface Listener  {
 

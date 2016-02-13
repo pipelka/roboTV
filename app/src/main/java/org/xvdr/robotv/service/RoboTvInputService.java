@@ -103,11 +103,11 @@ public class RoboTvInputService extends TvInputService {
             // player init
             mPlayer = new LiveTvPlayer(
                     mContext,
-                    SetupUtils.getServer(mContext),
-                    SetupUtils.getLanguageISO3(mContext),
-                    this,
-                    SetupUtils.getPassthrough(mContext),    // AC3 passthrough
-                    Player.CHANNELS_DIGITAL51);             // TODO - channel layout should be a configuration option
+                    SetupUtils.getServer(mContext),                 // XVDR server
+                    SetupUtils.getLanguageISO3(mContext),           // Language
+                    this,                                           // Listener
+                    SetupUtils.getPassthrough(mContext),            // AC3 passthrough
+                    SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
 
             mTuningToast = new Toast(mContext);
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

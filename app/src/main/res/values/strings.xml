@@ -79,5 +79,11 @@
     <string name="setup_root_passthrough_disabled">Disabled</string>
     <string name="setup_passthrough_title">AC3 passthrough</string>
     <string name="setup_passthrough_desc">Enable direct digital audio processing. If supported audio passthrough delivers the highest quality of audio playback.</string>
+    <string name="setup_root_speakerconfig_title">Speaker Configuration</string>
+    <string name="setup_root_speakerconfig_digital_51">5.1 surround sound</string>
+    <string name="setup_root_speakerconfig_surround">Surround</string>
+    <string name="setup_root_speakerconfig_stereo">Stereo</string>
+    <string name="setup_speakerconfig_desc">Define your loadspeaker layout.</string>
+    <string name="setup_root_speakerconfig_disabled">Disabled for passthrough</string>
 
 </resources>
