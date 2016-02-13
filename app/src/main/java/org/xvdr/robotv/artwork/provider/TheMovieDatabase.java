@@ -1,10 +1,10 @@
-package org.xvdr.robotv.tmdb;
-
-import android.util.Log;
+package org.xvdr.robotv.artwork.provider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xvdr.robotv.artwork.ArtworkHolder;
+import org.xvdr.robotv.artwork.Event;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
-public class TheMovieDatabase {
+public class TheMovieDatabase extends ArtworkProvider {
 
     private final static String TAG = "TheMovieDatabase";
 
@@ -26,7 +26,7 @@ public class TheMovieDatabase {
         mLanguage = language;
     }
 
-    private static String getJsonFromServer(String url) throws IOException {
+    private static String getResponseFromServer(String url) throws IOException {
         BufferedReader inputStream;
 
         URL jsonUrl = new URL(url);
@@ -49,10 +49,6 @@ public class TheMovieDatabase {
         return result;
     }
 
-    protected JSONArray search(String section, String title) throws IOException, JSONException {
-        return search(section, title, 0, "");
-    }
-
     protected JSONArray search(String section, String title, int year, String dateProperty) throws IOException, JSONException {
         String request;
 
@@ -62,7 +58,7 @@ public class TheMovieDatabase {
             request += "&language=" + mLanguage;
         }
 
-        JSONObject o = new JSONObject(getJsonFromServer(request));
+        JSONObject o = new JSONObject(getResponseFromServer(request));
         JSONArray results = o.optJSONArray("results");
 
         // filter entries (search for year)
@@ -83,7 +79,7 @@ public class TheMovieDatabase {
 
                 int entryYear = Integer.parseInt(date.substring(0, 4));
 
-                // release year differ often
+                // release year differs often
                 if(year == entryYear || year == entryYear -1 ) {
                     a.put(item);
                 }
@@ -97,23 +93,7 @@ public class TheMovieDatabase {
         return results;
     }
 
-    public JSONArray searchMovie(String title) throws IOException, JSONException {
-        return searchMovie(title, 0);
-    }
-
-    public JSONArray searchMovie(String title, int releaseYear) throws IOException, JSONException {
-        return search("movie", title, releaseYear, "release_date");
-    }
-
-    public JSONArray searchTv(String title) throws IOException, JSONException {
-        return search("tv", title);
-    }
-
-    public JSONArray searchTv(String title, int firstAirYear) throws IOException, JSONException {
-        return search("tv", title, firstAirYear, "first_air_date");
-    }
-
-    protected String getUrl(JSONArray results, String property) {
+    private String getUrl(JSONArray results, String property) {
         if(results == null) {
             return "";
         }
@@ -127,7 +107,6 @@ public class TheMovieDatabase {
             }
 
             path = item.optString(property);
-            Log.d(TAG, property + ": " +path);
 
             if(path != null && !path.equals("null")) {
                 break;
@@ -149,4 +128,37 @@ public class TheMovieDatabase {
         return getUrl(o, "backdrop_path");
     }
 
+    @Override
+    public ArtworkHolder searchMovie(Event event) throws IOException {
+        JSONArray results;
+
+        try {
+            results = search("movie", event.getTitle(), event.getYear(), "release_date");
+        }
+        catch(JSONException e) {
+            return null;
+        }
+
+        return new ArtworkHolder(
+                getPosterUrl(results),
+                getBackgroundUrl(results)
+        );
+    }
+
+    @Override
+    public ArtworkHolder searchTv(Event event) throws IOException {
+        JSONArray results;
+
+        try {
+            results = search("tv", event.getTitle(), event.getYear(), "first_air_date");
+        }
+        catch(JSONException e) {
+            return null;
+        }
+
+        return new ArtworkHolder(
+                getPosterUrl(results),
+                getBackgroundUrl(results)
+        );
+    }
 }

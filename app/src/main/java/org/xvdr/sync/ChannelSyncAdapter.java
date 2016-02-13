@@ -15,9 +15,9 @@ import android.util.SparseArray;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
+import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.tmdb.TheMovieDatabase;
 import org.xvdr.robotv.tv.ChannelList;
 import org.xvdr.robotv.tv.ServerConnection;
 
@@ -126,14 +126,12 @@ public class ChannelSyncAdapter {
 	}
 
 	static final String TAG = "ChannelSyncAdapter";
-    private final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
 	private Context mContext;
 	private ServerConnection mConnection;
     private ArtworkFetcher mArtwork;
 	private String mInputId;
 	private boolean mCancelChannelSync = false;
-    private TheMovieDatabase mMovieDb;
 
 	private static final SparseArray<String> mCanonicalGenre = new SparseArray<String>() {
 		{
@@ -188,7 +186,7 @@ public class ChannelSyncAdapter {
             append(0x7A, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
             append(0x81, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
             append(0x90, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
-            append(0x91, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ANIMAL_WILDLIFE));
+            //append(0x91, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ANIMAL_WILDLIFE));
             append(0x92, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
             append(0x93, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
             append(0x94, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TRAVEL));
@@ -209,8 +207,8 @@ public class ChannelSyncAdapter {
 		mContext = context;
 		mConnection = connection;
 		mInputId = inputId;
-        mMovieDb = new TheMovieDatabase(TMDB_APIKEY, SetupUtils.getLanguage(context));
-        mArtwork = new ArtworkFetcher(mConnection, mMovieDb);
+
+        mArtwork = new ArtworkFetcher(mConnection, SetupUtils.getLanguage(context));
 	}
 
 	public void setProgressCallback(ProgressCallback callback) {
@@ -430,6 +428,7 @@ public class ChannelSyncAdapter {
 			long startTime = resp.getU32();
 			long endTime = startTime + resp.getU32();
 			int content = (int)resp.getU32();
+            int eventDuration = (int)(endTime - startTime);
 			long parentalRating = resp.getU32();
 			String title = resp.getString();
 			String plotOutline = resp.getString();
@@ -444,34 +443,42 @@ public class ChannelSyncAdapter {
 
             description += plot;
 
+            Event event = new Event(content, title, plotOutline, plot, eventDuration);
+
             ContentValues values = new ContentValues();
             values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
-            values.put(TvContract.Programs.COLUMN_TITLE, title);
+            values.put(TvContract.Programs.COLUMN_TITLE, event.getTitle());
             values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, Math.min(description.length(), 400)));
-            values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, plot);
+            values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, event.getPlot());
             values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
             values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endTime * 1000);
             values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_DATA, eventId);
-            values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(content));
+            values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(event.getContentId()));
 
             // content rating
-            if(parentalRating >= 4 && parentalRating <=18) {
+            if(parentalRating >= 4 && parentalRating <= 18) {
                 TvContentRating rating = TvContentRating.createRating("com.android.tv", "DVB", "DVB_" + parentalRating);
                 values.put(TvContract.Programs.COLUMN_CONTENT_RATING, rating.flattenToString());
             }
 
             // artwork
-            if(posterUrl.equals("x")) {
-                ArtworkHolder art = mArtwork.fetch(content, title, plotOutline, plot);
+            if (posterUrl.equals("x")) {
+                try {
 
-                if(art != null) {
-                    posterUrl = art.getPosterUrl();
-                    backgroundUrl = art.getBackgroundUrl();
+                    backgroundUrl = "";
+                    ArtworkHolder art = mArtwork.fetchForEvent(event);
+
+                    if (art != null) {
+                        backgroundUrl = art.getBackgroundUrl();
+                    }
+                }
+                catch(IOException e) {
+                    e.printStackTrace();
                 }
             }
 
+            // add url (if not empty)
             if(!backgroundUrl.isEmpty()) {
-                Log.d(TAG, backgroundUrl);
                 values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, backgroundUrl);
             }
 
