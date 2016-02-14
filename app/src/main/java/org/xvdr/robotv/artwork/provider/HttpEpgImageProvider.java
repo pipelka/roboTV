@@ -32,6 +32,6 @@ public class HttpEpgImageProvider extends SimpleArtworkProvider {
             return null;
         }
 
-        return new ArtworkHolder("", url);
+        return new ArtworkHolder(url, url);
     }
 }
