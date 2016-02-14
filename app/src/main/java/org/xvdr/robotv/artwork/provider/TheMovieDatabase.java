@@ -23,6 +23,42 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         setDelayAfterRequest(200);
     }
 
+    private String simplifyString(String title) {
+        String result = title.toLowerCase();
+        result = result.replaceAll(",", "").replaceAll("-", "").replaceAll("  ", " ");
+
+        return result;
+    }
+
+    protected JSONArray filterTitleMatch(String title, String titleTag, JSONArray array) {
+        if(array == null) {
+            return null;
+        }
+
+        JSONArray results = new JSONArray();
+        String a = simplifyString(title);
+
+        for(int i = 0; i < array.length(); i++) {
+            JSONObject item = array.optJSONObject(i);
+
+            if (item == null) {
+                continue;
+            }
+
+            String b = simplifyString(item.optString(titleTag));
+
+            if(a.equals(b)) {
+                results.put(item);
+            }
+        }
+
+        if(results.length() > 0) {
+            return results;
+        }
+
+        return array;
+    }
+
     protected JSONArray search(String section, String title, int year, String dateProperty) throws IOException, JSONException {
         String request;
 
@@ -33,7 +69,10 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         }
 
         JSONObject o = new JSONObject(getResponseFromServer(request));
-        JSONArray results = o.optJSONArray("results");
+        JSONArray results = filterTitleMatch(
+                title,
+                section.equals("tv") ? "name" : "title",
+                o.optJSONArray("results"));
 
         // filter entries (search for year)
         if(year > 0 && !dateProperty.isEmpty()) {
