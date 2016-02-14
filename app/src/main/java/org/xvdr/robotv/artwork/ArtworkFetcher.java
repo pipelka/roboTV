@@ -4,8 +4,8 @@ import android.util.Log;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.artwork.provider.ArtworkProvider;
-import org.xvdr.robotv.artwork.provider.RoboTvCache;
-import org.xvdr.robotv.artwork.provider.StockImage;
+import org.xvdr.robotv.artwork.provider.RoboTvProvider;
+import org.xvdr.robotv.artwork.provider.StockImageProvider;
 import org.xvdr.robotv.artwork.provider.TheMovieDatabase;
 import org.xvdr.robotv.tv.ServerConnection;
 
@@ -22,11 +22,11 @@ public class ArtworkFetcher {
 
     public ArtworkFetcher(ServerConnection connection, String language) {
         mConnection = connection;
-        mServerCache = new RoboTvCache(connection);
+        mServerCache = new RoboTvProvider(connection);
 
         mProviders = new ArtworkProvider[2];
         mProviders[0] = new TheMovieDatabase(TMDB_APIKEY, language);
-        mProviders[1] = new StockImage();
+        mProviders[1] = new StockImageProvider();
 
 
     }

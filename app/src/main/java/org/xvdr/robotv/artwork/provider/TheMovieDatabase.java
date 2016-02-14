@@ -6,15 +6,10 @@ import org.json.JSONObject;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.concurrent.TimeUnit;
 
-public class TheMovieDatabase extends ArtworkProvider {
+public class TheMovieDatabase extends HttpArtworkProvider {
 
     private final static String TAG = "TheMovieDatabase";
 
@@ -24,29 +19,8 @@ public class TheMovieDatabase extends ArtworkProvider {
     public TheMovieDatabase(String apiKey, String language) {
         mApiKey = apiKey;
         mLanguage = language;
-    }
 
-    private static String getResponseFromServer(String url) throws IOException {
-        BufferedReader inputStream;
-
-        URL jsonUrl = new URL(url);
-        URLConnection dc = jsonUrl.openConnection();
-
-        dc.setConnectTimeout(2000);
-        dc.setReadTimeout(2000);
-
-        inputStream = new BufferedReader(new InputStreamReader(dc.getInputStream()));
-
-        String result = inputStream.readLine();
-
-        try {
-            TimeUnit.MILLISECONDS.sleep(200);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return result;
+        setDelayAfterRequest(200);
     }
 
     protected JSONArray search(String section, String title, int year, String dateProperty) throws IOException, JSONException {
@@ -129,7 +103,7 @@ public class TheMovieDatabase extends ArtworkProvider {
     }
 
     @Override
-    public ArtworkHolder searchMovie(Event event) throws IOException {
+    protected ArtworkHolder searchMovie(Event event) throws IOException {
         JSONArray results;
 
         try {
@@ -146,7 +120,7 @@ public class TheMovieDatabase extends ArtworkProvider {
     }
 
     @Override
-    public ArtworkHolder searchTv(Event event) throws IOException {
+    protected ArtworkHolder searchTv(Event event) throws IOException {
         JSONArray results;
 
         try {

@@ -5,7 +5,7 @@ import org.xvdr.robotv.artwork.Event;
 
 import java.io.IOException;
 
-public abstract class SimpleArtworkProvider extends ArtworkProvider {
+public abstract class SimpleArtworkProvider extends HttpArtworkProvider {
     @Override
     protected ArtworkHolder searchMovie(Event event) throws IOException {
         return null;

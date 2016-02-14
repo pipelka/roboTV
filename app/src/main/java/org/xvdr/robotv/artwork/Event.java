@@ -10,6 +10,7 @@ public class Event {
     private String mPlot;
     private int mDuration;
     private int mYear;
+    private int mEventId;
 
     private static String[] genreFilm = {
             "abenteuerfilm",
@@ -52,12 +53,17 @@ public class Event {
     private static int genreSoapMaxLength = 65 * 60; // 65 min
 
     public Event(int contentId, String title, String subTitle, String plot, int durationSec) {
+        this(contentId, title, subTitle, plot, durationSec, 0);
+    }
+
+    public Event(int contentId, String title, String subTitle, String plot, int durationSec, int eventId) {
         mContentId = guessGenreFromSubtitle(contentId, subTitle, durationSec);
         mYear = guessYearFromDescription(subTitle + " " + plot);
         mTitle = title;
         mSubTitle = subTitle;
         mPlot = plot;
         mDuration = durationSec;
+        mEventId = eventId;
     }
 
     public int getGenre() {
@@ -88,6 +94,10 @@ public class Event {
         return mDuration;
     }
 
+    public int getEventId() {
+        return mEventId;
+    }
+
     static public int guessYearFromDescription(String description) {
         String[] words = description.split("[\\.,;)| ]");
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -113,6 +123,10 @@ public class Event {
     }
 
     static int guessGenreFromSubtitle(int contentId, String subtitle, int duration) {
+        if(subtitle == null) {
+            return contentId;
+        }
+
         // try to guess soap from subtitle keywords
         for(String word: genreSoap) {
             if(subtitle.toLowerCase().contains(word.toLowerCase())) {
@@ -121,9 +135,11 @@ public class Event {
         }
 
         // try to guess soap or movie from subtitle keywords and event duration
-        for(String word: genreSoapOrMovie) {
-            if(subtitle.toLowerCase().contains(word.toLowerCase())) {
-                return duration < genreSoapMaxLength ? 0x15 : 0x10;
+        if(duration > 0) {
+            for (String word : genreSoapOrMovie) {
+                if (subtitle.toLowerCase().contains(word.toLowerCase())) {
+                    return duration < genreSoapMaxLength ? 0x15 : 0x10;
+                }
             }
         }
 

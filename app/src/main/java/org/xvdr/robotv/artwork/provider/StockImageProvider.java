@@ -3,9 +3,7 @@ package org.xvdr.robotv.artwork.provider;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
 
-import java.io.IOException;
-
-public class StockImage extends SimpleArtworkProvider{
+public class StockImageProvider extends SimpleArtworkProvider{
 
     private String getStockBackground(int contentId) {
         switch(contentId) {

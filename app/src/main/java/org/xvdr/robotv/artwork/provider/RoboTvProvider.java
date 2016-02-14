@@ -7,15 +7,13 @@ import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.tv.ServerConnection;
 
-import java.io.IOException;
+public class RoboTvProvider extends SimpleArtworkProvider {
 
-public class RoboTvCache extends SimpleArtworkProvider {
-
-    static final String TAG = "RoboTvCache";
+    static final String TAG = "RoboTvProvider";
 
     private ServerConnection mConnection;
 
-    public RoboTvCache(ServerConnection connection) {
+    public RoboTvProvider(ServerConnection connection) {
         mConnection = connection;
     }
 
