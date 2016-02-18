@@ -24,21 +24,24 @@ public class ChannelList extends ArrayList<ChannelList.Entry> {
 
 	}
 
-	public void load(ServerConnection connection) {
+	public void load(ServerConnection connection,String language) {
 		clear();
 
-		loadChannelType(connection, false, null);
+		loadChannelType(connection, false, language, null);
 	}
 
-	public void load(ServerConnection connection, Callback callback) {
+	public void load(ServerConnection connection, String language, Callback callback) {
 		clear();
 
-		loadChannelType(connection, false, callback);
+		loadChannelType(connection, false, language, callback);
 	}
 
-	private boolean loadChannelType(ServerConnection connection, boolean radio, Callback callback) {
+	private boolean loadChannelType(ServerConnection connection, boolean radio, String language, Callback callback) {
 		Packet req = connection.CreatePacket(ServerConnection.XVDR_CHANNELS_GETCHANNELS);
 		req.putU32(radio ? 1 : 0);
+        req.putString(language);
+        req.putU32(1);
+        req.putU32(0);
 
 		Packet resp = connection.transmitMessage(req);
 

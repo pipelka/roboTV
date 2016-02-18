@@ -207,7 +207,9 @@ public class RoboTvInputService extends TvInputService {
 
             // start player
             // stream channel
-            if(mPlayer.openStream(uid) == Player.ERROR) {
+            String language = SetupUtils.getLanguageISO3(mContext);
+
+            if(mPlayer.openStream(uid, language) == Player.ERROR) {
                 errorNotification(getResources().getString(R.string.failed_tune));
                 return false;
             }

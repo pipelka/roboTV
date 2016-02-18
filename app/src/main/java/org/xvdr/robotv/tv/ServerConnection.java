@@ -13,6 +13,10 @@ public class ServerConnection extends Session {
 	private short mCompressionLevel = 0;
 	private int mAudioType = StreamBundle.TYPE_AUDIO_AC3;
 	private String mLanguage = "deu";
+    private boolean mEnableStatus = false;
+
+    /** TCP/IP Port **/
+    public static final int TCPIP_PORT = 34892;
 
     /** Frame types */
     public static final int IFRAME = 1;
@@ -21,12 +25,10 @@ public class ServerConnection extends Session {
 	public static final int XVDR_CHANNEL_REQUEST_RESPONSE = 1;
 	public static final int XVDR_CHANNEL_STREAM = 2;
 	public static final int XVDR_CHANNEL_STATUS = 5;
-	public static final int XVDR_CHANNEL_SCAN = 6;
 
 
 	/* OPCODE 1 - 19: XVDR network functions for general purpose */
 	public static final int XVDR_LOGIN = 1;
-    public static final int XVDR_ENABLESTATUSINTERFACE = 3;
 
 	/* OPCODE 20 - 39: XVDR network functions for live streaming */
 	public static final int XVDR_CHANNELSTREAM_OPEN = 20;
@@ -36,11 +38,7 @@ public class ServerConnection extends Session {
 	public static final int XVDR_CHANNELSTREAM_SIGNAL = 24;
 
 	/* OPCODE 60 - 79: XVDR network functions for channel access */
-	public static final int XVDR_CHANNELS_GETCOUNT = 61;
 	public static final int XVDR_CHANNELS_GETCHANNELS = 63;
-	public static final int XVDR_CHANNELGROUP_GETCOUNT = 65;
-	public static final int XVDR_CHANNELGROUP_LIST = 66;
-	public static final int XVDR_CHANNELGROUP_MEMBERS = 67;
 
     /* OPCODE 100 - 119: XVDR network functions for recording access */
     public static final int XVDR_RECORDINGS_DISKSIZE = 100;
@@ -74,9 +72,8 @@ public class ServerConnection extends Session {
 	public static final int XVDR_STATUS_MESSAGE = 3;
 	public static final int XVDR_STATUS_CHANNELCHANGE = 4;
 	public static final int XVDR_STATUS_RECORDINGSCHANGE = 5;
-	public static final int XVDR_STATUS_CHANNELSCAN = 6;
 
-	public static final int XVDRPROTOCOLVERSION = 6;
+	public static final int XVDRPROTOCOLVERSION = 7;
 
 	public Packet CreatePacket(int msgid, int type) {
 		return new Packet(msgid, type);
@@ -86,17 +83,22 @@ public class ServerConnection extends Session {
 		return new Packet(msgid, XVDR_CHANNEL_REQUEST_RESPONSE);
 	}
 
-	public ServerConnection(String sessionname) {
-		mSessionName = sessionname;
+	public ServerConnection(String sessionName) {
+		mSessionName = sessionName;
 	}
 
-    public ServerConnection(String sessionname, String language) {
+    public ServerConnection(String sessionName, String language) {
+        this(sessionName, language, false);
+    }
+
+    public ServerConnection(String sessionname, String language, boolean enableStatus) {
         mSessionName = sessionname;
         mLanguage = language;
+        mEnableStatus = enableStatus;
     }
 
     public boolean open(String hostname) {
-		if(!super.open(hostname, 34891)) {
+		if(!super.open(hostname, TCPIP_PORT)) {
 			Log.e(TAG, "failed to open server connection");
 			return false;
 		}
@@ -116,7 +118,8 @@ public class ServerConnection extends Session {
 		req.putU8(mCompressionLevel);
 		req.putString(mSessionName);
 		req.putString(mLanguage);
-		req.putU8((short)mAudioType);
+        req.putU8((short)mAudioType);
+        req.putU8((short)(mEnableStatus ? 1 : 0));
 
 		// read welcome
 		Packet resp = transmitMessage(req);
@@ -137,16 +140,4 @@ public class ServerConnection extends Session {
 
 		return true;
 	}
-
-    public boolean enableStatusInterface() {
-        return enableStatusInterface(true);
-    }
-
-    public boolean enableStatusInterface(boolean enabled) {
-        Packet req = CreatePacket(XVDR_ENABLESTATUSINTERFACE);
-        req.putU8((short)(enabled ? 1 : 0));
-
-        Packet resp = transmitMessage(req);
-        return (resp != null);
-    }
 }

@@ -236,8 +236,9 @@ public class ChannelSyncAdapter {
 		// update or insert channels
 
 		ChannelList list = new ChannelList();
+        String language = SetupUtils.getLanguageISO3(mContext);
 
-		list.load(mConnection);
+		list.load(mConnection, language);
 
 		int i = 0;
         int index = 0;
@@ -316,7 +317,9 @@ public class ChannelSyncAdapter {
 		getExistingChannels(mContext, mInputId, existingChannels);
 
 		ChannelList list = new ChannelList();
-		list.load(mConnection, new ChannelList.Callback() {
+        String language = SetupUtils.getLanguageISO3(mContext);
+
+		list.load(mConnection, language, new ChannelList.Callback() {
             @Override
             public void onChannel(final ChannelList.Entry entry) {
                 Long channelId = existingChannels.get(entry.uid);

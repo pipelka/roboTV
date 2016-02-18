@@ -107,7 +107,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mExoPlayer.addListener(this);
 
         // create connection
-        mConnection = new ServerConnection("robo.TV Player", language);
+        mConnection = new ServerConnection("robo.TV Player", language, true);
         mConnection.addCallback(this);
 
         mHandlerThread = new PriorityHandlerThread("robotv:player", android.os.Process.THREAD_PRIORITY_DEFAULT);
@@ -185,8 +185,6 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         if(!mConnection.open(mServer)) {
             return false;
         }
-
-        mConnection.enableStatusInterface();
 
         // create samplesource
         mSampleSource = new RoboTvSampleSource(mConnection, mHandler, mAudioCapabilities, mAudioPassthrough, mChannelConfiguration);

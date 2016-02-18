@@ -17,8 +17,8 @@ public class LiveTvPlayer extends Player {
      * @param channelUid the unique id of the channel
      * @return returns the status of the operation
      */
-    public int openStream(int channelUid) {
-        return openStream(channelUid, false);
+    public int openStream(int channelUid, String language) {
+        return openStream(channelUid, language, false);
     }
 
     /**
@@ -27,8 +27,8 @@ public class LiveTvPlayer extends Player {
      * @param waitForKeyFrame start streaming after the first IFRAME has been received
      * @return returns the status of the operation
      */
-    public int openStream(int channelUid, boolean waitForKeyFrame) {
-        return openStream(channelUid, waitForKeyFrame, 50);
+    public int openStream(int channelUid, String language, boolean waitForKeyFrame) {
+        return openStream(channelUid, language, waitForKeyFrame, 50);
     }
 
     /**
@@ -38,7 +38,7 @@ public class LiveTvPlayer extends Player {
      * @param priority priority of the received device on the server
      * @return returns the status of the operation
      */
-    public int openStream(int channelUid, boolean waitForKeyFrame, int priority) {
+    public int openStream(int channelUid, String language, boolean waitForKeyFrame, int priority) {
         // stop playback
         stop();
 
@@ -52,6 +52,7 @@ public class LiveTvPlayer extends Player {
         req.putS32(priority); // priority 50
         req.putU8((short) (waitForKeyFrame ? 1 : 0)); // start with IFrame
         req.putU8((short)1); // raw PTS values
+        req.putString(language);
 
         Packet resp = mConnection.transmitMessage(req);
 
