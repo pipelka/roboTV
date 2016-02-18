@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "org.xvdr.robotv"
@@ -12,13 +12,17 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "0.3.0.${gitAbbreviatedId}"
-        archivesBaseName = "robotv-" + gitBranch + "-" + gitAbbreviatedId
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            archivesBaseName = "robotv-" + gitBranch + "-" + gitAbbreviatedId
+        }
+        debug {
+            archivesBaseName = "robotv"
         }
     }
 
