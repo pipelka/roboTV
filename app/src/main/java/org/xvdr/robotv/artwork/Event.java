@@ -50,6 +50,28 @@ public class Event {
             "scifi"
     };
 
+    private static String[] genreSportTitle = {
+            "fußball",
+            "fussball",
+            "tennis",
+            "slalom",
+            "rtl",
+            "abfahrt",
+            "ski",
+            "eishockey"
+    };
+
+    private static int[] genreSportTitleId = {
+            0x43,
+            0x43,
+            0x44,
+            0x49,
+            0x49,
+            0x49,
+            0x49,
+            0x49
+    };
+
     private static int genreSoapMaxLength = 65 * 60; // 65 min
 
     public Event(int contentId, String title, String subTitle, String plot, int durationSec) {
@@ -57,7 +79,13 @@ public class Event {
     }
 
     public Event(int contentId, String title, String subTitle, String plot, int durationSec, int eventId) {
-        mContentId = guessGenreFromSubtitle(contentId, subTitle, durationSec);
+        mContentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
+
+        // sometimes we can guess the sub genre from the title
+        if(getGenre() == 0x40) {
+            mContentId = guessGenreFromSubTitle(contentId, title, durationSec);
+        }
+
         mYear = guessYearFromDescription(subTitle + " " + plot);
         mTitle = title;
         mSubTitle = subTitle;
@@ -122,14 +150,27 @@ public class Event {
         return 0;
     }
 
-    static int guessGenreFromSubtitle(int contentId, String subtitle, int duration) {
+    static int guessGenreFromSubTitle(int contentId, String subtitle, int duration) {
         if(subtitle == null) {
             return contentId;
         }
 
+        subtitle = subtitle.toLowerCase();
+
+        // try to assign sport sub genre
+        if((contentId & 0xF0) == 0x40) {
+            int index = 0;
+            for(String word: genreSportTitle) {
+                if (subtitle.contains(word.toLowerCase())) {
+                    return genreSportTitleId[index];
+                }
+                index++;
+            }
+        }
+
         // try to guess soap from subtitle keywords
         for(String word: genreSoap) {
-            if(subtitle.toLowerCase().contains(word.toLowerCase())) {
+            if(subtitle.contains(word.toLowerCase())) {
                 return 0x15;
             }
         }
@@ -137,7 +178,7 @@ public class Event {
         // try to guess soap or movie from subtitle keywords and event duration
         if(duration > 0) {
             for (String word : genreSoapOrMovie) {
-                if (subtitle.toLowerCase().contains(word.toLowerCase())) {
+                if (subtitle.contains(word.toLowerCase())) {
                     return duration < genreSoapMaxLength ? 0x15 : 0x10;
                 }
             }
