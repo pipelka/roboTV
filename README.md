@@ -1,6 +1,6 @@
 # roboTV
 
-roboTV is a Android TV based frontend for XVDR.
+roboTV is a Android TV based frontend for VDR.
 Now you can use your Android TV Box (or your TV running Android) to stream LiveTV channels from your VDR backend (robotv-plugin must be installed).
 
 ## Screenshots
