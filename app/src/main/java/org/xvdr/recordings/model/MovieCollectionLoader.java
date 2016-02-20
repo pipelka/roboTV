@@ -5,11 +5,12 @@ import android.os.Handler;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.xvdr.msgexchange.Packet;
-import org.xvdr.robotv.tmdb.TheMovieDatabase;
+import org.xvdr.robotv.artwork.ArtworkFetcher;
+import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.tv.ServerConnection;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +32,10 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
     }
 
     private final static String TAG = "MovieCollectionLoader";
-    private final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
     private ServerConnection mConnection;
     private Listener mListener;
-    private TheMovieDatabase mMovieDb;
+    private ArtworkFetcher mFetcher;
     private List<ArtworkItem> mArtworkQueue = new ArrayList<>();
 
     public MovieCollectionLoader(ServerConnection connection) {
@@ -44,7 +44,7 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
 
     public MovieCollectionLoader(ServerConnection connection, String language) {
         mConnection = connection;
-        mMovieDb = new TheMovieDatabase(TMDB_APIKEY, language);
+        mFetcher = new ArtworkFetcher(mConnection, language);
     }
 
     public void load(Listener listener) {
@@ -78,13 +78,11 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
 
             // search movies
             String url = movie.getCardImageUrl();
-            int genreType = movie.getGenreType();
 
-            if(url != null) {
+            if(url != null && !url.isEmpty() && !url.equals("x")) {
                 Log.d(TAG, "recording '" + movie.getTitle() + "' has url: '" + movie.getCardImageUrl() + "'");
             }
-
-            if((genreType == 0x10 || genreType == 0x00) && (url == null || url.isEmpty())) {
+            else {
                 updateMovieArtwork(movie, adapter);
             }
         }
@@ -101,14 +99,21 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
             @Override
             public void run() {
                 for(final ArtworkItem item : mArtworkQueue) {
-                    JSONArray o = mMovieDb.searchMovie(item.searchMovie.getTitle());
+                    ArtworkHolder o = null;
+
+                    try {
+                        o = mFetcher.fetchForEvent(item.searchMovie.getEvent());
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     if (o == null) {
                         continue;
                     }
 
-                    String url = mMovieDb.getPosterUrl(o);
-                    item.searchMovie.setCardImageUrl(url);
-                    item.searchMovie.setBackgroundImageUrl(mMovieDb.getBackgroundUrl(o));
+                    item.searchMovie.setCardImageUrl(o.getPosterUrl());
+                    item.searchMovie.setBackgroundImageUrl(o.getBackgroundUrl());
 
                     // update item
                     mHandler.post(new Runnable() {

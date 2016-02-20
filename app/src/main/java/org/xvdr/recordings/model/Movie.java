@@ -1,5 +1,7 @@
 package org.xvdr.recordings.model;
 
+import org.xvdr.robotv.artwork.Event;
+
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,12 +11,11 @@ public class Movie implements Serializable {
     private String title;
     private String description;
     private String outline;
-    //private String videoUrl;
     private String category;
     private String cardImageUrl;
     private String backgroundImageUrl;
     private long timeStamp;
-    private long duration;
+    private int duration;
     private String id;
     private int content;
     private boolean isSeries = false;
@@ -98,7 +99,7 @@ public class Movie implements Serializable {
         return timeStamp;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 
@@ -150,6 +151,9 @@ public class Movie implements Serializable {
         return formattedDate;
     }
 
+    public Event getEvent() {
+        return new Event(content, title, outline, description, duration);
+    }
     @Override
     public String toString() {
         return "Movie {" +

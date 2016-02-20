@@ -151,6 +151,10 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
     protected void updateVideoImage(String url) {
         Log.d(TAG, "load url " + url);
+        if(url == null || url.isEmpty()) {
+            return;
+        }
+
         Picasso.with(getActivity())
                 .load(url)
                 .resize(Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_size), getActivity().getApplicationContext()),
