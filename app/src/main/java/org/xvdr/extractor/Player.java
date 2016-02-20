@@ -226,6 +226,13 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mConnection.close();
     }
 
+    public void reset() {
+        mExoPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DISABLED);
+        mExoPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DISABLED);
+        mExoPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DEFAULT);
+        mExoPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DEFAULT);
+    }
+
     public boolean selectAudioTrack(int trackId) {
         return mSampleSource.selectAudioTrack(trackId);
     }
