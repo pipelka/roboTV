@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">robo.TV</string>
-    <string name="robotv_input" translatable="false">robo.TV</string>
-    <string name="robotv_input_label" translatable="false">robo.TV</string>
+    <string name="robotv_input" translatable="false">roboTV</string>
+    <string name="robotv_input_label" translatable="false">roboTV</string>
     <string name="connect_unable">Unable to connect to server !</string>
 
-    <string name="setup_root_server_desc">Enter the XVDR backend server address</string>
+    <string name="setup_root_server_desc">Enter the roboTV server address</string>
     <string name="setup_root_language_title">Preferred audio language</string>
     <string name="setup_root_refreshrate_title">TV refresh rate</string>
     <string name="setup_root_import_title">Import channels</string>

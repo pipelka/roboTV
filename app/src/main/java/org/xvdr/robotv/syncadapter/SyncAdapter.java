@@ -46,7 +46,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             return;
         }
 
-        ServerConnection connection = new ServerConnection("xvdr.TV Sync Adapter");
+        ServerConnection connection = new ServerConnection("roboTV Sync Adapter");
         if(!connection.open(SetupUtils.getServer(mContext))) {
             Log.e(TAG, "unable to connect to server");
         }

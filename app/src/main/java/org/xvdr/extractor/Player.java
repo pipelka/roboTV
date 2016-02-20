@@ -107,10 +107,10 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mExoPlayer.addListener(this);
 
         // create connection
-        mConnection = new ServerConnection("robo.TV Player", language, true);
+        mConnection = new ServerConnection("roboTV Player", language, true);
         mConnection.addCallback(this);
 
-        mHandlerThread = new PriorityHandlerThread("robotv:player", android.os.Process.THREAD_PRIORITY_DEFAULT);
+        mHandlerThread = new PriorityHandlerThread("roboTV:player", android.os.Process.THREAD_PRIORITY_DEFAULT);
         mHandlerThread.start();
 
         mHandler = new Handler(mHandlerThread.getLooper());
