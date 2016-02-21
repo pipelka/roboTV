@@ -24,7 +24,8 @@ public class ServerConnection extends Session {
 	/** Packet types */
 	public static final int XVDR_CHANNEL_REQUEST_RESPONSE = 1;
 	public static final int XVDR_CHANNEL_STREAM = 2;
-	public static final int XVDR_CHANNEL_STATUS = 5;
+    public static final int XVDR_CHANNEL_STATUS = 5;
+    public static final int XVDR_GET_CONFIG = 8;
 
 
 	/* OPCODE 1 - 19: XVDR network functions for general purpose */

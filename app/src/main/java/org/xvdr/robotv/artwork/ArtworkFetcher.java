@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.artwork.provider.ArtworkProvider;
+import org.xvdr.robotv.artwork.provider.HttpEpgImageProvider;
 import org.xvdr.robotv.artwork.provider.RoboTvProvider;
 import org.xvdr.robotv.artwork.provider.StockImageProvider;
 import org.xvdr.robotv.artwork.provider.TheMovieDatabase;
@@ -19,22 +20,30 @@ public class ArtworkFetcher {
     ServerConnection mConnection;
     ArtworkProvider mServerCache;
     ArtworkProvider[] mProviders;
+    String mEpgImageTemplateUrl = "";
 
     public ArtworkFetcher(ServerConnection connection, String language) {
         mConnection = connection;
         mServerCache = new RoboTvProvider(connection);
 
-        mProviders = new ArtworkProvider[2];
-        mProviders[0] = new TheMovieDatabase(TMDB_APIKEY, language);
-        mProviders[1] = new StockImageProvider();
+        // fetch epg images template url
+        mEpgImageTemplateUrl = getEpgImageTemplateUrl();
 
-
+        mProviders = new ArtworkProvider[3];
+        mProviders[0] = new HttpEpgImageProvider(mEpgImageTemplateUrl);
+        mProviders[1] = new TheMovieDatabase(TMDB_APIKEY, language);
+        mProviders[2] = new StockImageProvider();
     }
 
     public ArtworkHolder fetchForEvent(Event event) throws IOException {
         // sanity check
         if(event.getTitle().isEmpty() || mProviders == null) {
             return null;
+        }
+
+        if(mEpgImageTemplateUrl.isEmpty()) {
+            mEpgImageTemplateUrl = getEpgImageTemplateUrl();
+            mProviders[0] = new HttpEpgImageProvider(mEpgImageTemplateUrl);
         }
 
         // check server cache first
@@ -47,7 +56,7 @@ public class ArtworkFetcher {
         for(ArtworkProvider provider: mProviders) {
             if((o = provider.search(event)) != null) {
                 break;
-            };
+            }
         }
 
         // didn't get any result
@@ -71,5 +80,17 @@ public class ArtworkFetcher {
         }
 
         return o;
+    }
+
+    protected String getEpgImageTemplateUrl() {
+        Packet request = mConnection.CreatePacket(ServerConnection.XVDR_GET_CONFIG);
+        request.putString("EpgImageUrl");
+
+        Packet response = mConnection.transmitMessage(request);
+        if(response == null) {
+            return "";
+        }
+
+        return response.getString();
     }
 }

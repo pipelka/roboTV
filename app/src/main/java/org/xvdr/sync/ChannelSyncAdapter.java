@@ -427,7 +427,7 @@ public class ChannelSyncAdapter {
 		// add schedule
         int i = 0;
 		while(!resp.eop()) {
-			long eventId = resp.getU32();
+			int eventId = (int)resp.getU32();
 			long startTime = resp.getU32();
 			long endTime = startTime + resp.getU32();
 			int content = (int)resp.getU32();
@@ -446,7 +446,7 @@ public class ChannelSyncAdapter {
 
             description += plot;
 
-            Event event = new Event(content, title, plotOutline, plot, eventDuration);
+            Event event = new Event(content, title, plotOutline, plot, eventDuration, eventId);
 
             ContentValues values = new ContentValues();
             values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
