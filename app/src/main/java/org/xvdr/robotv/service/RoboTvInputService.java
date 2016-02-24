@@ -23,7 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.util.PriorityHandlerThread;
 
@@ -41,7 +40,7 @@ import java.util.List;
 
 public class RoboTvInputService extends TvInputService {
 
-    private DisplayModeSetter mDisplayModeSetter;
+    private DisplayModeSetter mDisplayModeSetter = null;
 
     @Override
     public void onCreate() {
@@ -49,10 +48,12 @@ public class RoboTvInputService extends TvInputService {
 
         setTheme(android.R.style.Theme_DeviceDefault);
 
-        float mRefreshRate = SetupUtils.getRefreshRate(this);
+        if(SetupUtils.isRefreshRateChangeSupported()) {
+            float mRefreshRate = SetupUtils.getRefreshRate(this);
 
-        mDisplayModeSetter = new DisplayModeSetter(this);
-        mDisplayModeSetter.setRefreshRate(mRefreshRate);
+            mDisplayModeSetter = new DisplayModeSetter(this);
+            mDisplayModeSetter.setRefreshRate(mRefreshRate);
+        }
     }
 
     @Override
@@ -66,7 +67,10 @@ public class RoboTvInputService extends TvInputService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mDisplayModeSetter.release();
+
+        if(mDisplayModeSetter != null) {
+            mDisplayModeSetter.release();
+        }
     }
 
     /**
