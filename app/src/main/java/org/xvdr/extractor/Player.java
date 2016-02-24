@@ -179,10 +179,9 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     protected boolean open() {
-        // open server connection
-        mConnection.close();
 
-        if(!mConnection.open(mServer)) {
+        // open server connection
+        if(!mConnection.isOpen() && !mConnection.open(mServer)) {
             return false;
         }
 
