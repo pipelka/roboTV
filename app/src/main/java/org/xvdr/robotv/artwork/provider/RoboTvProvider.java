@@ -5,15 +5,15 @@ import android.util.Log;
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
-import org.xvdr.robotv.tv.ServerConnection;
+import org.xvdr.robotv.client.Connection;
 
 public class RoboTvProvider extends SimpleArtworkProvider {
 
     static final String TAG = "RoboTvProvider";
 
-    private ServerConnection mConnection;
+    private Connection mConnection;
 
-    public RoboTvProvider(ServerConnection connection) {
+    public RoboTvProvider(Connection connection) {
         mConnection = connection;
     }
 
@@ -22,7 +22,7 @@ public class RoboTvProvider extends SimpleArtworkProvider {
 
         // request artwork from server cache
 
-        Packet req = mConnection.CreatePacket(ServerConnection.XVDR_ARTWORK_GET);
+        Packet req = mConnection.CreatePacket(Connection.XVDR_ARTWORK_GET);
         req.putString(event.getTitle());
         req.putU32(event.getContentId());
 

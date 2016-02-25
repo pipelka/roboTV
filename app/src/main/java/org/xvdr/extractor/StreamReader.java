@@ -1,12 +1,6 @@
 package org.xvdr.extractor;
 
-import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.extractor.DefaultTrackOutput;
-import com.google.android.exoplayer.util.ParsableByteArray;
-
-import org.xvdr.robotv.tv.StreamBundle;
-
-import java.util.Queue;
+import org.xvdr.robotv.client.StreamBundle;
 
 abstract class StreamReader {
 

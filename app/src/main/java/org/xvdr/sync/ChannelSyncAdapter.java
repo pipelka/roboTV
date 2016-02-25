@@ -18,8 +18,8 @@ import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.tv.ChannelList;
-import org.xvdr.robotv.tv.ServerConnection;
+import org.xvdr.robotv.client.Channels;
+import org.xvdr.robotv.client.Connection;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -128,7 +128,7 @@ public class ChannelSyncAdapter {
 	static final String TAG = "ChannelSyncAdapter";
 
 	private Context mContext;
-	private ServerConnection mConnection;
+	private Connection mConnection;
     private ArtworkFetcher mArtwork;
 	private String mInputId;
 	private boolean mCancelChannelSync = false;
@@ -203,7 +203,7 @@ public class ChannelSyncAdapter {
 
 	private ProgressCallback mProgressCallback = null;
 
-	public ChannelSyncAdapter(Context context, String inputId, ServerConnection connection) {
+	public ChannelSyncAdapter(Context context, String inputId, Connection connection) {
 		mContext = context;
 		mConnection = connection;
 		mInputId = inputId;
@@ -235,7 +235,7 @@ public class ChannelSyncAdapter {
 
 		// update or insert channels
 
-		ChannelList list = new ChannelList();
+		Channels list = new Channels();
         String language = SetupUtils.getLanguageISO3(mContext);
 
 		list.load(mConnection, language);
@@ -243,7 +243,7 @@ public class ChannelSyncAdapter {
 		int i = 0;
         int index = 0;
 
-		for(ChannelList.Entry entry : list) {
+		for(Channels.Entry entry : list) {
 			Uri channelUri;
 			Long channelId = existingChannels.get(entry.uid);
 
@@ -316,12 +316,12 @@ public class ChannelSyncAdapter {
 
 		getExistingChannels(mContext, mInputId, existingChannels);
 
-		ChannelList list = new ChannelList();
+		Channels list = new Channels();
         String language = SetupUtils.getLanguageISO3(mContext);
 
-		list.load(mConnection, language, new ChannelList.Callback() {
+		list.load(mConnection, language, new Channels.Callback() {
             @Override
-            public void onChannel(final ChannelList.Entry entry) {
+            public void onChannel(final Channels.Entry entry) {
                 Long channelId = existingChannels.get(entry.uid);
 
                 if (channelId == null) {
@@ -412,7 +412,7 @@ public class ChannelSyncAdapter {
 
 		// fetch
 
-		Packet req = mConnection.CreatePacket(ServerConnection.XVDR_EPG_GETFORCHANNEL);
+		Packet req = mConnection.CreatePacket(Connection.XVDR_EPG_GETFORCHANNEL);
 		req.putU32(uid);
 		req.putU32(start);
 		req.putU32(duration);

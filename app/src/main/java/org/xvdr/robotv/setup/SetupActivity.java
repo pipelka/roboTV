@@ -10,13 +10,13 @@ import android.widget.Toast;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.syncadapter.SyncUtils;
 import org.xvdr.sync.ChannelSyncAdapter;
-import org.xvdr.robotv.tv.ServerConnection;
+import org.xvdr.robotv.client.Connection;
 
 public class SetupActivity extends Activity {
     private static final String TAG = "Setup";
 
     private String mInputId;
-    private ServerConnection mConnection;
+    private Connection mConnection;
 
     private ChannelSyncAdapter channelSync;
 
@@ -27,7 +27,7 @@ public class SetupActivity extends Activity {
         mInputId = getIntent().getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
 
         Log.i(TAG, "creating XVDR connection ...");
-        mConnection = new ServerConnection("AndroidTV Settings");
+        mConnection = new Connection("AndroidTV Settings");
 
         GuidedStepFragment.addAsRoot(this, new SetupFragmentRoot(), android.R.id.content);
     }

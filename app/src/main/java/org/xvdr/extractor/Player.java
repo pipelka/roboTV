@@ -18,16 +18,12 @@ import com.google.android.exoplayer.util.PriorityHandlerThread;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.msgexchange.Session;
-import org.xvdr.robotv.tv.ServerConnection;
-import org.xvdr.robotv.tv.StreamBundle;
+import org.xvdr.robotv.client.Connection;
+import org.xvdr.robotv.client.StreamBundle;
 
 public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampleSource.Listener, MediaCodecAudioTrackRenderer.EventListener, MediaCodecVideoTrackRenderer.EventListener {
 
     private static final String TAG = "Player";
-
-    public final static int NORESPONSE = -1;
-    public final static int SUCCESS = 0;
-    public final static int ERROR = 1;
 
     public final static int CHANNELS_DEFAULT = 0;
     public final static int CHANNELS_STEREO = 2;
@@ -66,7 +62,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     protected ExoPlayer mExoPlayer;
     private RoboTvSampleSource mSampleSource;
-    protected ServerConnection mConnection = null;
+    protected Connection mConnection = null;
 
     private MediaCodecVideoTrackRenderer mVideoRenderer = null;
     private MediaCodecAudioTrackRenderer mAudioRenderer = null;
@@ -107,7 +103,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mExoPlayer.addListener(this);
 
         // create connection
-        mConnection = new ServerConnection("roboTV Player", language, true);
+        mConnection = new Connection("roboTV Player", language, true);
         mConnection.addCallback(this);
 
         mHandlerThread = new PriorityHandlerThread("roboTV:player", android.os.Process.THREAD_PRIORITY_DEFAULT);
@@ -127,6 +123,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mExoPlayer = null;
 
         if(mConnection != null) {
+            mConnection.closeStream();
             mConnection.close();
             mConnection.removeAllCallbacks();
             mConnection = null;
@@ -299,13 +296,13 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
             return;
         }
 
-        mHandler.post(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mConnection.login();
                 mListener.onReconnect();
             }
-        });
+        }, 3000);
     }
 
     @Override

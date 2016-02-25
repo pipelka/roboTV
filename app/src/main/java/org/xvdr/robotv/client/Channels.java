@@ -1,13 +1,10 @@
-package org.xvdr.robotv.tv;
+package org.xvdr.robotv.client;
 
 import org.xvdr.msgexchange.Packet;
 
 import java.util.ArrayList;
 
-/**
- * Created by pipelka on 04.05.15.
- */
-public class ChannelList extends ArrayList<ChannelList.Entry> {
+public class Channels extends ArrayList<Channels.Entry> {
 
 	public interface Callback {
 		void onChannel(Entry entry);
@@ -24,20 +21,20 @@ public class ChannelList extends ArrayList<ChannelList.Entry> {
 
 	}
 
-	public void load(ServerConnection connection,String language) {
+	public void load(Connection connection, String language) {
 		clear();
 
 		loadChannelType(connection, false, language, null);
 	}
 
-	public void load(ServerConnection connection, String language, Callback callback) {
+	public void load(Connection connection, String language, Callback callback) {
 		clear();
 
 		loadChannelType(connection, false, language, callback);
 	}
 
-	private boolean loadChannelType(ServerConnection connection, boolean radio, String language, Callback callback) {
-		Packet req = connection.CreatePacket(ServerConnection.XVDR_CHANNELS_GETCHANNELS);
+	private boolean loadChannelType(Connection connection, boolean radio, String language, Callback callback) {
+		Packet req = connection.CreatePacket(Connection.XVDR_CHANNELS_GETCHANNELS);
 		req.putU32(radio ? 1 : 0);
         req.putString(language);
         req.putU32(1);

@@ -8,7 +8,7 @@ import org.xvdr.robotv.artwork.provider.HttpEpgImageProvider;
 import org.xvdr.robotv.artwork.provider.RoboTvProvider;
 import org.xvdr.robotv.artwork.provider.StockImageProvider;
 import org.xvdr.robotv.artwork.provider.TheMovieDatabase;
-import org.xvdr.robotv.tv.ServerConnection;
+import org.xvdr.robotv.client.Connection;
 
 import java.io.IOException;
 
@@ -17,12 +17,12 @@ public class ArtworkFetcher {
     static final String TAG = "ArtworkFetcher";
     private final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
-    ServerConnection mConnection;
+    Connection mConnection;
     ArtworkProvider mServerCache;
     ArtworkProvider[] mProviders;
     String mEpgImageTemplateUrl = "";
 
-    public ArtworkFetcher(ServerConnection connection, String language) {
+    public ArtworkFetcher(Connection connection, String language) {
         mConnection = connection;
         mServerCache = new RoboTvProvider(connection);
 
@@ -65,7 +65,7 @@ public class ArtworkFetcher {
         }
 
         // register artwork on server
-        Packet req = mConnection.CreatePacket(ServerConnection.XVDR_ARTWORK_SET);
+        Packet req = mConnection.CreatePacket(Connection.XVDR_ARTWORK_SET);
         req.putString(event.getTitle());
         req.putU32(event.getContentId());
         req.putString(o.getPosterUrl());
@@ -83,7 +83,7 @@ public class ArtworkFetcher {
     }
 
     protected String getEpgImageTemplateUrl() {
-        Packet request = mConnection.CreatePacket(ServerConnection.XVDR_GET_CONFIG);
+        Packet request = mConnection.CreatePacket(Connection.XVDR_GET_CONFIG);
         request.putString("EpgImageUrl");
 
         Packet response = mConnection.transmitMessage(request);

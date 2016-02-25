@@ -32,8 +32,9 @@ import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.tv.DisplayModeSetter;
-import org.xvdr.robotv.tv.ServerConnection;
-import org.xvdr.robotv.tv.StreamBundle;
+import org.xvdr.robotv.client.Connection;
+import org.xvdr.robotv.client.StreamBundle;
+import org.xvdr.robotv.tv.TrackInfoMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -213,7 +214,7 @@ public class RoboTvInputService extends TvInputService {
             // stream channel
             String language = SetupUtils.getLanguageISO3(mContext);
 
-            if(mPlayer.openStream(uid, language) == Player.ERROR) {
+            if(mPlayer.openStream(uid, language) != Connection.SUCCESS) {
                 errorNotification(getResources().getString(R.string.failed_tune));
                 return false;
             }
@@ -257,7 +258,7 @@ public class RoboTvInputService extends TvInputService {
             String message;
 
             // process only STATUS messages
-            if(notification.getType() != ServerConnection.XVDR_CHANNEL_STATUS) {
+            if(notification.getType() != Connection.XVDR_CHANNEL_STATUS) {
                 return;
             }
 
@@ -265,13 +266,13 @@ public class RoboTvInputService extends TvInputService {
             Log.d(TAG, "notification id: " + id);
 
             switch(id) {
-                case ServerConnection.XVDR_STATUS_MESSAGE:
+                case Connection.XVDR_STATUS_MESSAGE:
                     Log.d(TAG, "status message");
                     notification.getU32(); // type
                     message = notification.getString();
                     toastNotification(message);
                     break;
-                case ServerConnection.XVDR_STATUS_RECORDING:
+                case Connection.XVDR_STATUS_RECORDING:
                     Log.d(TAG, "recording status");
                     notification.getU32(); // card index
                     int on = (int) notification.getU32(); // on
@@ -406,7 +407,8 @@ public class RoboTvInputService extends TvInputService {
             final List<TvTrackInfo> tracks = new ArrayList<>(16);
 
             // create video track (limit surface size to display size)
-            TvTrackInfo info = bundle.getTrackInfo(
+            TvTrackInfo info = TrackInfoMapper.findTrackInfo(
+                    bundle,
                     StreamBundle.CONTENT_VIDEO,
                     0,
                     mDisplaySize.x,
@@ -421,7 +423,7 @@ public class RoboTvInputService extends TvInputService {
             int audioTrackCount = bundle.getStreamCount(StreamBundle.CONTENT_AUDIO);
 
             for(int i = 0; i < audioTrackCount; i++) {
-                info = bundle.getTrackInfo(StreamBundle.CONTENT_AUDIO, i);
+                info = TrackInfoMapper.findTrackInfo(bundle, StreamBundle.CONTENT_AUDIO, i);
                 if(info != null) {
                     tracks.add(info);
                 }

@@ -8,7 +8,7 @@ import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.MpegAudioHeader;
 
 import org.xvdr.audio.MpegAudioDecoder;
-import org.xvdr.robotv.tv.StreamBundle;
+import org.xvdr.robotv.client.StreamBundle;
 
 /**
  * Processes a XVDR MPEG Audio stream.

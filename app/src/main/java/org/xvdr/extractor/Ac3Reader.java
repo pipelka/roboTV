@@ -7,7 +7,7 @@ import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.audio.AC3Decoder;
-import org.xvdr.robotv.tv.StreamBundle;
+import org.xvdr.robotv.client.StreamBundle;
 
 /**
  * Processes a XVDR AC3 stream.

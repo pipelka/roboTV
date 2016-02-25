@@ -1,15 +1,18 @@
-package org.xvdr.robotv.tv;
+package org.xvdr.robotv.client;
 
 import android.util.Log;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.msgexchange.Session;
 
-public class ServerConnection extends Session {
+public class Connection extends Session {
 
 	private static final String TAG = "XVDR";
 
-	private String mSessionName = "XVDR Client";
+    public final static int NORESPONSE = -1;
+    public final static int SUCCESS = 0;
+
+    private String mSessionName = "XVDR Client";
 	private short mCompressionLevel = 0;
 	private int mAudioType = StreamBundle.TYPE_AUDIO_AC3;
 	private String mLanguage = "deu";
@@ -84,15 +87,15 @@ public class ServerConnection extends Session {
 		return new Packet(msgid, XVDR_CHANNEL_REQUEST_RESPONSE);
 	}
 
-	public ServerConnection(String sessionName) {
+	public Connection(String sessionName) {
 		mSessionName = sessionName;
 	}
 
-    public ServerConnection(String sessionName, String language) {
+    public Connection(String sessionName, String language) {
         this(sessionName, language, false);
     }
 
-    public ServerConnection(String sessionname, String language, boolean enableStatus) {
+    public Connection(String sessionname, String language, boolean enableStatus) {
         mSessionName = sessionname;
         mLanguage = language;
         mEnableStatus = enableStatus;
@@ -141,4 +144,34 @@ public class ServerConnection extends Session {
 
 		return true;
 	}
+
+    /**
+     * Start streaming of a LiveTV channel
+     * @param channelUid the unique id of the channel
+     * @param waitForKeyFrame start streaming after the first IFRAME has been received
+     * @param priority priority of the received device on the server
+     * @return returns the status of the operation
+     */
+    public int openStream(int channelUid, String language, boolean waitForKeyFrame, int priority) {
+        Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_OPEN, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+
+        req.putU32(channelUid);
+        req.putS32(priority); // priority 50
+        req.putU8((short) (waitForKeyFrame ? 1 : 0)); // start with IFrame
+        req.putU8((short)1); // raw PTS values
+        req.putString(language);
+
+        Packet resp = transmitMessage(req);
+
+        if(resp == null) {
+            return NORESPONSE;
+        }
+
+        return (int)resp.getU32();
+    }
+
+    public boolean closeStream() {
+        Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_CLOSE, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        return (transmitMessage(req) != null);
+    }
 }

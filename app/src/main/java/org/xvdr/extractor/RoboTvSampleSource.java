@@ -1,7 +1,6 @@
 package org.xvdr.extractor;
 
 import android.media.AudioFormat;
-import android.media.MediaCodecInfo;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
@@ -17,8 +16,8 @@ import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.msgexchange.Session;
-import org.xvdr.robotv.tv.ServerConnection;
-import org.xvdr.robotv.tv.StreamBundle;
+import org.xvdr.robotv.client.Connection;
+import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
@@ -39,7 +38,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     final static private int TRACK_AUDIO = 1;
     final static private int TRACK_SUBTITLE = 2;
 
-    private ServerConnection mConnection;
+    private Connection mConnection;
     private StreamBundle mBundle;
     private Listener mListener;
     private Handler mHandler;
@@ -70,15 +69,15 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
      * Create a LiveTv SampleSource
      * @param connection the server connection to use
      */
-    public RoboTvSampleSource(ServerConnection connection) {
+    public RoboTvSampleSource(Connection connection) {
         this(connection, new Handler());
     }
 
-    public RoboTvSampleSource(ServerConnection connection, Handler handler) {
+    public RoboTvSampleSource(Connection connection, Handler handler) {
         this(connection, handler, null, false, Player.CHANNELS_SURROUND);
     }
 
-    public RoboTvSampleSource(ServerConnection connection, Handler handler, AudioCapabilities audioCapabilities, boolean audioPassthrough, int channelConfiguration) {
+    public RoboTvSampleSource(Connection connection, Handler handler, AudioCapabilities audioCapabilities, boolean audioPassthrough, int channelConfiguration) {
         mConnection = connection;
         mHandler = handler;
         mBundle = new StreamBundle();
@@ -241,17 +240,17 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     @Override
     public void onNotification(Packet packet) {
         // process only STATUS messages
-        if(packet.getType() != ServerConnection.XVDR_CHANNEL_STREAM) {
+        if(packet.getType() != Connection.XVDR_CHANNEL_STREAM) {
             return;
         }
 
         switch(packet.getMsgID()) {
-            case ServerConnection.XVDR_STREAM_CHANGE:
+            case Connection.XVDR_STREAM_CHANGE:
                 final StreamBundle newBundle = new StreamBundle();
                 newBundle.updateFromPacket(packet);
                 createOutputTracks(newBundle);
                 break;
-            case ServerConnection.XVDR_STREAM_MUXPKT:
+            case Connection.XVDR_STREAM_MUXPKT:
                 writeData(packet);
                 break;
         }

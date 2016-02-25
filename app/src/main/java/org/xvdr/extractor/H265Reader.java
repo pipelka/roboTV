@@ -4,7 +4,7 @@ import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.util.MimeTypes;
 
-import org.xvdr.robotv.tv.StreamBundle;
+import org.xvdr.robotv.client.StreamBundle;
 
 import java.util.Collections;
 import java.util.List;

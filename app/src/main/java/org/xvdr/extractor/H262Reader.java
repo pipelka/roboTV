@@ -4,10 +4,7 @@ import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.util.MimeTypes;
 
-import org.xvdr.robotv.tv.StreamBundle;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.xvdr.robotv.client.StreamBundle;
 
 /**
  * Processes a XVDR H262 byte stream

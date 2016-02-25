@@ -1,10 +1,9 @@
 package org.xvdr.extractor;
 
 import android.content.Context;
-import android.os.Build;
 
 import org.xvdr.msgexchange.Packet;
-import org.xvdr.robotv.tv.ServerConnection;
+import org.xvdr.robotv.client.Connection;
 
 public class LiveTvPlayer extends Player {
 
@@ -44,32 +43,16 @@ public class LiveTvPlayer extends Player {
 
         // open server connection
         if(!open()) {
-            return ERROR;
+            return Connection.NORESPONSE;
         }
 
-        Packet req = mConnection.CreatePacket(ServerConnection.XVDR_CHANNELSTREAM_OPEN, ServerConnection.XVDR_CHANNEL_REQUEST_RESPONSE);
-        req.putU32(channelUid);
-        req.putS32(priority); // priority 50
-        req.putU8((short) (waitForKeyFrame ? 1 : 0)); // start with IFrame
-        req.putU8((short)1); // raw PTS values
-        req.putString(language);
-
-        Packet resp = mConnection.transmitMessage(req);
-
-        if(resp == null) {
-            return NORESPONSE;
-        }
-
-        int status = (int)resp.getU32();
-
-        if(status > 0) {
-            return ERROR;
+        int status = mConnection.openStream(channelUid, language, waitForKeyFrame, priority);
+        if(status != Connection.SUCCESS) {
+            return status;
         }
 
         start();
-
-        return SUCCESS;
+        return Connection.SUCCESS;
     }
-
 
 }

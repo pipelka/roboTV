@@ -11,7 +11,7 @@ import android.util.Log;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import org.xvdr.sync.ChannelSyncAdapter;
-import org.xvdr.robotv.tv.ServerConnection;
+import org.xvdr.robotv.client.Connection;
 
 /**
  * A SyncAdapter implementation which updates program info periodically.
@@ -46,7 +46,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             return;
         }
 
-        ServerConnection connection = new ServerConnection("roboTV Sync Adapter");
+        Connection connection = new Connection("roboTV Sync Adapter");
         if(!connection.open(SetupUtils.getServer(mContext))) {
             Log.e(TAG, "unable to connect to server");
         }

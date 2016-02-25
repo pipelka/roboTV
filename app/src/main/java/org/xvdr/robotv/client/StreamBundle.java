@@ -1,6 +1,5 @@
-package org.xvdr.robotv.tv;
+package org.xvdr.robotv.client;
 
-import android.media.tv.TvTrackInfo;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
@@ -112,42 +111,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 		public String getMimeType() {
 			return getMimeTypeFromType(type);
 		}
-
-        final public TvTrackInfo getTrackInfo() {
-            return getTrackInfo(0, 0);
-        }
-
-        final public TvTrackInfo getTrackInfo(int displayWidth, int displayHeight) {
-            if(content == CONTENT_AUDIO) {
-                return new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, Integer.toString(physicalId))
-                        .setAudioChannelCount(channels)
-                        .setAudioSampleRate(sampleRate)
-                        .setLanguage(language)
-                        .build();
-            }
-            else if(content == CONTENT_VIDEO) {
-                TvTrackInfo.Builder builder = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, Integer.toString(physicalId));
-                if(fpsScale != 0 && fpsRate != 0) {
-                    builder.setVideoFrameRate(fpsRate / fpsScale);
-                }
-
-                float stretchWidth = (float)width * pixelAspectRatio;
-                float factor = 1;
-
-                // scale down picture (if larger than display)
-                if(width != 0 && stretchWidth > displayWidth) {
-                    factor = displayWidth / stretchWidth;
-                }
-
-                builder.setVideoWidth((int)(stretchWidth * factor));
-                builder.setVideoHeight((int)(height * factor));
-
-                return builder.build();
-            }
-
-            return null;
-        }
-	}
+    }
 
     public StreamBundle() {
     }
@@ -225,12 +189,11 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 	}
 
 	public synchronized void updateFromPacket(Packet p) {
-		if(p.getMsgID() != ServerConnection.XVDR_STREAM_CHANGE) {
+		if(p.getMsgID() != Connection.XVDR_STREAM_CHANGE) {
 			return;
 		}
 
         clear();
-        int index = 0;
 
 		while(!p.eop()) {
 			Stream stream = new Stream();
@@ -301,7 +264,6 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 
             Log.i(TAG, "new " + stream.content + " " + typeMapping.get(stream.type) + " stream (" + stream.physicalId + ")");
 			add(stream);
-            index++;
 		}
 
 	}
@@ -317,30 +279,6 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         }
 
         return count;
-    }
-
-    public TvTrackInfo getTrackInfo(int contentType, int streamIndex) {
-        return getTrackInfo(contentType, streamIndex, 0, 0);
-    }
-
-    public TvTrackInfo getTrackInfo(int contentType, int streamIndex, int width, int height) {
-        if(streamIndex < 0) {
-            return null;
-        }
-
-        int count = 0;
-
-        for(int i = 0; i < size(); i++) {
-            Stream stream = get(i);
-            if(stream.content == contentType) {
-                if(count == streamIndex) {
-                    return stream.getTrackInfo(width, height);
-                }
-                count++;
-            }
-        }
-
-        return null;
     }
 
     public Stream getStream(int contentType, int streamIndex) {
