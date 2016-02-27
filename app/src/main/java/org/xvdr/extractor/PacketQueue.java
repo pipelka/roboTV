@@ -9,7 +9,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     final private static String TAG = "PacketQueue";
-    final private static int mMaxQueueSize = 400;
+    final private static int mMaxQueueSize = 300;
 
     private MediaFormat mFormat;
 
@@ -74,5 +74,9 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     public boolean hasFormat() {
         return (mFormat != null);
+    }
+
+    public boolean isFull() {
+        return (size() >= mMaxQueueSize);
     }
 }

@@ -12,6 +12,7 @@ import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.SampleSource;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.extractor.ts.PtsTimestampAdjuster;
+import com.google.android.exoplayer.upstream.Loader;
 import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.msgexchange.Packet;
@@ -21,7 +22,22 @@ import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSourceReader, Session.Callback {
+public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSourceReader, Session.Callback, Loader.Callback {
+
+    @Override
+    public void onLoadCanceled(Loader.Loadable loadable) {
+
+    }
+
+    @Override
+    public void onLoadCompleted(Loader.Loadable loadable) {
+
+    }
+
+    @Override
+    public void onLoadError(Loader.Loadable loadable, IOException e) {
+
+    }
 
     public interface Listener {
 
@@ -32,6 +48,32 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         void onVideoTrackChanged(StreamBundle.Stream stream);
     }
 
+    protected class RoboTvLoadable implements Loader.Loadable {
+
+        private volatile boolean mLoadCanceled = false;
+
+        @Override
+        public void cancelLoad() {
+            mLoadCanceled = true;
+        }
+
+        @Override
+        public boolean isLoadCanceled() {
+            return mLoadCanceled;
+        }
+
+        @Override
+        public void load() throws IOException, InterruptedException {
+            while(!mLoadCanceled) {
+                if(mOutputTracks[1].isFull() || mOutputTracks[0].isFull()) {
+                    Thread.sleep(10);
+                    continue;
+                }
+
+                requestPacket();
+            }
+        }
+    }
     final static private String TAG = "RoboTvSampleSource";
     final static private int TRACK_COUNT = 3;
     final static private int TRACK_VIDEO = 0;
@@ -49,6 +91,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     private long mLargestParsedTimestampUs = Long.MIN_VALUE;
     private long streamPositionUs;
     private int mChannelConfiguration;
+
+    private Loader mLoader;
 
     final private int[] mPids = new int[TRACK_COUNT];
     final private boolean[] mNeedFormatChange = new boolean[TRACK_COUNT];
@@ -93,6 +137,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         mAudioCapabilities = audioCapabilities;
 
+        mLoader = new Loader("roboTV:streamloader");
+
         logChannelConfiguration(mAudioPassthrough, mChannelConfiguration);
     }
 
@@ -108,6 +154,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     @Override
     public boolean prepare(long position) {
+        startLoading();
+
         // check if we have a video and a audio format
         for(int i = 0; i < 2; i++) {
             PacketQueue outputTrack = mOutputTracks[i];
@@ -118,6 +166,24 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         }
 
         return true;
+    }
+
+    protected void startLoading() {
+        if(mLoader.isLoading()) {
+            return;
+        }
+
+        Log.d(TAG, "startLoading");
+        mLoader.startLoading(new RoboTvLoadable(), this);
+    }
+
+    protected void stopLoading() {
+        if(!mLoader.isLoading()) {
+            return;
+        }
+
+        Log.d(TAG, "stopLoading");
+        mLoader.cancelLoading();
     }
 
     @Override
@@ -138,6 +204,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mTrackEnabled.put(track, true);
         mNeedFormatChange[track] = true;
         streamPositionUs = positionUs;
+        startLoading();
     }
 
     // false - continue buffering
@@ -145,6 +212,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     @Override
     public boolean continueBuffering(int track, long positionUs) {
         streamPositionUs = positionUs;
+
         return !mOutputTracks[track].isEmpty();
     }
 
@@ -229,10 +297,15 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     public void disable(int track) {
         Log.d(TAG, "disable track: " + track);
         mTrackEnabled.put(track, false);
+
+        if(!mTrackEnabled.get(0) && !mTrackEnabled.get(1)) {
+            stopLoading();
+        }
     }
 
     @Override
     public void release() {
+        stopLoading();
         mConnection.removeCallback(this);
 
         for(int i = 0; i < TRACK_COUNT; i++) {
@@ -495,4 +568,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
               Player.nameOfChannelConfiguration(channelConfiguration) + " " +
               "passthrough: " + (passthrough ? "enabled" : "disabled"));
     }
+
+    protected void requestPacket() {
+        Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        mConnection.sendRequest(req);
+    }
+
 }

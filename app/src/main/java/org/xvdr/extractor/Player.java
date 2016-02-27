@@ -54,7 +54,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     private static final int RENDERER_COUNT = 2;
-    protected static final int MIN_BUFFER_MS = 1000;
+    protected static final int MIN_BUFFER_MS = 2000;
     protected static final int MIN_REBUFFER_MS = 3000;
 
     private static final int RENDERER_VIDEO = 0;
@@ -161,18 +161,15 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     public void play() {
-        onStartLoader();
         mExoPlayer.setPlayWhenReady(true);
     }
 
     public void pause() {
         mExoPlayer.setPlayWhenReady(false);
-        onStopLoader();
     }
 
     public void stop() {
         mExoPlayer.stop();
-        onStopLoader();
     }
 
     protected boolean open() {
@@ -238,12 +235,6 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     public long getCurrentPosition() {
         return mExoPlayer.getCurrentPosition();
-    }
-
-    protected void onStartLoader() {
-    }
-
-    protected void onStopLoader() {
     }
 
     static public String nameOfChannelConfiguration(int channelConfiguration) {
