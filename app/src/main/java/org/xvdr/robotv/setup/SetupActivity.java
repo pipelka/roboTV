@@ -37,6 +37,7 @@ public class SetupActivity extends Activity {
         String server = SetupUtils.getServer(SetupActivity.this);
 
         mConnection.close();
+
         if(!mConnection.open(server)) {
             Toast.makeText(this, getString(R.string.connect_unable), Toast.LENGTH_SHORT).show();
             finish();

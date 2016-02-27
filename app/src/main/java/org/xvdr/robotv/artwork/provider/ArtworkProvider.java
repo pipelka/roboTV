@@ -13,11 +13,11 @@ public abstract class ArtworkProvider {
 
     public ArtworkHolder search(Event event) throws IOException {
         // search tv series
-        if (event.getContentId() == 0x15 || event.getGenre() == 0x50 || event.getContentId() == 0x23) {
+        if(event.getContentId() == 0x15 || event.getGenre() == 0x50 || event.getContentId() == 0x23) {
             return searchTv(event);
         }
         // search movies
-        else if (event.getGenre() == 0x10 || event.getGenre() == 0x70) {
+        else if(event.getGenre() == 0x10 || event.getGenre() == 0x70) {
             return searchMovie(event);
         }
 

@@ -33,18 +33,19 @@ public class SetupFragmentLanguage extends GuidedStepFragment {
         mLanguages = getResources().getStringArray(R.array.languages_array);
         mLanguageCode = getResources().getStringArray(R.array.iso639_code1);
 
-        if(langIndex > mLanguages.length -1) {
+        if(langIndex > mLanguages.length - 1) {
             langIndex = 0;
         }
 
         int id = 0;
-        for(String language: mLanguages) {
+
+        for(String language : mLanguages) {
             actions.add(new GuidedAction.Builder()
-                    .id(id)
-                    .title(language)
-                    .checkSetId(1)
-                    .checked(id == langIndex)
-                    .build());
+                        .id(id)
+                        .title(language)
+                        .checkSetId(1)
+                        .checked(id == langIndex)
+                        .build());
             id++;
         }
     }

@@ -11,7 +11,7 @@ import org.xvdr.msgexchange.Packet;
 import java.util.ArrayList;
 
 public class StreamBundle extends ArrayList<StreamBundle.Stream> {
-	static final String TAG = "StreamBundle";
+    static final String TAG = "StreamBundle";
 
     static private final SparseArray<String> typeMapping = new SparseArray<String>() {
         {
@@ -65,21 +65,21 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
     public final static int TYPE_TELETEXT = 9;
 
     private final static int supportedTypes[] = {
-            TYPE_VIDEO_MPEG2,
-            TYPE_VIDEO_H264,
-            TYPE_VIDEO_H265,
-            TYPE_AUDIO_AC3,
-            TYPE_AUDIO_AAC,
-            TYPE_AUDIO_MPEG2
+        TYPE_VIDEO_MPEG2,
+        TYPE_VIDEO_H264,
+        TYPE_VIDEO_H265,
+        TYPE_AUDIO_AC3,
+        TYPE_AUDIO_AAC,
+        TYPE_AUDIO_MPEG2
     };
 
     public class Stream {
 
-		public int physicalId;
-		public int type;
+        public int physicalId;
+        public int type;
         public int content;
         public long identifier = -1;
-		public String language;
+        public String language;
         public int channels;
         public int sampleRate;
         public long blockAlign;
@@ -87,9 +87,9 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         public long bitsPerSample;
         public long fpsScale;
         public long fpsRate;
-		public int width;
-		public int height;
-		public float pixelAspectRatio;
+        public int width;
+        public int height;
+        public float pixelAspectRatio;
         public int spsLength;
         public byte[] sps = new byte[128];
         public int ppsLength;
@@ -108,9 +108,9 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
                 this.type == s.type;
         }
 
-		public String getMimeType() {
-			return getMimeTypeFromType(type);
-		}
+        public String getMimeType() {
+            return getMimeTypeFromType(type);
+        }
     }
 
     public StreamBundle() {
@@ -123,6 +123,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 
         for(int i = 0; i < size(); i++) {
             Stream stream = b.get(i);
+
             if(stream == null) {
                 return false;
             }
@@ -136,17 +137,19 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
     }
 
     public boolean isTypeSupported(int type) {
-        for (int supportedType : supportedTypes) {
-            if (supportedType == type) {
+        for(int supportedType : supportedTypes) {
+            if(supportedType == type) {
                 return true;
             }
         }
+
         return false;
     }
 
     private int getTypeFromName(String typeName) {
         for(int i = 0; i < typeMapping.size(); i++) {
             String name = typeMapping.valueAt(i);
+
             if(name.equals(typeName)) {
                 return typeMapping.keyAt(i);
             }
@@ -156,106 +159,112 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
     }
 
     private static String getMimeTypeFromType(int type) {
-		if(type == TYPE_AUDIO_AC3) {
-			return MimeTypes.AUDIO_AC3;
-		}
-		else if(type == TYPE_AUDIO_MPEG2) {
-			return MimeTypes.AUDIO_MPEG;
-		}
-		else if(type == TYPE_AUDIO_AAC) {
-			return MimeTypes.AUDIO_AAC;
-		}
-		else if(type == TYPE_AUDIO_EAC3) {
-			return MimeTypes.AUDIO_E_AC3;
-		}
-		else if(type == TYPE_VIDEO_MPEG2) {
-			return MimeTypes.VIDEO_MPEG2;
-		}
+        if(type == TYPE_AUDIO_AC3) {
+            return MimeTypes.AUDIO_AC3;
+        }
+        else if(type == TYPE_AUDIO_MPEG2) {
+            return MimeTypes.AUDIO_MPEG;
+        }
+        else if(type == TYPE_AUDIO_AAC) {
+            return MimeTypes.AUDIO_AAC;
+        }
+        else if(type == TYPE_AUDIO_EAC3) {
+            return MimeTypes.AUDIO_E_AC3;
+        }
+        else if(type == TYPE_VIDEO_MPEG2) {
+            return MimeTypes.VIDEO_MPEG2;
+        }
         else if(type == TYPE_VIDEO_H264) {
             return MimeTypes.VIDEO_H264;
         }
         else if(type == TYPE_VIDEO_H265) {
             return MimeTypes.VIDEO_H265;
         }
-		else if(type == TYPE_SUBTITLE) {
-			return "text/vnd.dvb.subtitle";
-		}
-		else if(type == TYPE_TELETEXT) {
-			return "teletext";
-		}
-		else {
-			return "unknown";
-		}
-	}
+        else if(type == TYPE_SUBTITLE) {
+            return "text/vnd.dvb.subtitle";
+        }
+        else if(type == TYPE_TELETEXT) {
+            return "teletext";
+        }
+        else {
+            return "unknown";
+        }
+    }
 
-	public synchronized void updateFromPacket(Packet p) {
-		if(p.getMsgID() != Connection.XVDR_STREAM_CHANGE) {
-			return;
-		}
+    public synchronized void updateFromPacket(Packet p) {
+        if(p.getMsgID() != Connection.XVDR_STREAM_CHANGE) {
+            return;
+        }
 
         clear();
 
-		while(!p.eop()) {
-			Stream stream = new Stream();
+        while(!p.eop()) {
+            Stream stream = new Stream();
 
-			stream.physicalId = (int)p.getU32();
+            stream.physicalId = (int)p.getU32();
             stream.type = getTypeFromName(p.getString());
-			stream.content = contentMapping.get(stream.type);
+            stream.content = contentMapping.get(stream.type);
 
-			if(stream.content == CONTENT_AUDIO) {
-				stream.language = p.getString();
-				stream.channels = (int) p.getU32();
-				stream.sampleRate = (int) p.getU32();
-				stream.blockAlign = p.getU32();
-				stream.bitRate = (int)p.getU32();
-				stream.bitsPerSample = p.getU32();
-			}
-			else if(stream.content == CONTENT_VIDEO) {
-				stream.fpsScale = p.getU32();
-				stream.fpsRate = p.getU32();
-				stream.height = (int) p.getU32();
-				stream.width = (int) p.getU32();
+            if(stream.content == CONTENT_AUDIO) {
+                stream.language = p.getString();
+                stream.channels = (int) p.getU32();
+                stream.sampleRate = (int) p.getU32();
+                stream.blockAlign = p.getU32();
+                stream.bitRate = (int)p.getU32();
+                stream.bitsPerSample = p.getU32();
+            }
+            else if(stream.content == CONTENT_VIDEO) {
+                stream.fpsScale = p.getU32();
+                stream.fpsRate = p.getU32();
+                stream.height = (int) p.getU32();
+                stream.width = (int) p.getU32();
 
-				float aspect = (float)(p.getS64() / 10000.0);
+                float aspect = (float)(p.getS64() / 10000.0);
+
                 if(aspect < 1) {
                     aspect = 1;
                 }
 
-                // XVDR sends the picture aspect ratio
+                // roboTV sends the picture aspect ratio
                 // we have to convert it to the pixel aspect ratio
                 double value = (aspect * stream.height) / (double)stream.width;
                 stream.pixelAspectRatio = (float)Math.round(value * 1000) / 1000;
 
                 stream.spsLength = p.getU8();
+
                 if(stream.spsLength > 0) {
                     p.readBuffer(stream.sps, 0, stream.spsLength);
                 }
+
                 stream.ppsLength = p.getU8();
+
                 if(stream.ppsLength > 0) {
                     p.readBuffer(stream.pps, 0, stream.ppsLength);
                 }
+
                 stream.vpsLength = p.getU8();
+
                 if(stream.vpsLength > 0) {
                     p.readBuffer(stream.vps, 0, stream.vpsLength);
                 }
-			}
-			else if(stream.content == CONTENT_SUBTITLE) {
-				stream.language = p.getString();
-				long composition_id = p.getU32();
-				long ancillary_id = p.getU32();
-				stream.identifier = (composition_id & 0xffff) | ((ancillary_id & 0xffff) << 16);
-				continue;
-			}
-			else if(stream.content == CONTENT_TELETEXT) {
-				stream.language = p.getString();
-				long composition_id = p.getU32();
-				long ancillary_id = p.getU32();
-				stream.identifier = (composition_id & 0xffff) | ((ancillary_id & 0xffff) << 16);
-				continue;
-			}
-			else {
-				continue;
-			}
+            }
+            else if(stream.content == CONTENT_SUBTITLE) {
+                stream.language = p.getString();
+                long composition_id = p.getU32();
+                long ancillary_id = p.getU32();
+                stream.identifier = (composition_id & 0xffff) | ((ancillary_id & 0xffff) << 16);
+                continue;
+            }
+            else if(stream.content == CONTENT_TELETEXT) {
+                stream.language = p.getString();
+                long composition_id = p.getU32();
+                long ancillary_id = p.getU32();
+                stream.identifier = (composition_id & 0xffff) | ((ancillary_id & 0xffff) << 16);
+                continue;
+            }
+            else {
+                continue;
+            }
 
             // skip unsupported stream types
             if(!isTypeSupported(stream.type)) {
@@ -263,16 +272,17 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
             }
 
             Log.i(TAG, "new " + stream.content + " " + typeMapping.get(stream.type) + " stream (" + stream.physicalId + ")");
-			add(stream);
-		}
+            add(stream);
+        }
 
-	}
+    }
 
     public int getStreamCount(int contentType) {
         int count = 0;
 
         for(int i = 0; i < size(); i++) {
             Stream stream = get(i);
+
             if(stream.content == contentType) {
                 count++;
             }
@@ -290,13 +300,16 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 
         for(int i = 0; i < size(); i++) {
             Stream stream = get(i);
+
             if(stream == null) {
                 continue;
             }
+
             if(stream.content == contentType) {
                 if(count == streamIndex) {
                     return stream;
                 }
+
                 count++;
             }
         }
@@ -307,6 +320,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
     public Stream getStreamOfPid(int pid) {
         for(int i = 0; i < size(); i++) {
             Stream stream = get(i);
+
             if(stream.physicalId == pid) {
                 return stream;
             }
@@ -320,10 +334,12 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 
         for(int i = 0; i < size(); i++) {
             Stream stream = get(i);
+
             if(stream.content == contentType) {
-                if (stream.physicalId == physicalId) {
+                if(stream.physicalId == physicalId) {
                     return index;
                 }
+
                 index++;
             }
         }

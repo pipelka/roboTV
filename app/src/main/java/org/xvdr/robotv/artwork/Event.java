@@ -13,63 +13,63 @@ public class Event {
     private int mEventId;
 
     private static String[] genreFilm = {
-            "abenteuerfilm",
-            "actiondrama",
-            "actionfilm",
-            "animationsfilm",
-            "agentenfilm",
-            "fantasyfilm",
-            "fantasy-film",
-            "gangsterfilm",
-            "heimatfilm",
-            "horrorfilm",
-            "historienfilm",
-            "jugendfilm",
-            "kömödie",
-            "kriegsfilm",
-            "kriminalfilm",
-            "monumentalfilm",
-            "mysteryfilm",
-            "spielfilm",
-            "thriller",
-            "zeichentrickfilm"
+        "abenteuerfilm",
+        "actiondrama",
+        "actionfilm",
+        "animationsfilm",
+        "agentenfilm",
+        "fantasyfilm",
+        "fantasy-film",
+        "gangsterfilm",
+        "heimatfilm",
+        "horrorfilm",
+        "historienfilm",
+        "jugendfilm",
+        "kömödie",
+        "kriegsfilm",
+        "kriminalfilm",
+        "monumentalfilm",
+        "mysteryfilm",
+        "spielfilm",
+        "thriller",
+        "zeichentrickfilm"
     };
 
     private static String[] genreSoap = {
-            "folge ",
-            "serie",
-            "sitcom"
+        "folge ",
+        "serie",
+        "sitcom"
     };
 
     private static String[] genreSoapOrMovie = {
-            "action",
-            "comedy",
-            "drama",
-            "krimi",
-            "science-fiction",
-            "scifi"
+        "action",
+        "comedy",
+        "drama",
+        "krimi",
+        "science-fiction",
+        "scifi"
     };
 
     private static String[] genreSportTitle = {
-            "fußball",
-            "fussball",
-            "tennis",
-            "slalom",
-            "rtl",
-            "abfahrt",
-            "ski",
-            "eishockey"
+        "fußball",
+        "fussball",
+        "tennis",
+        "slalom",
+        "rtl",
+        "abfahrt",
+        "ski",
+        "eishockey"
     };
 
     private static int[] genreSportTitleId = {
-            0x43,
-            0x43,
-            0x44,
-            0x49,
-            0x49,
-            0x49,
-            0x49,
-            0x49
+        0x43,
+        0x43,
+        0x44,
+        0x49,
+        0x49,
+        0x49,
+        0x49,
+        0x49
     };
 
     private static int genreSoapMaxLength = 65 * 60; // 65 min
@@ -130,7 +130,7 @@ public class Event {
         String[] words = description.split("[\\.,;)| ]");
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 
-        for(String word: words) {
+        for(String word : words) {
             word = word.replaceAll("[^\\d]", "");
             int year;
 
@@ -160,16 +160,18 @@ public class Event {
         // try to assign sport sub genre
         if((contentId & 0xF0) == 0x40) {
             int index = 0;
-            for(String word: genreSportTitle) {
-                if (subtitle.contains(word.toLowerCase())) {
+
+            for(String word : genreSportTitle) {
+                if(subtitle.contains(word.toLowerCase())) {
                     return genreSportTitleId[index];
                 }
+
                 index++;
             }
         }
 
         // try to guess soap from subtitle keywords
-        for(String word: genreSoap) {
+        for(String word : genreSoap) {
             if(subtitle.contains(word.toLowerCase())) {
                 return 0x15;
             }
@@ -177,8 +179,8 @@ public class Event {
 
         // try to guess soap or movie from subtitle keywords and event duration
         if(duration > 0) {
-            for (String word : genreSoapOrMovie) {
-                if (subtitle.contains(word.toLowerCase())) {
+            for(String word : genreSoapOrMovie) {
+                if(subtitle.contains(word.toLowerCase())) {
                     return duration < genreSoapMaxLength ? 0x15 : 0x10;
                 }
             }
@@ -188,7 +190,7 @@ public class Event {
             return contentId;
         }
 
-        for(String word: genreFilm) {
+        for(String word : genreFilm) {
             if(subtitle.toLowerCase().contains(word.toLowerCase())) {
                 return 0x10;
             }

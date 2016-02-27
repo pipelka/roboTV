@@ -99,7 +99,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
             mChannelConfiguration = wantedChannelConfiguration;
         }
 
-        mExoPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT,MIN_BUFFER_MS,MIN_REBUFFER_MS);
+        mExoPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT, MIN_BUFFER_MS, MIN_REBUFFER_MS);
         mExoPlayer.addListener(this);
 
         // create connection
@@ -145,7 +145,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     public void setStreamVolume(float volume) {
-        if (mAudioRenderer != null) {
+        if(mAudioRenderer != null) {
             mExoPlayer.sendMessage(mAudioRenderer, MediaCodecAudioTrackRenderer.MSG_SET_VOLUME, volume);
         }
     }
@@ -187,26 +187,26 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mSampleSource.setListener(this);
 
         mVideoRenderer = new MediaCodecVideoTrackRenderer(
-                mContext,
-                mSampleSource,
-                MediaCodecSelector.DEFAULT,
-                MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-                5000, // joining time
-                null,
-                true,
-                mHandler,
-                this,
-                50);
+            mContext,
+            mSampleSource,
+            MediaCodecSelector.DEFAULT,
+            MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
+            5000, // joining time
+            null,
+            true,
+            mHandler,
+            this,
+            50);
 
         mAudioRenderer = new MediaCodecAudioTrackRenderer(
-                mSampleSource,
-                MediaCodecSelector.DEFAULT,
-                null,
-                true,
-                mHandler,
-                this,
-                mAudioCapabilities,
-                AudioManager.STREAM_MUSIC);
+            mSampleSource,
+            MediaCodecSelector.DEFAULT,
+            null,
+            true,
+            mHandler,
+            this,
+            mAudioCapabilities,
+            AudioManager.STREAM_MUSIC);
 
         if(mSurface != null) {
             mExoPlayer.sendMessage(mVideoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSurface);
@@ -250,10 +250,13 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         switch(channelConfiguration) {
             case CHANNELS_DEFAULT:
                 return "default (unknown)";
+
             case CHANNELS_STEREO:
                 return "stereo";
+
             case CHANNELS_SURROUND:
                 return "surround";
+
             case CHANNELS_DIGITAL51:
                 return "digital51";
         }
@@ -292,7 +295,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     @Override
     public void onReconnect() {
-        if (mConnection == null) {
+        if(mConnection == null) {
             return;
         }
 

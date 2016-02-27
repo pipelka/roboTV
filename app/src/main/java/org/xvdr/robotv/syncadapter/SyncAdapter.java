@@ -42,11 +42,13 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(TAG, "onPerformSync(" + account + ", " + authority + ", " + extras + ")");
         String inputId = extras.getString(SyncAdapter.BUNDLE_KEY_INPUT_ID);
-        if (inputId == null) {
+
+        if(inputId == null) {
             return;
         }
 
         Connection connection = new Connection("roboTV Sync Adapter");
+
         if(!connection.open(SetupUtils.getServer(mContext))) {
             Log.e(TAG, "unable to connect to server");
         }

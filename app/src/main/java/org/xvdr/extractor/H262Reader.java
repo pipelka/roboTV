@@ -11,25 +11,25 @@ import org.xvdr.robotv.client.StreamBundle;
  */
 final class H262Reader extends StreamReader {
 
-	private static final String TAG = "H262Reader";
+    private static final String TAG = "H262Reader";
 
-	public H262Reader(PacketQueue output, StreamBundle.Stream stream) {
+    public H262Reader(PacketQueue output, StreamBundle.Stream stream) {
         super(output, stream);
 
         output.format(MediaFormat.createVideoFormat(
-                Integer.toString(stream.physicalId), // << trackId
-                MimeTypes.VIDEO_MPEG2,
-                MediaFormat.NO_VALUE,
-                MediaFormat.NO_VALUE,
-                C.UNKNOWN_TIME_US       ,
-                stream.width,
-                stream.height,
-                null,
-                MediaFormat.NO_VALUE,
-                stream.pixelAspectRatio));
-	}
+                          Integer.toString(stream.physicalId), // << trackId
+                          MimeTypes.VIDEO_MPEG2,
+                          MediaFormat.NO_VALUE,
+                          MediaFormat.NO_VALUE,
+                          C.UNKNOWN_TIME_US       ,
+                          stream.width,
+                          stream.height,
+                          null,
+                          MediaFormat.NO_VALUE,
+                          stream.pixelAspectRatio));
+    }
 
-	@Override
+    @Override
     public void consume(byte[] data, long pesTimeUs) {
         output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
     }

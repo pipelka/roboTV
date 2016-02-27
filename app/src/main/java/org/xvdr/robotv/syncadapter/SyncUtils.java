@@ -22,7 +22,7 @@ public class SyncUtils {
         Account account = AccountService.getAccount(ACCOUNT_TYPE);
         AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
 
-        if (!accountManager.addAccountExplicitly(account, null, null)) {
+        if(!accountManager.addAccountExplicitly(account, null, null)) {
             Log.e(TAG, "Account already exists.");
         }
 

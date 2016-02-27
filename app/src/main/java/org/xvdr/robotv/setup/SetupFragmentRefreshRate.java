@@ -33,13 +33,14 @@ public class SetupFragmentRefreshRate extends GuidedStepFragment {
         int index = SetupUtils.getRefreshRateIndex(getActivity());
 
         int id = 0;
-        for(String rate: mRefreshRates) {
+
+        for(String rate : mRefreshRates) {
             actions.add(new GuidedAction.Builder()
-                    .id(id)
-                    .title(rate)
-                    .checkSetId(1)
-                    .checked(id == index)
-                    .build());
+                        .id(id)
+                        .title(rate)
+                        .checkSetId(1)
+                        .checked(id == index)
+                        .build());
             id++;
         }
     }

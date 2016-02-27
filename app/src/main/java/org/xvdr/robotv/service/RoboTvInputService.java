@@ -50,7 +50,7 @@ public class RoboTvInputService extends TvInputService {
         setTheme(android.R.style.Theme_DeviceDefault);
 
         if(SetupUtils.isRefreshRateChangeSupported()) {
-            float mRefreshRate = SetupUtils.getRefreshRate(this);
+            int mRefreshRate = (int)SetupUtils.getRefreshRate(this);
 
             mDisplayModeSetter = new DisplayModeSetter(this);
             mDisplayModeSetter.setRefreshRate(mRefreshRate);
@@ -107,12 +107,12 @@ public class RoboTvInputService extends TvInputService {
 
             // player init
             mPlayer = new LiveTvPlayer(
-                    mContext,
-                    SetupUtils.getServer(mContext),                 // XVDR server
-                    SetupUtils.getLanguageISO3(mContext),           // Language
-                    this,                                           // Listener
-                    SetupUtils.getPassthrough(mContext),            // AC3 passthrough
-                    SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
+                mContext,
+                SetupUtils.getServer(mContext),                 // XVDR server
+                SetupUtils.getLanguageISO3(mContext),           // Language
+                this,                                           // Listener
+                SetupUtils.getPassthrough(mContext),            // AC3 passthrough
+                SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
 
             mTuningToast = new Toast(mContext);
             LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -153,7 +153,7 @@ public class RoboTvInputService extends TvInputService {
         }
 
         @Override
-        public void onSurfaceChanged (int format, int width, int height) {
+        public void onSurfaceChanged(int format, int width, int height) {
             Log.i(TAG, "surface changed: " + width + "x" + height + " format: " + format);
         }
 
@@ -193,17 +193,20 @@ public class RoboTvInputService extends TvInputService {
             int uid = 0;
 
             Cursor cursor = null;
+
             try {
                 cursor = getContentResolver().query(channelUri, projection, null, null, null);
-                if (cursor == null || cursor.getCount() == 0) {
+
+                if(cursor == null || cursor.getCount() == 0) {
                     errorNotification(getResources().getString(R.string.channel_not_found));
                     return false;
                 }
+
                 cursor.moveToNext();
                 uid = cursor.getInt(0);
             }
             finally {
-                if (cursor != null) {
+                if(cursor != null) {
                     cursor.close();
                 }
             }
@@ -272,6 +275,7 @@ public class RoboTvInputService extends TvInputService {
                     message = notification.getString();
                     toastNotification(message);
                     break;
+
                 case Connection.XVDR_STATUS_RECORDING:
                     Log.d(TAG, "recording status");
                     notification.getU32(); // card index
@@ -282,8 +286,8 @@ public class RoboTvInputService extends TvInputService {
 
                     message = mContext.getResources().getString(R.string.recording_text) + " ";
                     message += (on == 1) ?
-                            mContext.getResources().getString(R.string.recording_started) :
-                            mContext.getResources().getString(R.string.recording_finished);
+                               mContext.getResources().getString(R.string.recording_started) :
+                               mContext.getResources().getString(R.string.recording_finished);
 
                     toastNotification(recname, message, R.drawable.ic_movie_white_48dp);
                     break;
@@ -304,9 +308,9 @@ public class RoboTvInputService extends TvInputService {
 
         private void toastNotification(String message) {
             toastNotification(
-                    message,
-                    mContext.getResources().getString(R.string.toast_information),
-                    R.drawable.ic_info_outline_white_48dp);
+                message,
+                mContext.getResources().getString(R.string.toast_information),
+                R.drawable.ic_info_outline_white_48dp);
         }
 
         private void toastNotification(String message, String title) {
@@ -344,7 +348,7 @@ public class RoboTvInputService extends TvInputService {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (state == ExoPlayer.STATE_READY) {
+                    if(state == ExoPlayer.STATE_READY) {
                         mTuningToast.cancel();
                         return;
                     }
@@ -356,9 +360,9 @@ public class RoboTvInputService extends TvInputService {
 
         private void errorNotification(String message) {
             toastNotification(
-                    message,
-                    mContext.getResources().getString(R.string.toast_error),
-                    R.drawable.ic_error_outline_white_48dp);
+                message,
+                mContext.getResources().getString(R.string.toast_error),
+                R.drawable.ic_error_outline_white_48dp);
         }
 
         @Override
@@ -408,12 +412,12 @@ public class RoboTvInputService extends TvInputService {
 
             // create video track (limit surface size to display size)
             TvTrackInfo info = TrackInfoMapper.findTrackInfo(
-                    bundle,
-                    StreamBundle.CONTENT_VIDEO,
-                    0,
-                    mDisplaySize.x,
-                    mDisplaySize.y
-                    );
+                                   bundle,
+                                   StreamBundle.CONTENT_VIDEO,
+                                   0,
+                                   mDisplaySize.x,
+                                   mDisplaySize.y
+                               );
 
             if(info != null) {
                 tracks.add(info);
@@ -424,6 +428,7 @@ public class RoboTvInputService extends TvInputService {
 
             for(int i = 0; i < audioTrackCount; i++) {
                 info = TrackInfoMapper.findTrackInfo(bundle, StreamBundle.CONTENT_AUDIO, i);
+
                 if(info != null) {
                     tracks.add(info);
                 }
@@ -445,6 +450,7 @@ public class RoboTvInputService extends TvInputService {
             if(stream.height == 720) {
                 values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_720P);
             }
+
             if(stream.height > 720 && stream.height <= 1080) {
                 values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_1080I);
                 scheduleReset();

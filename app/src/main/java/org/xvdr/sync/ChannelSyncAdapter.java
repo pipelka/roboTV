@@ -116,25 +116,25 @@ import java.util.List;
 */
 public class ChannelSyncAdapter {
 
-	public interface ProgressCallback {
+    public interface ProgressCallback {
 
-		void onProgress(int done, int total);
+        void onProgress(int done, int total);
 
-		void onDone();
+        void onDone();
 
-		void onCancel();
-	}
+        void onCancel();
+    }
 
-	static final String TAG = "ChannelSyncAdapter";
+    static final String TAG = "ChannelSyncAdapter";
 
-	private Context mContext;
-	private Connection mConnection;
+    private Context mContext;
+    private Connection mConnection;
     private ArtworkFetcher mArtwork;
-	private String mInputId;
-	private boolean mCancelChannelSync = false;
+    private String mInputId;
+    private boolean mCancelChannelSync = false;
 
-	private static final SparseArray<String> mCanonicalGenre = new SparseArray<String>() {
-		{
+    private static final SparseArray<String> mCanonicalGenre = new SparseArray<String>() {
+        {
             append(0x10, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
             append(0x11, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
             append(0x12, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
@@ -169,7 +169,7 @@ public class ChannelSyncAdapter {
             append(0x53, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
             append(0x54, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.EDUCATION));
             append(0x53, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
-			append(0x60, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
+            append(0x60, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
             append(0x61, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
             append(0x62, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
             append(0x63, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
@@ -198,133 +198,133 @@ public class ChannelSyncAdapter {
             append(0xA5, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
             append(0xA6, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SHOPPING));
             append(0xA7, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
-		}
-	};
+        }
+    };
 
-	private ProgressCallback mProgressCallback = null;
+    private ProgressCallback mProgressCallback = null;
 
-	public ChannelSyncAdapter(Context context, String inputId, Connection connection) {
-		mContext = context;
-		mConnection = connection;
-		mInputId = inputId;
+    public ChannelSyncAdapter(Context context, String inputId, Connection connection) {
+        mContext = context;
+        mConnection = connection;
+        mInputId = inputId;
 
         mArtwork = new ArtworkFetcher(mConnection, SetupUtils.getLanguage(context));
-	}
+    }
 
-	public void setProgressCallback(ProgressCallback callback) {
-		mProgressCallback = callback;
-	}
+    public void setProgressCallback(ProgressCallback callback) {
+        mProgressCallback = callback;
+    }
 
-	public void syncChannels(boolean removeExisting) {
-		final SparseArray<Long> existingChannels = new SparseArray<>();
-		final ContentResolver resolver = mContext.getContentResolver();
+    public void syncChannels(boolean removeExisting) {
+        final SparseArray<Long> existingChannels = new SparseArray<>();
+        final ContentResolver resolver = mContext.getContentResolver();
 
-		mCancelChannelSync = false;
+        mCancelChannelSync = false;
 
-		Log.i(TAG, "syncing channel list ...");
+        Log.i(TAG, "syncing channel list ...");
 
-		// remove existing channels
-		if(removeExisting)  {
-			Uri uri = TvContract.buildChannelsUriForInput(mInputId);
-			resolver.delete(uri, null, null);
-		}
+        // remove existing channels
+        if(removeExisting)  {
+            Uri uri = TvContract.buildChannelsUriForInput(mInputId);
+            resolver.delete(uri, null, null);
+        }
 
-		// fetch existing channel list
+        // fetch existing channel list
 
-		getExistingChannels(mContext, mInputId, existingChannels);
+        getExistingChannels(mContext, mInputId, existingChannels);
 
-		// update or insert channels
+        // update or insert channels
 
-		Channels list = new Channels();
+        Channels list = new Channels();
         String language = SetupUtils.getLanguageISO3(mContext);
 
-		list.load(mConnection, language);
+        list.load(mConnection, language);
 
-		int i = 0;
+        int i = 0;
         int index = 0;
 
-		for(Channels.Entry entry : list) {
-			Uri channelUri;
-			Long channelId = existingChannels.get(entry.uid);
+        for(Channels.Entry entry : list) {
+            Uri channelUri;
+            Long channelId = existingChannels.get(entry.uid);
 
-			// channel entry
-			ContentValues values = new ContentValues();
-			values.put(TvContract.Channels.COLUMN_INPUT_ID, mInputId);
+            // channel entry
+            ContentValues values = new ContentValues();
+            values.put(TvContract.Channels.COLUMN_INPUT_ID, mInputId);
 
             values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, Integer.toString(++index));
-			values.put(TvContract.Channels.COLUMN_DISPLAY_NAME, entry.name);
-			values.put(TvContract.Channels.COLUMN_SERVICE_ID, 0);
-			values.put(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID, 0);
-			values.put(TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID, entry.uid);
-			values.put(TvContract.Channels.COLUMN_SERVICE_TYPE, entry.radio ? TvContract.Channels.SERVICE_TYPE_AUDIO : TvContract.Channels.SERVICE_TYPE_AUDIO_VIDEO);
-			values.put(TvContract.Channels.COLUMN_TYPE, TvContract.Channels.TYPE_DVB_S2);
-			values.put(TvContract.Channels.COLUMN_SEARCHABLE, 1);
+            values.put(TvContract.Channels.COLUMN_DISPLAY_NAME, entry.name);
+            values.put(TvContract.Channels.COLUMN_SERVICE_ID, 0);
+            values.put(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID, 0);
+            values.put(TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID, entry.uid);
+            values.put(TvContract.Channels.COLUMN_SERVICE_TYPE, entry.radio ? TvContract.Channels.SERVICE_TYPE_AUDIO : TvContract.Channels.SERVICE_TYPE_AUDIO_VIDEO);
+            values.put(TvContract.Channels.COLUMN_TYPE, TvContract.Channels.TYPE_DVB_S2);
+            values.put(TvContract.Channels.COLUMN_SEARCHABLE, 1);
 
-			// insert new channel
-			if(channelId == null) {
-				resolver.insert(TvContract.Channels.CONTENT_URI, values);
-			}
+            // insert new channel
+            if(channelId == null) {
+                resolver.insert(TvContract.Channels.CONTENT_URI, values);
+            }
 
-			// update existing channel
-			else {
-				channelUri = TvContract.buildChannelUri(channelId);
+            // update existing channel
+            else {
+                channelUri = TvContract.buildChannelUri(channelId);
 
-				if(channelUri != null) {
-					resolver.update(channelUri, values, null, null);
-					existingChannels.remove(entry.uid);
-				}
-			}
+                if(channelUri != null) {
+                    resolver.update(channelUri, values, null, null);
+                    existingChannels.remove(entry.uid);
+                }
+            }
 
-			if(mProgressCallback != null) {
-				mProgressCallback.onProgress(++i, list.size());
+            if(mProgressCallback != null) {
+                mProgressCallback.onProgress(++i, list.size());
 
-				if(mCancelChannelSync)  {
-					mProgressCallback.onCancel();
-				}
-			}
+                if(mCancelChannelSync)  {
+                    mProgressCallback.onCancel();
+                }
+            }
 
-		}
+        }
 
-		// remove orphaned channels
+        // remove orphaned channels
 
-		int size = existingChannels.size();
+        int size = existingChannels.size();
 
-		for(i = 0; i < size; ++i) {
-			Long channelId = existingChannels.valueAt(i);
+        for(i = 0; i < size; ++i) {
+            Long channelId = existingChannels.valueAt(i);
 
-			if(channelId == null) {
-				continue;
-			}
+            if(channelId == null) {
+                continue;
+            }
 
-			Uri uri = TvContract.buildChannelUri(channelId);
-			resolver.delete(uri, null, null);
-		}
+            Uri uri = TvContract.buildChannelUri(channelId);
+            resolver.delete(uri, null, null);
+        }
 
-		if(mProgressCallback != null) {
-			mProgressCallback.onDone();
-		}
+        if(mProgressCallback != null) {
+            mProgressCallback.onDone();
+        }
 
-		Log.i(TAG, "synced channels");
-	}
+        Log.i(TAG, "synced channels");
+    }
 
-	public void cancelSyncChannels() {
-		mCancelChannelSync = true;
-	}
+    public void cancelSyncChannels() {
+        mCancelChannelSync = true;
+    }
 
-	public void syncChannelIcons() {
-		final SparseArray<Long> existingChannels = new SparseArray<>();
+    public void syncChannelIcons() {
+        final SparseArray<Long> existingChannels = new SparseArray<>();
 
-		getExistingChannels(mContext, mInputId, existingChannels);
+        getExistingChannels(mContext, mInputId, existingChannels);
 
-		Channels list = new Channels();
+        Channels list = new Channels();
         String language = SetupUtils.getLanguageISO3(mContext);
 
-		list.load(mConnection, language, new Channels.Callback() {
+        list.load(mConnection, language, new Channels.Callback() {
             @Override
             public void onChannel(final Channels.Entry entry) {
                 Long channelId = existingChannels.get(entry.uid);
 
-                if (channelId == null) {
+                if(channelId == null) {
                     return;
                 }
 
@@ -342,24 +342,25 @@ public class ChannelSyncAdapter {
 
                 try {
                     t.join();
-                } catch (InterruptedException e) {
+                }
+                catch(InterruptedException e) {
                     e.printStackTrace();
                 }
 
             }
         });
-	}
+    }
 
-	public void syncEPG() {
-		SparseArray<Long> existingChannels = new SparseArray<>();
-		getExistingChannels(mContext, mInputId, existingChannels);
+    public void syncEPG() {
+        SparseArray<Long> existingChannels = new SparseArray<>();
+        getExistingChannels(mContext, mInputId, existingChannels);
 
-		Log.i(TAG, "syncing epg ...");
+        Log.i(TAG, "syncing epg ...");
 
-		// fetch epg entries for each channel
-		int size = existingChannels.size();
+        // fetch epg entries for each channel
+        int size = existingChannels.size();
 
-		for(int i = 0; i < size; ++i) {
+        for(int i = 0; i < size; ++i) {
             List<ContentValues> programs = new ArrayList<>();
 
             fetchEPGForChannel(existingChannels.keyAt(i), existingChannels.valueAt(i), programs);
@@ -383,63 +384,65 @@ public class ChannelSyncAdapter {
             ops.clear();
         }
 
-		Log.i(TAG, "synced schedule for " + existingChannels.size() + " channels");
-	}
+        Log.i(TAG, "synced schedule for " + existingChannels.size() + " channels");
+    }
 
-	private void fetchEPGForChannel(int uid, long channelId, List<ContentValues> programs) {
-		ContentResolver resolver = mContext.getContentResolver();
-		long duration = 60 * 60 * 24 * 2; // EPG duration to fetch (2 days)
-		long start = System.currentTimeMillis() / 1000;
-		long end = start + duration;
+    private void fetchEPGForChannel(int uid, long channelId, List<ContentValues> programs) {
+        ContentResolver resolver = mContext.getContentResolver();
+        long duration = 60 * 60 * 24 * 2; // EPG duration to fetch (2 days)
+        long start = System.currentTimeMillis() / 1000;
+        long end = start + duration;
 
-		Uri channelUri = TvContract.buildChannelUri(channelId);
+        Uri channelUri = TvContract.buildChannelUri(channelId);
 
         Log.d(TAG, "feching epg for " + channelUri.toString() + " ...");
 
-		long last = getLastProgramEndTimeMillis(resolver, channelUri) / 1000;
+        long last = getLastProgramEndTimeMillis(resolver, channelUri) / 1000;
 
-		if(last > start) {
-			start = last;
-		}
+        if(last > start) {
+            start = last;
+        }
 
-		// new duration
-		duration = end - start;
+        // new duration
+        duration = end - start;
 
-		if(duration <= 0) {
-			Log.i(TAG, "duration < 0");
-			return;
-		}
+        if(duration <= 0) {
+            Log.i(TAG, "duration < 0");
+            return;
+        }
 
-		// fetch
+        // fetch
 
-		Packet req = mConnection.CreatePacket(Connection.XVDR_EPG_GETFORCHANNEL);
-		req.putU32(uid);
-		req.putU32(start);
-		req.putU32(duration);
+        Packet req = mConnection.CreatePacket(Connection.XVDR_EPG_GETFORCHANNEL);
+        req.putU32(uid);
+        req.putU32(start);
+        req.putU32(duration);
 
-		Packet resp = mConnection.transmitMessage(req);
+        Packet resp = mConnection.transmitMessage(req);
 
-		if(resp == null) {
+        if(resp == null) {
             Log.d(TAG, "error sending fetch epg request");
-			return;
-		}
+            return;
+        }
 
-		// add schedule
+        // add schedule
         int i = 0;
-		while(!resp.eop()) {
-			int eventId = (int)resp.getU32();
-			long startTime = resp.getU32();
-			long endTime = startTime + resp.getU32();
-			int content = (int)resp.getU32();
+
+        while(!resp.eop()) {
+            int eventId = (int)resp.getU32();
+            long startTime = resp.getU32();
+            long endTime = startTime + resp.getU32();
+            int content = (int)resp.getU32();
             int eventDuration = (int)(endTime - startTime);
-			long parentalRating = resp.getU32();
-			String title = resp.getString();
-			String plotOutline = resp.getString();
-			String plot = resp.getString();
+            long parentalRating = resp.getU32();
+            String title = resp.getString();
+            String plotOutline = resp.getString();
+            String plot = resp.getString();
             String posterUrl = resp.getString();
             String backgroundUrl = resp.getString();
 
             String description = plotOutline.trim();
+
             if(!description.isEmpty() && !plot.isEmpty()) {
                 description += " - ";
             }
@@ -465,13 +468,13 @@ public class ChannelSyncAdapter {
             }
 
             // artwork
-            if (posterUrl.equals("x")) {
+            if(posterUrl.equals("x")) {
                 try {
 
                     backgroundUrl = "";
                     ArtworkHolder art = mArtwork.fetchForEvent(event);
 
-                    if (art != null) {
+                    if(art != null) {
                         backgroundUrl = art.getBackgroundUrl();
                     }
                 }
@@ -486,97 +489,97 @@ public class ChannelSyncAdapter {
             }
 
             // add event
-			programs.add(values);
+            programs.add(values);
             i++;
-		}
+        }
 
         Log.d(TAG, "synced " + i + " epg events");
-	}
+    }
 
-	private void fetchChannelLogo(Uri channelUri, String address) {
-		URL sourceUrl;
-		OutputStream os;
-		InputStream in;
-		URLConnection urlConnection;
-		Uri channelLogoUri = TvContract.buildChannelLogoUri(channelUri);
+    private void fetchChannelLogo(Uri channelUri, String address) {
+        URL sourceUrl;
+        OutputStream os;
+        InputStream in;
+        URLConnection urlConnection;
+        Uri channelLogoUri = TvContract.buildChannelLogoUri(channelUri);
 
-		try {
-			os = mContext.getContentResolver().openOutputStream(channelLogoUri);
-			sourceUrl = new URL(address);
-			urlConnection = sourceUrl.openConnection();
-			in = new BufferedInputStream(urlConnection.getInputStream());
-		}
-		catch(Exception e) {
-			return;
-		}
+        try {
+            os = mContext.getContentResolver().openOutputStream(channelLogoUri);
+            sourceUrl = new URL(address);
+            urlConnection = sourceUrl.openConnection();
+            in = new BufferedInputStream(urlConnection.getInputStream());
+        }
+        catch(Exception e) {
+            return;
+        }
 
-		byte[] buffer = new byte[32768];
-		int bytes_read;
+        byte[] buffer = new byte[32768];
+        int bytes_read;
 
-		try {
-			while((bytes_read = in.read(buffer)) > 0) {
-				os.write(buffer, 0, bytes_read);
-			}
+        try {
+            while((bytes_read = in.read(buffer)) > 0) {
+                os.write(buffer, 0, bytes_read);
+            }
 
-			in.close();
-			os.close();
-		}
-		catch(IOException e) {
-		}
+            in.close();
+            os.close();
+        }
+        catch(IOException e) {
+        }
 
-	}
+    }
 
-	public static void getExistingChannels(Context context, String inputId, SparseArray<Long> existingChannels) {
-		// Create a map from original network ID to channel row ID for existing channels.
-		existingChannels.clear();
+    public static void getExistingChannels(Context context, String inputId, SparseArray<Long> existingChannels) {
+        // Create a map from original network ID to channel row ID for existing channels.
+        existingChannels.clear();
 
-		Uri channelsUri = TvContract.buildChannelsUriForInput(inputId);
-		String[] projection = {TvContract.Channels._ID, TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID};
+        Uri channelsUri = TvContract.buildChannelsUriForInput(inputId);
+        String[] projection = {TvContract.Channels._ID, TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID};
 
-		Cursor cursor = null;
-		ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = null;
+        ContentResolver resolver = context.getContentResolver();
 
-		try {
-			cursor = resolver.query(channelsUri, projection, null, null, null);
+        try {
+            cursor = resolver.query(channelsUri, projection, null, null, null);
 
-			while(cursor != null && cursor.moveToNext()) {
-				long channelId = cursor.getLong(0);
-				int uid = cursor.getInt(1);
-				existingChannels.put(uid, channelId);
-			}
-		}
-		finally {
-			if(cursor != null) {
-				cursor.close();
-			}
-		}
-	}
+            while(cursor != null && cursor.moveToNext()) {
+                long channelId = cursor.getLong(0);
+                int uid = cursor.getInt(1);
+                existingChannels.put(uid, channelId);
+            }
+        }
+        finally {
+            if(cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 
-	public static long getLastProgramEndTimeMillis(ContentResolver resolver, Uri channelUri) {
-		Uri uri = TvContract.buildProgramsUriForChannel(channelUri);
-		String[] projection = {TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS};
-		Cursor cursor = null;
+    public static long getLastProgramEndTimeMillis(ContentResolver resolver, Uri channelUri) {
+        Uri uri = TvContract.buildProgramsUriForChannel(channelUri);
+        String[] projection = {TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS};
+        Cursor cursor = null;
 
-		try {
-			// TvProvider returns programs chronological order by default.
-			cursor = resolver.query(uri, projection, null, null, null);
+        try {
+            // TvProvider returns programs chronological order by default.
+            cursor = resolver.query(uri, projection, null, null, null);
 
-			if(cursor == null || cursor.getCount() == 0) {
-				return 0;
-			}
+            if(cursor == null || cursor.getCount() == 0) {
+                return 0;
+            }
 
-			cursor.moveToLast();
-			return cursor.getLong(0);
-		}
-		catch(Exception e) {
-			Log.w(TAG, "Unable to get last program end time for " + channelUri, e);
-		}
-		finally {
-			if(cursor != null) {
-				cursor.close();
-			}
-		}
+            cursor.moveToLast();
+            return cursor.getLong(0);
+        }
+        catch(Exception e) {
+            Log.w(TAG, "Unable to get last program end time for " + channelUri, e);
+        }
+        finally {
+            if(cursor != null) {
+                cursor.close();
+            }
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 }

@@ -28,25 +28,25 @@ public class SetupFragmentSpeakerConfig extends GuidedStepFragment {
         int speakerConfig = SetupUtils.getSpeakerConfiguration(getActivity());
 
         actions.add(new GuidedAction.Builder()
-                .id(6)
-                .title(getString(R.string.setup_root_speakerconfig_digital_51))
-                .checkSetId(1)
-                .checked(speakerConfig == 6)
-                .build());
+                    .id(6)
+                    .title(getString(R.string.setup_root_speakerconfig_digital_51))
+                    .checkSetId(1)
+                    .checked(speakerConfig == 6)
+                    .build());
 
         actions.add(new GuidedAction.Builder()
-                .id(4)
-                .title(getString(R.string.setup_root_speakerconfig_surround))
-                .checkSetId(1)
-                .checked(speakerConfig == 4)
-                .build());
+                    .id(4)
+                    .title(getString(R.string.setup_root_speakerconfig_surround))
+                    .checkSetId(1)
+                    .checked(speakerConfig == 4)
+                    .build());
 
         actions.add(new GuidedAction.Builder()
-                .id(2)
-                .title(getString(R.string.setup_root_speakerconfig_stereo))
-                .checkSetId(1)
-                .checked(speakerConfig == 2)
-                .build());
+                    .id(2)
+                    .title(getString(R.string.setup_root_speakerconfig_stereo))
+                    .checkSetId(1)
+                    .checked(speakerConfig == 2)
+                    .build());
     }
 
     public void onGuidedActionClicked(GuidedAction action) {

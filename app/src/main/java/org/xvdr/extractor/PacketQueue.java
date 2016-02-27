@@ -52,7 +52,7 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
         try {
             put(holder);
         }
-        catch (InterruptedException e) {
+        catch(InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -63,7 +63,7 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
         try {
             put(holder);
         }
-        catch (InterruptedException e) {
+        catch(InterruptedException e) {
             e.printStackTrace();
         }
     }

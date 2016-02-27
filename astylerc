@@ -1,0 +1,14 @@
+--indent-col1-comments
+-s4
+-A2
+-y
+-j
+--indent-switches
+--indent-cases
+--break-blocks
+--pad-oper
+--unpad-paren
+--align-pointer=type
+--suffix=none
+--lineend=linux
+

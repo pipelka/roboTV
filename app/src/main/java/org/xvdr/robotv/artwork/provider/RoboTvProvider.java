@@ -30,7 +30,7 @@ public class RoboTvProvider extends SimpleArtworkProvider {
         String posterUrl = resp.getString();
         String backgroundUrl = resp.getString();
 
-        if (posterUrl.equals("x") || backgroundUrl.equals("x")) {
+        if(posterUrl.equals("x") || backgroundUrl.equals("x")) {
             return null;
         }
 

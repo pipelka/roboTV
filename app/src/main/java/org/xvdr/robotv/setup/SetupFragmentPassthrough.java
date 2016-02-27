@@ -28,18 +28,18 @@ public class SetupFragmentPassthrough extends GuidedStepFragment {
         boolean passthrough = SetupUtils.getPassthrough(getActivity());
 
         actions.add(new GuidedAction.Builder()
-                .id(0)
-                .title(getString(R.string.setup_root_passthrough_disabled))
-                .checkSetId(1)
-                .checked(!passthrough)
-                .build());
+                    .id(0)
+                    .title(getString(R.string.setup_root_passthrough_disabled))
+                    .checkSetId(1)
+                    .checked(!passthrough)
+                    .build());
 
         actions.add(new GuidedAction.Builder()
-                .id(1)
-                .title(getString(R.string.setup_root_passthrough_enabled))
-                .checkSetId(1)
-                .checked(passthrough)
-                .build());
+                    .id(1)
+                    .title(getString(R.string.setup_root_passthrough_enabled))
+                    .checkSetId(1)
+                    .checked(passthrough)
+                    .build());
     }
 
     public void onGuidedActionClicked(GuidedAction action) {

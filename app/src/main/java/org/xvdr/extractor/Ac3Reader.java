@@ -28,21 +28,21 @@ final class Ac3Reader extends StreamReader {
         this(output, stream, ac3PassThrough, Player.CHANNELS_SURROUND);
     }
 
-	public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelConfiguration) {
-		super(output, stream);
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelConfiguration) {
+        super(output, stream);
         this.ac3PassThrough = ac3PassThrough;
 
         if(ac3PassThrough) {
             output.format(MediaFormat.createAudioFormat(
-                    Integer.toString(stream.physicalId),
-                    MimeTypes.AUDIO_AC3,
-                    stream.bitRate,
-                    MediaFormat.NO_VALUE,
-                    C.UNKNOWN_TIME_US,
-                    stream.channels,
-                    stream.sampleRate,
-                    null,
-                    stream.language));
+                              Integer.toString(stream.physicalId),
+                              MimeTypes.AUDIO_AC3,
+                              stream.bitRate,
+                              MediaFormat.NO_VALUE,
+                              C.UNKNOWN_TIME_US,
+                              stream.channels,
+                              stream.sampleRate,
+                              null,
+                              stream.language));
             return;
         }
 
@@ -56,10 +56,10 @@ final class Ac3Reader extends StreamReader {
         }
 
         mDecoder = new AC3Decoder(decoderMode);
-	}
+    }
 
-	@Override
-	public void consume(byte[] data, long pesTimeUs) {
+    @Override
+    public void consume(byte[] data, long pesTimeUs) {
         if(ac3PassThrough) {
             output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
             return;
@@ -82,20 +82,20 @@ final class Ac3Reader extends StreamReader {
         if(!hasOutputFormat) {
             Log.i(TAG, "channels: " + mDecoder.getChannels());
             MediaFormat format = MediaFormat.createAudioFormat(
-                    Integer.toString(stream.physicalId), // < trackId
-                    MimeTypes.AUDIO_RAW,
-                    mDecoder.getBitRate(),
-                    MediaFormat.NO_VALUE,
-                    C.UNKNOWN_TIME_US,
-                    mDecoder.getChannels(),
-                    mDecoder.getSampleRate(),
-                    null,
-                    stream.language);
+                                     Integer.toString(stream.physicalId), // < trackId
+                                     MimeTypes.AUDIO_RAW,
+                                     mDecoder.getBitRate(),
+                                     MediaFormat.NO_VALUE,
+                                     C.UNKNOWN_TIME_US,
+                                     mDecoder.getChannels(),
+                                     mDecoder.getSampleRate(),
+                                     null,
+                                     stream.language);
             output.format(format);
             hasOutputFormat = true;
         }
 
         output.sampleData(audioChunk, audioChunk.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
-	}
+    }
 
 }

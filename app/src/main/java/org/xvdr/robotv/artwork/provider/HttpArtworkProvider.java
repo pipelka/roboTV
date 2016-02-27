@@ -34,7 +34,7 @@ public abstract class HttpArtworkProvider extends ArtworkProvider {
         try {
             url = new URL(urlString);
         }
-        catch (MalformedURLException e) {
+        catch(MalformedURLException e) {
             return false;
         }
 
@@ -43,6 +43,7 @@ public abstract class HttpArtworkProvider extends ArtworkProvider {
         huc.connect();
 
         int status = huc.getResponseCode();
+
         if(status == 200) {
             return true;
         }
@@ -69,7 +70,8 @@ public abstract class HttpArtworkProvider extends ArtworkProvider {
         if(mDelayAfterRequestMs > 0) {
             try {
                 TimeUnit.MILLISECONDS.sleep(mDelayAfterRequestMs);
-            } catch (InterruptedException e) {
+            }
+            catch(InterruptedException e) {
                 e.printStackTrace();
             }
         }

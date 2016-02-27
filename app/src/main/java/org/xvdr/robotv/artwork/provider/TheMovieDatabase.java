@@ -41,7 +41,7 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         for(int i = 0; i < array.length(); i++) {
             JSONObject item = array.optJSONObject(i);
 
-            if (item == null) {
+            if(item == null) {
                 continue;
             }
 
@@ -64,15 +64,15 @@ public class TheMovieDatabase extends HttpArtworkProvider {
 
         request = "http://api.themoviedb.org/3/search/" + section + "?api_key=" + mApiKey + "&query=" + URLEncoder.encode(title);
 
-        if (!mLanguage.isEmpty()) {
+        if(!mLanguage.isEmpty()) {
             request += "&language=" + mLanguage;
         }
 
         JSONObject o = new JSONObject(getResponseFromServer(request));
         JSONArray results = filterTitleMatch(
-                title,
-                section.equals("tv") ? "name" : "title",
-                o.optJSONArray("results"));
+                                title,
+                                section.equals("tv") ? "name" : "title",
+                                o.optJSONArray("results"));
 
         // filter entries (search for year)
         if(year > 0 && !dateProperty.isEmpty()) {
@@ -81,11 +81,12 @@ public class TheMovieDatabase extends HttpArtworkProvider {
             for(int i = 0; i < results.length(); i++) {
                 JSONObject item = results.optJSONObject(i);
 
-                if (item == null) {
+                if(item == null) {
                     continue;
                 }
 
                 String date = item.optString(dateProperty);
+
                 if(date == null || date.length() < 4) {
                     continue;
                 }
@@ -93,7 +94,7 @@ public class TheMovieDatabase extends HttpArtworkProvider {
                 int entryYear = Integer.parseInt(date.substring(0, 4));
 
                 // release year differs often
-                if(year == entryYear || year == entryYear -1 ) {
+                if(year == entryYear || year == entryYear - 1) {
                     a.put(item);
                 }
             }
@@ -112,10 +113,11 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         }
 
         String path = "";
+
         for(int i = 0; i < results.length(); i++) {
             JSONObject item = results.optJSONObject(i);
 
-            if (item == null) {
+            if(item == null) {
                 continue;
             }
 
@@ -153,9 +155,9 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         }
 
         return new ArtworkHolder(
-                getPosterUrl(results),
-                getBackgroundUrl(results)
-        );
+                   getPosterUrl(results),
+                   getBackgroundUrl(results)
+               );
     }
 
     @Override
@@ -170,8 +172,8 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         }
 
         return new ArtworkHolder(
-                getPosterUrl(results),
-                getBackgroundUrl(results)
-        );
+                   getPosterUrl(results),
+                   getBackgroundUrl(results)
+               );
     }
 }

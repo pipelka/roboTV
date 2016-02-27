@@ -48,12 +48,13 @@ public class ArtworkFetcher {
 
         // check server cache first
         ArtworkHolder o;
+
         if((o = mServerCache.search(event)) != null) {
             return o;
         }
 
         // try all providers
-        for(ArtworkProvider provider: mProviders) {
+        for(ArtworkProvider provider : mProviders) {
             if((o = provider.search(event)) != null) {
                 break;
             }
@@ -75,7 +76,7 @@ public class ArtworkFetcher {
         if(mConnection.transmitMessage(req) == null) {
             Log.d(TAG, "failed to register artwork for '" + event.getTitle() + "' in cache");
         }
-        else if (!o.getBackgroundUrl().isEmpty()) {
+        else if(!o.getBackgroundUrl().isEmpty()) {
             Log.d(TAG, "putting artwork for '" + event.getTitle() + "' into cache (0x" + Integer.toHexString(event.getContentId()) + ")");
         }
 
@@ -87,6 +88,7 @@ public class ArtworkFetcher {
         request.putString("EpgImageUrl");
 
         Packet response = mConnection.transmitMessage(request);
+
         if(response == null) {
             return "";
         }

@@ -47,6 +47,7 @@ public class LiveTvPlayer extends Player {
         }
 
         int status = mConnection.openStream(channelUid, language, waitForKeyFrame, priority);
+
         if(status != Connection.SUCCESS) {
             return status;
         }

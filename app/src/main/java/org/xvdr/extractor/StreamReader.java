@@ -4,14 +4,14 @@ import org.xvdr.robotv.client.StreamBundle;
 
 abstract class StreamReader {
 
-	protected final PacketQueue output;
+    protected final PacketQueue output;
     public final StreamBundle.Stream stream;
 
-	protected StreamReader(PacketQueue output, StreamBundle.Stream stream) {
-		this.output = output;
+    protected StreamReader(PacketQueue output, StreamBundle.Stream stream) {
+        this.output = output;
         this.stream = stream;
-	}
+    }
 
-	public abstract void consume(byte[] data, long pesTimeUs);
+    public abstract void consume(byte[] data, long pesTimeUs);
 
 }

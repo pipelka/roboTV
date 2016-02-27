@@ -58,9 +58,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     final private SparseBooleanArray mTrackEnabled = new SparseBooleanArray(TRACK_COUNT);
 
     final private int mTrackContentMapping[] = {
-            StreamBundle.CONTENT_VIDEO,
-            StreamBundle.CONTENT_AUDIO,
-            StreamBundle.CONTENT_SUBTITLE
+        StreamBundle.CONTENT_VIDEO,
+        StreamBundle.CONTENT_AUDIO,
+        StreamBundle.CONTENT_SUBTITLE
     };
 
     private AudioCapabilities mAudioCapabilities;
@@ -109,10 +109,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     @Override
     public boolean prepare(long position) {
         // check if we have a video and a audio format
-        for (int i = 0; i < 2; i++) {
+        for(int i = 0; i < 2; i++) {
             PacketQueue outputTrack = mOutputTracks[i];
 
-            if (!outputTrack.hasFormat() || outputTrack.isEmpty()) {
+            if(!outputTrack.hasFormat() || outputTrack.isEmpty()) {
                 return false;
             }
         }
@@ -126,11 +126,13 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     }
 
     @Override
+
     synchronized public MediaFormat getFormat(int track) {
         return mOutputTracks[track].getFormat();
     }
 
     @Override
+
     synchronized public void enable(int track, long positionUs) {
         Log.d(TAG, "enable track: " + track);
         mTrackEnabled.put(track, true);
@@ -209,6 +211,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         for(int i = 0; i < TRACK_COUNT; i++) {
             mOutputTracks[i].clear();
         }
+
         streamPositionUs = positionUs;
         mLargestParsedTimestampUs = Long.MIN_VALUE;
     }
@@ -250,6 +253,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                 newBundle.updateFromPacket(packet);
                 createOutputTracks(newBundle);
                 break;
+
             case Connection.XVDR_STREAM_MUXPKT:
                 writeData(packet);
                 break;
@@ -324,11 +328,11 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mTrackCount = 0;
 
         // check for changed streams
-        for (int i = 0; i < TRACK_COUNT; i++) {
+        for(int i = 0; i < TRACK_COUNT; i++) {
             int pid = mPids[i];
             int index = newBundle.findIndexByPhysicalId(mTrackContentMapping[i], pid);
 
-            if (index < 0) {
+            if(index < 0) {
                 index = 0;
             }
 
@@ -339,26 +343,28 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             StreamBundle.Stream stream = newBundle.getStream(mTrackContentMapping[i], index);
 
             // skip missing streams
-            if (stream == null) {
+            if(stream == null) {
                 // disable if track was enabled
-                if (mTrackEnabled.get(i, false)) {
+                if(mTrackEnabled.get(i, false)) {
                     mTrackEnabled.put(i, false);
                 }
+
                 continue;
             }
 
             // old stream did not exist -> create new stream
             // or check if the stream has changed
-            if (oldStream == null || !stream.isEqualTo(oldStream)) {
+            if(oldStream == null || !stream.isEqualTo(oldStream)) {
                 addReader(i, stream);
             }
 
             mPids[i] = stream.physicalId;
             mTrackCount++;
 
-            if (i == TRACK_AUDIO) {
+            if(i == TRACK_AUDIO) {
                 postAudioTrackChanged(stream);
-            } else if (i == TRACK_VIDEO) {
+            }
+            else if(i == TRACK_VIDEO) {
                 postVideoTrackChanged(stream);
             }
         }
@@ -368,13 +374,13 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     synchronized public boolean selectAudioTrack(int pid) {
         // pid already selected
-        if (mPids[TRACK_AUDIO] == pid) {
+        if(mPids[TRACK_AUDIO] == pid) {
             return true;
         }
 
         StreamBundle.Stream stream = mBundle.getStreamOfPid(pid);
 
-        if (stream == null) {
+        if(stream == null) {
             return false;
         }
 
@@ -389,6 +395,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         for(int i = 0; i < mStreamReaders.size(); i++) {
             StreamReader reader = mStreamReaders.valueAt(i);
+
             if(reader.stream.physicalId == physicalId) {
                 return mStreamReaders.keyAt(i);
             }
@@ -406,7 +413,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             return;
         }
 
-        if (mTrackEnabled.size() != 0 && !mTrackEnabled.get(track, false)) {
+        if(mTrackEnabled.size() != 0 && !mTrackEnabled.get(track, false)) {
             return;
         }
 
@@ -438,8 +445,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         // push buffer to reader
         reader.consume(
-                buffer,
-                timeUs);
+            buffer,
+            timeUs);
 
         mLargestParsedTimestampUs = Math.max(mLargestParsedTimestampUs, timeUs);
     }
@@ -485,7 +492,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     private void logChannelConfiguration(boolean passthrough, int channelConfiguration) {
         Log.i(TAG, "audio: " +
-                Player.nameOfChannelConfiguration(channelConfiguration) + " " +
-                "passthrough: " + (passthrough ? "enabled" : "disabled"));
+              Player.nameOfChannelConfiguration(channelConfiguration) + " " +
+              "passthrough: " + (passthrough ? "enabled" : "disabled"));
     }
 }

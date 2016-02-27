@@ -57,9 +57,11 @@ public class SetupUtils {
         String[] array = context.getResources().getStringArray(R.array.refresh_rate_value_array);
 
         float[] refreshRateValueArray = new float[array.length];
+
         for(int i = 0; i < array.length; i++) {
             refreshRateValueArray[i] = Float.parseFloat(array[i]);
         }
+
         float rate = getRefreshRate(context);
 
         for(int i = 0; i < array.length; i++) {
@@ -72,7 +74,7 @@ public class SetupUtils {
     }
 
     public static boolean isRefreshRateChangeSupported() {
-        if (Build.MODEL.equals("SHIELD Android TV")) {
+        if(Build.MODEL.equals("SHIELD Android TV")) {
             return false;
         }
 

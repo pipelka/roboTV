@@ -14,9 +14,9 @@ import java.util.List;
  */
 final class H265Reader extends StreamReader {
 
-	private static final String TAG = "H265Reader";
+    private static final String TAG = "H265Reader";
 
-	public H265Reader(PacketQueue output, StreamBundle.Stream stream) {
+    public H265Reader(PacketQueue output, StreamBundle.Stream stream) {
         super(output, stream);
 
         // do we have the decoder init data ?
@@ -27,19 +27,19 @@ final class H265Reader extends StreamReader {
         }
 
         output.format(MediaFormat.createVideoFormat(
-                Integer.toString(stream.physicalId), // << trackId
-                MimeTypes.VIDEO_H265,
-                MediaFormat.NO_VALUE,
-                MediaFormat.NO_VALUE,
-                C.UNKNOWN_TIME_US,
-                stream.width,
-                stream.height,
-                initializationData,
-                MediaFormat.NO_VALUE,
-                stream.pixelAspectRatio));
-	}
+                          Integer.toString(stream.physicalId), // << trackId
+                          MimeTypes.VIDEO_H265,
+                          MediaFormat.NO_VALUE,
+                          MediaFormat.NO_VALUE,
+                          C.UNKNOWN_TIME_US,
+                          stream.width,
+                          stream.height,
+                          initializationData,
+                          MediaFormat.NO_VALUE,
+                          stream.pixelAspectRatio));
+    }
 
-	@Override
+    @Override
     public void consume(byte[] data, long pesTimeUs) {
         output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
     }
