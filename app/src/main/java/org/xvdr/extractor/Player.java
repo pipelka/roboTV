@@ -54,7 +54,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     private static final int RENDERER_COUNT = 2;
-    protected static final int MIN_BUFFER_MS = 2000;
+    protected static final int MIN_BUFFER_MS = 1000;
     protected static final int MIN_REBUFFER_MS = 3000;
 
     private static final int RENDERER_VIDEO = 0;
@@ -164,8 +164,13 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mExoPlayer.setPlayWhenReady(true);
     }
 
-    public void pause() {
-        mExoPlayer.setPlayWhenReady(false);
+    public void pause(boolean on) {
+        Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_PAUSE, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        req.putU32(on ? 1L : 0L);
+
+        mConnection.transmitMessage(req);
+
+        mExoPlayer.setPlayWhenReady(!on);
     }
 
     public void stop() {
@@ -227,6 +232,14 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     public boolean selectAudioTrack(int trackId) {
         return mSampleSource.selectAudioTrack(trackId);
+    }
+
+    public long getStartPositionWallclock() {
+        return mSampleSource.getStartPositionWallclock();
+    }
+
+    public long getCurrentPositionWallclock() {
+        return mSampleSource.getCurrentPositionWallclock();
     }
 
     public void seekTo(long position) {

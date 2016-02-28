@@ -70,7 +70,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                     continue;
                 }
 
-                requestPacket();
+                if(!requestPacket()) {
+                    Thread.sleep(10);
+                }
             }
         }
     }
@@ -93,6 +95,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     private int mChannelConfiguration;
 
     private Loader mLoader;
+    private long mCurrentPosition;
+    private long mStartPosition;
 
     final private int[] mPids = new int[TRACK_COUNT];
     final private boolean[] mNeedFormatChange = new boolean[TRACK_COUNT];
@@ -129,6 +133,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mChannelConfiguration = channelConfiguration;
 
         mTimestampAdjuster = new PtsTimestampAdjuster(PtsTimestampAdjuster.DO_NOT_OFFSET);
+        mStartPosition = System.currentTimeMillis();
+        mCurrentPosition = mStartPosition;
 
         // create output tracks
         for(int i = 0; i < TRACK_COUNT; i++) {
@@ -276,12 +282,12 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         Log.d(TAG, "seekToUs: " + positionUs);
 
         // empty packet queue
-        for(int i = 0; i < TRACK_COUNT; i++) {
+        /*for(int i = 0; i < TRACK_COUNT; i++) {
             mOutputTracks[i].clear();
         }
 
         streamPositionUs = positionUs;
-        mLargestParsedTimestampUs = Long.MIN_VALUE;
+        mLargestParsedTimestampUs = Long.MIN_VALUE;*/
     }
 
     @Override
@@ -306,6 +312,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     @Override
     public void release() {
         stopLoading();
+        mLoader.release();
         mConnection.removeCallback(this);
 
         for(int i = 0; i < TRACK_COUNT; i++) {
@@ -315,11 +322,20 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     @Override
     public void onNotification(Packet packet) {
-        // process only STATUS messages
-        if(packet.getType() != Connection.XVDR_CHANNEL_STREAM) {
-            return;
-        }
+        switch(packet.getMsgID()) {
+            case Connection.XVDR_STREAM_POSITIONS:
+                long p  = packet.getS64();
 
+                // sanity check
+                if(p < mCurrentPosition) {
+                    mStartPosition = p;
+                }
+
+                break;
+        };
+    }
+
+    public void writePacket(Packet packet) {
         switch(packet.getMsgID()) {
             case Connection.XVDR_STREAM_CHANGE:
                 final StreamBundle newBundle = new StreamBundle();
@@ -516,6 +532,14 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         byte[] buffer = new byte[length];
         p.readBuffer(buffer, 0, length);
 
+        // read timestamp
+        long pos = p.getS64(); // current timestamp
+
+        // sanity check
+        if(pos > mStartPosition) {
+            mCurrentPosition = pos;
+        }
+
         // push buffer to reader
         reader.consume(
             buffer,
@@ -569,9 +593,23 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
               "passthrough: " + (passthrough ? "enabled" : "disabled"));
     }
 
-    protected void requestPacket() {
+    protected boolean requestPacket() {
         Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
-        mConnection.sendRequest(req);
+        Packet resp = mConnection.transmitMessage(req);
+
+        if(resp == null || resp.eop()) {
+            return false;
+        }
+
+        writePacket(resp);
+        return true;
     }
 
+    public long getStartPositionWallclock() {
+        return mStartPosition;
+    }
+
+    public long getCurrentPositionWallclock() {
+        return mCurrentPosition;
+    }
 }

@@ -40,6 +40,7 @@ public class Connection extends Session {
     public static final int XVDR_CHANNELSTREAM_REQUEST = 22;
     public static final int XVDR_CHANNELSTREAM_PAUSE = 23;
     public static final int XVDR_CHANNELSTREAM_SIGNAL = 24;
+    public static final int XVDR_CHANNELSTREAM_SEEK = 25;
 
     /* OPCODE 60 - 79: XVDR network functions for channel access */
     public static final int XVDR_CHANNELS_GETCHANNELS = 63;
@@ -69,6 +70,7 @@ public class Connection extends Session {
     public static final int XVDR_STREAM_MUXPKT = 4;
     public static final int XVDR_STREAM_SIGNALINFO = 5;
     public static final int XVDR_STREAM_DETACH = 7;
+    public static final int XVDR_STREAM_POSITIONS = 8;
 
     /** Status packet types (server -> client) */
     public static final int XVDR_STATUS_TIMERCHANGE = 1;

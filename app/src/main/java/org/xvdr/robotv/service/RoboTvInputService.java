@@ -181,6 +181,30 @@ public class RoboTvInputService extends TvInputService {
             return true;
         }
 
+        @Override
+        public void onTimeShiftPause() {
+            mPlayer.pause(true);
+        }
+
+        @Override
+        public void onTimeShiftResume() {
+            mPlayer.pause(false);
+        }
+
+        @Override
+        public long onTimeShiftGetStartPosition() {
+            return mPlayer.getStartPositionWallclock();
+        }
+
+        @Override
+        public long onTimeShiftGetCurrentPosition() {
+            return mPlayer.getCurrentPositionWallclock();
+        }
+
+        public void onTimeShiftSeekTo(long timeMs) {
+            mPlayer.seekTo(timeMs);
+        }
+
         private boolean tune(Uri channelUri) {
             if(mPlayer == null) {
                 return false;
@@ -221,6 +245,8 @@ public class RoboTvInputService extends TvInputService {
                 errorNotification(getResources().getString(R.string.failed_tune));
                 return false;
             }
+
+            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
 
             Log.i(TAG, "successfully switched channel");
             return true;

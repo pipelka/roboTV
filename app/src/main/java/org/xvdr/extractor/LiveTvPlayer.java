@@ -52,10 +52,6 @@ public class LiveTvPlayer extends Player {
             return status;
         }
 
-        // set stream into timeshift mode (pause on/off)
-        pauseStream(true);
-        pauseStream(false);
-
         start();
         return Connection.SUCCESS;
     }
