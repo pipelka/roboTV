@@ -16,21 +16,23 @@ final class Ac3Reader extends StreamReader {
 
     private static final String TAG = "Ac3Reader";
     private boolean ac3PassThrough;
-    boolean hasOutputFormat = false;
+    private boolean hasOutputFormat = false;
 
+    AdaptiveAllocator mAllocator;
     AC3Decoder mDecoder;
 
-    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream) {
-        this(output, stream, false);
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, AdaptiveAllocator allocator) {
+        this(output, stream, false, allocator);
     }
 
-    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough) {
-        this(output, stream, ac3PassThrough, Player.CHANNELS_SURROUND);
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, AdaptiveAllocator allocator) {
+        this(output, stream, ac3PassThrough, Player.CHANNELS_SURROUND, allocator);
     }
 
-    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelConfiguration) {
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelConfiguration, AdaptiveAllocator allocator) {
         super(output, stream);
         this.ac3PassThrough = ac3PassThrough;
+        mAllocator = allocator;
 
         if(ac3PassThrough) {
             output.format(MediaFormat.createAudioFormat(
@@ -59,25 +61,30 @@ final class Ac3Reader extends StreamReader {
     }
 
     @Override
-    public void consume(byte[] data, long pesTimeUs) {
+    public void consume(Allocation buffer, long pesTimeUs) {
         if(ac3PassThrough) {
-            output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+            output.sampleData(buffer, pesTimeUs, C.SAMPLE_FLAG_SYNC);
             return;
         }
 
-        int length = mDecoder.decode(data, 0, data.length);
+        int length = mDecoder.decode(buffer.data(), 0, buffer.length());
 
         if(length == 0) {
             Log.e(TAG, "Unable to decode frame data");
             return;
         }
 
-        byte[] audioChunk = new byte[length];
+        Allocation chunk = mAllocator.allocate(length);
 
-        if(!mDecoder.read(audioChunk, 0, audioChunk.length)) {
+        if(!mDecoder.read(chunk.data(), 0, chunk.size())) {
             Log.e(TAG, "failed to read audio chunk");
+            mAllocator.release(buffer);
+            mAllocator.release(chunk);
             return;
         }
+
+        chunk.setLength(length);
+        mAllocator.release(buffer);
 
         if(!hasOutputFormat) {
             Log.i(TAG, "channels: " + mDecoder.getChannels());
@@ -95,7 +102,7 @@ final class Ac3Reader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(audioChunk, audioChunk.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+        output.sampleData(chunk, pesTimeUs, C.SAMPLE_FLAG_SYNC);
     }
 
 }

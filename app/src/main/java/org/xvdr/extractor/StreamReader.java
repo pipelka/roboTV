@@ -12,6 +12,6 @@ abstract class StreamReader {
         this.stream = stream;
     }
 
-    public abstract void consume(byte[] data, long pesTimeUs);
+    public abstract void consume(Allocation buffer, long pesTimeUs);
 
 }

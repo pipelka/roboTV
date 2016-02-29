@@ -30,7 +30,7 @@ final class H262Reader extends StreamReader {
     }
 
     @Override
-    public void consume(byte[] data, long pesTimeUs) {
-        output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+    public void consume(Allocation buffer, long pesTimeUs) {
+        output.sampleData(buffer, pesTimeUs, C.SAMPLE_FLAG_SYNC);
     }
 }

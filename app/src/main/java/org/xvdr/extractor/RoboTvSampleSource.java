@@ -82,6 +82,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     final static private int TRACK_AUDIO = 1;
     final static private int TRACK_SUBTITLE = 2;
 
+    private AdaptiveAllocator mAllocator;
     private Connection mConnection;
     private StreamBundle mBundle;
     private Listener mListener;
@@ -144,6 +145,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mAudioCapabilities = audioCapabilities;
 
         mLoader = new Loader("roboTV:streamloader");
+        mAllocator = new AdaptiveAllocator(10, 16 * 1024);
 
         logChannelConfiguration(mAudioPassthrough, mChannelConfiguration);
     }
@@ -264,13 +266,17 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         // check if we have sample data
         if(p.isSample()) {
             outputTrack.poll();
+
+            Allocation buffer = p.buffer;
+
             sampleHolder.timeUs = p.timeUs;
             sampleHolder.flags = p.flags;
-            sampleHolder.size = p.length;
+            sampleHolder.size = buffer.length();
 
             sampleHolder.ensureSpaceForWrite(sampleHolder.size);
-            sampleHolder.data.put(p.data, 0, sampleHolder.size);
+            sampleHolder.data.put(buffer.data(), 0, sampleHolder.size);
 
+            mAllocator.release(buffer);
             return SAMPLE_READ;
         }
 
@@ -391,11 +397,11 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
             case MimeTypes.AUDIO_AC3:
                 boolean passthrough = mAudioPassthrough && mAudioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3);
-                reader = new Ac3Reader(outputTrack, stream, passthrough, mChannelConfiguration);
+                reader = new Ac3Reader(outputTrack, stream, passthrough, mChannelConfiguration, mAllocator);
                 break;
 
             case MimeTypes.AUDIO_MPEG:
-                reader = new MpegAudioReader(outputTrack, stream, false);
+                reader = new MpegAudioReader(outputTrack, stream, false, mAllocator);
                 break;
         }
 
@@ -529,8 +535,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         long timeUs = mTimestampAdjuster.adjustTimestamp(pts);
 
         // read buffer
-        byte[] buffer = new byte[length];
-        p.readBuffer(buffer, 0, length);
+        Allocation buffer = mAllocator.allocate(length);
+
+        p.readBuffer(buffer.data(), 0, length);
+        buffer.setLength(length);
 
         // read timestamp
         long pos = p.getS64(); // current timestamp

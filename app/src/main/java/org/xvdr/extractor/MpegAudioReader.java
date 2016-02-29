@@ -18,14 +18,16 @@ final class MpegAudioReader extends StreamReader {
     private static final String TAG = "MpegAudioReader";
     boolean hasOutputFormat = false;
 
+    AdaptiveAllocator mAllocator;
     MpegAudioDecoder mDecoder;
 
-    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream) {
-        this(output, stream, false);
+    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream, AdaptiveAllocator allocator) {
+        this(output, stream, false, allocator);
     }
 
-    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream, boolean useHwDecoder) {
+    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream, boolean useHwDecoder, AdaptiveAllocator allocator) {
         super(output, stream);
+        mAllocator = allocator;
 
         if(!useHwDecoder) {
             mDecoder = new MpegAudioDecoder();
@@ -33,24 +35,30 @@ final class MpegAudioReader extends StreamReader {
     }
 
     @Override
-    public void consume(byte[] data, long pesTimeUs) {
+    public void consume(Allocation buffer, long pesTimeUs) {
         if(mDecoder == null) {
-            consumeHw(data, pesTimeUs);
+            consumeHw(buffer, pesTimeUs);
             return;
         }
 
-        int length = mDecoder.decode(data, 0, data.length);
+        int length = mDecoder.decode(buffer.data(), 0, buffer.length());
 
         if(length == 0) {
+            mAllocator.release(buffer);
             return;
         }
 
-        byte[] audioChunk = new byte[length];
+        Allocation chunk = mAllocator.allocate(length);
 
-        if(!mDecoder.read(audioChunk, 0, audioChunk.length)) {
+        if(!mDecoder.read(chunk.data(), 0, chunk.size())) {
             Log.e(TAG, "failed to read audio chunk");
+            mAllocator.release(buffer);
+            mAllocator.release(chunk);
             return;
         }
+
+        chunk.setLength(length);
+        mAllocator.release(buffer);
 
         if(!hasOutputFormat) {
             MediaFormat format = MediaFormat.createAudioFormat(
@@ -67,10 +75,12 @@ final class MpegAudioReader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(audioChunk, audioChunk.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+        output.sampleData(chunk, pesTimeUs, C.SAMPLE_FLAG_SYNC);
     }
 
-    private void consumeHw(byte[] data, long pesTimeUs) {
+    private void consumeHw(Allocation buffer, long pesTimeUs) {
+        byte[] data = buffer.data();
+
         if(!hasOutputFormat) {
             int  header = ((data[0] << 24) | (data[1] << 16) | (data[2] <<  8) | data[3]);
             MpegAudioHeader mpegAudioHeader = new MpegAudioHeader();
@@ -92,7 +102,7 @@ final class MpegAudioReader extends StreamReader {
             }
         }
 
-        output.sampleData(data, data.length, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+        output.sampleData(buffer, pesTimeUs, C.SAMPLE_FLAG_SYNC);
     }
 
 }

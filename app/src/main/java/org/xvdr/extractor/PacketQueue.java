@@ -1,7 +1,5 @@
 package org.xvdr.extractor;
 
-import android.util.Log;
-
 import com.google.android.exoplayer.MediaFormat;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -9,24 +7,22 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     final private static String TAG = "PacketQueue";
-    final private static int mMaxQueueSize = 300;
+    final private static int mMaxQueueSize = 200;
 
     private MediaFormat mFormat;
 
     public class PacketHolder {
-        public byte[] data = null;
+        public Allocation buffer = null;
         public MediaFormat format = null;
         public long timeUs;
         public int flags;
-        public int length;
 
         public PacketHolder(MediaFormat format) {
             this.format = format;
         }
 
-        public PacketHolder(byte[] data, int length, long timeUs, int flags) {
-            this.data = data;
-            this.length = length;
+        public PacketHolder(Allocation buffer, long timeUs, int flags) {
+            this.buffer = buffer;
             this.timeUs = timeUs;
             this.flags = flags;
         }
@@ -36,9 +32,16 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
         }
 
         public boolean isSample() {
-            return (data != null);
+            return (buffer != null);
         }
 
+        public void release() {
+            if(buffer == null) {
+                return;
+            }
+
+            buffer.release();
+        }
     }
 
     public PacketQueue() {
@@ -57,8 +60,8 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
         }
     }
 
-    public void sampleData(byte[] data, int length, long timeUs, int flags) {
-        PacketHolder holder = new PacketHolder(data, length, timeUs, flags);
+    synchronized public void sampleData(Allocation buffer, long timeUs, int flags) {
+        PacketHolder holder = new PacketHolder(buffer, timeUs, flags);
 
         try {
             put(holder);
@@ -78,5 +81,13 @@ public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     public boolean isFull() {
         return (size() >= mMaxQueueSize);
+    }
+
+    synchronized public void clear() {
+        for(PacketHolder item : this) {
+            item.release();
+        }
+
+        super.clear();
     }
 }
