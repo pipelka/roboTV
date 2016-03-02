@@ -29,21 +29,27 @@ public class Utils {
         int min = millis / 60000;
         millis %= 60000;
         int sec = millis / 1000;
-        if (hr > 0) {
+
+        if(hr > 0) {
             result += hr + ":";
         }
-        if (min >= 0) {
-            if (min > 9) {
+
+        if(min >= 0) {
+            if(min > 9) {
                 result += min + ":";
-            } else {
+            }
+            else {
                 result += "0" + min + ":";
             }
         }
-        if (sec > 9) {
+
+        if(sec > 9) {
             result += sec;
-        } else {
+        }
+        else {
             result += "0" + sec;
         }
+
         return result;
     }
 
@@ -52,26 +58,32 @@ public class Utils {
         return Math.round((float) dp * density);
     }
 
-    public static String loadJSONFromResource( Context context, int resource ) {
-        if( resource <= 0 )
+    public static String loadJSONFromResource(Context context, int resource) {
+        if(resource <= 0) {
             return null;
+        }
 
         String json = null;
-        InputStream is = context.getResources().openRawResource( resource );
+        InputStream is = context.getResources().openRawResource(resource);
+
         try {
-            if( is != null ) {
+            if(is != null) {
                 int size = is.available();
                 byte[] buffer = new byte[size];
                 is.read(buffer);
                 json = new String(buffer, "UTF-8");
             }
-        } catch( IOException e ) {
+        }
+        catch(IOException e) {
 
-        } finally {
+        }
+        finally {
             try {
-                if( is != null )
+                if(is != null) {
                     is.close();
-            } catch( IOException e ) {}
+                }
+            }
+            catch(IOException e) {}
         }
 
         return json;

@@ -69,17 +69,17 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     private ArrayObjectAdapter mSecondaryActionAdapter;
 
     private PlaybackControlsRow.PlayPauseAction mPlayPauseAction;
+    private PlaybackControlsRow.SkipNextAction mSkipNextAction;
+    private PlaybackControlsRow.SkipPreviousAction mSkipPreviousAction;
+    private PlaybackControlsRow.FastForwardAction mFastForwardAction;
+    private PlaybackControlsRow.RewindAction mRewindAction;
+    /*private PlaybackControlsRow.HighQualityAction mHighQualityAction;
     private PlaybackControlsRow.RepeatAction mRepeatAction;
     private PlaybackControlsRow.ThumbsUpAction mThumbsUpAction;
     private PlaybackControlsRow.ThumbsDownAction mThumbsDownAction;
     private PlaybackControlsRow.ShuffleAction mShuffleAction;
-    //private PlaybackControlsRow.SkipNextAction mSkipNextAction;
-    //private PlaybackControlsRow.SkipPreviousAction mSkipPreviousAction;
-    private PlaybackControlsRow.FastForwardAction mFastForwardAction;
-    private PlaybackControlsRow.RewindAction mRewindAction;
-    private PlaybackControlsRow.HighQualityAction mHighQualityAction;
     private PlaybackControlsRow.ClosedCaptioningAction mClosedCaptioningAction;
-    private PlaybackControlsRow.MoreActions mMoreActions;
+    private PlaybackControlsRow.MoreActions mMoreActions;*/
 
     private PicassoPlaybackControlsRowTarget mPlaybackControlsRowTarget;
 
@@ -116,20 +116,29 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         /* add ListRow to second row of mRowsAdapter */
         addOtherRows();
 
-              /* onClick */
+        /* onClick */
         playbackControlsRowPresenter.setOnActionClickedListener(new OnActionClickedListener() {
             public void onActionClicked(Action action) {
-                if (action.getId() == mPlayPauseAction.getId()) {
+                if(action.getId() == mPlayPauseAction.getId()) {
                     /* PlayPause action */
                     togglePlayback(mPlayPauseAction.getIndex() == PlaybackControlsRow.PlayPauseAction.PLAY);
-                } else if (action.getId() == mFastForwardAction.getId()) {
-                    /* FastForward action  */
-                    fastForward();
-                } else if (action.getId() == mRewindAction.getId()) {
-                    /* Rewind action */
-                    rewind();
                 }
-                if (action instanceof PlaybackControlsRow.MultiAction) {
+                else if(action.getId() == mFastForwardAction.getId()) {
+                    /* FastForward action  */
+                    fastForward(60 * 1000);
+                }
+                else if(action.getId() == mRewindAction.getId()) {
+                    /* Rewind action */
+                    rewind(60 * 1000);
+                }
+                else if(action.getId() == mSkipNextAction.getId()) {
+                    fastForward(10 * 60 * 1000);
+                }
+                else if(action.getId() == mSkipPreviousAction.getId()) {
+                    rewind(10 * 60 * 1000);
+                }
+
+                if(action instanceof PlaybackControlsRow.MultiAction) {
                     /* Following action is subclass of MultiAction
                      * - PlayPauseAction
                      * - FastForwardAction
@@ -151,15 +160,16 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
     protected void updateVideoImage(String url) {
         Log.d(TAG, "load url " + url);
+
         if(url == null || url.isEmpty()) {
             return;
         }
 
         Picasso.with(getActivity())
-                .load(url)
-                .resize(Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_size), getActivity().getApplicationContext()),
-                        Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_height), getActivity().getApplicationContext()))
-                .into(mPlaybackControlsRowTarget);
+        .load(url)
+        .resize(Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_size), getActivity().getApplicationContext()),
+                Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_height), getActivity().getApplicationContext()))
+        .into(mPlaybackControlsRowTarget);
     }
 
     private void addPlaybackControlsRow() {
@@ -181,33 +191,33 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
         Activity activity = getActivity();
         mPlayPauseAction = new PlaybackControlsRow.PlayPauseAction(activity);
-        mRepeatAction = new PlaybackControlsRow.RepeatAction(activity);
+        /*mRepeatAction = new PlaybackControlsRow.RepeatAction(activity);
         mThumbsUpAction = new PlaybackControlsRow.ThumbsUpAction(activity);
         mThumbsDownAction = new PlaybackControlsRow.ThumbsDownAction(activity);
-        mShuffleAction = new PlaybackControlsRow.ShuffleAction(activity);
-        //mSkipNextAction = new PlaybackControlsRow.SkipNextAction(activity);
-        //mSkipPreviousAction = new PlaybackControlsRow.SkipPreviousAction(activity);
+        mShuffleAction = new PlaybackControlsRow.ShuffleAction(activity);*/
+        mSkipNextAction = new PlaybackControlsRow.SkipNextAction(activity);
+        mSkipPreviousAction = new PlaybackControlsRow.SkipPreviousAction(activity);
         mFastForwardAction = new PlaybackControlsRow.FastForwardAction(activity);
         mRewindAction = new PlaybackControlsRow.RewindAction(activity);
-        mHighQualityAction = new PlaybackControlsRow.HighQualityAction(activity);
+        /*mHighQualityAction = new PlaybackControlsRow.HighQualityAction(activity);
         mClosedCaptioningAction = new PlaybackControlsRow.ClosedCaptioningAction(activity);
-        mMoreActions = new PlaybackControlsRow.MoreActions(activity);
+        mMoreActions = new PlaybackControlsRow.MoreActions(activity);*/
 
         /* PrimaryAction setting */
-        //mPrimaryActionAdapter.add(mSkipPreviousAction);
+        mPrimaryActionAdapter.add(mSkipPreviousAction);
         mPrimaryActionAdapter.add(mRewindAction);
         mPrimaryActionAdapter.add(mPlayPauseAction);
         mPrimaryActionAdapter.add(mFastForwardAction);
-        //mPrimaryActionAdapter.add(mSkipNextAction);
+        mPrimaryActionAdapter.add(mSkipNextAction);
 
         /* SecondaryAction setting */
-        mSecondaryActionAdapter.add(mThumbsUpAction);
+        /*mSecondaryActionAdapter.add(mThumbsUpAction);
         mSecondaryActionAdapter.add(mThumbsDownAction);
         mSecondaryActionAdapter.add(mRepeatAction);
         mSecondaryActionAdapter.add(mShuffleAction);
         mSecondaryActionAdapter.add(mHighQualityAction);
         mSecondaryActionAdapter.add(mClosedCaptioningAction);
-        mSecondaryActionAdapter.add(mMoreActions);
+        mSecondaryActionAdapter.add(mMoreActions);*/
 
         updateVideoImage(mSelectedMovie.getCardImageUrl());
     }
@@ -217,22 +227,20 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
     private void startProgressAutomation() {
-        if (mRunnable == null) {
+        if(mRunnable == null) {
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
                     int updatePeriod = getUpdatePeriod();
-                    int currentTime = mPlaybackControlsRow.getCurrentTime() + updatePeriod;
+                    int currentTime = getCurrentTime();
                     int totalTime = mPlaybackControlsRow.getTotalTime();
-                    mPlaybackControlsRow.setCurrentTime(currentTime);
-                    mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
 
-                    if (totalTime > 0 && totalTime <= currentTime) {
-                        stopProgressAutomation();
-                        //next(true);
-                    } else {
-                        mHandler.postDelayed(this, updatePeriod);
+                    if(currentTime <= totalTime) {
+                        mPlaybackControlsRow.setCurrentTime(currentTime);
+                        mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
                     }
+
+                    mHandler.postDelayed(this, updatePeriod);
                 }
             };
             mHandler.postDelayed(mRunnable, getUpdatePeriod());
@@ -240,7 +248,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
     private void stopProgressAutomation() {
-        if (mHandler != null && mRunnable != null) {
+        if(mHandler != null && mRunnable != null) {
             mHandler.removeCallbacks(mRunnable);
             mRunnable = null;
         }
@@ -248,14 +256,15 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
     public void playbackStateChanged() {
 
-        if (mCurrentPlaybackState != PlaybackState.STATE_PLAYING) {
+        if(mCurrentPlaybackState != PlaybackState.STATE_PLAYING) {
             mCurrentPlaybackState = PlaybackState.STATE_PLAYING;
             startProgressAutomation();
             setFadingEnabled(true);
             mPlayPauseAction.setIndex(PlaybackControlsRow.PlayPauseAction.PAUSE);
             mPlayPauseAction.setIcon(mPlayPauseAction.getDrawable(PlaybackControlsRow.PlayPauseAction.PAUSE));
             notifyChanged(mPlayPauseAction);
-        } else if (mCurrentPlaybackState != PlaybackState.STATE_PAUSED) {
+        }
+        else if(mCurrentPlaybackState != PlaybackState.STATE_PAUSED) {
             mCurrentPlaybackState = PlaybackState.STATE_PAUSED;
             stopProgressAutomation();
             setFadingEnabled(false); // if set to false, PlaybackcontrolsRow will always be on the screen
@@ -264,43 +273,43 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
             notifyChanged(mPlayPauseAction);
         }
 
-        int currentTime = ((PlayerActivity) getActivity()).getPosition();
+        int currentTime = getCurrentTime();
         mPlaybackControlsRow.setCurrentTime(currentTime);
         mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
 
     }
 
+    private int getCurrentTime() {
+        PlayerActivity activity = (PlayerActivity) getActivity();
+
+        if(activity == null) {
+            return 0;
+        }
+
+        return activity.getCurrentTime();
+    }
     private void notifyChanged(Action action) {
         ArrayObjectAdapter adapter = mPrimaryActionAdapter;
-        if (adapter.indexOf(action) >= 0) {
+
+        if(adapter.indexOf(action) >= 0) {
             adapter.notifyArrayItemRangeChanged(adapter.indexOf(action), 1);
             return;
         }
+
         adapter = mSecondaryActionAdapter;
-        if (adapter.indexOf(action) >= 0) {
+
+        if(adapter.indexOf(action) >= 0) {
             adapter.notifyArrayItemRangeChanged(adapter.indexOf(action), 1);
             return;
         }
     }
 
-    private void fastForward() {
-        /* Video control part */
-        ((PlayerActivity) getActivity()).fastForward();
-
-        /* UI part */
-        int currentTime = ((PlayerActivity) getActivity()).getPosition();
-        mPlaybackControlsRow.setCurrentTime(currentTime);
-        mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
+    private void fastForward(int timeMs) {
+        ((PlayerActivity) getActivity()).fastForward(timeMs);
     }
 
-    private void rewind() {
-        /* Video control part */
-        ((PlayerActivity) getActivity()).rewind();
-
-        /* UI part */
-        int currentTime = ((PlayerActivity) getActivity()).getPosition();
-        mPlaybackControlsRow.setCurrentTime(currentTime);
-        mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
+    private void rewind(int timeMs) {
+        ((PlayerActivity) getActivity()).rewind(timeMs);
     }
 
     private void addOtherRows() {
@@ -318,11 +327,8 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
 
-    private void togglePlayback(boolean playPause) {
-        /* Video control part */
+    public void togglePlayback(boolean playPause) {
         ((PlayerActivity) getActivity()).playPause(playPause);
-
-        /* UI control part */
         playbackStateChanged();
     }
 }

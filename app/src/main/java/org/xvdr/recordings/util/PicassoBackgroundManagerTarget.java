@@ -30,15 +30,19 @@ public class PicassoBackgroundManagerTarget implements Target {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if(this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+
+        if(o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         PicassoBackgroundManagerTarget that = (PicassoBackgroundManagerTarget) o;
 
-        if (!mBackgroundManager.equals(that.mBackgroundManager))
+        if(!mBackgroundManager.equals(that.mBackgroundManager)) {
             return false;
+        }
 
         return true;
     }

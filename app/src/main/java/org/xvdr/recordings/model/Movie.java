@@ -84,12 +84,12 @@ public class Movie implements Serializable {
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
 
-        try{
+        try {
             DateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
             Date netDate = (new Date(timeStamp));
             formattedDate = sdf.format(netDate);
         }
-        catch(Exception e){
+        catch(Exception e) {
             formattedDate = "";
         }
 
@@ -157,12 +157,12 @@ public class Movie implements Serializable {
     @Override
     public String toString() {
         return "Movie {" +
-                    "title=\'" + title + "\'" +
-                    ", description=\'" + description + "\'" +
-                    ", outline=\'" + outline + "\'" +
-                    ", category=\'" + category + "\'" +
-                    ", cardImageUrl=\'" + cardImageUrl + "\'" +
-                    ", backgroundImageUrl=\'" + backgroundImageUrl + "\'" +
-                "}";
+               "title=\'" + title + "\'" +
+               ", description=\'" + description + "\'" +
+               ", outline=\'" + outline + "\'" +
+               ", category=\'" + category + "\'" +
+               ", cardImageUrl=\'" + cardImageUrl + "\'" +
+               ", backgroundImageUrl=\'" + backgroundImageUrl + "\'" +
+               "}";
     }
 }

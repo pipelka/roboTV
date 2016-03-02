@@ -17,13 +17,13 @@ public class PicassoImageCardViewTarget implements Target {
 
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
-        Drawable bitmapDrawable = new BitmapDrawable( mImageCardView.getContext().getResources(), bitmap );
+        Drawable bitmapDrawable = new BitmapDrawable(mImageCardView.getContext().getResources(), bitmap);
         mImageCardView.setMainImage(bitmapDrawable);
     }
 
     @Override
     public void onBitmapFailed(Drawable drawable) {
-        mImageCardView.setMainImage( drawable );
+        mImageCardView.setMainImage(drawable);
     }
 
     @Override

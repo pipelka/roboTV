@@ -24,36 +24,36 @@ public class CardPresenter extends Presenter {
         private ImageCardView mCardView;
         private PicassoImageCardViewTarget mImageCardViewTarget;
 
-        public ViewHolder( View view ) {
+        public ViewHolder(View view) {
             super(view);
             mCardView = (ImageCardView) view;
-            mImageCardViewTarget = new PicassoImageCardViewTarget( mCardView );
+            mImageCardViewTarget = new PicassoImageCardViewTarget(mCardView);
         }
 
         public ImageCardView getCardView() {
             return mCardView;
         }
 
-        protected void updateCardViewImage( Context context, String link ) {
+        protected void updateCardViewImage(Context context, String link) {
             if(link == null || link.isEmpty()) {
                 mCardView.setMainImage(context.getDrawable(R.drawable.recording_unkown));
                 return;
             }
 
-            Picasso.with( context )
-                .load(link)
-                .resize(266, 400)
-                .centerCrop()
-                .error(new ColorDrawable(0))
-                .into(mImageCardViewTarget);
+            Picasso.with(context)
+            .load(link)
+            .resize(266, 400)
+            .centerCrop()
+            .error(new ColorDrawable(0))
+            .into(mImageCardViewTarget);
         }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        ImageCardView cardView = new ImageCardView( parent.getContext() );
-        cardView.setFocusable( true );
-        cardView.setFocusableInTouchMode( true );
+        ImageCardView cardView = new ImageCardView(parent.getContext());
+        cardView.setFocusable(true);
+        cardView.setFocusableInTouchMode(true);
         return new ViewHolder(cardView);
     }
 

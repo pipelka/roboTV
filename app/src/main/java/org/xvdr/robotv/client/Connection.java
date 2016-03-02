@@ -42,6 +42,9 @@ public class Connection extends Session {
     public static final int XVDR_CHANNELSTREAM_SIGNAL = 24;
     public static final int XVDR_CHANNELSTREAM_SEEK = 25;
 
+    public static final int XVDR_RECSTREAM_OPEN = 40;
+    public static final int XVDR_RECSTREAM_CLOSE = 41;
+
     /* OPCODE 60 - 79: XVDR network functions for channel access */
     public static final int XVDR_CHANNELS_GETCHANNELS = 63;
 

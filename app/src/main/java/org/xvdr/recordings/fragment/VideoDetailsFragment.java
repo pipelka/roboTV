@@ -52,7 +52,7 @@ public class VideoDetailsFragment extends DetailsFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSelectedMovie = (Movie) getActivity().getIntent().getSerializableExtra( EXTRA_MOVIE );
+        mSelectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
 
         initBackground();
         new DetailRowBuilderTask().execute(mSelectedMovie);
@@ -67,40 +67,41 @@ public class VideoDetailsFragment extends DetailsFragment {
         mMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(mMetrics);
 
-        if( mSelectedMovie != null && !TextUtils.isEmpty( mSelectedMovie.getBackgroundImageUrl() ) ) {
+        if(mSelectedMovie != null && !TextUtils.isEmpty(mSelectedMovie.getBackgroundImageUrl())) {
             updateBackground(mSelectedMovie.getBackgroundImageUrl());
         }
     }
 
     protected void updateBackground(String url) {
-        if(url == null || url.isEmpty() ) {
+        if(url == null || url.isEmpty()) {
             return;
         }
 
         Picasso.with(getActivity())
-                .load(url)
-                .error(new ColorDrawable(getResources().getColor(R.color.recordings_background)))
-                .resize(mMetrics.widthPixels, mMetrics.heightPixels)
-                .into(mBackgroundTarget);
+        .load(url)
+        .error(new ColorDrawable(getResources().getColor(R.color.recordings_background)))
+        .resize(mMetrics.widthPixels, mMetrics.heightPixels)
+        .into(mBackgroundTarget);
     }
 
 
 
     private class DetailRowBuilderTask extends AsyncTask<Movie, Integer, DetailsOverviewRow> {
         @Override
-        protected DetailsOverviewRow doInBackground( Movie... movies ) {
+        protected DetailsOverviewRow doInBackground(Movie... movies) {
             mSelectedMovie = movies[0];
             String url = mSelectedMovie.getCardImageUrl();
 
             DetailsOverviewRow row = new DetailsOverviewRow(mSelectedMovie);
+
             try {
                 if(!(url == null || url.isEmpty())) {
                     Bitmap poster = Picasso.with(getActivity())
-                            .load(url)
-                            .resize(Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_size), getActivity().getApplicationContext()),
-                                    Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_height), getActivity().getApplicationContext()))
-                            .centerCrop()
-                            .get();
+                                    .load(url)
+                                    .resize(Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_size), getActivity().getApplicationContext()),
+                                            Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_height), getActivity().getApplicationContext()))
+                                    .centerCrop()
+                                    .get();
                     row.setImageBitmap(getActivity(), poster);
                 }
             }
@@ -115,39 +116,40 @@ public class VideoDetailsFragment extends DetailsFragment {
         }
 
         @Override
-        protected void onPostExecute( DetailsOverviewRow detailRow ) {
-            if( detailRow == null )
+        protected void onPostExecute(DetailsOverviewRow detailRow) {
+            if(detailRow == null) {
                 return;
+            }
 
             ClassPresenterSelector ps = new ClassPresenterSelector();
             FullWidthDetailsOverviewRowPresenter dorPresenter =
-                    new FullWidthDetailsOverviewRowPresenter( new DetailsDescriptionPresenter() );
+                new FullWidthDetailsOverviewRowPresenter(new DetailsDescriptionPresenter());
             // set detail background and style
-            dorPresenter.setBackgroundColor(getResources().getColor(R.color.recordings_fastlane_background ) );
-            dorPresenter.setOnActionClickedListener( new OnActionClickedListener() {
+            dorPresenter.setBackgroundColor(getResources().getColor(R.color.recordings_fastlane_background));
+            dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
                 @Override
-                public void onActionClicked( Action action ) {
-                    if (action.getId() == ACTION_WATCH ) {
-                        Intent intent = new Intent( getActivity(), PlayerActivity.class );
-                        intent.putExtra( EXTRA_MOVIE, mSelectedMovie );
-                        intent.putExtra( EXTRA_SHOULD_AUTO_START, true );
-                        startActivity( intent );
+                public void onActionClicked(Action action) {
+                    if(action.getId() == ACTION_WATCH) {
+                        Intent intent = new Intent(getActivity(), PlayerActivity.class);
+                        intent.putExtra(EXTRA_MOVIE, mSelectedMovie);
+                        intent.putExtra(EXTRA_SHOULD_AUTO_START, true);
+                        startActivity(intent);
                     }
                 }
             });
 
-            ps.addClassPresenter( DetailsOverviewRow.class, dorPresenter );
-            ps.addClassPresenter( ListRow.class,
-                    new ListRowPresenter() );
+            ps.addClassPresenter(DetailsOverviewRow.class, dorPresenter);
+            ps.addClassPresenter(ListRow.class,
+                                 new ListRowPresenter());
 
 
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter( ps );
-            adapter.add( detailRow );
-            loadRelatedMedia( adapter );
-            setAdapter( adapter );
+            ArrayObjectAdapter adapter = new ArrayObjectAdapter(ps);
+            adapter.add(detailRow);
+            loadRelatedMedia(adapter);
+            setAdapter(adapter);
         }
 
-        private void loadRelatedMedia( ArrayObjectAdapter adapter ) {
+        private void loadRelatedMedia(ArrayObjectAdapter adapter) {
 
             /*String json = Utils.loadJSONFromResource( getActivity(), R.raw.movies );
             Gson gson = new Gson();

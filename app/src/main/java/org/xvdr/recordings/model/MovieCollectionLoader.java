@@ -8,13 +8,13 @@ import android.util.Log;
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.tv.ServerConnection;
+import org.xvdr.robotv.client.Connection;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, MovieCollectionAdapter> {
+public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieCollectionAdapter> {
 
     public interface Listener {
         void onStart();
@@ -33,16 +33,16 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
 
     private final static String TAG = "MovieCollectionLoader";
 
-    private ServerConnection mConnection;
+    private Connection mConnection;
     private Listener mListener;
     private ArtworkFetcher mFetcher;
     private List<ArtworkItem> mArtworkQueue = new ArrayList<>();
 
-    public MovieCollectionLoader(ServerConnection connection) {
+    public MovieCollectionLoader(Connection connection) {
         this(connection, "");
     }
 
-    public MovieCollectionLoader(ServerConnection connection, String language) {
+    public MovieCollectionLoader(Connection connection, String language) {
         mConnection = connection;
         mFetcher = new ArtworkFetcher(mConnection, language);
     }
@@ -60,10 +60,10 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
     }
 
     @Override
-    protected MovieCollectionAdapter doInBackground(ServerConnection... params) {
+    protected MovieCollectionAdapter doInBackground(Connection... params) {
         final MovieCollectionAdapter collection = new MovieCollectionAdapter();
 
-        Packet request = mConnection.CreatePacket(ServerConnection.XVDR_RECORDINGS_GETLIST);
+        Packet request = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_GETLIST);
         Packet response = mConnection.transmitMessage(request);
 
         if(response == null) {
@@ -104,11 +104,11 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
                     try {
                         o = mFetcher.fetchForEvent(item.searchMovie.getEvent());
                     }
-                    catch (IOException e) {
+                    catch(IOException e) {
                         e.printStackTrace();
                     }
 
-                    if (o == null) {
+                    if(o == null) {
                         continue;
                     }
 
@@ -125,7 +125,7 @@ public class MovieCollectionLoader extends AsyncTask<ServerConnection, Void, Mov
                     });
 
                     // send new urls to server
-                    Packet p = mConnection.CreatePacket(ServerConnection.XVDR_RECORDINGS_SETURLS);
+                    Packet p = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_SETURLS);
                     p.putString(item.searchMovie.getId());
                     p.putString(item.searchMovie.getCardImageUrl());
                     p.putString(item.searchMovie.getBackgroundImageUrl());

@@ -55,6 +55,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
         for(int i = 0; i < size(); i++) {
             listrow = (ListRow)get(i);
+
             if(listrow.getHeaderItem().getName().equalsIgnoreCase(category)) {
                 return (ArrayObjectAdapter) listrow.getAdapter();
             }
@@ -75,6 +76,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
     private ObjectAdapter getSeries(String title, boolean addNew) {
         ArrayObjectAdapter row = (ArrayObjectAdapter) getCategory("Serien", true);
+
         if(row == null) {
             return null;
         }
@@ -119,6 +121,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
     protected ArrayObjectAdapter addMovie(Movie movie) {
         ArrayObjectAdapter row = (ArrayObjectAdapter) getCategory(movie.getCategory(), true);
+
         if(row == null) {
             return null;
         }
@@ -129,6 +132,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
     protected ArrayObjectAdapter addSeriesEpisode(Movie episode) {
         ArrayObjectAdapter seriesRow = (ArrayObjectAdapter) getSeries(episode.getCategory(), true);
+
         if(seriesRow == null) {
             return null;
         }
@@ -139,6 +143,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
     public void remove(Movie movie) {
         ArrayObjectAdapter row = (ArrayObjectAdapter) getCategory(movie.getCategory(), true);
+
         if(row == null) {
             return;
         }

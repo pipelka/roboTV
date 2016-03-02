@@ -240,10 +240,6 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mExoPlayer.seekTo(wallclockTimeMs / 1000);
     }
 
-    public long getCurrentPosition() {
-        return mExoPlayer.getCurrentPosition();
-    }
-
     public void setPlaybackSpeed(int speed) {
         if(speed == mSampleSource.getPlaybackSpeed()) {
             return;

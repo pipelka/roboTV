@@ -1,34 +1,19 @@
 package org.xvdr.recordings.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout.LayoutParams;
-import android.widget.SeekBar;
-import android.widget.TextView;
-
-import com.google.android.exoplayer.ExoPlayer;
 
 import org.xvdr.extractor.Player;
 import org.xvdr.extractor.RecordingPlayer;
 import org.xvdr.msgexchange.Packet;
+import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
 import org.xvdr.recordings.model.Movie;
-import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
-import org.xvdr.robotv.tv.StreamBundle;
-
-import java.util.Timer;
-import java.util.TimerTask;
+import org.xvdr.robotv.client.StreamBundle;
 
 public class PlayerActivity extends Activity implements Player.Listener {
 
@@ -36,18 +21,16 @@ public class PlayerActivity extends Activity implements Player.Listener {
     public static final String EXTRA_START_POSITION = "extra_start_position";
 
     private RecordingPlayer mPlayer;
+    private PlaybackOverlayFragment mControls;
     private SurfaceView mVideoView;
-    private int mPlaybackState;
     private Movie mSelectedMovie;
-    private int mDuration = -1;
-    private int mPosition = 0;
-    private long mStartTimeMillis;
 
     @Override
-    public void onCreate( Bundle savedInstanceState ) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
+        mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
         mPlayer = new RecordingPlayer(this, SetupUtils.getServer(this), SetupUtils.getLanguageISO3(this), this);
         initViews();
         startVideoPlayer();
@@ -59,39 +42,26 @@ public class PlayerActivity extends Activity implements Player.Listener {
         mSelectedMovie = (Movie) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
     }
 
-    private void setPosition(int position) {
-        if (position > mDuration) {
-            mPosition = (int) mDuration;
-        } else if (position < 0) {
-            mPosition = 0;
-            mStartTimeMillis = System.currentTimeMillis();
-        } else {
-            mPosition = position;
-        }
-        mStartTimeMillis = System.currentTimeMillis();
-        Log.d(TAG, "position set to " + mPosition);
-    }
-
-    public int getPosition() {
-        return mPosition;
-    }
-
     private void startVideoPlayer() {
         Bundle bundle = getIntent().getExtras();
 
-        if( mSelectedMovie == null || bundle == null )
+        if(mSelectedMovie == null || bundle == null) {
             return;
+        }
 
-        mPosition = bundle.getInt(EXTRA_START_POSITION, 0);
+        //mPosition = bundle.getInt(EXTRA_START_POSITION, 0);
 
         mPlayer.openRecording(mSelectedMovie.getId());
-        mDuration = (int)mSelectedMovie.getDuration() * 1000;
+        mControls.togglePlayback(true);
+    }
+
+    public int getCurrentTime() {
+        return (int)(mPlayer.getCurrentPositionWallclock() - mPlayer.getStartPositionWallclock());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mPlayer.pause();
     }
 
     @Override
@@ -103,34 +73,18 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        mPlaybackState = playbackState;
     }
 
     public void playPause(boolean doPlay) {
-        if (doPlay) {
-            mPlayer.play();
-            mStartTimeMillis = System.currentTimeMillis();
-        }
-        else {
-
-            int timeElapsedSinceStart = (int) (System.currentTimeMillis() - mStartTimeMillis);
-            setPosition(mPosition + timeElapsedSinceStart);
-            mPlayer.pause();
-        }
+        mPlayer.pause(!doPlay);
     }
 
-    public void fastForward() {
-        if (mDuration != -1) {
-            // Fast forward 10 seconds.
-            setPosition((int)mPlayer.getCurrentPosition() + (10 * 1000));
-            mPlayer.seekTo(mPosition);
-        }
+    public void fastForward(int timeMs) {
+        mPlayer.seekTo(mPlayer.getCurrentPositionWallclock() + timeMs);
     }
 
-    public void rewind() {
-        // rewind 10 seconds
-        setPosition((int)mPlayer.getCurrentPosition() - (10 * 1000));
-        mPlayer.seekTo(mPosition);
+    public void rewind(int timeMs) {
+        mPlayer.seekTo(mPlayer.getCurrentPositionWallclock() - timeMs);
     }
 
     @Override
@@ -143,10 +97,12 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     @Override
     public void onDisconnect() {
+        playPause(false);
     }
 
     @Override
     public void onReconnect() {
+        playPause(true);
     }
 
     @Override

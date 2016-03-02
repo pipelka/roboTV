@@ -24,19 +24,19 @@ import org.xvdr.recordings.model.MovieCollectionLoader;
 import org.xvdr.recordings.presenter.PreferenceCardPresenter;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
-import org.xvdr.robotv.tv.ServerConnection;
+import org.xvdr.robotv.client.Connection;
 
 public class RecordingsFragment extends BrowseFragment {
 
     private final static String TAG = "RecordingsFragment";
 
-    private ServerConnection mConnection;
+    private Connection mConnection;
     private SpinnerFragment mSpinnerFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mConnection = new ServerConnection("roboTV recordings");
+        mConnection = new Connection("roboTV recordings");
     }
 
     @Override
@@ -61,9 +61,8 @@ public class RecordingsFragment extends BrowseFragment {
                 mSpinnerFragment = new SpinnerFragment();
                 getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
 
-                if (!mConnection.open(SetupUtils.getServer(getActivity()))) {
+                if(!mConnection.open(SetupUtils.getServer(getActivity()))) {
                     Log.e(TAG, "unable to open connection");
-                    return;
                 }
 
             }
@@ -74,6 +73,7 @@ public class RecordingsFragment extends BrowseFragment {
                 setupPreferences(adapter);
 
                 FragmentManager fragmentManager = getFragmentManager();
+
                 if(fragmentManager != null) {
                     getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
                 }
@@ -81,21 +81,21 @@ public class RecordingsFragment extends BrowseFragment {
         });
     }
 
-    private void setupPreferences( ArrayObjectAdapter adapter ) {
+    private void setupPreferences(ArrayObjectAdapter adapter) {
         if(adapter == null) {
             return;
         }
 
-        HeaderItem gridHeader = new HeaderItem( adapter.size(), "Preferences" );
+        HeaderItem gridHeader = new HeaderItem(adapter.size(), "Preferences");
         PreferenceCardPresenter mGridPresenter = new PreferenceCardPresenter();
-        ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter( mGridPresenter );
+        ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
         gridRowAdapter.add(getResources().getString(R.string.setup_activity));
         adapter.add(new ListRow(gridHeader, gridRowAdapter));
 
     }
 
     private void setBackground() {
-        BackgroundManager backgroundManager = BackgroundManager.getInstance( getActivity() );
+        BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
         backgroundManager.setColor(getResources().getColor(R.color.recordings_background));
     }
@@ -113,7 +113,7 @@ public class RecordingsFragment extends BrowseFragment {
     }
 
     private void setupEventListeners() {
-        setOnItemViewClickedListener( getDefaultItemClickedListener() );
+        setOnItemViewClickedListener(getDefaultItemClickedListener());
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,16 +125,17 @@ public class RecordingsFragment extends BrowseFragment {
     protected OnItemViewClickedListener getDefaultItemClickedListener() {
         return new OnItemViewClickedListener() {
             @Override
-            public void onItemClicked( Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row ) {
-                if( item instanceof Movie ) {
+            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
+                if(item instanceof Movie) {
                     Movie movie = (Movie) item;
-                    Intent intent = new Intent( getActivity(), DetailsActivity.class );
-                    intent.putExtra( VideoDetailsFragment.EXTRA_MOVIE, movie );
-                    startActivity( intent );
-                } else if( item instanceof String ) {
-                    if( ((String) item).equalsIgnoreCase( getString( R.string.setup_activity) ) ) {
-                        Intent intent = new Intent( getActivity(), org.xvdr.robotv.setup.SetupActivity.class );
-                        startActivity( intent );
+                    Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                    intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
+                    startActivity(intent);
+                }
+                else if(item instanceof String) {
+                    if(((String) item).equalsIgnoreCase(getString(R.string.setup_activity))) {
+                        Intent intent = new Intent(getActivity(), org.xvdr.robotv.setup.SetupActivity.class);
+                        startActivity(intent);
                     }
                 }
             }
