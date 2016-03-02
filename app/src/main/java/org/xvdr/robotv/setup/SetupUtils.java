@@ -74,11 +74,7 @@ public class SetupUtils {
     }
 
     public static boolean isRefreshRateChangeSupported() {
-        if(Build.MODEL.equals("SHIELD Android TV")) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     public static float getRefreshRate(Context context) {

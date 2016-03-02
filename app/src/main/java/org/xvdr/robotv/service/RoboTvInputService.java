@@ -10,7 +10,6 @@ import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Display;
@@ -32,7 +31,6 @@ import org.xvdr.extractor.Player;
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
-import org.xvdr.robotv.tv.DisplayModeSetter;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 import org.xvdr.robotv.tv.TrackInfoMapper;
@@ -42,8 +40,6 @@ import java.util.List;
 
 public class RoboTvInputService extends TvInputService {
 
-    private DisplayModeSetter mDisplayModeSetter = null;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -52,9 +48,6 @@ public class RoboTvInputService extends TvInputService {
 
         if(SetupUtils.isRefreshRateChangeSupported()) {
             int mRefreshRate = (int)SetupUtils.getRefreshRate(this);
-
-            mDisplayModeSetter = new DisplayModeSetter(this);
-            mDisplayModeSetter.setRefreshRate(mRefreshRate);
         }
     }
 
@@ -69,10 +62,6 @@ public class RoboTvInputService extends TvInputService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        if(mDisplayModeSetter != null) {
-            mDisplayModeSetter.release();
-        }
     }
 
     /**
