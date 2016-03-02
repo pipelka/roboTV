@@ -203,6 +203,10 @@ public class Packet {
     msgexchangeJNI.Packet_print(swigCPtr, this);
   }
 
+  public void skipBuffer(int length) {
+    msgexchangeJNI.Packet_skipBuffer(swigCPtr, this, length);
+  }
+
   public void readBuffer(byte[] BYTE, int offset, int length) {
     msgexchangeJNI.Packet_readBuffer(swigCPtr, this, BYTE, offset, length);
   }

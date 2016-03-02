@@ -147,6 +147,10 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
     }
 
     private int getTypeFromName(String typeName) {
+        if(typeName == null) {
+            return -1;
+        }
+
         for(int i = 0; i < typeMapping.size(); i++) {
             String name = typeMapping.valueAt(i);
 
@@ -191,18 +195,24 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         }
     }
 
-    public synchronized void updateFromPacket(Packet p) {
+    public synchronized void updateFromPacket(final Packet p) {
         if(p.getMsgID() != Connection.XVDR_STREAM_CHANGE) {
             return;
         }
 
         clear();
 
-        while(!p.eop()) {
+        int streamCount = p.getU8();
+        Log.d(TAG, "new streamchange: " + streamCount + " entries");
+
+        for(int i = 0; i < streamCount; i++) {
+            Log.d(TAG, "stream: " + i);
             Stream stream = new Stream();
 
             stream.physicalId = (int)p.getU32();
-            stream.type = getTypeFromName(p.getString());
+            String typeName = p.getString();
+            Log.d(TAG, "type: " + typeName);
+            stream.type = getTypeFromName(typeName);
             stream.content = contentMapping.get(stream.type);
 
             if(stream.content == CONTENT_AUDIO) {
@@ -256,10 +266,6 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
                 continue;
             }
             else if(stream.content == CONTENT_TELETEXT) {
-                stream.language = p.getString();
-                long composition_id = p.getU32();
-                long ancillary_id = p.getU32();
-                stream.identifier = (composition_id & 0xffff) | ((ancillary_id & 0xffff) << 16);
                 continue;
             }
             else {

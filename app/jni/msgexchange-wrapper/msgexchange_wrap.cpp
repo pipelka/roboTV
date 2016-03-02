@@ -612,6 +612,9 @@ namespace Swig {
 #include "msgconnection.h"
 #include "msgsession.h"
 
+SWIGINTERN void MsgPacket_skipBuffer(MsgPacket *self,int length){
+		self->consume(length);
+	}
 SWIGINTERN void MsgPacket_readBuffer(MsgPacket *self,char *BYTE,int offset,int length){
 		uint8_t* buffer_src = self->consume(length);
 		uint8_t* buffer_dst = (uint8_t*)&BYTE[offset];
@@ -1716,6 +1719,19 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1syncPos
   result = (int)MsgPacket::SyncPos;
   jresult = (jint)result; 
   return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1skipBuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  MsgPacket *arg1 = (MsgPacket *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MsgPacket **)&jarg1; 
+  arg2 = (int)jarg2; 
+  MsgPacket_skipBuffer(arg1,arg2);
 }
 
 

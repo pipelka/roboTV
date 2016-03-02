@@ -40,6 +40,10 @@
 
 %extend MsgPacket {
 
+	void skipBuffer(int length) {
+		self->consume(length);
+	}
+
 	void readBuffer(char* BYTE, int offset, int length) {
 		uint8_t* buffer_src = self->consume(length);
 		uint8_t* buffer_dst = (uint8_t*)&BYTE[offset];

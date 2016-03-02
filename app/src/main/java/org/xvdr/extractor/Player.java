@@ -3,7 +3,9 @@ package org.xvdr.extractor;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaCodec;
+import android.media.PlaybackParams;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Surface;
 
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -223,13 +225,6 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mConnection.close();
     }
 
-    public void reset() {
-        mExoPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DISABLED);
-        mExoPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DISABLED);
-        mExoPlayer.setSelectedTrack(1, ExoPlayer.TRACK_DEFAULT);
-        mExoPlayer.setSelectedTrack(0, ExoPlayer.TRACK_DEFAULT);
-    }
-
     public boolean selectAudioTrack(int trackId) {
         return mSampleSource.selectAudioTrack(trackId);
     }
@@ -242,12 +237,26 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         return mSampleSource.getCurrentPositionWallclock();
     }
 
-    public void seekTo(long position) {
-        mExoPlayer.seekTo(position);
+    public void seekTo(long wallclockTimeMs) {
+        mExoPlayer.seekTo(wallclockTimeMs / 1000);
     }
 
     public long getCurrentPosition() {
         return mExoPlayer.getCurrentPosition();
+    }
+
+    public void setPlaybackParams(PlaybackParams params) {
+        int speed = (int) params.getSpeed();
+        Log.d(TAG, "playback speed: " + speed);
+
+        // reverse playback ?
+        if(speed <= 0) {
+            params.setSpeed(1);
+            return;
+        }
+
+        mSampleSource.setPlaybackSpeed(speed);
+        mExoPlayer.sendMessage(mAudioRenderer, MediaCodecAudioTrackRenderer.MSG_SET_PLAYBACK_PARAMS, params);
     }
 
     static public String nameOfChannelConfiguration(int channelConfiguration) {

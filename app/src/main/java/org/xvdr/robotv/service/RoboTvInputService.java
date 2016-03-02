@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Point;
+import android.media.PlaybackParams;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
@@ -201,8 +202,13 @@ public class RoboTvInputService extends TvInputService {
             return mPlayer.getCurrentPositionWallclock();
         }
 
+        @Override
         public void onTimeShiftSeekTo(long timeMs) {
             mPlayer.seekTo(timeMs);
+        }
+
+        @Override
+        public void onTimeShiftSetPlaybackParams(PlaybackParams params) {
         }
 
         private boolean tune(Uri channelUri) {
@@ -406,32 +412,6 @@ public class RoboTvInputService extends TvInputService {
             mLastResetRunnable = null;
         }
 
-        private void scheduleReset() {
-            // only for "SHIELD Android TV"
-            if(!Build.MODEL.equals("SHIELD Android TV")) {
-                return;
-            }
-
-            // schedule player reset
-            Runnable reset = new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "track reset");
-                    doReset();
-                    scheduleReset();
-                }
-            };
-
-            cancelReset();
-
-            mHandler.postDelayed(reset, 12 * 60 * 1000); // 12 minutes
-            mLastResetRunnable = reset;
-        }
-
-        private void doReset() {
-            mPlayer.reset();
-        }
-
         @Override
         public void onTracksChanged(StreamBundle bundle) {
             final List<TvTrackInfo> tracks = new ArrayList<>(16);
@@ -479,7 +459,6 @@ public class RoboTvInputService extends TvInputService {
 
             if(stream.height > 720 && stream.height <= 1080) {
                 values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_1080I);
-                scheduleReset();
             }
             else if(stream.height == 2160) {
                 values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_2160P);
@@ -501,9 +480,6 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onAudioTrackUnderrun(int i, long l, long l1) {
             Log.e(TAG, "audio track underrun");
-            /*cancelReset();
-            doReset();
-            scheduleReset();*/
         }
     }
 }

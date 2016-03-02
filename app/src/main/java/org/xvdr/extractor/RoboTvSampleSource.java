@@ -24,21 +24,6 @@ import java.io.IOException;
 
 public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSourceReader, Session.Callback, Loader.Callback {
 
-    @Override
-    public void onLoadCanceled(Loader.Loadable loadable) {
-
-    }
-
-    @Override
-    public void onLoadCompleted(Loader.Loadable loadable) {
-
-    }
-
-    @Override
-    public void onLoadError(Loader.Loadable loadable, IOException e) {
-
-    }
-
     public interface Listener {
 
         void onTracksChanged(StreamBundle streamBundle);
@@ -76,7 +61,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             }
         }
     }
+
     final static private String TAG = "RoboTvSampleSource";
+
     final static private int TRACK_COUNT = 3;
     final static private int TRACK_VIDEO = 0;
     final static private int TRACK_AUDIO = 1;
@@ -88,20 +75,26 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     private Listener mListener;
     private Handler mHandler;
     private PtsTimestampAdjuster mTimestampAdjuster;
+    private PlaybackSpeedAdjuster mPlaybackAdjuster;
+    private Loader mLoader;
+
     private boolean mAudioPassthrough;
 
     private int mTrackCount = 0;
+    private int mTracksEnabledCount = 0;
     private long mLargestParsedTimestampUs = Long.MIN_VALUE;
-    private long streamPositionUs;
+    private long mStreamPositionUs;
+    private long mLastSeekPositionUs = 0;
     private int mChannelConfiguration;
 
-    private Loader mLoader;
-    private long mCurrentPosition;
-    private long mStartPosition;
+    private long mCurrentPositionTimeshift;
+    private long mStartPositionTimeshift;
+    private long mSeekPosition = -1;
 
     final private int[] mPids = new int[TRACK_COUNT];
     final private boolean[] mNeedFormatChange = new boolean[TRACK_COUNT];
     final private PacketQueue[] mOutputTracks = new PacketQueue[TRACK_COUNT];
+    private boolean[] mPendingDiscontinuities = new boolean[TRACK_COUNT];
 
     final private SparseArray<StreamReader> mStreamReaders = new SparseArray(TRACK_COUNT);
     final private SparseBooleanArray mTrackEnabled = new SparseBooleanArray(TRACK_COUNT);
@@ -134,18 +127,21 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mChannelConfiguration = channelConfiguration;
 
         mTimestampAdjuster = new PtsTimestampAdjuster(PtsTimestampAdjuster.DO_NOT_OFFSET);
-        mStartPosition = System.currentTimeMillis();
-        mCurrentPosition = mStartPosition;
+        mPlaybackAdjuster = new PlaybackSpeedAdjuster();
+
+        mStartPositionTimeshift = System.currentTimeMillis();
+        mCurrentPositionTimeshift = mStartPositionTimeshift;
 
         // create output tracks
         for(int i = 0; i < TRACK_COUNT; i++) {
             mOutputTracks[i] = new PacketQueue();
+            mPendingDiscontinuities[i] = false;
         }
 
         mAudioCapabilities = audioCapabilities;
 
         mLoader = new Loader("roboTV:streamloader");
-        mAllocator = new AdaptiveAllocator(10, 16 * 1024);
+        mAllocator = new AdaptiveAllocator(200, 32 * 1024);
 
         logChannelConfiguration(mAudioPassthrough, mChannelConfiguration);
     }
@@ -211,27 +207,42 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         Log.d(TAG, "enable track: " + track);
         mTrackEnabled.put(track, true);
         mNeedFormatChange[track] = true;
-        streamPositionUs = positionUs;
-        startLoading();
+        mStreamPositionUs = positionUs;
+
+        mTracksEnabledCount++;
+
+        if(mTracksEnabledCount == 1) {
+            startLoading();
+        }
     }
 
     // false - continue buffering
     // true - playback
     @Override
     public boolean continueBuffering(int track, long positionUs) {
-        streamPositionUs = positionUs;
+        mStreamPositionUs = positionUs;
 
         return !mOutputTracks[track].isEmpty();
     }
 
     @Override
     public long readDiscontinuity(int track) {
+        if(mPendingDiscontinuities[track]) {
+            Log.d(TAG, "discontinuity read: track " + track);
+            mPendingDiscontinuities[track] = false;
+            return mLastSeekPositionUs;
+        }
+
         return SampleSource.NO_DISCONTINUITY;
     }
 
     @Override
     public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder) {
-        streamPositionUs = positionUs;
+        if(mPendingDiscontinuities[track]) {
+            return NOTHING_READ;
+        }
+
+        mStreamPositionUs = positionUs;
 
         // get output track
         PacketQueue outputTrack = mOutputTracks[track];
@@ -269,7 +280,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
             Allocation buffer = p.buffer;
 
-            sampleHolder.timeUs = p.timeUs;
+            // adpapt timestamps for playback speed
+            sampleHolder.timeUs = mPlaybackAdjuster.adjustTimestamp(p.timeUs);
             sampleHolder.flags = p.flags;
             sampleHolder.size = buffer.length();
 
@@ -284,33 +296,34 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     }
 
     @Override
-    public void seekToUs(long positionUs) {
-        Log.d(TAG, "seekToUs: " + positionUs);
-
-        // empty packet queue
-        /*for(int i = 0; i < TRACK_COUNT; i++) {
-            mOutputTracks[i].clear();
+    public void seekToUs(long wallclockTimeMs) {
+        if(mSeekPosition == wallclockTimeMs) {
+            return;
         }
 
-        streamPositionUs = positionUs;
-        mLargestParsedTimestampUs = Long.MIN_VALUE;*/
+        Log.d(TAG, "seek to timestamp: " + wallclockTimeMs);
+        Log.d(TAG, "current timestamp: " + mCurrentPositionTimeshift);
+        Log.d(TAG, "seekbuffer start : " + mStartPositionTimeshift);
+        Log.d(TAG, "seek difference  : " + (wallclockTimeMs - mCurrentPositionTimeshift) + " ms");
+
+        mSeekPosition = wallclockTimeMs;
+        mCurrentPositionTimeshift = mSeekPosition;
+
+        stopLoading();
     }
 
     @Override
     public long getBufferedPositionUs() {
-        return (mLargestParsedTimestampUs == Long.MIN_VALUE) ? streamPositionUs : mLargestParsedTimestampUs;
-    }
-
-    public long getStreamPositionUs() {
-        return streamPositionUs;
+        return (mLargestParsedTimestampUs == Long.MIN_VALUE) ? mStreamPositionUs : mLargestParsedTimestampUs;
     }
 
     @Override
     public void disable(int track) {
         Log.d(TAG, "disable track: " + track);
         mTrackEnabled.put(track, false);
+        mTracksEnabledCount--;
 
-        if(!mTrackEnabled.get(0) && !mTrackEnabled.get(1)) {
+        if(mTracksEnabledCount == 0) {
             stopLoading();
         }
     }
@@ -328,20 +341,22 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     @Override
     public void onNotification(Packet packet) {
-        switch(packet.getMsgID()) {
+        int id = packet.getMsgID();
+
+        switch(id) {
             case Connection.XVDR_STREAM_POSITIONS:
                 long p  = packet.getS64();
 
                 // sanity check
-                if(p < mCurrentPosition) {
-                    mStartPosition = p;
+                if(p < mCurrentPositionTimeshift) {
+                    mStartPositionTimeshift = p;
                 }
 
                 break;
-        };
+        }
     }
 
-    public void writePacket(Packet packet) {
+    public void writePacket(final Packet packet) {
         switch(packet.getMsgID()) {
             case Connection.XVDR_STREAM_CHANGE:
                 final StreamBundle newBundle = new StreamBundle();
@@ -499,16 +514,27 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         return -1;
     }
 
-    private void writeData(Packet p) {
+    private void skipPacketData(final Packet p) {
+        p.getS64(); // pts
+        p.getS64(); // dts
+        p.getU32(); // duration
+        int length = (int) p.getU32();
+        p.skipBuffer(length);
+        p.getS64(); // current timestamp
+    }
+
+    private void writeData(final Packet p) {
         // read pid of packet
         int pid = p.getU16();
         int track = findSampleReaderIndex(pid);
 
         if(track == -1) {
+            skipPacketData(p);
             return;
         }
 
         if(mTrackEnabled.size() != 0 && !mTrackEnabled.get(track, false)) {
+            skipPacketData(p);
             return;
         }
 
@@ -520,11 +546,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         long dts = p.getS64(); // dts
         p.getU32(); // duration
         int length = (int) p.getU32();
-
-        // skip empty packet
-        if(length == 0) {
-            return;
-        }
 
         // adjust first timestamp
         if(!mTimestampAdjuster.isInitialized()) {
@@ -544,8 +565,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         long pos = p.getS64(); // current timestamp
 
         // sanity check
-        if(pos > mStartPosition) {
-            mCurrentPosition = pos;
+        if(pos > mStartPositionTimeshift) {
+            mCurrentPositionTimeshift = pos;
         }
 
         // push buffer to reader
@@ -602,22 +623,96 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     }
 
     protected boolean requestPacket() {
-        Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
-        Packet resp = mConnection.transmitMessage(req);
+        final Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        final Packet resp = mConnection.transmitMessage(req);
 
         if(resp == null || resp.eop()) {
+            if(resp != null) {
+                resp.delete();
+            }
+
+            req.delete();
             return false;
         }
 
-        writePacket(resp);
+        // process all the packets in the packet
+        while(!resp.eop()) {
+            int msgId = resp.getU16();
+            int clientId = resp.getU16();
+            resp.setMsgID(msgId);
+            resp.setClientID(clientId);
+
+            if(resp.eop()) {
+                Log.d(TAG, "error in packet skipping");
+                return false;
+            }
+
+            writePacket(resp);
+        }
+
+        resp.delete();
+        req.delete();
+
         return true;
     }
 
     public long getStartPositionWallclock() {
-        return mStartPosition;
+        return mStartPositionTimeshift;
     }
 
     public long getCurrentPositionWallclock() {
-        return mCurrentPosition;
+        return mCurrentPositionTimeshift;
     }
+
+    public void setPlaybackSpeed(int speed) {
+        mPlaybackAdjuster.setSpeed(speed, mStreamPositionUs);
+    }
+
+    // Loader callback
+
+    @Override
+    public void onLoadCanceled(Loader.Loadable loadable) {
+        if(mSeekPosition != -1) {
+            // set seek pointer
+            Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_SEEK, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+            req.putS64(mSeekPosition);
+
+            Packet resp = mConnection.transmitMessage(req);
+
+            if(resp == null) {
+                mSeekPosition = -1;
+                startLoading();
+                return;
+            }
+
+            mLastSeekPositionUs = mTimestampAdjuster.adjustTimestamp(resp.getS64());
+            Log.d(TAG, "seek to position us: " + mLastSeekPositionUs);
+
+            mCurrentPositionTimeshift = mSeekPosition;
+            mLargestParsedTimestampUs = Long.MIN_VALUE;
+
+            // empty packet queue
+            for(int i = 0; i < TRACK_COUNT; i++) {
+                mPendingDiscontinuities[i] = true;
+                mOutputTracks[i].clear();
+            }
+
+            mSeekPosition = -1;
+            startLoading();
+            return;
+        }
+
+        if(mTracksEnabledCount > 0) {
+            startLoading();
+        }
+    }
+
+    @Override
+    public void onLoadCompleted(Loader.Loadable loadable) {
+    }
+
+    @Override
+    public void onLoadError(Loader.Loadable loadable, IOException e) {
+    }
+
 }
