@@ -65,9 +65,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     final static private String TAG = "RoboTvSampleSource";
 
     final static private int TRACK_COUNT = 3;
-    final static private int TRACK_VIDEO = 0;
-    final static private int TRACK_AUDIO = 1;
-    final static private int TRACK_SUBTITLE = 2;
+    final static public int TRACK_VIDEO = 0;
+    final static public int TRACK_AUDIO = 1;
+    final static public int TRACK_SUBTITLE = 2;
 
     private AdaptiveAllocator mAllocator;
     private Connection mConnection;
@@ -624,6 +624,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     protected boolean requestPacket() {
         final Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+
+        boolean keyFrameMode = mPlaybackAdjuster.getSpeed() > 2;
+        req.putU8(keyFrameMode ? (short)1 : (short)0);
+
         final Packet resp = mConnection.transmitMessage(req);
 
         if(resp == null || resp.eop()) {

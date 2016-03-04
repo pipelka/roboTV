@@ -198,6 +198,7 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onTimeShiftSetPlaybackParams(PlaybackParams params) {
+            mPlayer.setPlaybackSpeed((int)params.getSpeed());
         }
 
         private boolean tune(Uri channelUri) {
@@ -260,10 +261,6 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
-
-            if(playbackState != ExoPlayer.STATE_READY) {
-                toastTuning(playbackState);
-            }
         }
 
         // Listener implementation

@@ -57,7 +57,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     private static final int RENDERER_COUNT = 2;
     protected static final int MIN_BUFFER_MS = 1000;
-    protected static final int MIN_REBUFFER_MS = 3000;
+    protected static final int MIN_REBUFFER_MS = 2000;
 
     private static final int RENDERER_VIDEO = 0;
     private static final int RENDERER_AUDIO = 1;
@@ -172,6 +172,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
         mConnection.transmitMessage(req);
 
+        setPlaybackSpeed(1);
         mExoPlayer.setPlayWhenReady(!on);
     }
 
@@ -245,18 +246,22 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         return mExoPlayer.getCurrentPosition();
     }
 
-    public void setPlaybackParams(PlaybackParams params) {
-        int speed = (int) params.getSpeed();
+    public void setPlaybackSpeed(int speed) {
         Log.d(TAG, "playback speed: " + speed);
 
         // reverse playback ?
-        if(speed <= 0) {
-            params.setSpeed(1);
+        if(speed < 0) {
             return;
         }
 
-        mSampleSource.setPlaybackSpeed(speed);
-        mExoPlayer.sendMessage(mAudioRenderer, MediaCodecAudioTrackRenderer.MSG_SET_PLAYBACK_PARAMS, params);
+        if(speed == 1) {
+            mExoPlayer.setSelectedTrack(RoboTvSampleSource.TRACK_AUDIO, ExoPlayer.TRACK_DEFAULT);
+        }
+        else {
+            mExoPlayer.setSelectedTrack(RoboTvSampleSource.TRACK_AUDIO, ExoPlayer.TRACK_DISABLED);
+        }
+
+        mSampleSource.setPlaybackSpeed((int)speed);
     }
 
     static public String nameOfChannelConfiguration(int channelConfiguration) {
