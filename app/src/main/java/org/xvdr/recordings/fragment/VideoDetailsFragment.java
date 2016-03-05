@@ -104,6 +104,9 @@ public class VideoDetailsFragment extends DetailsFragment {
                                     .get();
                     row.setImageBitmap(getActivity(), poster);
                 }
+                else {
+                    row.setImageDrawable( getResources().getDrawable(R.drawable.recording_unkown, null));
+                }
             }
             catch(Exception e) {
             }
