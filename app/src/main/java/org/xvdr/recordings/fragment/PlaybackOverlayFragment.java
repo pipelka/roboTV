@@ -240,6 +240,8 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                         mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
                     }
 
+                    ((PlayerActivity)getActivity()).updatePlaybackState();
+
                     mHandler.postDelayed(this, updatePeriod);
                 }
             };
@@ -277,6 +279,10 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         mPlaybackControlsRow.setCurrentTime(currentTime);
         mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
 
+    }
+
+    public int getPlaybackState() {
+        return mCurrentPlaybackState;
     }
 
     private int getCurrentTime() {

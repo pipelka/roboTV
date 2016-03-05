@@ -1,9 +1,18 @@
 package org.xvdr.recordings.activity;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.media.MediaMetadata;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.view.Surface;
 import android.view.SurfaceView;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.xvdr.extractor.Player;
 import org.xvdr.extractor.RecordingPlayer;
@@ -24,6 +33,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
     private PlaybackOverlayFragment mControls;
     private SurfaceView mVideoView;
     private Movie mSelectedMovie;
+    private MediaSession mSession;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,17 +42,72 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
         mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
         mPlayer = new RecordingPlayer(this, SetupUtils.getServer(this), SetupUtils.getLanguageISO3(this), this);
+
+        mSession = new MediaSession(this, "roboTV Movie");
+        mSession.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
         initViews();
-        startVideoPlayer();
+        startPlayback();
+    }
+
+    private void updateMetadata(Movie movie) {
+        final MediaMetadata.Builder metadataBuilder = new MediaMetadata.Builder();
+
+        metadataBuilder
+        .putLong(MediaMetadata.METADATA_KEY_DURATION, mSelectedMovie.getDuration() * 1000)
+        .putString(MediaMetadata.METADATA_KEY_TITLE, movie.getTitle())
+        .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, movie.getOutline())
+        .putString(MediaMetadata.METADATA_KEY_DISPLAY_DESCRIPTION, movie.getDescription());
+
+        String url = movie.getCardImageUrl();
+
+        if(url != null && !url.isEmpty()) {
+            Picasso
+            .with(this)
+            .load(movie.getBackgroundImageUrl())
+            .resize(266, 400)
+            .centerCrop()
+            .into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap);
+                    MediaMetadata m = metadataBuilder.build();
+                    mSession.setMetadata(m);
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                }
+            });
+            return;
+        }
+
+        metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, BitmapFactory.decodeResource(getResources(), R.drawable.recording_unkown));
+        mSession.setMetadata(metadataBuilder.build());
+    }
+
+    public void updatePlaybackState() {
+        long position = getCurrentTime();
+
+        PlaybackState.Builder stateBuilder = new PlaybackState.Builder();
+        stateBuilder.setState(mControls.getPlaybackState(), position, 1.0f);
+
+        mSession.setPlaybackState(stateBuilder.build());
     }
 
     private void initViews() {
         mVideoView = (SurfaceView) findViewById(R.id.videoView);
         mPlayer.setSurface(mVideoView.getHolder().getSurface());
         mSelectedMovie = (Movie) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
+
+        updateMetadata(mSelectedMovie);
     }
 
-    private void startVideoPlayer() {
+    private void startPlayback() {
         Bundle bundle = getIntent().getExtras();
 
         if(mSelectedMovie == null || bundle == null) {
@@ -53,17 +118,21 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
         mPlayer.openRecording(mSelectedMovie.getId());
         mControls.togglePlayback(true);
+
+        if(!mSession.isActive()) {
+            mSession.setActive(true);
+        }
     }
 
     public int getCurrentTime() {
-        return (int)(mPlayer.getCurrentPositionWallclock() - mPlayer.getStartPositionWallclock());
+        return Math.max((int)(mPlayer.getCurrentPositionWallclock() - mPlayer.getStartPositionWallclock()), 0);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        if (!requestVisibleBehind(true)) {
+        if(!requestVisibleBehind(true)) {
             stopPlayback();
         }
     }
@@ -87,6 +156,10 @@ public class PlayerActivity extends Activity implements Player.Listener {
     protected void stopPlayback() {
         if(mPlayer == null) {
             return;
+        }
+
+        if(mSession.isActive()) {
+            mSession.setActive(false);
         }
 
         mControls.stopProgressAutomation();
