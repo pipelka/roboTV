@@ -30,4 +30,9 @@ public class PlaybackSpeedAdjuster {
 
         return timeUs;
     }
+
+    public void seek(long timeUs) {
+        mOffsetUs = -1;
+        mStartTimeUs = timeUs;
+    }
 }

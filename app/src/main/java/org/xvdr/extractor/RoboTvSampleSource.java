@@ -695,6 +695,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             mCurrentPositionTimeshift = mSeekPosition;
             mLargestParsedTimestampUs = Long.MIN_VALUE;
 
+            mPlaybackAdjuster.seek(mLastSeekPositionUs);
+
             // empty packet queue
             for(int i = 0; i < TRACK_COUNT; i++) {
                 mPendingDiscontinuities[i] = true;
