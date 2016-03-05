@@ -152,6 +152,10 @@ public class Movie implements Serializable {
     }
 
     public Event getEvent() {
+        if(content == 0 || (content & 0x50) == 0x50) {
+            content = 0x10;
+        }
+
         return new Event(content, title, outline, description, duration);
     }
     @Override
