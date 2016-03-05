@@ -11,12 +11,11 @@ import android.support.v17.leanback.widget.Action;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ClassPresenterSelector;
 import android.support.v17.leanback.widget.DetailsOverviewRow;
-import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnActionClickedListener;
+import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
@@ -29,10 +28,6 @@ import org.xvdr.robotv.R;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class VideoDetailsFragment extends DetailsFragment {
 
@@ -111,10 +106,32 @@ public class VideoDetailsFragment extends DetailsFragment {
             catch(Exception e) {
             }
 
-            row.addAction(new Action(ACTION_WATCH, getResources().getString(R.string.watch), null));
-            row.addAction(new Action(ACTION_EDIT, getResources().getString(R.string.edit), null));
-            row.addAction(new Action(ACTION_MOVE, getResources().getString(R.string.move_folder), null));
+            SparseArrayObjectAdapter actions = new SparseArrayObjectAdapter();
 
+            actions.set(0,
+                        new Action(
+                            ACTION_WATCH,
+                            getResources().getString(R.string.watch),
+                            null,
+                            getResources().getDrawable(R.drawable.ic_play_arrow_white_48dp, null)
+                        )
+                       );
+            actions.set(1,
+                        new Action(
+                            ACTION_EDIT,
+                            getResources().getString(R.string.change_cover),
+                            null
+                        )
+                       );
+            actions.set(2,
+                        new Action(
+                            ACTION_MOVE,
+                            getResources().getString(R.string.move_folder),
+                            null
+                        )
+                       );
+
+            row.setActionsAdapter(actions);
             return row;
         }
 
@@ -154,21 +171,7 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         private void loadRelatedMedia(ArrayObjectAdapter adapter) {
 
-            /*String json = Utils.loadJSONFromResource( getActivity(), R.raw.movies );
-            Gson gson = new Gson();
-            Type collection = new TypeToken<ArrayList<Movie>>(){}.getType();
-            List<Movie> movies = gson.fromJson( json, collection );
-            List<Movie> related = new ArrayList<>();
-            for( Movie movie : movies ) {
-                if( movie.getCategory().equals( mSelectedMovie.getCategory() ) ) {
-                    related.add( movie );
-                }
-            }
-
-            if( related.isEmpty() )
-                return;
-
-            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter( new CardPresenter() );
+            /*ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter( new CardPresenter() );
             for( Movie movie : related ) {
                 listRowAdapter.add( movie );
             }
