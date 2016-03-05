@@ -247,7 +247,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         }
     }
 
-    private void stopProgressAutomation() {
+    public void stopProgressAutomation() {
         if(mHandler != null && mRunnable != null) {
             mHandler.removeCallbacks(mRunnable);
             mRunnable = null;

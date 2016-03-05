@@ -62,17 +62,39 @@ public class PlayerActivity extends Activity implements Player.Listener {
     @Override
     protected void onPause() {
         super.onPause();
+
+        if (!requestVisibleBehind(true)) {
+            stopPlayback();
+        }
+    }
+
+    @Override
+    public void onVisibleBehindCanceled() {
+        // App-specific method to stop playback and release resources
+        super.onVisibleBehindCanceled();
+        stopPlayback();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mPlayer.stop();
-        mPlayer.release();
     }
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+    }
+
+    protected void stopPlayback() {
+        if(mPlayer == null) {
+            return;
+        }
+
+        mControls.stopProgressAutomation();
+        mPlayer.stop();
+        mPlayer.release();
+        mPlayer = null;
+
+        finishAndRemoveTask();
     }
 
     public void playPause(boolean doPlay) {
