@@ -247,6 +247,10 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     public void setPlaybackSpeed(int speed) {
+        if(speed == mSampleSource.getPlaybackSpeed()) {
+            return;
+        }
+
         Log.d(TAG, "playback speed: " + speed);
 
         // reverse playback ?

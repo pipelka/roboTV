@@ -7,7 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class PacketQueue extends LinkedBlockingQueue<PacketQueue.PacketHolder> {
 
     final private static String TAG = "PacketQueue";
-    final private static int mMaxQueueSize = 200;
+    final private static int mMaxQueueSize = 400;
 
     private MediaFormat mFormat;
 

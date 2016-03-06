@@ -672,6 +672,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mPlaybackAdjuster.setSpeed(speed, mStreamPositionUs);
     }
 
+    public int getPlaybackSpeed() {
+        return mPlaybackAdjuster.getSpeed();
+    }
+
     // Loader callback
 
     @Override
