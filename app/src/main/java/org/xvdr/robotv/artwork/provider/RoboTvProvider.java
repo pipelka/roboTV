@@ -27,6 +27,11 @@ public class RoboTvProvider extends SimpleArtworkProvider {
         req.putU32(event.getContentId());
 
         Packet resp = mConnection.transmitMessage(req);
+
+        if(resp == null) {
+            return null;
+        }
+
         String posterUrl = resp.getString();
         String backgroundUrl = resp.getString();
 

@@ -44,7 +44,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
         mPlayer = new RecordingPlayer(this, SetupUtils.getServer(this), SetupUtils.getLanguageISO3(this), this);
 
         mSession = new MediaSession(this, "roboTV Movie");
-        mSession.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         initViews();
         startPlayback();
@@ -114,14 +114,11 @@ public class PlayerActivity extends Activity implements Player.Listener {
             return;
         }
 
-        //mPosition = bundle.getInt(EXTRA_START_POSITION, 0);
-
-        mPlayer.openRecording(mSelectedMovie.getId());
+        String id = mSelectedMovie.getId();
+        mPlayer.openRecording(id, true);
         mControls.togglePlayback(true);
 
-        if(!mSession.isActive()) {
-            mSession.setActive(true);
-        }
+        mSession.setActive(true);
     }
 
     public int getCurrentTime() {
@@ -154,15 +151,15 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     protected void stopPlayback() {
+        mSession.setActive(false);
+
         if(mPlayer == null) {
             return;
         }
 
-        if(mSession.isActive()) {
-            mSession.setActive(false);
-        }
-
         mControls.stopProgressAutomation();
+
+        mPlayer.setLastPosition(getCurrentTime());
         mPlayer.stop();
         mPlayer.release();
         mPlayer = null;
