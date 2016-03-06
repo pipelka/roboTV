@@ -11,7 +11,7 @@ public class Channels extends ArrayList<Channels.Entry> {
     }
 
     public class Entry {
-        public long number = 0;
+        public int number = 0;
         public String name;
         public int uid = 0;
         public int caid = 0;
@@ -48,7 +48,7 @@ public class Channels extends ArrayList<Channels.Entry> {
 
         while(!resp.eop()) {
             Entry e = new Entry();
-            e.number = resp.getU32();
+            e.number = (int)resp.getU32();
             e.name = resp.getString();
             e.uid = (int) resp.getU32();
             e.caid = (int) resp.getU32();

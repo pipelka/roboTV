@@ -241,7 +241,6 @@ public class ChannelSyncAdapter {
         list.load(mConnection, language);
 
         int i = 0;
-        int index = 0;
 
         for(Channels.Entry entry : list) {
             Uri channelUri;
@@ -251,7 +250,7 @@ public class ChannelSyncAdapter {
             ContentValues values = new ContentValues();
             values.put(TvContract.Channels.COLUMN_INPUT_ID, mInputId);
 
-            values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, Integer.toString(++index));
+            values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, Integer.toString(entry.number));
             values.put(TvContract.Channels.COLUMN_DISPLAY_NAME, entry.name);
             values.put(TvContract.Channels.COLUMN_SERVICE_ID, 0);
             values.put(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID, 0);
