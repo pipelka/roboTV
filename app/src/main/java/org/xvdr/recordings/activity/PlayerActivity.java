@@ -41,7 +41,14 @@ public class PlayerActivity extends Activity implements Player.Listener {
         setContentView(R.layout.activity_player);
 
         mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
-        mPlayer = new RecordingPlayer(this, SetupUtils.getServer(this), SetupUtils.getLanguageISO3(this), this);
+        mPlayer = new RecordingPlayer(
+            this,
+            SetupUtils.getServer(this),
+            SetupUtils.getLanguageISO3(this),
+            this,
+            SetupUtils.getPassthrough(this),
+            SetupUtils.getSpeakerConfiguration(this)
+        );
 
         mSession = new MediaSession(this, "roboTV Movie");
         mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -54,7 +61,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
         final MediaMetadata.Builder metadataBuilder = new MediaMetadata.Builder();
 
         metadataBuilder
-        .putLong(MediaMetadata.METADATA_KEY_DURATION, mSelectedMovie.getDuration() * 1000)
+        .putLong(MediaMetadata.METADATA_KEY_DURATION, mSelectedMovie.getDurationMs() * 1000)
         .putString(MediaMetadata.METADATA_KEY_TITLE, movie.getTitle())
         .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, movie.getOutline())
         .putString(MediaMetadata.METADATA_KEY_DISPLAY_DESCRIPTION, movie.getDescription());
@@ -125,6 +132,22 @@ public class PlayerActivity extends Activity implements Player.Listener {
         return Math.max((int)(mPlayer.getCurrentPositionWallclock() - mPlayer.getStartPositionWallclock()), 0);
     }
 
+    public int getTotalTime() {
+        if(mSelectedMovie == null) {
+            return 0;
+        }
+
+        if(mPlayer == null) {
+            return (int)mSelectedMovie.getDurationMs();
+        }
+
+        if(mPlayer.getEndPositionWallclock() == -1) {
+            return mPlayer.getDurationMs();
+        }
+
+        return (int)(mPlayer.getEndPositionWallclock() - mPlayer.getStartPositionWallclock());
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -152,6 +175,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     protected void stopPlayback() {
         mSession.setActive(false);
+        mSession.release();
 
         if(mPlayer == null) {
             return;

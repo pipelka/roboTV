@@ -99,12 +99,12 @@ public class Movie implements Serializable {
         return timeStamp;
     }
 
-    public void setDuration(int duration) {
+    public void setDurationMs(int duration) {
         this.duration = duration;
     }
 
-    public long getDuration() {
-        return duration;
+    public long getDurationMs() {
+        return duration * 1000;
     }
 
     public void setId(String id) {

@@ -173,7 +173,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     private void addPlaybackControlsRow() {
         mPlaybackControlsRow = new PlaybackControlsRow(mSelectedMovie);
 
-        mPlaybackControlsRow.setTotalTime((int) mSelectedMovie.getDuration() * 1000);
+        mPlaybackControlsRow.setTotalTime(getTotalDurationMs());
         mPlaybackControlsRow.setCurrentTime(0);
         mPlaybackControlsRow.setBufferedProgress(0);
 
@@ -214,30 +214,30 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         updateVideoImage(mSelectedMovie.getCardImageUrl());
     }
 
-    private int getUpdatePeriod() {
-        return DEFAULT_UPDATE_PERIOD;
-    }
-
     private void startProgressAutomation() {
         if(mRunnable == null) {
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    int updatePeriod = getUpdatePeriod();
                     int currentTime = getCurrentTime();
-                    int totalTime = mPlaybackControlsRow.getTotalTime();
+                    int totalTime = getTotalDurationMs();
 
                     if(currentTime <= totalTime) {
+                        int oldTotalTime = mPlaybackControlsRow.getTotalTime();
+                        mPlaybackControlsRow.setTotalTime(totalTime);
                         mPlaybackControlsRow.setCurrentTime(currentTime);
-                        mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
+
+                        if(oldTotalTime != totalTime) {
+                            mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
+                        }
                     }
 
                     ((PlayerActivity)getActivity()).updatePlaybackState();
 
-                    mHandler.postDelayed(this, updatePeriod);
+                    mHandler.postDelayed(this, DEFAULT_UPDATE_PERIOD);
                 }
             };
-            mHandler.postDelayed(mRunnable, getUpdatePeriod());
+            mHandler.post(mRunnable);
         }
     }
 
@@ -249,6 +249,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
     public void playbackStateChanged() {
+        mPlaybackControlsRow.setTotalTime(getTotalDurationMs());
 
         if(mCurrentPlaybackState != PlaybackState.STATE_PLAYING) {
             mCurrentPlaybackState = PlaybackState.STATE_PLAYING;
@@ -286,6 +287,18 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
         return activity.getCurrentTime();
     }
+
+    private int getTotalDurationMs() {
+        PlayerActivity activity = (PlayerActivity) getActivity();
+
+        if(activity == null) {
+            return 0;
+        }
+
+        int total = activity.getTotalTime();
+        return total;
+    }
+
     private void notifyChanged(Action action) {
         ArrayObjectAdapter adapter = mPrimaryActionAdapter;
 

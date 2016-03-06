@@ -8,7 +8,7 @@ import org.xvdr.robotv.client.Connection;
 public class LiveTvPlayer extends Player {
 
     public LiveTvPlayer(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) {
-        super(context, server, language, listener, audioPassthrough, wantedChannelConfiguration);
+        super(context, server, language, listener, audioPassthrough, wantedChannelConfiguration, 400);
     }
 
     /**

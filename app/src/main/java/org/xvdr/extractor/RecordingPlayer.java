@@ -16,8 +16,8 @@ public class RecordingPlayer extends Player {
     private long mLengthInBytes = 0;
     private String mRecordingId;
 
-    public RecordingPlayer(Context context, String server, String language, Listener listener) {
-        super(context, server, language, listener);
+    public RecordingPlayer(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) {
+        super(context, server, language, listener, audioPassthrough, wantedChannelConfiguration, 100);
     }
 
     public int openRecording(String recordingId, boolean startAtLastPosition) {
@@ -98,4 +98,10 @@ public class RecordingPlayer extends Player {
 
         mConnection.transmitMessage(req);
     }
+
+    public int getDurationMs() {
+        return mDurationInMs;
+    }
+
+
 }

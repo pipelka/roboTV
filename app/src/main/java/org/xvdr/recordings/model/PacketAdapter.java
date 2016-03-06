@@ -2,10 +2,6 @@ package org.xvdr.recordings.model;
 
 import org.xvdr.msgexchange.Packet;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class PacketAdapter {
     static String mSeriesFolder = "Serien";
 
@@ -13,7 +9,7 @@ public class PacketAdapter {
         Movie movie = new Movie();
 
         movie.setTimeStamp(p.getU32() * 1000L);
-        movie.setDuration((int)p.getU32());
+        movie.setDurationMs((int)p.getU32());
         p.getU32(); // Priority
         p.getU32(); // Lifetime
         movie.setChannelName(p.getString()); // ChannelName

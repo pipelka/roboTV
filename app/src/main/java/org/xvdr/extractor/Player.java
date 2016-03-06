@@ -78,21 +78,23 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     private AudioCapabilities mAudioCapabilities;
     private boolean mAudioPassthrough;
     private int mChannelConfiguration;
+    private int mQueueSize = 400;
 
     public Player(Context context, String server, String language, Listener listener) {
-        this(context, server, language, listener, false, CHANNELS_SURROUND);
+        this(context, server, language, listener, false, CHANNELS_SURROUND, 400);
     }
 
     public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough) {
-        this(context, server, language, listener, audioPassthrough, CHANNELS_SURROUND);
+        this(context, server, language, listener, audioPassthrough, CHANNELS_SURROUND, 400);
     }
 
-    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) {
+    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration, int queueSize) {
         mServer = server;
         mContext = context;
         mListener = listener;
         mAudioPassthrough = audioPassthrough;
         mAudioCapabilities = AudioCapabilities.getCapabilities(mContext);
+        mQueueSize = queueSize;
 
         if(wantedChannelConfiguration == CHANNELS_DIGITAL51 && mAudioCapabilities.getMaxChannelCount() < 6) {
             mChannelConfiguration = CHANNELS_SURROUND;
@@ -186,7 +188,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         }
 
         // create samplesource
-        mSampleSource = new RoboTvSampleSource(mConnection, mHandler, mAudioCapabilities, mAudioPassthrough, mChannelConfiguration);
+        mSampleSource = new RoboTvSampleSource(mConnection, mHandler, mAudioCapabilities, mAudioPassthrough, mChannelConfiguration, mQueueSize);
         mSampleSource.setListener(this);
 
         mVideoRenderer = new MediaCodecVideoTrackRenderer(
@@ -230,6 +232,10 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     public long getStartPositionWallclock() {
         return mSampleSource.getStartPositionWallclock();
+    }
+
+    public long getEndPositionWallclock() {
+        return mSampleSource.getEndPositionWallclock();
     }
 
     public long getCurrentPositionWallclock() {
