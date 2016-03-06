@@ -160,7 +160,6 @@ public class Connection extends Session {
         req.putU32(channelUid);
         req.putS32(priority); // priority 50
         req.putU8((short)(waitForKeyFrame ? 1 : 0));  // start with IFrame
-        req.putU8((short)1); // raw PTS values
         req.putString(language);
 
         Packet resp = transmitMessage(req);
