@@ -17,8 +17,8 @@ public class Channels extends ArrayList<Channels.Entry> {
         public int caid = 0;
         public String iconURL;
         public String serviceReference;
+        public String groupName;
         public boolean radio = false;
-
     }
 
     public void load(Connection connection, String language) {
@@ -54,6 +54,7 @@ public class Channels extends ArrayList<Channels.Entry> {
             e.caid = (int) resp.getU32();
             e.iconURL = resp.getString();
             e.serviceReference = resp.getString();
+            e.groupName = resp.getString().trim();
             e.radio = radio;
 
             if(callback != null) {
