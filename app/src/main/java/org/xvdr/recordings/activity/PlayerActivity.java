@@ -179,6 +179,10 @@ public class PlayerActivity extends Activity implements Player.Listener {
         mPlayer.seekTo(mPlayer.getCurrentPositionWallclock() - timeMs);
     }
 
+    public void restart() {
+        mPlayer.seekTo(mPlayer.getStartPositionWallclock());
+    }
+
     @Override
     public void onPlayerError(Exception e) {
     }
