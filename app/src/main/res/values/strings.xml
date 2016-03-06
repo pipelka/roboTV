@@ -23,6 +23,7 @@
         <item>French</item>
         <item>Spanish</item>
         <item>Czech</item>
+        <item>None</item>
     </string-array>
 
     <string-array name="iso639_code1" translatable="false">
@@ -31,6 +32,7 @@
         <item>fr</item>
         <item>es</item>
         <item>cs</item>
+        <item></item>
     </string-array>
 
     <string-array name="refresh_rate_name_array" translatable="false">

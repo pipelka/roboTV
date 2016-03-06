@@ -26,7 +26,7 @@ public class SetupUtils {
 
     static public String getLanguage(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        return prefs.getString("language", Locale.getDefault().getLanguage());
+        return prefs.getString("language", "");
     }
 
     static public String getLanguageISO3(Context context) {
