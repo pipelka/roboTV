@@ -126,6 +126,10 @@ public class Event {
         return mEventId;
     }
 
+    public boolean isTvShow() {
+        return (getContentId() == 0x15);
+    }
+
     static public int guessYearFromDescription(String description) {
         String[] words = description.split("[\\.,;)| ]");
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);

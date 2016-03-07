@@ -3,7 +3,6 @@ package org.xvdr.recordings.model;
 import org.xvdr.msgexchange.Packet;
 
 public class PacketAdapter {
-    static String mSeriesFolder = "Serien";
 
     public static Movie toMovie(Packet p) {
         Movie movie = new Movie();
@@ -30,11 +29,6 @@ public class PacketAdapter {
 
         if(folder.isEmpty()) {
             folder = "Unsorted";
-        }
-
-        if(folder.startsWith(mSeriesFolder)) {
-            movie.setSeries(true);
-            folder = folder.substring(mSeriesFolder.length() + 1);
         }
 
         movie.setCategory(folder); // directory / folder

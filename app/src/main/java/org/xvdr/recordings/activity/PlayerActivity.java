@@ -71,7 +71,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
         if(url != null && !url.isEmpty()) {
             Picasso
             .with(this)
-            .load(movie.getBackgroundImageUrl())
+            .load(url)
             .resize(266, 400)
             .centerCrop()
             .into(new Target() {

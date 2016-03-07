@@ -5,6 +5,6 @@
     android:name="org.xvdr.recordings.fragment.RecordingsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context="org.xvdr.recordings.activity.RecordingsActivity"
     tools:deviceIds="tv"
     tools:ignore="MergeRootFrame" />

@@ -32,6 +32,7 @@ public class RecordingsFragment extends BrowseFragment {
 
     private Connection mConnection;
     private SpinnerFragment mSpinnerFragment;
+    private MovieCollectionAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,8 @@ public class RecordingsFragment extends BrowseFragment {
 
             @Override
             public void onCompleted(MovieCollectionAdapter adapter) {
+                mAdapter = adapter;
+
                 setAdapter(adapter);
                 setupPreferences(adapter);
 
@@ -97,7 +100,7 @@ public class RecordingsFragment extends BrowseFragment {
     private void setBackground() {
         BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
-        backgroundManager.setColor(getResources().getColor(R.color.recordings_background));
+        backgroundManager.setColor(getResources().getColor(R.color.recordings_background, null));
     }
 
     private void initUI() {
@@ -107,8 +110,8 @@ public class RecordingsFragment extends BrowseFragment {
         //Back button goes to the fast lane, rather than home screen
         setHeadersTransitionOnBackEnabled(true);
 
-        setBrandColor(getResources().getColor(R.color.recordings_fastlane_background));
-        setSearchAffordanceColor(getResources().getColor(R.color.recordings_search_button_color));
+        setBrandColor(getResources().getColor(R.color.recordings_fastlane_background, null));
+        setSearchAffordanceColor(getResources().getColor(R.color.recordings_search_button_color, null));
         setBackground();
     }
 
@@ -128,9 +131,15 @@ public class RecordingsFragment extends BrowseFragment {
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
                 if(item instanceof Movie) {
                     Movie movie = (Movie) item;
-                    Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                    intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
-                    startActivity(intent);
+
+                    if(movie.isSeriesHeader()) {
+                        mAdapter.setSeriesRow(movie.getTitle());
+                    }
+                    else {
+                        Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                        intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
+                        startActivity(intent);
+                    }
                 }
                 else if(item instanceof String) {
                     if(((String) item).equalsIgnoreCase(getString(R.string.setup_activity))) {

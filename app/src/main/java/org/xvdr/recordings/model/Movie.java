@@ -18,9 +18,9 @@ public class Movie implements Serializable {
     private int duration;
     private String id;
     private int content;
-    private boolean isSeries = false;
     private String channelName;
     private String formattedDate;
+    private boolean isSeriesHeader = false;
 
     public Movie() {
     }
@@ -48,14 +48,6 @@ public class Movie implements Serializable {
     public void setOutline(String outline) {
         this.outline = outline;
     }
-
-    /*public String getVideoUrl() {
-        return videoUrl;
-    }
-
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
-    }*/
 
     public String getCategory() {
         return category;
@@ -131,12 +123,8 @@ public class Movie implements Serializable {
         return content & 0x0F;
     }
 
-    public void setSeries(boolean isSeries) {
-        this.isSeries = isSeries;
-    }
-
     public boolean isSeries() {
-        return isSeries;
+        return getEvent().isTvShow();
     }
 
     public void setChannelName(String channelName) {
@@ -158,6 +146,15 @@ public class Movie implements Serializable {
 
         return new Event(content, title, outline, description, duration);
     }
+
+    public void setSeriesHeader() {
+        isSeriesHeader = true;
+    }
+
+    public boolean isSeriesHeader() {
+        return isSeriesHeader;
+    }
+
     @Override
     public String toString() {
         return "Movie {" +

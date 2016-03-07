@@ -22,6 +22,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     private ArrayMap<String, ListRow> mSeriesMap;
     private List<Movie> mList;
     private ArrayObjectAdapter mLatest;
+    private ArrayObjectAdapter mTvShows;
 
     private Comparator<Movie> compareTimestamps = new Comparator<Movie>() {
         @Override
@@ -39,7 +40,8 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         mSeriesMap = new ArrayMap<>();
         mList = new ArrayList<>();
 
-        mLatest = getCategory("Latest", true, mLatestCardPresenter);
+        mLatest = getCategory("Latest", true, mLatestCardPresenter); // 0
+        mTvShows = getCategory("TV Shows", true, mCardPresenter); // 1
     }
 
     private ArrayObjectAdapter getCategory(String category) {
@@ -74,8 +76,12 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         return listRowAdapter;
     }
 
-    private ObjectAdapter getSeries(String title, boolean addNew) {
-        ArrayObjectAdapter row = (ArrayObjectAdapter) getCategory("Serien", true);
+    public ObjectAdapter getSeries(String title) {
+        return getSeries(title, "", false);
+    }
+
+    private ObjectAdapter getSeries(String title, String url, boolean addNew) {
+        ArrayObjectAdapter row = (ArrayObjectAdapter) getCategory("TV Shows", true);
 
         if(row == null) {
             return null;
@@ -95,13 +101,21 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         // create a new one for this series
         Movie series = new Movie();
         series.setTitle(title);
-        series.setSeries(true);
+        series.setContent(0x15);
+        series.setCardImageUrl(url);
+        series.setSeriesHeader();
 
         row.add(series);
 
         // create a new adapter for this series
         ArrayObjectAdapter seriesRowAdapter = new SortedArrayObjectAdapter(compareTimestamps, mCardPresenter);
-        mSeriesMap.put(title, new ListRow(null, seriesRowAdapter));
+        ListRow listRow = new ListRow(new HeaderItem("Show: " + title), seriesRowAdapter);
+
+        if(mSeriesMap.isEmpty()) {
+            add(2, listRow);
+        }
+
+        mSeriesMap.put(title, listRow);
 
         return seriesRowAdapter;
     }
@@ -131,11 +145,14 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     }
 
     protected ArrayObjectAdapter addSeriesEpisode(Movie episode) {
-        ArrayObjectAdapter seriesRow = (ArrayObjectAdapter) getSeries(episode.getCategory(), true);
+        ArrayObjectAdapter seriesRow = (ArrayObjectAdapter) getSeries(episode.getTitle(), episode.getCardImageUrl(), true);
 
         if(seriesRow == null) {
             return null;
         }
+
+        episode.setTitle(episode.getOutline());
+        episode.setOutline(episode.getDate());
 
         seriesRow.add(episode);
         return seriesRow;
@@ -149,5 +166,11 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         }
 
         row.remove(movie);
+    }
+
+    public void setSeriesRow(String title) {
+        ListRow row = mSeriesMap.get(title);
+        replace(2, row);
+        notifyArrayItemRangeChanged(2, 1);
     }
 }
