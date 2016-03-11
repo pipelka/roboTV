@@ -21,11 +21,12 @@ JNI_MSGEXCHANGE__DEPS := $(JNI_MSGEXCHANGE__INCLUDE) $(LOCAL_PATH)/msgexchange.i
 
 OUTDIR := $(LOCAL_PATH)/../../src/main/java/org/xvdr/msgexchange
 
-$(JNI_MSGEXCHANGE__WRAP): $(JNI_MSGEXCHANGE__I) $(JNI_MSGEXCHANGE__DEPS)
-	#rm -Rf $(OUTDIR)
+swig-msgexchange: $(JNI_MSGEXCHANGE__I) $(JNI_MSGEXCHANGE__DEPS)
 	mkdir -p $(OUTDIR)
-	swig -v -c++ -java -package $(JNI_MSGEXCHANGE__PACKAGE) -I$(JNI_MSGEXCHANGE__INCLUDE) -outdir $(OUTDIR) -o $(JNI_MSGEXCHANGE__WRAP) $(JNI_MSGEXCHANGE__I) || true
+	swig -v -c++ -java -package $(JNI_MSGEXCHANGE__PACKAGE) -I$(JNI_MSGEXCHANGE__INCLUDE) -outdir $(OUTDIR) -o $(JNI_MSGEXCHANGE__WRAP) $(JNI_MSGEXCHANGE__I)
 
 LOCAL_SHARED_LIBRARIES := msgexchange
 
 include $(BUILD_SHARED_LIBRARY)
+
+.PHONY: swig-msgexchange
