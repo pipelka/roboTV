@@ -154,7 +154,7 @@ public class Event {
         return 0;
     }
 
-    static int guessGenreFromSubTitle(int contentId, String subtitle, int duration) {
+    static public int guessGenreFromSubTitle(int contentId, String subtitle, int duration) {
         if(subtitle == null) {
             return contentId;
         }

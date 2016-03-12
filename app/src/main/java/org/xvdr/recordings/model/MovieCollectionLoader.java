@@ -115,6 +115,10 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
                     item.searchMovie.setCardImageUrl(o.getPosterUrl());
                     item.searchMovie.setBackgroundImageUrl(o.getBackgroundUrl());
 
+                    if(item.rowAdapter == null) {
+                        continue;
+                    }
+
                     // update item
                     mHandler.post(new Runnable() {
                         @Override

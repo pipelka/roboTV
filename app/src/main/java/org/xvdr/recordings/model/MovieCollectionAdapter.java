@@ -20,7 +20,6 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     private CardPresenter mCardPresenter;
     private LatestCardPresenter mLatestCardPresenter;
     private ArrayMap<String, ListRow> mSeriesMap;
-    private List<Movie> mList;
     private ArrayObjectAdapter mLatest;
     private ArrayObjectAdapter mTvShows;
 
@@ -38,7 +37,6 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         mLatestCardPresenter = new LatestCardPresenter();
 
         mSeriesMap = new ArrayMap<>();
-        mList = new ArrayList<>();
 
         mLatest = getCategory("Latest", true, mLatestCardPresenter); // 0
         mTvShows = getCategory("TV Shows", true, mCardPresenter); // 1
@@ -121,8 +119,6 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     }
 
     public ArrayObjectAdapter add(Movie movie) {
-        mList.add(movie);
-
         // add into "latest" category
         mLatest.add(movie);
 

@@ -124,7 +124,8 @@ public class Movie implements Serializable {
     }
 
     public boolean isSeries() {
-        return getEvent().isTvShow();
+        content = Event.guessGenreFromSubTitle(content, outline, duration);
+        return (content == 0x15);
     }
 
     public void setChannelName(String channelName) {
