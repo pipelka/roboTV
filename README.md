@@ -48,9 +48,11 @@ or use AndroidStudio
 - [x] MPEG Audio support
 - [X] Movie Database integration for EPG
 - [X] AC3 passthrough
-
+- [X] Watch Recordings
+- [X] Timeshift support
+- 
 # Planned Features
 
-- [ ] Full timeshift support
-- [ ] Schedule / Watch Recordings
+- [ ] Timeshift Reverse Play
+- [ ] Schedule Recordings
 - [ ] H265 (UHD) Support (partly done)
