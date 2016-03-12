@@ -265,6 +265,9 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
             return;
         }
 
+        // remove pending audio
+        mSampleSource.clearAudioTrack();
+
         if(speed == 1) {
             mExoPlayer.setSelectedTrack(RoboTvSampleSource.TRACK_AUDIO, ExoPlayer.TRACK_DEFAULT);
         }

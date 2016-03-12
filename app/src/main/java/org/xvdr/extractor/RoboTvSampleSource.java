@@ -238,7 +238,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     }
 
     @Override
-    public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder) {
+
+    synchronized public int readData(int track, long positionUs, MediaFormatHolder formatHolder, SampleHolder sampleHolder) {
         if(mPendingDiscontinuities[track]) {
             return NOTHING_READ;
         }
@@ -356,6 +357,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                 mEndPositionTimeshift = packet.getS64();
                 break;
         }
+    }
+
+    synchronized public void clearAudioTrack() {
+        mOutputTracks[TRACK_AUDIO].clear();
     }
 
     public void writePacket(final Packet packet) {
