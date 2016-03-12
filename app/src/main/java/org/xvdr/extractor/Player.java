@@ -32,6 +32,8 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     public final static int CHANNELS_SURROUND = 4;
     public final static int CHANNELS_DIGITAL51 = 6;
 
+    private final static int WIND_UPDATE_PERIOD_MS = 1000;
+
     public interface Listener  {
 
         void onPlayerStateChanged(boolean playWhenReady, int playbackState);
@@ -79,6 +81,8 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     private boolean mAudioPassthrough;
     private int mChannelConfiguration;
     private int mQueueSize = 400;
+
+    private Runnable mWindRunnable = null;
 
     public Player(Context context, String server, String language, Listener listener) {
         this(context, server, language, listener, false, CHANNELS_SURROUND, 400);
@@ -172,8 +176,12 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
         mConnection.transmitMessage(req);
 
-        setPlaybackSpeed(1);
         mExoPlayer.setPlayWhenReady(!on);
+        setPlaybackSpeed(1);
+    }
+
+    public boolean isPaused() {
+        return !mExoPlayer.getPlayWhenReady();
     }
 
     public void stop() {
@@ -249,19 +257,62 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         return mSampleSource.getCurrentPositionWallclock();
     }
 
+    public void setCurrentPositionWallclock(long positionWallclock) {
+        mSampleSource.setCurrentPositionWallclock(positionWallclock);
+    }
+
     public void seekTo(long wallclockTimeMs) {
         mExoPlayer.seekTo(wallclockTimeMs / 1000);
     }
 
-    public void setPlaybackSpeed(int speed) {
-        if(speed == mSampleSource.getPlaybackSpeed()) {
+    private void stopWinding() {
+        if(mWindRunnable == null) {
             return;
         }
 
+        mHandler.removeCallbacks(mWindRunnable);
+        mWindRunnable = null;
+    }
+
+    private void startWinding(final int speed) {
+        stopWinding();
+
+        mWindRunnable = new Runnable() {
+            @Override
+            public void run() {
+                long diff = speed * WIND_UPDATE_PERIOD_MS;
+                long pos = getCurrentPositionWallclock() + diff;
+
+                Log.d(TAG, "position: " + pos);
+                setCurrentPositionWallclock(pos);
+
+                mHandler.postDelayed(mWindRunnable, WIND_UPDATE_PERIOD_MS);
+            }
+        };
+
+        mHandler.postDelayed(mWindRunnable, WIND_UPDATE_PERIOD_MS);
+    }
+
+    public void setPlaybackSpeed(int speed) {
         Log.d(TAG, "playback speed: " + speed);
 
-        // reverse playback ?
+        // just shift timestamps if we're paused
+        if(isPaused()) {
+            startWinding(speed);
+            return;
+        }
+
+        if(mWindRunnable != null) {
+            stopWinding();
+            mExoPlayer.seekTo(getCurrentPositionWallclock() / 1000);
+        }
+
+        // TODO - reverse playback
         if(speed < 0) {
+            return;
+        }
+
+        if(speed == mSampleSource.getPlaybackSpeed()) {
             return;
         }
 
@@ -276,6 +327,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         }
 
         mSampleSource.setPlaybackSpeed((int)speed);
+
     }
 
     static public String nameOfChannelConfiguration(int channelConfiguration) {

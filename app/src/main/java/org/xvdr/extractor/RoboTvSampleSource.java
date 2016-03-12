@@ -679,6 +679,15 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         return mCurrentPositionTimeshift;
     }
 
+    public void setCurrentPositionWallclock(long positionWallclock) {
+        if(positionWallclock < mStartPositionTimeshift) {
+            return;
+        }
+
+        mCurrentPositionTimeshift = positionWallclock;
+    }
+
+
     public void setPlaybackSpeed(int speed) {
         mPlaybackAdjuster.setSpeed(speed, mStreamPositionUs);
     }
