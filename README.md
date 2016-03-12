@@ -46,11 +46,11 @@ or use AndroidStudio
 - [x] MPEG2 Video support
 - [x] decoding of AC3 streams
 - [x] MPEG Audio support
-- [X] Movie Database integration for EPG
-- [X] AC3 passthrough
-- [X] Watch Recordings
-- [X] Timeshift support
-- 
+- [x] Movie Database integration for EPG
+- [x] AC3 passthrough
+- [x] Watch Recordings
+- [x] Timeshift support
+
 # Planned Features
 
 - [ ] Timeshift Reverse Play
