@@ -297,7 +297,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         Log.d(TAG, "playback speed: " + speed);
 
         // just shift timestamps if we're paused
-        if(isPaused()) {
+        if(isPaused() && speed != 1) {
             startWinding(speed);
             return;
         }
