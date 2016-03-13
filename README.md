@@ -24,10 +24,6 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 * [VDR 2.2](http://www.vdr-wiki.de/)
 * [vdr-plugin-robotv](https://github.com/pipelka/vdr-plugin-robotv)
 
-Note: for roboTV versions up to 0.3.0 the xvdr plugin (robotv branch) was needed:
-
-* [vdr-plugin-xvdr](https://github.com/pipelka/vdr-plugin-xvdr) ([robotv](https://github.com/pipelka/vdr-plugin-xvdr/tree/robotv) branch)
-
 The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [Shield Android TV](https://shield.nvidia.com/android-tv) are used for development.
 
 ## Building
