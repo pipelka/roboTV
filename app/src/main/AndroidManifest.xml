@@ -46,6 +46,15 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="org.xvdr.recordings.activity.SearchActivity"
+            android:theme="@style/Theme.Leanback">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
         <!-- Launched by the TV app when user wants to change the settings for this input. The
         settings activity is expected to be used for the existing configuration. E.g. subscription
         change, fine tuning of the channels, etc. -->

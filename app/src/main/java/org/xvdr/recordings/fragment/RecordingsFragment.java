@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.xvdr.recordings.activity.DetailsActivity;
+import org.xvdr.recordings.activity.SearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
 import org.xvdr.recordings.model.MovieCollectionLoader;
@@ -120,7 +121,8 @@ public class RecordingsFragment extends BrowseFragment {
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "Implement your own in-app search", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                startActivity(intent);
             }
         });
     }

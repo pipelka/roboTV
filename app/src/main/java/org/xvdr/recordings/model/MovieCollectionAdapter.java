@@ -23,7 +23,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     private ArrayObjectAdapter mLatest;
     private ArrayObjectAdapter mTvShows;
 
-    private Comparator<Movie> compareTimestamps = new Comparator<Movie>() {
+    static public Comparator<Movie> compareTimestamps = new Comparator<Movie>() {
         @Override
         public int compare(Movie lhs, Movie rhs) {
             return lhs.getTimeStamp() > rhs.getTimeStamp() ? -1 : 1;
