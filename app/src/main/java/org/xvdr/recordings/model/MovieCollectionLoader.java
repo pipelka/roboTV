@@ -63,6 +63,7 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
     protected MovieCollectionAdapter doInBackground(Connection... params) {
         final MovieCollectionAdapter collection = new MovieCollectionAdapter();
 
+        // get movies
         Packet request = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_GETLIST);
         Packet response = mConnection.transmitMessage(request);
 
@@ -92,6 +93,10 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
 
     @Override
     protected void onPostExecute(MovieCollectionAdapter result) {
+        if(result != null) {
+            result.cleanup();
+        }
+
         // start update thread
         Thread thread = new Thread(new Runnable() {
             Handler mHandler = new Handler();

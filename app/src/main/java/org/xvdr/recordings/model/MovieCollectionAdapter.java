@@ -11,9 +11,7 @@ import android.util.ArrayMap;
 import org.xvdr.recordings.presenter.CardPresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
@@ -147,9 +145,6 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
             return null;
         }
 
-        episode.setTitle(episode.getOutline());
-        episode.setOutline(episode.getDate());
-
         seriesRow.add(episode);
         return seriesRow;
     }
@@ -168,5 +163,11 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         ListRow row = mSeriesMap.get(title);
         replace(2, row);
         notifyArrayItemRangeChanged(2, 1);
+    }
+
+    public void cleanup() {
+        if(mTvShows.size() == 0) {
+            removeItems(1, 1);
+        }
     }
 }

@@ -4,6 +4,8 @@ import org.xvdr.msgexchange.Packet;
 
 public class PacketAdapter {
 
+    public static final String FOLDER_UNSORTED = "Unsorted";
+
     public static Movie toMovie(Packet p) {
         Movie movie = new Movie();
 
@@ -28,7 +30,7 @@ public class PacketAdapter {
         String folder = p.getString();
 
         if(folder.isEmpty()) {
-            folder = "Unsorted";
+            folder = FOLDER_UNSORTED;
         }
 
         movie.setCategory(folder); // directory / folder
