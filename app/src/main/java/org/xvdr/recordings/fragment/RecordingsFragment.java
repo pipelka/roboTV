@@ -15,7 +15,6 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.Row;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
@@ -34,6 +33,40 @@ public class RecordingsFragment extends BrowseFragment {
     private Connection mConnection;
     private SpinnerFragment mSpinnerFragment;
     private MovieCollectionAdapter mAdapter;
+    private ArrayObjectAdapter mRowAdapter = null;
+
+    private MovieCollectionLoader.Listener mListener = new MovieCollectionLoader.Listener() {
+        @Override
+        public void onStart() {
+            mSpinnerFragment = new SpinnerFragment();
+            getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
+
+            if(!mConnection.open(SetupUtils.getServer(getActivity()))) {
+                Log.e(TAG, "unable to open connection");
+            }
+
+        }
+
+        @Override
+        public void onCompleted(MovieCollectionAdapter adapter) {
+            FragmentManager fragmentManager = getFragmentManager();
+
+            if(fragmentManager != null) {
+                getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
+            }
+
+            if(mAdapter == null) {
+                mAdapter = adapter;
+                setAdapter(adapter);
+                setupPreferences(adapter);
+            }
+
+            if(mRowAdapter != null) {
+                mRowAdapter.notifyArrayItemRangeChanged(0, mRowAdapter.size());
+                mRowAdapter = null;
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,38 +84,27 @@ public class RecordingsFragment extends BrowseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        updateMovies();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         mConnection.close();
     }
 
     private void loadMovies() {
-        new MovieCollectionLoader(mConnection, SetupUtils.getLanguage(getActivity())).load(new MovieCollectionLoader.Listener() {
-            @Override
-            public void onStart() {
-                mSpinnerFragment = new SpinnerFragment();
-                getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
+        new MovieCollectionLoader(mConnection, SetupUtils.getLanguage(getActivity())).load(mListener);
+    }
 
-                if(!mConnection.open(SetupUtils.getServer(getActivity()))) {
-                    Log.e(TAG, "unable to open connection");
-                }
+    private void updateMovies() {
+        if(mAdapter == null) {
+            return;
+        }
 
-            }
-
-            @Override
-            public void onCompleted(MovieCollectionAdapter adapter) {
-                mAdapter = adapter;
-
-                setAdapter(adapter);
-                setupPreferences(adapter);
-
-                FragmentManager fragmentManager = getFragmentManager();
-
-                if(fragmentManager != null) {
-                    getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
-                }
-            }
-        });
+        new MovieCollectionLoader(mConnection, SetupUtils.getLanguage(getActivity()), mAdapter).load(mListener);
     }
 
     private void setupPreferences(ArrayObjectAdapter adapter) {
@@ -138,6 +160,7 @@ public class RecordingsFragment extends BrowseFragment {
                         mAdapter.setSeriesRow(movie.getTitle());
                     }
                     else {
+                        mRowAdapter = mAdapter.getCategory(movie);
                         Intent intent = new Intent(getActivity(), DetailsActivity.class);
                         intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
                         startActivity(intent);

@@ -1,24 +1,20 @@
 package org.xvdr.recordings.presenter;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.xvdr.recordings.model.Movie;
-import org.xvdr.recordings.util.PicassoImageCardViewTarget;
-import org.xvdr.robotv.R;
-
 import com.squareup.picasso.Picasso;
 
+import org.xvdr.recordings.util.PicassoImageCardViewTarget;
+import org.xvdr.robotv.R;
+import org.xvdr.robotv.artwork.ArtworkHolder;
 
-public class CardPresenter extends Presenter {
+
+public class ArtworkPresenter extends Presenter {
 
     static class ViewHolder extends Presenter.ViewHolder {
         private ImageCardView mCardView;
@@ -60,16 +56,17 @@ public class CardPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
-        Movie movie = (Movie) item;
+        ArtworkHolder holder = (ArtworkHolder) item;
         ViewHolder vh = (ViewHolder) viewHolder;
+
         ImageCardView cardView = vh.getCardView();
+        Context context = cardView.getContext();
 
-        cardView.setTitleText(movie.getTitle());
-        cardView.setContentText(movie.getOutline());
-        cardView.setInfoAreaBackgroundColor(cardView.getContext().getColor(R.color.recordings_fastlane_background));
+        cardView.setTitleText(holder.getTitle());
         cardView.setMainImageDimensions(266, 400);
+        cardView.setInfoAreaBackgroundColor(context.getColor(R.color.recordings_fastlane_background));
 
-        vh.updateCardViewImage(cardView.getContext(), movie.getCardImageUrl());
+        vh.updateCardViewImage(cardView.getContext(), holder.getPosterUrl());
     }
 
     @Override

@@ -6,6 +6,7 @@ public class ArtworkHolder {
 
     protected String mPosterUrl;
     protected String mBackgroundUrl;
+    protected String mTitle;
 
     public ArtworkHolder(String posterUrl, String backgroundUrl) {
         mPosterUrl = posterUrl;
@@ -26,5 +27,13 @@ public class ArtworkHolder {
 
     public boolean hasBackground() {
         return !mBackgroundUrl.isEmpty();
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
+    public String getTitle() {
+        return mTitle;
     }
 }

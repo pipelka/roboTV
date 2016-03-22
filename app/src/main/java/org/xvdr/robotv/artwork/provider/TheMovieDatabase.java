@@ -1,5 +1,7 @@
 package org.xvdr.robotv.artwork.provider;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,10 +10,13 @@ import org.xvdr.robotv.artwork.Event;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TheMovieDatabase extends HttpArtworkProvider {
 
     private final static String TAG = "TheMovieDatabase";
+    private final static String IMAGE_BASE_PATH = "http://image.tmdb.org/t/p/w600";
 
     private String mApiKey;
     private String mLanguage;
@@ -57,6 +62,72 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         }
 
         return array;
+    }
+
+    private List<ArtworkHolder> getArtworkList(JSONArray array) {
+        List<ArtworkHolder> result = new ArrayList<>();
+
+        for(int i = 0; i < array.length(); i++) {
+            JSONObject item = array.optJSONObject(i);
+
+            if(item == null) {
+                continue;
+            }
+
+            String poster = item.optString("poster_path");
+            String background = item.optString("backdrop_path");
+            String title = item.optString("title");
+
+            if(poster == null || poster.equals("null")) {
+                continue;
+            }
+
+            if(background == null || !background.equals("null")) {
+                background = "";
+            }
+
+            ArtworkHolder holder = new ArtworkHolder(
+                IMAGE_BASE_PATH + poster,
+                IMAGE_BASE_PATH + background
+            );
+
+            holder.setTitle(title);
+
+            Log.d(TAG, IMAGE_BASE_PATH + poster);
+            result.add(holder);
+
+        }
+
+        return result;
+    }
+
+    public List<ArtworkHolder> searchAll(String title) {
+        List<ArtworkHolder> result = new ArrayList<>();
+        JSONArray array;
+
+        // movie search
+        try {
+            array = search("movie", title, 0, null);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return result;
+        }
+
+        result.addAll(getArtworkList(array));
+
+        // tv search
+        try {
+            array = search("tv", title, 0, null);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return result;
+        }
+
+        result.addAll(getArtworkList(array));
+
+        return result;
     }
 
     protected JSONArray search(String section, String title, int year, String dateProperty) throws IOException, JSONException {
@@ -132,7 +203,7 @@ public class TheMovieDatabase extends HttpArtworkProvider {
             return "";
         }
 
-        return "http://image.tmdb.org/t/p/w600" + path;
+        return IMAGE_BASE_PATH + path;
     }
 
     public String getPosterUrl(JSONArray o) {

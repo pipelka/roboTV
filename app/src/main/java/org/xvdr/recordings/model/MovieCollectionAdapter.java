@@ -40,6 +40,22 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         mTvShows = getCategory("TV Shows", true, mCardPresenter); // 1
     }
 
+    private Movie movieExists(ArrayObjectAdapter adapter, Movie movie) {
+        for(int i = 0; i < adapter.size(); i++) {
+            Movie item = (Movie) adapter.get(i);
+
+            if(item.getId().equals(movie.getId())) {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+    public ArrayObjectAdapter getCategory(Movie movie) {
+        return getCategory(movie.getCategory());
+    }
+
     private ArrayObjectAdapter getCategory(String category) {
         return getCategory(category, false);
     }
@@ -77,7 +93,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     }
 
     private ObjectAdapter getSeries(String title, String url, boolean addNew) {
-        ArrayObjectAdapter row = (ArrayObjectAdapter) getCategory("TV Shows", true);
+        ArrayObjectAdapter row = getCategory("TV Shows", true);
 
         if(row == null) {
             return null;
@@ -118,7 +134,14 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
     public ArrayObjectAdapter add(Movie movie) {
         // add into "latest" category
-        mLatest.add(movie);
+        Movie item = movieExists(mLatest, movie);
+
+        if(item != null) {
+            item.setArtwork(movie);
+        }
+        else {
+            mLatest.add(movie);
+        }
 
         if(movie.isSeries()) {
             return addSeriesEpisode(movie);
@@ -128,13 +151,21 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     }
 
     protected ArrayObjectAdapter addMovie(Movie movie) {
-        ArrayObjectAdapter row = (ArrayObjectAdapter) getCategory(movie.getCategory(), true);
+        ArrayObjectAdapter row = getCategory(movie.getCategory(), true);
 
         if(row == null) {
             return null;
         }
 
-        row.add(movie);
+        Movie item = movieExists(row, movie);
+
+        if(item != null) {
+            item.setArtwork(movie);
+        }
+        else {
+            row.add(movie);
+        }
+
         return row;
     }
 
@@ -145,12 +176,20 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
             return null;
         }
 
-        seriesRow.add(episode);
+        Movie item = movieExists(seriesRow, episode);
+
+        if(item != null) {
+            item.setArtwork(episode);
+        }
+        else {
+            seriesRow.add(episode);
+        }
+
         return seriesRow;
     }
 
     public void remove(Movie movie) {
-        ArrayObjectAdapter row = (ArrayObjectAdapter) getCategory(movie.getCategory(), true);
+        ArrayObjectAdapter row = getCategory(movie.getCategory(), true);
 
         if(row == null) {
             return;

@@ -156,6 +156,11 @@ public class Movie implements Serializable {
         return isSeriesHeader;
     }
 
+    public void setArtwork(Movie movie) {
+        cardImageUrl = movie.getCardImageUrl();
+        backgroundImageUrl = movie.getBackgroundImageUrl();
+    }
+
     @Override
     public String toString() {
         return "Movie {" +

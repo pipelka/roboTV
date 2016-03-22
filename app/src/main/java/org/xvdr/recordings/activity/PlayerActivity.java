@@ -27,11 +27,9 @@ import org.xvdr.robotv.client.StreamBundle;
 public class PlayerActivity extends Activity implements Player.Listener {
 
     public static final String TAG = "PlayerActivity";
-    public static final String EXTRA_START_POSITION = "extra_start_position";
 
     private RecordingPlayer mPlayer;
     private PlaybackOverlayFragment mControls;
-    private SurfaceView mVideoView;
     private Movie mSelectedMovie;
     private MediaSession mSession;
 
@@ -107,7 +105,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     private void initViews() {
-        mVideoView = (SurfaceView) findViewById(R.id.videoView);
+        SurfaceView mVideoView = (SurfaceView) findViewById(R.id.videoView);
         mPlayer.setSurface(mVideoView.getHolder().getSurface());
         mSelectedMovie = (Movie) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
 

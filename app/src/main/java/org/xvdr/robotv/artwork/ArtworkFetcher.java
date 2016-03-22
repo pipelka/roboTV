@@ -15,7 +15,7 @@ import java.io.IOException;
 public class ArtworkFetcher {
 
     static final String TAG = "ArtworkFetcher";
-    private final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
+    public final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
     Connection mConnection;
     ArtworkProvider mServerCache;

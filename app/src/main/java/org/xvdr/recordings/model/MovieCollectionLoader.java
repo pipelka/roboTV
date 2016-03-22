@@ -8,6 +8,7 @@ import android.util.Log;
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
+import org.xvdr.robotv.artwork.ArtworkUtils;
 import org.xvdr.robotv.client.Connection;
 
 import java.io.IOException;
@@ -37,13 +38,15 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
     private Listener mListener;
     private ArtworkFetcher mFetcher;
     private List<ArtworkItem> mArtworkQueue = new ArrayList<>();
-
-    public MovieCollectionLoader(Connection connection) {
-        this(connection, "");
-    }
+    private MovieCollectionAdapter mCollection;
 
     public MovieCollectionLoader(Connection connection, String language) {
+        this(connection, language, new MovieCollectionAdapter());
+    }
+
+    public MovieCollectionLoader(Connection connection, String language, MovieCollectionAdapter collection) {
         mConnection = connection;
+        mCollection = collection;
         mFetcher = new ArtworkFetcher(mConnection, language);
     }
 
@@ -61,7 +64,6 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
 
     @Override
     protected MovieCollectionAdapter doInBackground(Connection... params) {
-        final MovieCollectionAdapter collection = new MovieCollectionAdapter();
 
         // get movies
         Packet request = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_GETLIST);
@@ -75,7 +77,7 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
 
         while(!response.eop()) {
             final Movie movie = PacketAdapter.toMovie(response);
-            final ArrayObjectAdapter adapter = collection.add(movie);
+            final ArrayObjectAdapter adapter = mCollection.add(movie);
 
             // search movies
             String url = movie.getCardImageUrl();
@@ -88,7 +90,7 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
             }
         }
 
-        return collection;
+        return mCollection;
     }
 
     @Override
@@ -134,13 +136,7 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
                     });
 
                     // send new urls to server
-                    Packet p = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_SETURLS);
-                    p.putString(item.searchMovie.getId());
-                    p.putString(item.searchMovie.getCardImageUrl());
-                    p.putString(item.searchMovie.getBackgroundImageUrl());
-                    p.putU32(0);
-
-                    mConnection.transmitMessage(p);
+                    ArtworkUtils.setMovieArtwork(mConnection, item.searchMovie);
                 }
             }
         });

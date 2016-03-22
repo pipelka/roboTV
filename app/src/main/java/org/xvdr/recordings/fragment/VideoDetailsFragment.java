@@ -19,6 +19,7 @@ import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
+import org.xvdr.recordings.activity.CoverSearchActivity;
 import org.xvdr.recordings.activity.PlayerActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.presenter.DetailsDescriptionPresenter;
@@ -31,12 +32,13 @@ import com.squareup.picasso.Target;
 
 public class VideoDetailsFragment extends DetailsFragment {
 
+    public static final String TAG = "VideoDetailsFragment";
     public static final String EXTRA_MOVIE = "extra_movie";
     public static final String EXTRA_SHOULD_AUTO_START = "extra_should_auto_start";
 
     private static final int ACTION_WATCH = 1;
     private static final int ACTION_EDIT = 2;
-    private static final int ACTION_MOVE = 2;
+    private static final int ACTION_MOVE = 3;
 
     private Movie mSelectedMovie;
 
@@ -48,10 +50,14 @@ public class VideoDetailsFragment extends DetailsFragment {
         super.onCreate(savedInstanceState);
 
         mSelectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         initBackground();
         new DetailRowBuilderTask().execute(mSelectedMovie);
-
     }
 
     private void initBackground() {
@@ -74,12 +80,10 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         Picasso.with(getActivity())
         .load(url)
-        .error(new ColorDrawable(getResources().getColor(R.color.recordings_background)))
+        .error(new ColorDrawable(getResources().getColor(R.color.recordings_background, null)))
         .resize(mMetrics.widthPixels, mMetrics.heightPixels)
         .into(mBackgroundTarget);
     }
-
-
 
     private class DetailRowBuilderTask extends AsyncTask<Movie, Integer, DetailsOverviewRow> {
         @Override
@@ -95,6 +99,8 @@ public class VideoDetailsFragment extends DetailsFragment {
                                     .load(url)
                                     .resize(Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_size), getActivity().getApplicationContext()),
                                             Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_height), getActivity().getApplicationContext()))
+                                    .error(getResources().getDrawable(R.drawable.recording_unkown, null))
+                                    .placeholder(getResources().getDrawable(R.drawable.recording_unkown, null))
                                     .centerCrop()
                                     .get();
                     row.setImageBitmap(getActivity(), poster);
@@ -104,6 +110,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                 }
             }
             catch(Exception e) {
+                e.printStackTrace();
             }
 
             SparseArrayObjectAdapter actions = new SparseArrayObjectAdapter();
@@ -145,7 +152,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             FullWidthDetailsOverviewRowPresenter dorPresenter =
                 new FullWidthDetailsOverviewRowPresenter(new DetailsDescriptionPresenter());
             // set detail background and style
-            dorPresenter.setBackgroundColor(getResources().getColor(R.color.recordings_fastlane_background));
+            dorPresenter.setBackgroundColor(getResources().getColor(R.color.recordings_fastlane_background, null));
             dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
                 @Override
                 public void onActionClicked(Action action) {
@@ -154,6 +161,13 @@ public class VideoDetailsFragment extends DetailsFragment {
                         intent.putExtra(EXTRA_MOVIE, mSelectedMovie);
                         intent.putExtra(EXTRA_SHOULD_AUTO_START, true);
                         startActivity(intent);
+                        getActivity().finishAndRemoveTask();
+                    }
+                    else if(action.getId() == ACTION_EDIT) {
+                        Intent intent = new Intent(getActivity(), CoverSearchActivity.class);
+                        intent.putExtra(EXTRA_MOVIE, mSelectedMovie);
+                        startActivity(intent);
+                        getActivity().finishAndRemoveTask();
                     }
                 }
             });
