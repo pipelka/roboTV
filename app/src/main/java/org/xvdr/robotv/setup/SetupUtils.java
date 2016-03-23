@@ -21,7 +21,7 @@ public class SetupUtils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         SharedPreferences.Editor e = prefs.edit();
         e.putString("server", server);
-        e.apply();
+        e.commit();
     }
 
     static public String getLanguage(Context context) {

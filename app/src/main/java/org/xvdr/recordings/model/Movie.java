@@ -46,7 +46,15 @@ public class Movie implements Serializable {
     }
 
     public void setOutline(String outline) {
-        this.outline = outline;
+        String parts[] = outline.split("/");
+
+        if(parts.length == 0) {
+            this.outline = "";
+            return;
+        }
+
+        outline = parts[0];
+        this.outline = outline.trim();
     }
 
     public String getCategory() {
@@ -79,7 +87,7 @@ public class Movie implements Serializable {
         try {
             DateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
             Date netDate = (new Date(timeStamp));
-            formattedDate = sdf.format(netDate);
+            formattedDate = sdf.format(netDate).trim();
         }
         catch(Exception e) {
             formattedDate = "";

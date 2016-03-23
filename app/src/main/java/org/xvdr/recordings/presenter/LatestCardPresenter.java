@@ -16,7 +16,7 @@ public class LatestCardPresenter extends CardPresenter {
         ImageCardView cardView = vh.getCardView();
         Context context = cardView.getContext();
 
-        String contextText = movie.getCategory() + (!movie.getDate().isEmpty() ? " / " + movie.getDate() : "");
+        String contextText = movie.getDate();
 
         cardView.setTitleText(movie.getTitle());
         cardView.setContentText(contextText);

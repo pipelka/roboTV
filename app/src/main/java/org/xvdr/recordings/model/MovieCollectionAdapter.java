@@ -64,6 +64,20 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         return getCategory(category, addNew, mCardPresenter);
     }
 
+    private ListRow findRow(String category) {
+        ListRow listrow;
+
+        for(int i = 0; i < size(); i++) {
+            listrow = (ListRow)get(i);
+
+            if(listrow.getHeaderItem().getName().equalsIgnoreCase(category)) {
+                return listrow;
+            }
+        }
+
+        return null;
+    }
+
     private ArrayObjectAdapter getCategory(String category, boolean addNew, Presenter presenter) {
         ListRow listrow;
 
@@ -205,8 +219,10 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     }
 
     public void cleanup() {
-        if(mTvShows.size() == 0) {
-            removeItems(1, 1);
+        ListRow tvShowsRow = findRow("TV Shows");
+
+        if(tvShowsRow != null) {
+            remove(tvShowsRow);
         }
     }
 }

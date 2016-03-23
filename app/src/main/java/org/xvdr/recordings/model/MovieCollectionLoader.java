@@ -3,6 +3,7 @@ package org.xvdr.recordings.model;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import android.support.v17.leanback.widget.ListRow;
 import android.util.Log;
 
 import org.xvdr.msgexchange.Packet;
@@ -94,7 +95,7 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
     }
 
     @Override
-    protected void onPostExecute(MovieCollectionAdapter result) {
+    protected void onPostExecute(final MovieCollectionAdapter result) {
         if(result != null) {
             result.cleanup();
         }
@@ -138,6 +139,23 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
                     // send new urls to server
                     ArtworkUtils.setMovieArtwork(mConnection, item.searchMovie);
                 }
+
+                mConnection.close();
+                mConnection = null;
+
+                if(result == null) {
+                    return;
+                }
+
+                // update latest row
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ListRow latestRow = (ListRow) result.get(0);
+                        ArrayObjectAdapter latest = (ArrayObjectAdapter) latestRow.getAdapter();
+                        latest.notifyArrayItemRangeChanged(0, latest.size());
+                    }
+                });
             }
         });
 

@@ -31,10 +31,10 @@ public class RecordingsFragment extends BrowseFragment {
 
     private final static String TAG = "RecordingsFragment";
 
-    private Connection mConnection;
     private SpinnerFragment mSpinnerFragment;
     private MovieCollectionAdapter mAdapter;
     private ArrayObjectAdapter mRowAdapter = null;
+    private String mLastServer = "";
 
     private int color_background;
     private int color_brand;
@@ -44,11 +44,6 @@ public class RecordingsFragment extends BrowseFragment {
         public void onStart() {
             mSpinnerFragment = new SpinnerFragment();
             getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
-
-            if(!mConnection.open(SetupUtils.getServer(getActivity()))) {
-                Log.e(TAG, "unable to open connection");
-            }
-
         }
 
         @Override
@@ -75,7 +70,6 @@ public class RecordingsFragment extends BrowseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mConnection = new Connection("roboTV recordings");
     }
 
     @Override
@@ -83,32 +77,48 @@ public class RecordingsFragment extends BrowseFragment {
         super.onActivityCreated(savedInstanceState);
 
         initUI();
-        loadMovies();
+        loadMovies(false);
         setupEventListeners();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateMovies();
+        loadMovies(true);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mConnection.close();
     }
 
-    private void loadMovies() {
-        new MovieCollectionLoader(mConnection, SetupUtils.getLanguage(getActivity())).load(mListener);
-    }
+    private void loadMovies(boolean onlyUpdate) {
+        Connection connection = new Connection("roboTV recordings");
 
-    private void updateMovies() {
-        if(mAdapter == null) {
-            return;
+        String currentServer = SetupUtils.getServer(getActivity());
+
+        if(!mLastServer.equals(currentServer)) {
+            onlyUpdate = false;
+            mAdapter = null;
         }
 
-        new MovieCollectionLoader(mConnection, SetupUtils.getLanguage(getActivity()), mAdapter).load(mListener);
+        if(!connection.open(currentServer)) {
+            Log.e(TAG, "unable to open connection");
+        }
+
+        mLastServer = SetupUtils.getServer(getActivity());
+
+        if(onlyUpdate) {
+            if(mAdapter == null) {
+                connection.close();
+                return;
+            }
+
+            new MovieCollectionLoader(connection, SetupUtils.getLanguage(getActivity()), mAdapter).load(mListener);
+        }
+        else {
+            new MovieCollectionLoader(connection, SetupUtils.getLanguage(getActivity())).load(mListener);
+        }
     }
 
     private void setupPreferences(ArrayObjectAdapter adapter) {
@@ -116,10 +126,10 @@ public class RecordingsFragment extends BrowseFragment {
             return;
         }
 
-        HeaderItem gridHeader = new HeaderItem(adapter.size(), "Preferences");
-        PreferenceCardPresenter mGridPresenter = new PreferenceCardPresenter();
-        ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
-        gridRowAdapter.add(getResources().getString(R.string.setup_activity));
+        HeaderItem gridHeader = new HeaderItem(adapter.size(), "Settings");
+        ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(new PreferenceCardPresenter());
+        gridRowAdapter.add(new PreferenceCardPresenter.Style(1, "Setup", R.drawable.ic_settings_white_48dp));
+
         adapter.add(new ListRow(gridHeader, gridRowAdapter));
 
     }
@@ -141,7 +151,7 @@ public class RecordingsFragment extends BrowseFragment {
         color_brand = Utils.getColor(getActivity(), R.color.recordings_fastlane_background);
 
         setBrandColor(color_brand);
-        setSearchAffordanceColor(color_background);
+        setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));
         setBackground();
     }
 
@@ -173,8 +183,8 @@ public class RecordingsFragment extends BrowseFragment {
                         startActivity(intent);
                     }
                 }
-                else if(item instanceof String) {
-                    if(((String) item).equalsIgnoreCase(getString(R.string.setup_activity))) {
+                else if(item instanceof PreferenceCardPresenter.Style) {
+                    if(((PreferenceCardPresenter.Style) item).getId() == 1) {
                         Intent intent = new Intent(getActivity(), org.xvdr.robotv.setup.SetupActivity.class);
                         startActivity(intent);
                     }

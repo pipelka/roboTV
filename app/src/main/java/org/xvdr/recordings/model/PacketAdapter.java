@@ -18,7 +18,7 @@ public class PacketAdapter {
         String title = p.getString();
         String outline = p.getString();
 
-        if(title.equals(outline) || outline.isEmpty() || title.contains(outline)) {
+        if(title.equals(outline) || outline.isEmpty()) {
             outline = movie.getDate();
         }
 
