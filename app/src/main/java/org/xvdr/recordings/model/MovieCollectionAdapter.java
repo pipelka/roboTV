@@ -221,7 +221,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     public void cleanup() {
         ListRow tvShowsRow = findRow("TV Shows");
 
-        if(tvShowsRow != null) {
+        if(tvShowsRow != null && tvShowsRow.getAdapter().size() == 0) {
             remove(tvShowsRow);
         }
     }
