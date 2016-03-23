@@ -22,6 +22,7 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
 import org.xvdr.recordings.model.MovieCollectionLoader;
 import org.xvdr.recordings.presenter.PreferenceCardPresenter;
+import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.client.Connection;
@@ -34,6 +35,9 @@ public class RecordingsFragment extends BrowseFragment {
     private SpinnerFragment mSpinnerFragment;
     private MovieCollectionAdapter mAdapter;
     private ArrayObjectAdapter mRowAdapter = null;
+
+    private int color_background;
+    private int color_brand;
 
     private MovieCollectionLoader.Listener mListener = new MovieCollectionLoader.Listener() {
         @Override
@@ -123,7 +127,7 @@ public class RecordingsFragment extends BrowseFragment {
     private void setBackground() {
         BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
-        backgroundManager.setColor(getResources().getColor(R.color.recordings_background, null));
+        backgroundManager.setColor(color_background);
     }
 
     private void initUI() {
@@ -133,8 +137,11 @@ public class RecordingsFragment extends BrowseFragment {
         //Back button goes to the fast lane, rather than home screen
         setHeadersTransitionOnBackEnabled(true);
 
-        setBrandColor(getResources().getColor(R.color.recordings_fastlane_background, null));
-        setSearchAffordanceColor(getResources().getColor(R.color.recordings_search_button_color, null));
+        color_background = Utils.getColor(getActivity(), R.color.recordings_background);
+        color_brand = Utils.getColor(getActivity(), R.color.recordings_fastlane_background);
+
+        setBrandColor(color_brand);
+        setSearchAffordanceColor(color_background);
         setBackground();
     }
 

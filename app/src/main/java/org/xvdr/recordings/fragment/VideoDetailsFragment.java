@@ -80,7 +80,7 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         Picasso.with(getActivity())
         .load(url)
-        .error(new ColorDrawable(getResources().getColor(R.color.recordings_background, null)))
+        .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
         .resize(mMetrics.widthPixels, mMetrics.heightPixels)
         .into(mBackgroundTarget);
     }
@@ -152,7 +152,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             FullWidthDetailsOverviewRowPresenter dorPresenter =
                 new FullWidthDetailsOverviewRowPresenter(new DetailsDescriptionPresenter());
             // set detail background and style
-            dorPresenter.setBackgroundColor(getResources().getColor(R.color.recordings_fastlane_background, null));
+            dorPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.recordings_fastlane_background));
             dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
                 @Override
                 public void onActionClicked(Action action) {

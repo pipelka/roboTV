@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
 public class PreferenceCardPresenter extends Presenter {
@@ -17,7 +18,7 @@ public class PreferenceCardPresenter extends Presenter {
                                  parent.getResources().getInteger(R.integer.preference_square_size)));
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
-        view.setBackgroundColor(parent.getContext().getResources().getColor(R.color.default_background));
+        view.setBackgroundColor(Utils.getColor(parent.getContext(), R.color.default_background));
         view.setTextColor(Color.WHITE);
         view.setGravity(Gravity.CENTER);
         return new ViewHolder(view);

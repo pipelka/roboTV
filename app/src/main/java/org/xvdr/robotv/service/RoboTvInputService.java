@@ -43,12 +43,7 @@ public class RoboTvInputService extends TvInputService {
     @Override
     public void onCreate() {
         super.onCreate();
-
         setTheme(android.R.style.Theme_DeviceDefault);
-
-        if(SetupUtils.isRefreshRateChangeSupported()) {
-            int mRefreshRate = (int)SetupUtils.getRefreshRate(this);
-        }
     }
 
     @Override
@@ -198,7 +193,9 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onTimeShiftSetPlaybackParams(PlaybackParams params) {
-            mPlayer.setPlaybackSpeed((int)params.getSpeed());
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mPlayer.setPlaybackSpeed((int) params.getSpeed());
+            }
         }
 
         private boolean tune(Uri channelUri) {
@@ -242,7 +239,9 @@ public class RoboTvInputService extends TvInputService {
                 return false;
             }
 
-            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+            }
 
             Log.i(TAG, "successfully switched channel");
             return true;

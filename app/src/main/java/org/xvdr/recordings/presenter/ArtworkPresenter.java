@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 
 import org.xvdr.recordings.util.PicassoImageCardViewTarget;
+import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 
@@ -64,7 +65,7 @@ public class ArtworkPresenter extends Presenter {
 
         cardView.setTitleText(holder.getTitle());
         cardView.setMainImageDimensions(266, 400);
-        cardView.setInfoAreaBackgroundColor(context.getColor(R.color.recordings_fastlane_background));
+        cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.recordings_fastlane_background));
 
         vh.updateCardViewImage(cardView.getContext(), holder.getPosterUrl());
     }

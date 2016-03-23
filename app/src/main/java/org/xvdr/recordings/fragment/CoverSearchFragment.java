@@ -29,7 +29,7 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
     private class SearchRunnable implements Runnable {
 
         private String query;
-        private TheMovieDatabase mMovieDb = new TheMovieDatabase(ArtworkFetcher.TMDB_APIKEY, SetupUtils.getLanguage(getContext()));
+        private TheMovieDatabase mMovieDb = new TheMovieDatabase(ArtworkFetcher.TMDB_APIKEY, SetupUtils.getLanguage(getActivity()));
 
         @Override
         public void run() {

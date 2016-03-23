@@ -1,18 +1,14 @@
 package org.xvdr.recordings.presenter;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.util.PicassoImageCardViewTarget;
+import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
 import com.squareup.picasso.Picasso;
@@ -66,7 +62,7 @@ public class CardPresenter extends Presenter {
 
         cardView.setTitleText(movie.getTitle());
         cardView.setContentText(movie.getOutline());
-        cardView.setInfoAreaBackgroundColor(cardView.getContext().getColor(R.color.recordings_fastlane_background));
+        cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.recordings_fastlane_background));
         cardView.setMainImageDimensions(266, 400);
 
         vh.updateCardViewImage(cardView.getContext(), movie.getCardImageUrl());

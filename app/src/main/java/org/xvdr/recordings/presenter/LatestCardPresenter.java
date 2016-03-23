@@ -5,6 +5,7 @@ import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 
 import org.xvdr.recordings.model.Movie;
+import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
 public class LatestCardPresenter extends CardPresenter {
@@ -20,7 +21,7 @@ public class LatestCardPresenter extends CardPresenter {
         cardView.setTitleText(movie.getTitle());
         cardView.setContentText(contextText);
         cardView.setMainImageDimensions(266, 400);
-        cardView.setInfoAreaBackgroundColor(context.getColor(R.color.recordings_fastlane_background));
+        cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.recordings_fastlane_background));
         vh.updateCardViewImage(context, movie.getCardImageUrl());
     }
 

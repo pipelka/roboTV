@@ -58,11 +58,4 @@ public class LiveTvPlayer extends Player {
         return Connection.SUCCESS;
     }
 
-    public void pauseStream(boolean pause) {
-        Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_PAUSE, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
-        req.putU32(pause ? 1L : 0L);
-
-        mConnection.transmitMessage(req);
-    }
-
 }
