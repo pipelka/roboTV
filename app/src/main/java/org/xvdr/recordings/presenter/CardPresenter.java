@@ -62,7 +62,7 @@ public class CardPresenter extends Presenter {
 
         cardView.setTitleText(movie.getTitle());
         cardView.setContentText(movie.getOutline());
-        cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.recordings_fastlane_background));
+        cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.primary_color));
         cardView.setMainImageDimensions(266, 400);
 
         vh.updateCardViewImage(cardView.getContext(), movie.getCardImageUrl());

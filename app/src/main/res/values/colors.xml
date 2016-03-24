@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="recordings_fastlane_background">#3949ab</color>
+    <color name="primary_color">#3949ab</color>
     <color name="recordings_search_button_color">#D50000</color>
     <color name="recordings_background">#616161</color>
 

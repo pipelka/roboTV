@@ -148,7 +148,7 @@ public class RecordingsFragment extends BrowseFragment {
         setHeadersTransitionOnBackEnabled(true);
 
         color_background = Utils.getColor(getActivity(), R.color.recordings_background);
-        color_brand = Utils.getColor(getActivity(), R.color.recordings_fastlane_background);
+        color_brand = Utils.getColor(getActivity(), R.color.primary_color);
 
         setBrandColor(color_brand);
         setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));

@@ -1,7 +1,6 @@
 package org.xvdr.recordings.presenter;
 
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.view.View;
@@ -65,7 +64,7 @@ public class ArtworkPresenter extends Presenter {
 
         cardView.setTitleText(holder.getTitle());
         cardView.setMainImageDimensions(266, 400);
-        cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.recordings_fastlane_background));
+        cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.primary_color));
 
         vh.updateCardViewImage(cardView.getContext(), holder.getPosterUrl());
     }

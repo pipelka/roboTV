@@ -21,7 +21,7 @@ public class LatestCardPresenter extends CardPresenter {
         cardView.setTitleText(movie.getTitle());
         cardView.setContentText(contextText);
         cardView.setMainImageDimensions(266, 400);
-        cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.recordings_fastlane_background));
+        cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.primary_color));
         vh.updateCardViewImage(context, movie.getCardImageUrl());
     }
 

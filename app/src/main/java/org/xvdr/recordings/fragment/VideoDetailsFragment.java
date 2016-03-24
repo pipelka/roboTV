@@ -152,7 +152,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             FullWidthDetailsOverviewRowPresenter dorPresenter =
                 new FullWidthDetailsOverviewRowPresenter(new DetailsDescriptionPresenter());
             // set detail background and style
-            dorPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.recordings_fastlane_background));
+            dorPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.primary_color));
             dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
                 @Override
                 public void onActionClicked(Action action) {

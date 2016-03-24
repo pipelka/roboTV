@@ -99,6 +99,8 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         PlaybackControlsRowPresenter playbackControlsRowPresenter;
         playbackControlsRowPresenter = new PlaybackControlsRowPresenter(new DetailsDescriptionPresenter());
 
+        playbackControlsRowPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.primary_color));
+
         ps.addClassPresenter(PlaybackControlsRow.class, playbackControlsRowPresenter);
         ps.addClassPresenter(ListRow.class, new ListRowPresenter());
         mRowsAdapter = new ArrayObjectAdapter(ps);
