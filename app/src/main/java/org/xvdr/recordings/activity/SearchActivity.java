@@ -10,7 +10,7 @@ import org.xvdr.robotv.R;
 
 public class SearchActivity extends Activity {
 
-    private static final int REQUEST_SPEECH = 1;
+    private static final int REQUEST_SPEECH = 0x10;
     SearchFragment mFragment;
 
     @Override

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.ObjectAdapter;
@@ -13,8 +14,11 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.text.TextUtils;
 
+import com.google.android.exoplayer.util.PriorityHandlerThread;
+
 import org.xvdr.recordings.activity.CoverSearchActivity;
 import org.xvdr.recordings.presenter.ArtworkPresenter;
+import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.provider.TheMovieDatabase;
@@ -33,25 +37,28 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
 
         @Override
         public void run() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final List<ArtworkHolder> list = mMovieDb.searchAll(query);
+            mRowsAdapter.clear();
 
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mListRowAdapter.clear();
+            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new ArtworkPresenter());
+            List<ArtworkHolder> list = mMovieDb.searchAll(query);
+            HeaderItem header;
 
-                            for(ArtworkHolder item : list) {
-                                mListRowAdapter.add(item);
-                            }
+            // no results
+            if(list.isEmpty()) {
+                header = new HeaderItem(getString(R.string.no_search_results, query));
+            }
+            else {
+                header = new HeaderItem(getString(R.string.search_results, query));
+            }
 
-                            mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
-                        }
-                    });
-                }
-            }).start();
+            final ListRow listRow = new ListRow(header, listRowAdapter);
+
+            for(ArtworkHolder item : list) {
+                listRowAdapter.add(item);
+            }
+
+            mRowsAdapter.add(listRow);
+            mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
         }
 
         public void setSearchQuery(String newQuery) {
@@ -60,13 +67,17 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
     }
 
     private ArrayObjectAdapter mRowsAdapter;
-    private Handler mHandler = new Handler();
+    private PriorityHandlerThread mHandlerThread;
+    private Handler mHandler;
     private SearchRunnable mDelayedLoad;
-    private ArrayObjectAdapter mListRowAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mHandlerThread = new PriorityHandlerThread("robotv:coversearchhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
 
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setSearchResultProvider(this);
@@ -82,11 +93,6 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
         });
 
         mDelayedLoad = new SearchRunnable();
-        mListRowAdapter = new ArrayObjectAdapter(new ArtworkPresenter());
-
-        ListRow listRow = new ListRow(null, mListRowAdapter);
-        mRowsAdapter.add(listRow);
-
     }
 
     @Override
@@ -112,8 +118,6 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        mListRowAdapter.clear();
-
         if(!TextUtils.isEmpty(query)) {
             mDelayedLoad.setSearchQuery(query);
             mHandler.removeCallbacks(mDelayedLoad);

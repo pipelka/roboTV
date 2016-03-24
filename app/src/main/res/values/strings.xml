@@ -88,4 +88,7 @@
     <string name="setup_speakerconfig_desc">Define your loadspeaker layout.</string>
     <string name="setup_root_speakerconfig_disabled">Disabled for passthrough</string>
 
+    <string name="search_results">Search results for \'%1$s\'</string>
+    <string name="no_search_results">No search results found for \'%1$s\'</string>
+
 </resources>
