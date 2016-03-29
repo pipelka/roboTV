@@ -50,14 +50,11 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         @Override
         public void load() throws IOException, InterruptedException {
             while(!mLoadCanceled) {
-                if(mOutputTracks[1].isFull() || mOutputTracks[0].isFull()) {
-                    Thread.sleep(10);
-                    continue;
+                if(buffersFull()) {
+                    Thread.sleep(50);
                 }
 
-                if(!requestPacket()) {
-                    Thread.sleep(10);
-                }
+                requestPacket();
             }
         }
     }
@@ -665,6 +662,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         req.delete();
 
         return true;
+    }
+
+    private boolean buffersFull() {
+        return mOutputTracks[1].isFull() || mOutputTracks[0].isFull();
     }
 
     public long getStartPositionWallclock() {
