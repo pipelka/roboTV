@@ -75,7 +75,6 @@ public class RoboTvInputService extends TvInputService {
 
         private PriorityHandlerThread mHandlerThread;
         private Handler mHandler;
-        private final Toast mTuningToast;
 
         private Point mDisplaySize = new Point();
 
@@ -112,15 +111,6 @@ public class RoboTvInputService extends TvInputService {
                 this,                                           // Listener
                 SetupUtils.getPassthrough(mContext),            // AC3 passthrough
                 SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
-
-            mTuningToast = new Toast(mContext);
-            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View view = inflater.inflate(R.layout.layout_tuning, null);
-
-            mTuningToast.setView(view);
-            mTuningToast.setDuration(Toast.LENGTH_SHORT);
-            mTuningToast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
 
             // get display width / height
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -363,20 +353,6 @@ public class RoboTvInputService extends TvInputService {
                     toast.setGravity(Gravity.RIGHT | Gravity.BOTTOM, 0, 0);
 
                     toast.show();
-                }
-            });
-        }
-
-        private void toastTuning(final int state) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if(state == ExoPlayer.STATE_READY) {
-                        mTuningToast.cancel();
-                        return;
-                    }
-
-                    mTuningToast.show();
                 }
             });
         }
