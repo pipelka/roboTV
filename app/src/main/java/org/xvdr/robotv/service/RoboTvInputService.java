@@ -247,6 +247,13 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
+
+            if(playWhenReady == true && playbackState == ExoPlayer.STATE_READY) {
+                notifyVideoAvailable();
+            }
+            else if(playWhenReady == true && playbackState == ExoPlayer.STATE_BUFFERING) {
+                notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
+            }
         }
 
         // Listener implementation
@@ -300,7 +307,7 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onDisconnect() {
-            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
+            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL);
             errorNotification(mContext.getResources().getString(R.string.connection_lost));
         }
 
@@ -358,7 +365,6 @@ public class RoboTvInputService extends TvInputService {
         @Override
         public void onDrawnToSurface(Surface surface) {
             Log.i(TAG, "onDrawnToSurface()");
-            notifyVideoAvailable();
         }
 
         private void cancelReset() {
