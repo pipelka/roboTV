@@ -68,7 +68,6 @@ public class RoboTvInputService extends TvInputService {
 
         private Uri mCurrentChannelUri;
         private String mInputId;
-        private Runnable mLastTuneRunnable;
         private Runnable mLastResetRunnable;
 
         private LiveTvPlayer mPlayer;
@@ -79,6 +78,21 @@ public class RoboTvInputService extends TvInputService {
         private final Toast mTuningToast;
 
         private Point mDisplaySize = new Point();
+
+        private class TuneRunnable implements Runnable {
+            private Uri mChannelUri;
+
+            public void setChannelUri(Uri channelUri) {
+                mChannelUri = channelUri;
+            }
+
+            @Override
+            public void run() {
+                tune(mChannelUri);
+            }
+        };
+
+        private TuneRunnable mTune = new TuneRunnable();
 
         RoboTvSession(Context context, String inputId) {
             super(context);
@@ -149,20 +163,12 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onTune(final Uri channelUri) {
-            Runnable tuneRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    tune(channelUri);
-                }
-            };
-
             // remove pending tune request
-            mHandler.removeCallbacks(mLastTuneRunnable);
-            mLastTuneRunnable = tuneRunnable;
+            mHandler.removeCallbacks(mTune);
+            mTune.setChannelUri(channelUri);
 
             // post new tune request
-            mHandler.postAtFrontOfQueue(tuneRunnable);
-
+            mHandler.post(mTune);
             return true;
         }
 
