@@ -43,7 +43,6 @@ public class RoboTvInputService extends TvInputService {
     @Override
     public void onCreate() {
         super.onCreate();
-        setTheme(android.R.style.Theme_DeviceDefault);
     }
 
     @Override
@@ -86,19 +85,20 @@ public class RoboTvInputService extends TvInputService {
             public void run() {
                 tune(mChannelUri);
             }
-        };
+        }
 
         private TuneRunnable mTune = new TuneRunnable();
 
         RoboTvSession(Context context, String inputId) {
             super(context);
             mContext = context;
-
             mInputId = inputId;
 
-            mHandlerThread = new PriorityHandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
-            mHandlerThread.start();
-            mHandler = new Handler(mHandlerThread.getLooper());
+            // get display width / height
+            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+
+            display.getSize(mDisplaySize);
 
             // player init
             mPlayer = new LiveTvPlayer(
@@ -109,16 +109,13 @@ public class RoboTvInputService extends TvInputService {
                 SetupUtils.getPassthrough(mContext),            // AC3 passthrough
                 SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
 
-            // get display width / height
-            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            Display display = wm.getDefaultDisplay();
-
-            display.getSize(mDisplaySize);
+            mHandlerThread = new PriorityHandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
+            mHandlerThread.start();
+            mHandler = new Handler(mHandlerThread.getLooper());
         }
 
         @Override
         public void onRelease() {
-
             cancelReset();
             mPlayer.release();
             mHandlerThread.interrupt();
@@ -126,6 +123,11 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onSetSurface(Surface surface) {
+            if(mPlayer == null) {
+                return false;
+            }
+
+            Log.i(TAG, "set surface");
             mPlayer.setSurface(surface);
             return true;
         }
