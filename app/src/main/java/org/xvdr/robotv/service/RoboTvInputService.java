@@ -48,10 +48,7 @@ public class RoboTvInputService extends TvInputService {
 
     @Override
     public final Session onCreateSession(String inputId) {
-        Session session = new RoboTvSession(this, inputId);
-        session.setOverlayViewEnabled(true);
-
-        return session;
+        return new RoboTvSession(this, inputId);
     }
 
     @Override
@@ -125,14 +122,6 @@ public class RoboTvInputService extends TvInputService {
             cancelReset();
             mPlayer.release();
             mHandlerThread.interrupt();
-        }
-
-        @Override
-        public View onCreateOverlayView() {
-            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View view = inflater.inflate(R.layout.overlayview, null);
-            return view;
         }
 
         @Override
