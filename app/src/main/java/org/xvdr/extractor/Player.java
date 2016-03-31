@@ -73,7 +73,6 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     private Listener mListener;
     private Handler mHandler;
-    private PriorityHandlerThread mHandlerThread;
     private Surface mSurface;
     private String mServer;
     private Context mContext;
@@ -114,17 +113,13 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mConnection = new Connection("roboTV Player", language, true);
         mConnection.addCallback(this);
 
-        mHandlerThread = new PriorityHandlerThread("roboTV:player", android.os.Process.THREAD_PRIORITY_DEFAULT);
-        mHandlerThread.start();
-
-        mHandler = new Handler(mHandlerThread.getLooper());
+        mHandler = new Handler();
     }
 
     public void release() {
         stop();
 
         mHandler = null;
-        mHandlerThread.interrupt();
 
         mExoPlayer.removeListener(this);
         mExoPlayer.release();
