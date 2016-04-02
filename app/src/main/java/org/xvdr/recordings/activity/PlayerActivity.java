@@ -8,7 +8,6 @@ import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
-import android.view.Surface;
 import android.view.SurfaceView;
 
 import com.squareup.picasso.Picasso;
@@ -16,7 +15,6 @@ import com.squareup.picasso.Target;
 
 import org.xvdr.extractor.Player;
 import org.xvdr.extractor.RecordingPlayer;
-import org.xvdr.msgexchange.Packet;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
 import org.xvdr.recordings.model.Movie;
@@ -210,10 +208,6 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     @Override
-    public void onNotification(Packet notification) {
-    }
-
-    @Override
     public void onDisconnect() {
         playPause(false);
     }
@@ -221,10 +215,6 @@ public class PlayerActivity extends Activity implements Player.Listener {
     @Override
     public void onReconnect() {
         playPause(true);
-    }
-
-    @Override
-    public void onDrawnToSurface(Surface surface) {
     }
 
     @Override

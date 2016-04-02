@@ -2,6 +2,7 @@ package org.xvdr.robotv.service;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.media.PlaybackParams;
@@ -14,21 +15,14 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Display;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Surface;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.util.PriorityHandlerThread;
 
 import org.xvdr.extractor.LiveTvPlayer;
 import org.xvdr.extractor.Player;
-import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.client.Connection;
@@ -47,6 +41,10 @@ public class RoboTvInputService extends TvInputService {
 
     @Override
     public final Session onCreateSession(String inputId) {
+        // start service
+        Intent serviceIntent = new Intent(this, DataService.class);
+        startService(serviceIntent);
+
         return new RoboTvSession(this, inputId);
     }
 
@@ -71,6 +69,7 @@ public class RoboTvInputService extends TvInputService {
 
         private PriorityHandlerThread mHandlerThread;
         private Handler mHandler;
+        private NotificationHandler mNotification;
 
         private Point mDisplaySize = new Point();
 
@@ -108,6 +107,8 @@ public class RoboTvInputService extends TvInputService {
                 this,                                           // Listener
                 SetupUtils.getPassthrough(mContext),            // AC3 passthrough
                 SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
+
+            mNotification = new NotificationHandler(mContext);
 
             mHandlerThread = new PriorityHandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
             mHandlerThread.start();
@@ -202,7 +203,7 @@ public class RoboTvInputService extends TvInputService {
                 cursor = getContentResolver().query(channelUri, projection, null, null, null);
 
                 if(cursor == null || cursor.getCount() == 0) {
-                    errorNotification(getResources().getString(R.string.channel_not_found));
+                    mNotification.error(getResources().getString(R.string.channel_not_found));
                     return false;
                 }
 
@@ -222,7 +223,7 @@ public class RoboTvInputService extends TvInputService {
             String language = SetupUtils.getLanguageISO3(mContext);
 
             if(mPlayer.openStream(uid, language) != Connection.SUCCESS) {
-                errorNotification(getResources().getString(R.string.failed_tune));
+                mNotification.error(getResources().getString(R.string.failed_tune));
                 return false;
             }
 
@@ -248,10 +249,10 @@ public class RoboTvInputService extends TvInputService {
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
 
-            if(playWhenReady == true && playbackState == ExoPlayer.STATE_READY) {
+            if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
                 notifyVideoAvailable();
             }
-            else if(playWhenReady == true && playbackState == ExoPlayer.STATE_BUFFERING) {
+            else if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
                 notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
             }
         }
@@ -260,7 +261,7 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onPlayerError(Exception e) {
-            toastNotification(getResources().getString(R.string.player_error));
+            mNotification.error(getResources().getString(R.string.player_error));
             Log.e(TAG, "onPlayerError");
             e.printStackTrace();
 
@@ -268,103 +269,15 @@ public class RoboTvInputService extends TvInputService {
         }
 
         @Override
-        public void onNotification(Packet notification) {
-            String message;
-
-            // process only STATUS messages
-            if(notification.getType() != Connection.XVDR_CHANNEL_STATUS) {
-                return;
-            }
-
-            int id = notification.getMsgID();
-            Log.d(TAG, "notification id: " + id);
-
-            switch(id) {
-                case Connection.XVDR_STATUS_MESSAGE:
-                    Log.d(TAG, "status message");
-                    notification.getU32(); // type
-                    message = notification.getString();
-                    toastNotification(message);
-                    break;
-
-                case Connection.XVDR_STATUS_RECORDING:
-                    Log.d(TAG, "recording status");
-                    notification.getU32(); // card index
-                    int on = (int) notification.getU32(); // on
-
-                    String recname = notification.getString(); // name
-                    notification.getString(); // filename
-
-                    message = mContext.getResources().getString(R.string.recording_text) + " ";
-                    message += (on == 1) ?
-                               mContext.getResources().getString(R.string.recording_started) :
-                               mContext.getResources().getString(R.string.recording_finished);
-
-                    toastNotification(recname, message, R.drawable.ic_movie_white_48dp);
-                    break;
-            }
-        }
-
-        @Override
         public void onDisconnect() {
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL);
-            errorNotification(mContext.getResources().getString(R.string.connection_lost));
+            mNotification.error(mContext.getResources().getString(R.string.connection_lost));
         }
 
         @Override
         public void onReconnect() {
-            toastNotification(mContext.getResources().getString(R.string.connection_restored));
+            mNotification.notify(mContext.getResources().getString(R.string.connection_restored));
             onTune(mCurrentChannelUri);
-        }
-
-        private void toastNotification(String message) {
-            toastNotification(
-                message,
-                mContext.getResources().getString(R.string.toast_information),
-                R.drawable.ic_info_outline_white_48dp);
-        }
-
-        private void toastNotification(String message, String title) {
-            toastNotification(message, title, R.drawable.ic_info_outline_white_48dp);
-        }
-
-        private void toastNotification(final String message, final String title, final int icon) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    final Toast toast = new Toast(mContext);
-                    LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                    View view = inflater.inflate(R.layout.layout_toast, null);
-
-                    TextView titleView = (TextView) view.findViewById(R.id.title);
-                    titleView.setText(title);
-
-                    TextView messageView = (TextView) view.findViewById(R.id.message);
-                    messageView.setText(message);
-
-                    ImageView imageView = (ImageView) view.findViewById(R.id.icon);
-                    imageView.setImageResource(icon);
-
-                    toast.setView(view);
-                    toast.setDuration(Toast.LENGTH_LONG);
-                    toast.setGravity(Gravity.RIGHT | Gravity.BOTTOM, 0, 0);
-
-                    toast.show();
-                }
-            });
-        }
-
-        private void errorNotification(String message) {
-            toastNotification(
-                message,
-                mContext.getResources().getString(R.string.toast_error),
-                R.drawable.ic_error_outline_white_48dp);
-        }
-
-        @Override
-        public void onDrawnToSurface(Surface surface) {
-            Log.i(TAG, "onDrawnToSurface()");
         }
 
         private void cancelReset() {

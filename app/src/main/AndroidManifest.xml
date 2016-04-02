@@ -20,6 +20,8 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature
@@ -105,7 +107,25 @@
                 android:resource="@xml/authenticator" />
         </service>
 
+        <!-- data service -->
+
+        <service android:name=".service.DataService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
+        <receiver
+            android:enabled="true"
+            android:name=".service.BootCompletedReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
         <!-- roboTV Recordings -->
+
         <activity
             android:name="org.xvdr.recordings.activity.RecordingsActivity"
             android:banner="@drawable/banner_movies"

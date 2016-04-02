@@ -3,7 +3,6 @@ package org.xvdr.extractor;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaCodec;
-import android.media.PlaybackParams;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
@@ -16,7 +15,6 @@ import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioTrack;
-import com.google.android.exoplayer.util.PriorityHandlerThread;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.msgexchange.Session;
@@ -40,13 +38,9 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
         void onPlayerError(Exception e);
 
-        void onNotification(Packet notification);
-
         void onDisconnect();
 
         void onReconnect();
-
-        void onDrawnToSurface(Surface surface);
 
         void onTracksChanged(StreamBundle bundle);
 
@@ -359,7 +353,6 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     @Override
     public void onNotification(final Packet notification) {
-        mListener.onNotification(notification);
     }
 
     @Override
@@ -438,7 +431,6 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     @Override
     public void onDrawnToSurface(Surface surface) {
-        mListener.onDrawnToSurface(surface);
     }
 
 }
