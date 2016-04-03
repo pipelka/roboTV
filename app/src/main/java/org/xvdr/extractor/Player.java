@@ -104,7 +104,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mExoPlayer.addListener(this);
 
         // create connection
-        mConnection = new Connection("roboTV Player", language, true);
+        mConnection = new Connection("roboTV Player", language, false);
         mConnection.addCallback(this);
 
         mHandler = new Handler();
