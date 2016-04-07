@@ -504,6 +504,10 @@ public class ChannelSyncAdapter {
             return;
         }
 
+        if(os == null) {
+            return;
+        }
+
         byte[] buffer = new byte[32768];
         int bytes_read;
 
