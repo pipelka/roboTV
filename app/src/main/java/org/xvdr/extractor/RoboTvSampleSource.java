@@ -16,13 +16,12 @@ import com.google.android.exoplayer.upstream.Loader;
 import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.msgexchange.Packet;
-import org.xvdr.msgexchange.Session;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSourceReader, Session.Callback, Loader.Callback {
+public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSourceReader, Loader.Callback {
 
     public interface Listener {
 
@@ -146,7 +145,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     @Override
     public SampleSourceReader register() {
-        mConnection.addCallback(this);
         return this;
     }
 
@@ -331,28 +329,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     public void release() {
         stopLoading();
         mLoader.release();
-        mConnection.removeCallback(this);
 
         for(int i = 0; i < TRACK_COUNT; i++) {
             mOutputTracks[i].clear();
-        }
-    }
-
-    @Override
-    public void onNotification(Packet packet) {
-        int id = packet.getMsgID();
-
-        switch(id) {
-            case Connection.XVDR_STREAM_POSITIONS:
-                long p  = packet.getS64();
-
-                // sanity check
-                if(p < mCurrentPositionTimeshift) {
-                    mStartPositionTimeshift = p;
-                }
-
-                mEndPositionTimeshift = packet.getS64();
-                break;
         }
     }
 
@@ -373,14 +352,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                 break;
         }
 
-    }
-
-    @Override
-    public void onDisconnect() {
-    }
-
-    @Override
-    public void onReconnect() {
     }
 
     /**
@@ -643,6 +614,15 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             return false;
         }
 
+        long p  = resp.getS64();
+
+        // sanity check
+        if(p < mCurrentPositionTimeshift) {
+            mStartPositionTimeshift = p;
+        }
+
+        mEndPositionTimeshift = resp.getS64();
+
         // process all the packets in the packet
         while(!resp.eop()) {
             int msgId = resp.getU16();
@@ -651,7 +631,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             resp.setClientID(clientId);
 
             if(resp.eop()) {
-                Log.d(TAG, "error in packet skipping");
+                Log.d(TAG, "error in packet - skipping");
                 return false;
             }
 
