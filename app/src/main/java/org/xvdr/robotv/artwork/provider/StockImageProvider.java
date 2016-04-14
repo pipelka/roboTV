@@ -7,23 +7,23 @@ public class StockImageProvider extends SimpleArtworkProvider {
 
     private String getStockBackground(int contentId) {
         switch(contentId) {
-            // Football / Soccer
+                // Football / Soccer
             case 0x43:
                 return "https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-football.jpg";
 
-            // Tennis
+                // Tennis
             case 0x44:
                 return "https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-tennis.jpg";
 
-            // Athletics
+                // Athletics
             case 0x46:
                 return "https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-athletics.jpg";
 
-            // Wintersports
+                // Wintersports
             case 0x49:
                 return "https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-winter.jpg";
 
-            // Equestrian
+                // Equestrian
             case 0x4A:
                 return "https://raw.githubusercontent.com/pipelka/roboTV/master/media/stock/sport-equestrian.jpg";
         }

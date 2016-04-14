@@ -97,8 +97,8 @@ public class VideoDetailsFragment extends DetailsFragment {
                 if(!(url == null || url.isEmpty())) {
                     Bitmap poster = Picasso.with(getActivity())
                                     .load(url)
-                                    .resize(Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_size), getActivity().getApplicationContext()),
-                                            Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_height), getActivity().getApplicationContext()))
+                                    .resize(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()),
+                                            Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
                                     .error(getResources().getDrawable(R.drawable.recording_unkown, null))
                                     .placeholder(getResources().getDrawable(R.drawable.recording_unkown, null))
                                     .centerCrop()

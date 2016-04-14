@@ -18,6 +18,7 @@ import org.xvdr.extractor.RecordingPlayer;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
 import org.xvdr.recordings.model.Movie;
+import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.client.StreamBundle;
@@ -68,7 +69,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
             Picasso
             .with(this)
             .load(url)
-            .resize(266, 400)
+            .resize(Utils.dpToPx(R.integer.artwork_poster_width, this), Utils.dpToPx(R.integer.artwork_poster_height, this))
             .centerCrop()
             .into(new Target() {
                 @Override

@@ -167,8 +167,8 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
         Picasso.with(getActivity())
         .load(url)
-        .resize(Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_size), getActivity().getApplicationContext()),
-                Utils.dpToPx(getActivity().getResources().getInteger(R.integer.detail_thumbnail_square_height), getActivity().getApplicationContext()))
+        .resize(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()),
+                Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
         .into(mPlaybackControlsRowTarget);
     }
 

@@ -9,14 +9,21 @@ import android.util.Log;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.artwork.ArtworkFetcher;
+import org.xvdr.robotv.artwork.ArtworkHolder;
+import org.xvdr.robotv.artwork.ArtworkUtils;
+import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.setup.SetupUtils;
+
+import java.io.IOException;
 
 public class DataService extends Service implements Connection.Callback {
 
     Connection mConnection;
     Handler mHandler;
     NotificationHandler mNotification;
+    ArtworkFetcher m_artwork;
 
     private static final String TAG = "DataService";
 
@@ -57,6 +64,9 @@ public class DataService extends Service implements Connection.Callback {
             true);
 
         mConnection.addCallback(this);
+
+        m_artwork = new ArtworkFetcher(mConnection, SetupUtils.getLanguage(this));
+
         mHandler.post(mOpenRunnable);
     }
 
@@ -68,6 +78,42 @@ public class DataService extends Service implements Connection.Callback {
 
     private boolean open() {
         return mConnection.open(SetupUtils.getServer(this));
+    }
+
+    private void onRecording(Packet p) {
+        p.getU32(); // recording index - currently unused
+        boolean on = (p.getU32() == 1); // on
+        String title = p.getString(); // title
+        p.getString(); // description - currently unused
+
+        final String message = getResources().getString(R.string.recording_text) + " " + (on ?
+                               getResources().getString(R.string.recording_started) :
+                               getResources().getString(R.string.recording_finished));
+
+        // we do not have an event attached
+
+        if(p.eop()) {
+            mNotification.notify(message, title, R.drawable.ic_movie_white_48dp);
+            return;
+        }
+
+        // process atteched event
+
+        final Event event = ArtworkUtils.packetToEvent(p);
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ArtworkHolder holder = m_artwork.fetchForEvent(event);
+                    mNotification.notify(message, event.getTitle(), holder.getBackgroundUrl());
+                }
+                catch(IOException e) {
+                    e.printStackTrace();
+                    mNotification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
+                }
+            }
+        });
     }
 
     @Override
@@ -84,26 +130,13 @@ public class DataService extends Service implements Connection.Callback {
 
         switch(id) {
             case Connection.XVDR_STATUS_MESSAGE:
-                Log.d(TAG, "status message");
                 notification.getU32(); // type
                 message = notification.getString();
                 mNotification.notify(message);
                 break;
 
             case Connection.XVDR_STATUS_RECORDING:
-                Log.d(TAG, "recording status");
-                notification.getU32(); // card index
-                int on = (int) notification.getU32(); // on
-
-                String recname = notification.getString(); // name
-                notification.getString(); // filename
-
-                message = getResources().getString(R.string.recording_text) + " ";
-                message += (on == 1) ?
-                           getResources().getString(R.string.recording_started) :
-                           getResources().getString(R.string.recording_finished);
-
-                mNotification.notify(recname, message, R.drawable.ic_movie_white_48dp);
+                onRecording(notification);
                 break;
         }
     }
