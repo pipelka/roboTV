@@ -3,7 +3,5 @@
     <color name="primary_color">#3949ab</color>
     <color name="recordings_search_button_color">#D50000</color>
     <color name="recordings_background">#616161</color>
-
     <color name="default_background">#3d3d3d</color>
-
 </resources>
