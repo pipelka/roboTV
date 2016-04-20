@@ -13,13 +13,15 @@
         android:elevation="7dp">
 
         <ImageView
-            android:layout_width="30pt"
+            android:layout_width="wrap_content"
             android:layout_height="30pt"
             android:id="@+id/icon"
             android:src="@drawable/ic_info_outline_white_48dp"
             android:layout_marginLeft="5pt"
             android:layout_marginTop="5pt"
-            android:layout_marginBottom="5pt"/>
+            android:layout_marginBottom="5pt"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"/>
 
         <LinearLayout
             android:orientation="vertical"
