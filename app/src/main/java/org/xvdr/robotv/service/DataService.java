@@ -47,14 +47,22 @@ public class DataService extends Service implements Connection.Callback {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
+        Log.d(TAG, "start service");
+
+        // check if the server has changed
+        String server = SetupUtils.getServer(this);
+
+        if(mConnection != null && mConnection.isOpen() && !mConnection.getHostname().equals(server)) {
+            Log.i(TAG, "new server: " + server);
+            mConnection.close();
+            mHandler.post(mOpenRunnable);
+        }
+
         return START_STICKY;
     }
 
     @Override
     public void onCreate() {
-        Log.d(TAG, "onCreate");
-
         mHandler = new Handler();
         mNotification = new NotificationHandler(this);
 
@@ -72,7 +80,6 @@ public class DataService extends Service implements Connection.Callback {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy");
         mConnection.close();
     }
 
