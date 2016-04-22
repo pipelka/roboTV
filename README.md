@@ -28,10 +28,8 @@ The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [
 
 ## Building
 
-1. Set the SDK and NDK location in Android Studio or "local.properties"
+1. Set the SDK and NDK location in Android Studio (Project Structure) or "local.properties". Please downwload the Android NDK 11 and set the proper path.2
 2. ./gradlew assembleDebug
-
-or use AndroidStudio
 
 # Current Features
 
