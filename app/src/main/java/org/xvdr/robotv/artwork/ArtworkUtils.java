@@ -47,6 +47,9 @@ public class ArtworkUtils {
         String shortText = p.getString();
         String description = p.getString();
 
-        return new Event(contentId, title, shortText, description, duration, eventId);
+        Event e = new Event(contentId, title, shortText, description, duration, eventId);
+        e.setStartTime(startTime);
+
+        return e;
     }
 }

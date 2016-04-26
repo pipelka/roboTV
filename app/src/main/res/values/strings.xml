@@ -93,4 +93,17 @@
 
     <string name="receivers_busy">All receivers busy</string>
     <string name="blocked_by_recording">Channel blocked by recording</string>
+
+    <string name="service_connected">roboTV service connected</string>
+    <string name="timer_add_desc">%1$s%2$s - %3$s</string>
+    <string name="timer_add_create">Create Timer</string>
+    <string name="timer_add_select_folder">Select Folder</string>
+    <string name="timer_add_cancel">Cancel</string>
+    <string name="search_epg">EPG</string>
+    <string name="schedule_recording">Schedule recording</string>
+    <string name="timer_title">Add Timer</string>
+    <string name="empty_folder">None</string>
+    <string name="timer_add_create_new_folder">Create new folder</string>
+    <string name="timer_add_select_folder_none">None</string>
+    <string name="timer_new_folder">New</string>
 </resources>

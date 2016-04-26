@@ -21,6 +21,10 @@ public class Channels extends ArrayList<Channels.Entry> {
         public boolean radio = false;
     }
 
+    public void load(Connection connection) {
+        load(connection, "");
+    }
+
     public void load(Connection connection, String language) {
         clear();
 
@@ -31,6 +35,16 @@ public class Channels extends ArrayList<Channels.Entry> {
         clear();
 
         loadChannelType(connection, false, language, callback);
+    }
+
+    public Entry findByUid(int uid) {
+        for(Entry e : this) {
+            if(e.uid == uid) {
+                return e;
+            }
+        }
+
+        return null;
     }
 
     private boolean loadChannelType(Connection connection, boolean radio, String language, Callback callback) {

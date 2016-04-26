@@ -185,7 +185,7 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         private void loadRelatedMedia(ArrayObjectAdapter adapter) {
 
-            /*ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter( new CardPresenter() );
+            /*ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter( new MoviePresenter() );
             for( Movie movie : related ) {
                 listRowAdapter.add( movie );
             }

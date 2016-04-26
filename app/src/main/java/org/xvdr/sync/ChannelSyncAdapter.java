@@ -4,22 +4,29 @@ import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.RemoteException;
+import android.support.annotation.AnyRes;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
 
 import org.xvdr.msgexchange.Packet;
+import org.xvdr.recordings.util.Utils;
+import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.Channels;
 import org.xvdr.robotv.client.Connection;
+import org.xvdr.timers.activity.TimerActivity;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -242,7 +249,15 @@ public class ChannelSyncAdapter {
 
         int i = 0;
 
+        // epg search intent
+
         for(Channels.Entry entry : list) {
+            Intent intent = new Intent(mContext, TimerActivity.class);
+            intent.putExtra("uid", entry.uid);
+            intent.putExtra("name", entry.name);
+
+            String link = "intent:" + intent.toUri(0);
+
             Uri channelUri;
             Long channelId = existingChannels.get(entry.uid);
 
@@ -258,6 +273,13 @@ public class ChannelSyncAdapter {
             values.put(TvContract.Channels.COLUMN_SERVICE_TYPE, entry.radio ? TvContract.Channels.SERVICE_TYPE_AUDIO : TvContract.Channels.SERVICE_TYPE_AUDIO_VIDEO);
             values.put(TvContract.Channels.COLUMN_TYPE, TvContract.Channels.TYPE_DVB_S2);
             values.put(TvContract.Channels.COLUMN_SEARCHABLE, 1);
+            values.put(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA, Integer.toString(entry.uid));
+
+            values.put(TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI, getUriToResource(mContext, R.drawable.banner_timers).toString());
+            values.put(TvContract.Channels.COLUMN_APP_LINK_INTENT_URI, link);
+            values.put(TvContract.Channels.COLUMN_APP_LINK_TEXT, mContext.getString(R.string.timer_title));
+            values.put(TvContract.Channels.COLUMN_APP_LINK_COLOR, Utils.getColor(mContext, R.color.primary_color));
+            values.put(TvContract.Channels.COLUMN_APP_LINK_ICON_URI, "");
 
             // insert new channel
             if(channelId == null) {
@@ -576,5 +598,29 @@ public class ChannelSyncAdapter {
         }
 
         return 0;
+    }
+
+    /**
+     * get uri to any resource type
+     * @param context - context
+     * @param resId - resource id
+     * @throws Resources.NotFoundException if the given ID does not exist.
+     * @return - Uri to resource by given id
+     */
+    public static final Uri getUriToResource(@NonNull Context context, @AnyRes int resId) throws Resources.NotFoundException {
+        /** Return a Resources instance for your application's package. */
+        Resources res = context.getResources();
+        /**
+         * Creates a Uri which parses the given encoded URI string.
+         * @param uriString an RFC 2396-compliant, encoded URI
+         * @throws NullPointerException if uriString is null
+         * @return Uri for this given uri string
+         */
+        Uri resUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
+                               "://" + res.getResourcePackageName(resId)
+                               + '/' + res.getResourceTypeName(resId)
+                               + '/' + res.getResourceEntryName(resId));
+        /** return uri */
+        return resUri;
     }
 }

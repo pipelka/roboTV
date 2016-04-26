@@ -5,5 +5,5 @@
     android:name="org.xvdr.recordings.fragment.VideoDetailsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DetailsActivity"
+    tools:context="org.xvdr.recordings.activity.DetailsActivity"
     tools:deviceIds="tv" />

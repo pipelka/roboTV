@@ -8,14 +8,14 @@ import android.support.v17.leanback.widget.ObjectAdapter;
 import android.support.v17.leanback.widget.Presenter;
 import android.util.ArrayMap;
 
-import org.xvdr.recordings.presenter.CardPresenter;
+import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
 
 import java.util.Comparator;
 
 public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
-    private CardPresenter mCardPresenter;
+    private MoviePresenter mCardPresenter;
     private LatestCardPresenter mLatestCardPresenter;
     private ArrayMap<String, ListRow> mSeriesMap;
     private ArrayObjectAdapter mLatest;
@@ -31,7 +31,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
     public MovieCollectionAdapter() {
         super(new ListRowPresenter());
-        mCardPresenter = new CardPresenter();
+        mCardPresenter = new MoviePresenter();
         mLatestCardPresenter = new LatestCardPresenter();
 
         mSeriesMap = new ArrayMap<>();

@@ -30,11 +30,11 @@ public class Connection extends Session {
     public static final int XVDR_CHANNEL_REQUEST_RESPONSE = 1;
     public static final int XVDR_CHANNEL_STREAM = 2;
     public static final int XVDR_CHANNEL_STATUS = 5;
-    public static final int XVDR_GET_CONFIG = 8;
 
 
     /* OPCODE 1 - 19: XVDR network functions for general purpose */
     public static final int XVDR_LOGIN = 1;
+    public static final int XVDR_GET_CONFIG = 8;
 
     /* OPCODE 20 - 39: XVDR network functions for live streaming */
     public static final int XVDR_CHANNELSTREAM_OPEN = 20;
@@ -49,6 +49,9 @@ public class Connection extends Session {
 
     /* OPCODE 60 - 79: XVDR network functions for channel access */
     public static final int XVDR_CHANNELS_GETCHANNELS = 63;
+
+    /* OPCODE 80 - 99: RoboTV network functions for timer access */
+    public static final int ROBOTV_TIMER_ADD = 83;
 
     /* OPCODE 100 - 119: XVDR network functions for recording access */
     public static final int XVDR_RECORDINGS_DISKSIZE = 100;
@@ -68,6 +71,7 @@ public class Connection extends Session {
 
     /* OPCODE 120 - 139: XVDR network functions for epg access and manipulating */
     public static final int XVDR_EPG_GETFORCHANNEL = 120;
+    public static final int XVDR_EPG_SEARCH = 121;
 
     /** Stream packet types (server -> client) */
     public static final int XVDR_STREAM_CHANGE = 1;
@@ -181,4 +185,18 @@ public class Connection extends Session {
         Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_CLOSE, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
         return (transmitMessage(req) != null);
     }
+
+    public String getConfig(String key) {
+        Packet request = CreatePacket(XVDR_GET_CONFIG);
+        request.putString(key);
+
+        Packet response = transmitMessage(request);
+
+        if(response == null) {
+            return "";
+        }
+
+        return response.getString();
+    }
+
 }

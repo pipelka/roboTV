@@ -10,6 +10,10 @@ public class Utils {
     private Utils() {
     }
 
+    public static int dp(int integerResource, Context ctx) {
+        return ctx.getResources().getInteger(integerResource);
+    }
+
     public static int dpToPx(int integerResource, Context ctx) {
         int dp = ctx.getResources().getInteger(integerResource);
         float density = ctx.getResources().getDisplayMetrics().density;

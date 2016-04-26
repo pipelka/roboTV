@@ -84,15 +84,6 @@ public class ArtworkFetcher {
     }
 
     protected String getEpgImageTemplateUrl() {
-        Packet request = mConnection.CreatePacket(Connection.XVDR_GET_CONFIG);
-        request.putString("EpgImageUrl");
-
-        Packet response = mConnection.transmitMessage(request);
-
-        if(response == null) {
-            return "";
-        }
-
-        return response.getString();
+        return mConnection.getConfig("EpgImageUrl");
     }
 }

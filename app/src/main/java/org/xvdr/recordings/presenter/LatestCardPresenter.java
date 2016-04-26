@@ -8,7 +8,7 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
-public class LatestCardPresenter extends CardPresenter {
+public class LatestCardPresenter extends MoviePresenter {
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
         Movie movie = (Movie) item;

@@ -21,7 +21,7 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
 import org.xvdr.recordings.model.PacketAdapter;
 import org.xvdr.recordings.model.SortedArrayObjectAdapter;
-import org.xvdr.recordings.presenter.CardPresenter;
+import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.setup.SetupUtils;
@@ -36,7 +36,7 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
 
         @Override
         public void run() {
-            ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(MovieCollectionAdapter.compareTimestamps, new CardPresenter());
+            ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(MovieCollectionAdapter.compareTimestamps, new MoviePresenter());
 
             Packet req = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_SEARCH, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
             req.putString(query);

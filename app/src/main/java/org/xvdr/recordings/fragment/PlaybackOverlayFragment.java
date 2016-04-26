@@ -330,7 +330,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
     private void addOtherRows() {
-        /*ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
+        /*ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new MoviePresenter());
         Movie movie = new Movie();
         movie.setTitle("Title");
         movie.setStudio("studio");

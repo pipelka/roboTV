@@ -2,9 +2,9 @@
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
-    android:name="org.xvdr.recordings.fragment.RecordingsFragment"
+    android:name="org.xvdr.timers.fragment.TimerFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.xvdr.recordings.activity.RecordingsActivity"
+    tools:context="org.xvdr.timers.activity.TimerActivity"
     tools:deviceIds="tv"
     tools:ignore="MergeRootFrame" />

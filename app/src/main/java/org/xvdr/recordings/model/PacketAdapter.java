@@ -10,7 +10,7 @@ public class PacketAdapter {
         Movie movie = new Movie();
 
         movie.setTimeStamp(p.getU32() * 1000L);
-        movie.setDurationMs((int)p.getU32());
+        movie.setDuration((int)p.getU32());
         p.getU32(); // Priority
         p.getU32(); // Lifetime
         movie.setChannelName(p.getString()); // ChannelName

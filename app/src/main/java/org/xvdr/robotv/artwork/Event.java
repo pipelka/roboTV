@@ -1,5 +1,6 @@
 package org.xvdr.robotv.artwork;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 
 public class Event {
@@ -11,6 +12,7 @@ public class Event {
     private int mDuration;
     private int mYear;
     private int mEventId;
+    private long mStartTime;
 
     private static String[] genreFilm = {
         "abenteuerfilm",
@@ -201,5 +203,17 @@ public class Event {
         }
 
         return contentId;
+    }
+
+    void setStartTime(long startTime) {
+        mStartTime = startTime;
+    }
+
+    public long getStartTime() {
+        return mStartTime;
+    }
+
+    public Timestamp getTimestamp() {
+        return new Timestamp(mStartTime * 1000);
     }
 }

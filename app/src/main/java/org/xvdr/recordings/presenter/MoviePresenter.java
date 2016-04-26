@@ -14,9 +14,9 @@ import org.xvdr.robotv.R;
 import com.squareup.picasso.Picasso;
 
 
-public class CardPresenter extends Presenter {
+public class MoviePresenter extends Presenter {
 
-    static class ViewHolder extends Presenter.ViewHolder {
+    static public class ViewHolder extends Presenter.ViewHolder {
         private ImageCardView mCardView;
         private PicassoImageCardViewTarget mImageCardViewTarget;
 

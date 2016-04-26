@@ -43,7 +43,7 @@ public class RecordingsFragment extends BrowseFragment {
         @Override
         public void onStart() {
             mSpinnerFragment = new SpinnerFragment();
-            getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
+            getFragmentManager().beginTransaction().add(R.id.container, mSpinnerFragment).commit();
         }
 
         @Override
@@ -128,6 +128,7 @@ public class RecordingsFragment extends BrowseFragment {
 
         HeaderItem gridHeader = new HeaderItem(adapter.size(), "Settings");
         ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(new PreferenceCardPresenter());
+
         gridRowAdapter.add(new PreferenceCardPresenter.Style(1, "Setup", R.drawable.ic_settings_white_48dp));
 
         adapter.add(new ListRow(gridHeader, gridRowAdapter));

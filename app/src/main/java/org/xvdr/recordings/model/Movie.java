@@ -1,5 +1,6 @@
 package org.xvdr.recordings.model;
 
+import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
 
 import java.io.Serializable;
@@ -19,7 +20,7 @@ public class Movie implements Serializable {
     private String id;
     private int content;
     private String channelName;
-    private String formattedDate;
+    private int channelUid;
     private boolean isSeriesHeader = false;
 
     public Movie() {
@@ -83,28 +84,22 @@ public class Movie implements Serializable {
 
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
-
-        try {
-            DateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-            Date netDate = (new Date(timeStamp));
-            formattedDate = sdf.format(netDate).trim();
-        }
-        catch(Exception e) {
-            formattedDate = "";
-        }
-
     }
 
     public long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setDurationMs(int duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 
     public long getDurationMs() {
         return duration * 1000;
+    }
+
+    public long getDuration() {
+        return duration;
     }
 
     public void setId(String id) {
@@ -144,8 +139,34 @@ public class Movie implements Serializable {
         return channelName;
     }
 
+    public void setChannelUid(int channelUid) {
+        this.channelUid = channelUid;
+    }
+
+    public int getChannelUid() {
+        return channelUid;
+    }
+
     public String getDate() {
-        return formattedDate;
+        try {
+            DateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            Date netDate = (new Date(timeStamp));
+            return sdf.format(netDate).trim();
+        }
+        catch(Exception e) {
+            return "";
+        }
+    }
+
+    public String getDateTime() {
+        try {
+            DateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+            Date netDate = (new Date(timeStamp));
+            return sdf.format(netDate).trim();
+        }
+        catch(Exception e) {
+            return "";
+        }
     }
 
     public Event getEvent() {
@@ -164,6 +185,15 @@ public class Movie implements Serializable {
         return isSeriesHeader;
     }
 
+    public void setArtwork(ArtworkHolder artwork) {
+        if(artwork == null) {
+            return;
+        }
+
+        cardImageUrl = artwork.getPosterUrl();
+        backgroundImageUrl = artwork.getBackgroundUrl();
+    }
+
     public void setArtwork(Movie movie) {
         cardImageUrl = movie.getCardImageUrl();
         backgroundImageUrl = movie.getBackgroundImageUrl();
@@ -179,5 +209,13 @@ public class Movie implements Serializable {
                ", cardImageUrl=\'" + cardImageUrl + "\'" +
                ", backgroundImageUrl=\'" + backgroundImageUrl + "\'" +
                "}";
+    }
+
+    public void setStartTime(long startTime) {
+        this.timeStamp = startTime * 1000;
+    }
+
+    public long getStartTime() {
+        return timeStamp / 1000;
     }
 }

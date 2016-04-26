@@ -12,6 +12,8 @@ import java.util.Locale;
 
 public class SetupUtils {
 
+    static private String mRecordingFolder = "";
+
     static public String getServer(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         return prefs.getString("server", "192.168.16.10");
@@ -111,5 +113,13 @@ public class SetupUtils {
         SharedPreferences.Editor e = prefs.edit();
         e.putInt("speakerconfig", speakerConfig);
         e.apply();
+    }
+
+    public static void setRecordingFolder(String folder) {
+        mRecordingFolder = folder;
+    }
+
+    public static String getRecordingFolder() {
+        return mRecordingFolder;
     }
 }
