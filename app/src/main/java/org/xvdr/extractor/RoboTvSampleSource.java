@@ -13,6 +13,7 @@ import com.google.android.exoplayer.SampleSource;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.extractor.ts.PtsTimestampAdjuster;
 import com.google.android.exoplayer.upstream.Loader;
+import com.google.android.exoplayer.util.Assertions;
 import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.msgexchange.Packet;
@@ -51,6 +52,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             while(!mLoadCanceled) {
                 if(buffersFull()) {
                     Thread.sleep(50);
+                    continue;
                 }
 
                 requestPacket();
@@ -96,6 +98,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     final private SparseArray<StreamReader> mStreamReaders = new SparseArray(TRACK_COUNT);
     final private SparseBooleanArray mTrackEnabled = new SparseBooleanArray(TRACK_COUNT);
 
+    final private Packet mRequest;
+    final private Packet mResponse;
+
     final private int mTrackContentMapping[] = {
         StreamBundle.CONTENT_VIDEO,
         StreamBundle.CONTENT_AUDIO,
@@ -103,6 +108,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     };
 
     private AudioCapabilities mAudioCapabilities;
+    private int mReleaseCount;
 
     /**
      * Create a LiveTv SampleSource
@@ -140,11 +146,16 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mLoader = new Loader("roboTV:streamloader");
         mAllocator = new AdaptiveAllocator(200, 32 * 1024);
 
+        mResponse = new Packet();
+        mRequest = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+
+
         logChannelConfiguration(mAudioPassthrough, mChannelConfiguration);
     }
 
     @Override
     public SampleSourceReader register() {
+        mReleaseCount++;
         return this;
     }
 
@@ -256,6 +267,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             outputTrack.poll();
             formatHolder.format = p.format;
             mNeedFormatChange[track] = false;
+            mOutputTracks[track].release(p);
             return FORMAT_READ;
         }
 
@@ -286,6 +298,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             sampleHolder.data.put(buffer.data(), 0, sampleHolder.size);
 
             mAllocator.release(buffer);
+            mOutputTracks[track].release(p);
+
             return SAMPLE_READ;
         }
 
@@ -327,11 +341,16 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     @Override
     public void release() {
-        stopLoading();
-        mLoader.release();
-
-        for(int i = 0; i < TRACK_COUNT; i++) {
-            mOutputTracks[i].clear();
+        Assertions.checkState(mReleaseCount > 0);
+        if (--mReleaseCount == 0) {
+            if (mLoader != null) {
+                mLoader.release();
+                mLoader = null;
+            }
+            for (int i = 0; i < TRACK_COUNT; i++) {
+                mOutputTracks[i].clear();
+                mOutputTracks[i] = null;
+            }
         }
     }
 
@@ -598,48 +617,42 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     }
 
     protected boolean requestPacket() {
-        final Packet req = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
-
         boolean keyFrameMode = mPlaybackAdjuster.getSpeed() > 2;
-        req.putU8(keyFrameMode ? (short)1 : (short)0);
 
-        final Packet resp = mConnection.transmitMessage(req);
+        mRequest.createUid();
+        mRequest.putU8(keyFrameMode ? (short)1 : (short)0);
 
-        if(resp == null || resp.eop()) {
-            if(resp != null) {
-                resp.delete();
-            }
-
-            req.delete();
+        if(!mConnection.transmitMessage(mRequest, mResponse)) {
             return false;
         }
 
-        long p  = resp.getS64();
+        if(mResponse.eop()) {
+            return false;
+        }
+
+        long p = mResponse.getS64();
 
         // sanity check
         if(p < mCurrentPositionTimeshift) {
             mStartPositionTimeshift = p;
         }
 
-        mEndPositionTimeshift = resp.getS64();
+        mEndPositionTimeshift = mResponse.getS64();
 
         // process all the packets in the packet
-        while(!resp.eop()) {
-            int msgId = resp.getU16();
-            int clientId = resp.getU16();
-            resp.setMsgID(msgId);
-            resp.setClientID(clientId);
+        while(!mResponse.eop()) {
+            int msgId = mResponse.getU16();
+            int clientId = mResponse.getU16();
+            mResponse.setMsgID(msgId);
+            mResponse.setClientID(clientId);
 
-            if(resp.eop()) {
+            if(mResponse.eop()) {
                 Log.d(TAG, "error in packet - skipping");
                 return false;
             }
 
-            writePacket(resp);
+            writePacket(mResponse);
         }
-
-        resp.delete();
-        req.delete();
 
         return true;
     }

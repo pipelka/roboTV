@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ListIterator;
 
 public class AdaptiveAllocator {
 
     final static String TAG = "AdaptiveAllocator";
 
     private List<Allocation> m_list;
-
+    private Comparator<Allocation> mComparator = new Comparator<Allocation>() {
+        @Override
+        public int compare(Allocation lhs, Allocation rhs) {
+            return lhs.size() < rhs.size() ? -1 : 1;
+        }
+    };
 
     public AdaptiveAllocator(int initialBufferCount, int initalBufferSize) {
         m_list = new ArrayList<>(initialBufferCount);
@@ -53,7 +57,9 @@ public class AdaptiveAllocator {
     }
 
     private Allocation findAllocation(int neededSize) {
-        for(Allocation p : m_list) {
+        for(int i = 0; i < m_list.size(); i++) {
+            Allocation p = m_list.get(i);
+
             if(p.size() >= neededSize && p.allocate()) {
                 return p;
             }
@@ -63,10 +69,10 @@ public class AdaptiveAllocator {
     }
 
     private Allocation findUnallocated() {
-        ListIterator<Allocation> li = m_list.listIterator(m_list.size());
+        int i = m_list.size() - 1;
 
-        while(li.hasPrevious()) {
-            Allocation p = li.previous();
+        while(i >= 0) {
+            Allocation p = m_list.get(i--);
 
             if(p.allocate()) {
                 return p;
@@ -77,11 +83,6 @@ public class AdaptiveAllocator {
     }
 
     private void sort() {
-        Collections.sort(m_list, new Comparator<Allocation>() {
-            @Override
-            public int compare(Allocation lhs, Allocation rhs) {
-                return lhs.size() < rhs.size() ? -1 : 1;
-            }
-        });
+        Collections.sort(m_list, mComparator);
     }
 }
