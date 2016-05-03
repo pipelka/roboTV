@@ -51,6 +51,10 @@ public class Packet {
     this(msgexchangeJNI.new_Packet__SWIG_3(), true);
   }
 
+  public void createUid() {
+    msgexchangeJNI.Packet_createUid(swigCPtr, this);
+  }
+
   public boolean putString(String string) {
     return msgexchangeJNI.Packet_putString(swigCPtr, this, string);
   }
@@ -201,6 +205,10 @@ public class Packet {
 
   public void print() {
     msgexchangeJNI.Packet_print(swigCPtr, this);
+  }
+
+  public void copy(Packet p) {
+    msgexchangeJNI.Packet_copy(swigCPtr, this, Packet.getCPtr(p), p);
   }
 
   public void skipBuffer(int length) {

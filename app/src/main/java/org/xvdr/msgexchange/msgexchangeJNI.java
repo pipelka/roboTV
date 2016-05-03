@@ -14,6 +14,7 @@ public class msgexchangeJNI {
   public final static native long new_Packet__SWIG_2(int jarg1);
   public final static native long new_Packet__SWIG_3();
   public final static native void delete_Packet(long jarg1);
+  public final static native void Packet_createUid(long jarg1, Packet jarg1_);
   public final static native boolean Packet_putString(long jarg1, Packet jarg1_, String jarg2);
   public final static native boolean Packet_putU8(long jarg1, Packet jarg1_, short jarg2);
   public final static native boolean Packet_putU16(long jarg1, Packet jarg1_, int jarg2);
@@ -52,6 +53,7 @@ public class msgexchangeJNI {
   public final static native boolean Packet_isCompressed(long jarg1, Packet jarg1_);
   public final static native boolean Packet_uncompress(long jarg1, Packet jarg1_);
   public final static native void Packet_print(long jarg1, Packet jarg1_);
+  public final static native void Packet_copy(long jarg1, Packet jarg1_, long jarg2, Packet jarg2_);
   public final static native int Packet_headerLength_get();
   public final static native int Packet_checkSumPos_get();
   public final static native int Packet_uncompressedPayloadLengthPos_get();
@@ -73,9 +75,12 @@ public class msgexchangeJNI {
   public final static native boolean Connection_isOpen(long jarg1, Connection jarg1_);
   public final static native boolean Connection_isAborting(long jarg1, Connection jarg1_);
   public final static native boolean Connection_sendRequest(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_);
-  public final static native long Connection_readResponse(long jarg1, Connection jarg1_);
-  public final static native long Connection_transmitMessage(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_);
-  public final static native long Connection_transmitMessageSwigExplicitConnection(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_);
+  public final static native long Connection_readResponse__SWIG_0(long jarg1, Connection jarg1_);
+  public final static native boolean Connection_readResponse__SWIG_1(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_);
+  public final static native long Connection_transmitMessage__SWIG_0(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_);
+  public final static native long Connection_transmitMessageSwigExplicitConnection__SWIG_0(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_);
+  public final static native boolean Connection_transmitMessage__SWIG_1(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_, long jarg3, Packet jarg3_);
+  public final static native boolean Connection_transmitMessageSwigExplicitConnection__SWIG_1(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_, long jarg3, Packet jarg3_);
   public final static native void Connection_setTimeout(long jarg1, Connection jarg1_, int jarg2);
   public final static native String Connection_getHostname(long jarg1, Connection jarg1_);
   public final static native void Connection_onDisconnect(long jarg1, Connection jarg1_);
@@ -89,8 +94,10 @@ public class msgexchangeJNI {
   public final static native boolean SessionProxy_open(long jarg1, SessionProxy jarg1_, String jarg2, int jarg3);
   public final static native boolean SessionProxy_close(long jarg1, SessionProxy jarg1_);
   public final static native boolean SessionProxy_terminate(long jarg1, SessionProxy jarg1_);
-  public final static native long SessionProxy_transmitMessage(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_);
-  public final static native long SessionProxy_transmitMessageSwigExplicitSessionProxy(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_);
+  public final static native long SessionProxy_transmitMessage__SWIG_0(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_);
+  public final static native long SessionProxy_transmitMessageSwigExplicitSessionProxy__SWIG_0(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_);
+  public final static native boolean SessionProxy_transmitMessage__SWIG_1(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_, long jarg3, Packet jarg3_);
+  public final static native boolean SessionProxy_transmitMessageSwigExplicitSessionProxy__SWIG_1(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_, long jarg3, Packet jarg3_);
   public final static native void SessionProxy_onNotification(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_);
   public final static native void SessionProxy_onNotificationSwigExplicitSessionProxy(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_);
   public final static native void SessionProxy_director_connect(SessionProxy obj, long cptr, boolean mem_own, boolean weak_global);
@@ -109,8 +116,11 @@ static {
 
   public final static native long SessionProxy_SWIGUpcast(long jarg1);
 
-  public static long SwigDirector_Connection_transmitMessage(Connection self, long message) {
+  public static long SwigDirector_Connection_transmitMessage__SWIG_0(Connection self, long message) {
     return Packet.getCPtr(self.transmitMessage((message == 0) ? null : new Packet(message, false)));
+  }
+  public static boolean SwigDirector_Connection_transmitMessage__SWIG_1(Connection self, long request, long response) {
+    return self.transmitMessage((request == 0) ? null : new Packet(request, false), (response == 0) ? null : new Packet(response, false));
   }
   public static void SwigDirector_Connection_onDisconnect(Connection self) {
     self.onDisconnect();
@@ -118,8 +128,11 @@ static {
   public static void SwigDirector_Connection_onReconnect(Connection self) {
     self.onReconnect();
   }
-  public static long SwigDirector_SessionProxy_transmitMessage(SessionProxy self, long message) {
+  public static long SwigDirector_SessionProxy_transmitMessage__SWIG_0(SessionProxy self, long message) {
     return Packet.getCPtr(self.transmitMessage((message == 0) ? null : new Packet(message, false)));
+  }
+  public static boolean SwigDirector_SessionProxy_transmitMessage__SWIG_1(SessionProxy self, long request, long response) {
+    return self.transmitMessage((request == 0) ? null : new Packet(request, false), (response == 0) ? null : new Packet(response, false));
   }
   public static void SwigDirector_SessionProxy_onDisconnect(SessionProxy self) {
     self.onDisconnect();

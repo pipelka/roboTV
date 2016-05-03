@@ -80,13 +80,21 @@ public class Connection {
   }
 
   public Packet readResponse() {
-    long cPtr = msgexchangeJNI.Connection_readResponse(swigCPtr, this);
+    long cPtr = msgexchangeJNI.Connection_readResponse__SWIG_0(swigCPtr, this);
     return (cPtr == 0) ? null : new Packet(cPtr, false);
   }
 
+  public boolean readResponse(Packet p) {
+    return msgexchangeJNI.Connection_readResponse__SWIG_1(swigCPtr, this, Packet.getCPtr(p), p);
+  }
+
   public Packet transmitMessage(Packet message) {
-    long cPtr = (getClass() == Connection.class) ? msgexchangeJNI.Connection_transmitMessage(swigCPtr, this, Packet.getCPtr(message), message) : msgexchangeJNI.Connection_transmitMessageSwigExplicitConnection(swigCPtr, this, Packet.getCPtr(message), message);
+    long cPtr = (getClass() == Connection.class) ? msgexchangeJNI.Connection_transmitMessage__SWIG_0(swigCPtr, this, Packet.getCPtr(message), message) : msgexchangeJNI.Connection_transmitMessageSwigExplicitConnection__SWIG_0(swigCPtr, this, Packet.getCPtr(message), message);
     return (cPtr == 0) ? null : new Packet(cPtr, true);
+  }
+
+  public boolean transmitMessage(Packet request, Packet response) {
+    return (getClass() == Connection.class) ? msgexchangeJNI.Connection_transmitMessage__SWIG_1(swigCPtr, this, Packet.getCPtr(request), request, Packet.getCPtr(response), response) : msgexchangeJNI.Connection_transmitMessageSwigExplicitConnection__SWIG_1(swigCPtr, this, Packet.getCPtr(request), request, Packet.getCPtr(response), response);
   }
 
   public void setTimeout(int timeout_ms) {

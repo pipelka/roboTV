@@ -68,8 +68,12 @@ public class SessionProxy extends Connection {
   }
 
   public Packet transmitMessage(Packet message) {
-    long cPtr = (getClass() == SessionProxy.class) ? msgexchangeJNI.SessionProxy_transmitMessage(swigCPtr, this, Packet.getCPtr(message), message) : msgexchangeJNI.SessionProxy_transmitMessageSwigExplicitSessionProxy(swigCPtr, this, Packet.getCPtr(message), message);
+    long cPtr = (getClass() == SessionProxy.class) ? msgexchangeJNI.SessionProxy_transmitMessage__SWIG_0(swigCPtr, this, Packet.getCPtr(message), message) : msgexchangeJNI.SessionProxy_transmitMessageSwigExplicitSessionProxy__SWIG_0(swigCPtr, this, Packet.getCPtr(message), message);
     return (cPtr == 0) ? null : new Packet(cPtr, true);
+  }
+
+  public boolean transmitMessage(Packet request, Packet response) {
+    return (getClass() == SessionProxy.class) ? msgexchangeJNI.SessionProxy_transmitMessage__SWIG_1(swigCPtr, this, Packet.getCPtr(request), request, Packet.getCPtr(response), response) : msgexchangeJNI.SessionProxy_transmitMessageSwigExplicitSessionProxy__SWIG_1(swigCPtr, this, Packet.getCPtr(request), request, Packet.getCPtr(response), response);
   }
 
   protected void onNotification(Packet notification) {
