@@ -192,30 +192,37 @@ bool MsgConnection::SendRequest(MsgPacket* request) {
 	return true;
 }
 
-MsgPacket* MsgConnection::ReadResponse() {
+bool MsgConnection::ReadResponse(MsgPacket* p) {
 	if(IsAborting()) {
-		return NULL;
+		return false;
 	}
 
 	// restore connection if needed
 	if(GetConnectionLost() && !Reconnect()) {
-		return NULL;
+		return false;
 	}
 
 	bool bClosed = false;
-	MsgPacket* response = MsgPacket::read(m_socket, bClosed, m_timeout);
+	bool rc = MsgPacket::read(m_socket, bClosed, p, m_timeout);
 
 	if(bClosed) {
 		SetConnectionLost();
-
-		if(response != NULL) {
-			delete response;
-		}
-
-		return NULL;
+		return false;
 	}
 
-	return response;
+	return rc;
+
+}
+
+MsgPacket* MsgConnection::ReadResponse() {
+	MsgPacket* p = new MsgPacket();
+
+	if(!ReadResponse(p)) {
+		delete p;
+		return nullptr;
+	}
+
+	return p;
 }
 
 MsgPacket* MsgConnection::TransmitMessage(MsgPacket* message) {
@@ -224,6 +231,14 @@ MsgPacket* MsgConnection::TransmitMessage(MsgPacket* message) {
 	}
 
 	return ReadResponse();
+}
+
+bool MsgConnection::TransmitMessage(MsgPacket* request, MsgPacket* response) {
+	if(!SendRequest(request)) {
+		return false;
+	}
+
+	return ReadResponse(response);
 }
 
 bool MsgConnection::pollfd(int fd, int timeout_ms, bool in) {

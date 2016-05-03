@@ -59,6 +59,8 @@ public:
 
 	MsgPacket* TransmitMessage(MsgPacket* message);
 
+	bool TransmitMessage(MsgPacket* request, MsgPacket* response);
+
 protected:
 
 	void Run();
@@ -85,6 +87,8 @@ private:
 
 		MsgResponseCondition();
 
+		MsgResponseCondition(MsgPacket* destinationPacket);
+
 		/**
 		Signals reponse reception.
 		This member is called if a response was received.
@@ -93,7 +97,7 @@ private:
 		*/
 		void Signal(MsgPacket* p);
 
-		std::atomic<MsgPacket*> packet; /*!< pointer to the response packet, NULL if there wasn't any response received. */
+		MsgPacket* packet; /*!< pointer to the response packet, NULL if there wasn't any response received. */
 
 	protected:
 

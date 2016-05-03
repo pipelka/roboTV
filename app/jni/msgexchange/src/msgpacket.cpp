@@ -123,6 +123,14 @@ void MsgPacket::Init(uint16_t msgid, uint16_t type, uint32_t uid) {
 	setType(type);											// message type
 }
 
+void MsgPacket::createUid() {
+	std::lock_guard<std::mutex> lock(uidmutex);
+	uint32_t uid = globalUID++;
+	setUID(uid);
+	clear();
+    m_freezed = false;
+}
+
 void MsgPacket::setClientID(uint16_t oid) {
 	writePacket<uint16_t>(ClientIDPos, htobe16(oid));
 }
@@ -428,27 +436,51 @@ bool MsgPacket::write(int fd, int timeout_ms) {
 	return true;
 }
 
+void MsgPacket::copy(MsgPacket* p) {
+	clear();
+	reserve(p->getPayloadLength());
+
+	memcpy(getPacket(), p->getPacket(), p->getPayloadLength() + HeaderLength);
+
+	rewind();
+	p->rewind();
+}
+
 MsgPacket* MsgPacket::read(int fd, int timeout_ms) {
 	bool bClosed;
 	return read(fd, bClosed, timeout_ms);
 }
 
-MsgPacket* MsgPacket::read(int fd, bool& closed, int timeout_ms) {
-	if(pollfd(fd, timeout_ms, true) <= 0) {
-		return NULL;
-	}
+bool MsgPacket::read(int fd, MsgPacket* p, int timeout_ms) {
+	bool bClosed;
+	return read(fd, bClosed, p, timeout_ms);
+}
 
+MsgPacket* MsgPacket::read(int fd, bool& closed, int timeout_ms) {
 	MsgPacket* p = new MsgPacket(0, 0, 1);
 
-	if(p == NULL) {
-		return NULL;
+	if(!read(fd, closed, p, timeout_ms)) {
+		delete p;
+		return nullptr;
 	}
 
+	return p;
+}
+
+bool MsgPacket::read(int fd, bool& closed, MsgPacket* p, int timeout_ms) {
+	if(p == NULL) {
+		return false;
+	}
+
+	if(pollfd(fd, timeout_ms, true) <= 0) {
+		return false;
+	}
+
+	p->clear();
 	uint8_t* header = p->getPacket();
 
 	if(header == NULL) {
-		delete p;
-		return NULL;
+		return false;
 	}
 
 	// try to find sync
@@ -465,8 +497,7 @@ MsgPacket* MsgPacket::read(int fd, bool& closed, int timeout_ms) {
 	// not found / timeout
 	if(rc != 0) {
 		closed = (rc == ECONNRESET);
-		delete p;
-		return NULL;
+		return false;
 	}
 
 	// read remaining header bytes
@@ -474,8 +505,7 @@ MsgPacket* MsgPacket::read(int fd, bool& closed, int timeout_ms) {
 	uint32_t datalen = HeaderLength - sizeof(uint32_t);
 
 	if(socketread(fd, data, datalen, timeout_ms) != 0) {
-		delete p;
-		return NULL;
+		return false;
 	}
 
 	// header validation
@@ -487,26 +517,23 @@ MsgPacket* MsgPacket::read(int fd, bool& closed, int timeout_ms) {
 		std::cerr << "checksum failed !" << std::endl;
 		std::cerr << "PACKET CHECKSUM  : " << std::hex << checksum << std::endl;
 		std::cerr << "COMPUTED CHECKSUM: " << std::hex << test << std::endl;
-		delete p;
-		return NULL;
+		return false;
 	}
 
 	// no payload ?
 	if(datalen == 0) {
-		return p;
+		return true;
 	}
 
 	// read payload
 	data = p->reserve(datalen);
 
 	if(data == NULL) {
-		delete p;
-		return NULL;
+		return false;
 	}
 
 	if(socketread(fd, data, datalen, timeout_ms) != 0) {
-		delete p;
-		return NULL;
+		return false;
 	}
 
 	// payload checksum validation
@@ -515,11 +542,11 @@ MsgPacket* MsgPacket::read(int fd, bool& closed, int timeout_ms) {
 
 	if(p->m_payloadchecksum && p->getPayloadCheckSum() != crc32(data, datalen)) {
 		std::cerr << "wrong payload checksum !" << std::endl;
-		delete p;
-		return NULL;
+		return false;
 	}
 
-	return p;
+	p->rewind();
+	return true;
 }
 
 bool MsgPacket::readstream(std::istream& in, MsgPacket& p) {

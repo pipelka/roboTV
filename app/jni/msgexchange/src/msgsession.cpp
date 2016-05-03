@@ -5,16 +5,26 @@
 
 #include <unistd.h>
 #include <sys/time.h>
+#include <iostream>
 #include "errno.h"
 
 #include "msgsession.h"
 #include "msgpacket.h"
 
-MsgSession::MsgResponseCondition::MsgResponseCondition() : packet(NULL) {
+MsgSession::MsgResponseCondition::MsgResponseCondition() : packet(nullptr) {
+}
+
+MsgSession::MsgResponseCondition::MsgResponseCondition(MsgPacket* destinationPacket) : packet(destinationPacket) {
 }
 
 void MsgSession::MsgResponseCondition::Signal(MsgPacket* p) {
-	packet = p;
+	if(packet != nullptr) {
+		packet->copy(p);
+	}
+	else {
+		packet = p;
+	}
+
 	MsgCondition::Signal();
 }
 
@@ -49,11 +59,12 @@ bool MsgSession::Terminate() {
 }
 
 void MsgSession::Run() {
+	MsgPacket* p = new MsgPacket();
 
 	while(IsRunning() || !emptyQueue()) {
 
 		// read packet from socket
-		MsgPacket* p = ReadResponse();
+		bool rc = ReadResponse(p);
 
 		// connection lost ?
 		if(GetConnectionLost()) {
@@ -61,7 +72,7 @@ void MsgSession::Run() {
 		}
 
 		// no message
-		if(p == NULL) {
+		if(!rc) {
 			continue;
 		}
 
@@ -85,56 +96,57 @@ void MsgSession::Run() {
 		// no one waiting (notification message) ?
 		else {
 			OnNotification(p);
-			delete p;
 		}
 	}
 
+	delete p;
 	m_queue.clear();
 }
 
 void MsgSession::OnNotification(MsgPacket* notification) {
 }
 
-MsgPacket* MsgSession::TransmitMessage(MsgPacket* message) {
+bool MsgSession::TransmitMessage(MsgPacket* request, MsgPacket* response) {
 	if((!IsOpen() || IsAborting()) && !GetConnectionLost()) {
-		return NULL;
+		return false;
 	}
 
-	MsgResponseCondition* q(NULL);
-	uint64_t uid(0);
+	// new condition
+	MsgResponseCondition* q = new MsgResponseCondition(response);
+	uint64_t uid = ((uint64_t)request->getUID() << 32) | request->getType();
+
+	// add to queue
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-
-		// put message on queue
-		q = new MsgResponseCondition;
-		uid = ((uint64_t)message->getUID() << 32) | message->getType();
-
 		m_queue[uid] = q;
+	}
 
-		// send message
-		if(!SendRequest(message)) {
-			m_queue.erase(uid);
-			delete q;
-			return NULL;
-		}
+	// send message
+	if(!SendRequest(request)) {
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_queue.erase(uid);
+		delete q;
+		return false;
 	}
 
 	// wait for response
-	q->Wait(m_timeout);
+	bool rc = q->Wait(m_timeout);
 
-	MsgPacket* response = NULL;
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-
-		// get response packet
-		response = q->packet;
-
-		// remove condition from queue if there wasn't any response
-		if(q->packet == NULL) {
-			m_queue.erase(uid);
-		}
-
+		m_queue.erase(uid);
 		delete q;
+	}
+
+	return rc;
+}
+
+MsgPacket* MsgSession::TransmitMessage(MsgPacket* message) {
+	MsgPacket* response = new MsgPacket();
+
+	if(!TransmitMessage(message, response)) {
+		delete response;
+		return nullptr;
 	}
 
 	return response;

@@ -95,6 +95,8 @@ public:
 	*/
 	MsgPacket* ReadResponse();
 
+	bool ReadResponse(MsgPacket* p);
+
 	/**
 	Transmit message to server.
 	Sends a message to the server and receives the response from the server.
@@ -103,6 +105,8 @@ public:
 	@return Pointer to the received message packet or NULL if there hasn't been any packet received
 	*/
 	virtual MsgPacket* TransmitMessage(MsgPacket* message);
+
+	virtual bool TransmitMessage(MsgPacket* request, MsgPacket* response);
 
 	/**
 	Set transmit timeout.

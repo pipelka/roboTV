@@ -213,6 +213,8 @@ TEST_F(ClientServerTest, SessionTest) {
 
 	Start();
 
+	MsgPacket resp;
+
 	for(int j = 0; j < 100; j++) {
 		EXPECT_TRUE(c.Open("127.0.0.1", 12001));
 
@@ -231,30 +233,26 @@ TEST_F(ClientServerTest, SessionTest) {
 
 			p.compress(9);
 
-			MsgPacket* resp = c.TransmitMessage(&p);
+			EXPECT_TRUE(c.TransmitMessage(&p, &resp));
 
-			EXPECT_TRUE(resp != NULL);
-
-			resp->consume(1024);
-			EXPECT_TRUE(strcmp(resp->get_String(), "testmessage") == 0);
-			EXPECT_TRUE(strcmp(resp->get_String(), "") == 0);
-			EXPECT_EQ(128, (int)resp->get_U8());
-			EXPECT_EQ(-453786, resp->get_S32());
-			EXPECT_EQ(434345, resp->get_U32());
-			EXPECT_EQ(43748364343ULL, resp->get_U64());
-			EXPECT_EQ(-454746546464343LL, resp->get_S64());
-			EXPECT_TRUE(strcmp(resp->get_String(), "") == 0);
-			EXPECT_TRUE(strcmp(resp->get_String(), "") == 0);
-			EXPECT_TRUE(strcmp(resp->get_String(), "") == 0);
-			EXPECT_EQ(0, resp->get_U8());
-			EXPECT_EQ(0, resp->get_U16());
-			EXPECT_EQ(0, resp->get_S16());
-			EXPECT_EQ(0, resp->get_U32());
-			EXPECT_EQ(0, resp->get_S32());
-			EXPECT_EQ(0, resp->get_U64());
-			EXPECT_EQ(0, resp->get_S64());
-
-			delete resp;
+			resp.consume(1024);
+			EXPECT_TRUE(strcmp(resp.get_String(), "testmessage") == 0);
+			EXPECT_TRUE(strcmp(resp.get_String(), "") == 0);
+			EXPECT_EQ(128, (int)resp.get_U8());
+			EXPECT_EQ(-453786, resp.get_S32());
+			EXPECT_EQ(434345, resp.get_U32());
+			EXPECT_EQ(43748364343ULL, resp.get_U64());
+			EXPECT_EQ(-454746546464343LL, resp.get_S64());
+			EXPECT_TRUE(strcmp(resp.get_String(), "") == 0);
+			EXPECT_TRUE(strcmp(resp.get_String(), "") == 0);
+			EXPECT_TRUE(strcmp(resp.get_String(), "") == 0);
+			EXPECT_EQ(0, resp.get_U8());
+			EXPECT_EQ(0, resp.get_U16());
+			EXPECT_EQ(0, resp.get_S16());
+			EXPECT_EQ(0, resp.get_U32());
+			EXPECT_EQ(0, resp.get_S32());
+			EXPECT_EQ(0, resp.get_U64());
+			EXPECT_EQ(0, resp.get_S64());
 		}
 
 		c.Close();

@@ -64,6 +64,8 @@ public:
 	*/
 	~MsgPacket();
 
+        void createUid();
+
 	/**
 	Insert NULL terminated string.
 	Add a NULL terminted string to the payload of the packet.
@@ -433,6 +435,14 @@ public:
 	bool write(int fd, int timeout_ms = 3000);
 
 	/**
+	Copy packet.
+	copies the contents of packet p into this one
+
+	@param p		packet to copy
+	*/
+	void copy(MsgPacket* p);
+
+	/**
 	Receive packet from socket.
 	Create a new packet from incoming socket data
 
@@ -441,6 +451,29 @@ public:
 	@return pointer to new packet or NULL on timeout
 	*/
 	static MsgPacket* read(int fd, int timeout_ms = 3000);
+
+	/**
+	Receive packet from socket.
+	Reads into a packet from incoming socket data
+
+	@param	fd		filedescriptor of the socket
+	@param  p		pointer to packet
+	@param	timeout_ms	read operation timeout in milliseconds
+	@return true on success, otherwise false
+	*/
+	static bool read(int fd, MsgPacket* p, int timeout_ms = 3000);
+
+	/**
+	Receive packet from socket.
+	Reads into a packet from incoming socket data
+
+	@param	fd			filedescriptor of the socket
+	@param	closed		set to true if connection has been closed
+	@param  p			pointer to packet
+	@param	timeout_ms	read operation timeout in milliseconds
+	@return true on success, otherwise false
+	*/
+	static bool read(int fd, bool& closed, MsgPacket* p, int timeout_ms = 3000);
 
 	/**
 	Receive packet from socket.
