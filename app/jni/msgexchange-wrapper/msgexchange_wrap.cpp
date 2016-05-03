@@ -598,7 +598,7 @@ namespace Swig {
 namespace Swig {
   namespace {
     jclass jclass_msgexchangeJNI = NULL;
-    jmethodID director_methids[7];
+    jmethodID director_methids[9];
   }
 }
 
@@ -666,18 +666,49 @@ MsgPacket *SwigDirector_Connection::TransmitMessage(MsgPacket *message) {
   return c_result;
 }
 
+bool SwigDirector_Connection::TransmitMessage(MsgPacket *request, MsgPacket *response) {
+  bool c_result = SwigValueInit< bool >() ;
+  jboolean jresult = 0 ;
+  JNIEnvWrapper swigjnienv(this) ;
+  JNIEnv * jenv = swigjnienv.getJNIEnv() ;
+  jobject swigjobj = (jobject) NULL ;
+  jlong jrequest = 0 ;
+  jlong jresponse = 0 ;
+  
+  if (!swig_override[1]) {
+    return MsgConnection::TransmitMessage(request,response);
+  }
+  swigjobj = swig_get_self(jenv);
+  if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
+    *((MsgPacket **)&jrequest) = (MsgPacket *) request; 
+    *((MsgPacket **)&jresponse) = (MsgPacket *) response; 
+    jresult = (jboolean) jenv->CallStaticBooleanMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[1], swigjobj, jrequest, jresponse);
+    jthrowable swigerror = jenv->ExceptionOccurred();
+    if (swigerror) {
+      jenv->ExceptionClear();
+      throw Swig::DirectorException(jenv, swigerror);
+    }
+    
+    c_result = jresult ? true : false; 
+  } else {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null upcall object in MsgConnection::TransmitMessage ");
+  }
+  if (swigjobj) jenv->DeleteLocalRef(swigjobj);
+  return c_result;
+}
+
 void SwigDirector_Connection::OnDisconnect() {
   JNIEnvWrapper swigjnienv(this) ;
   JNIEnv * jenv = swigjnienv.getJNIEnv() ;
   jobject swigjobj = (jobject) NULL ;
   
-  if (!swig_override[1]) {
+  if (!swig_override[2]) {
     MsgConnection::OnDisconnect();
     return;
   }
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
-    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[1], swigjobj);
+    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[2], swigjobj);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -695,13 +726,13 @@ void SwigDirector_Connection::OnReconnect() {
   JNIEnv * jenv = swigjnienv.getJNIEnv() ;
   jobject swigjobj = (jobject) NULL ;
   
-  if (!swig_override[2]) {
+  if (!swig_override[3]) {
     MsgConnection::OnReconnect();
     return;
   }
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
-    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[2], swigjobj);
+    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[3], swigjobj);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -724,6 +755,9 @@ void SwigDirector_Connection::swig_connect_director(JNIEnv *jenv, jobject jself,
       "transmitMessage", "(Lorg/xvdr/msgexchange/Packet;)Lorg/xvdr/msgexchange/Packet;", NULL 
     },
     {
+      "transmitMessage", "(Lorg/xvdr/msgexchange/Packet;Lorg/xvdr/msgexchange/Packet;)Z", NULL 
+    },
+    {
       "onDisconnect", "()V", NULL 
     },
     {
@@ -740,7 +774,7 @@ void SwigDirector_Connection::swig_connect_director(JNIEnv *jenv, jobject jself,
       baseclass = (jclass) jenv->NewGlobalRef(baseclass);
     }
     bool derived = (jenv->IsSameObject(baseclass, jcls) ? false : true);
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
       if (!methods[i].base_methid) {
         methods[i].base_methid = jenv->GetMethodID(baseclass, methods[i].mname, methods[i].mdesc);
         if (!methods[i].base_methid) return;
@@ -778,7 +812,7 @@ MsgPacket *SwigDirector_SessionProxy::TransmitMessage(MsgPacket *message) {
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
     *((MsgPacket **)&jmessage) = (MsgPacket *) message; 
-    jresult = (jlong) jenv->CallStaticLongMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[3], swigjobj, jmessage);
+    jresult = (jlong) jenv->CallStaticLongMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[4], swigjobj, jmessage);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -793,18 +827,49 @@ MsgPacket *SwigDirector_SessionProxy::TransmitMessage(MsgPacket *message) {
   return c_result;
 }
 
+bool SwigDirector_SessionProxy::TransmitMessage(MsgPacket *request, MsgPacket *response) {
+  bool c_result = SwigValueInit< bool >() ;
+  jboolean jresult = 0 ;
+  JNIEnvWrapper swigjnienv(this) ;
+  JNIEnv * jenv = swigjnienv.getJNIEnv() ;
+  jobject swigjobj = (jobject) NULL ;
+  jlong jrequest = 0 ;
+  jlong jresponse = 0 ;
+  
+  if (!swig_override[1]) {
+    return MsgSession::TransmitMessage(request,response);
+  }
+  swigjobj = swig_get_self(jenv);
+  if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
+    *((MsgPacket **)&jrequest) = (MsgPacket *) request; 
+    *((MsgPacket **)&jresponse) = (MsgPacket *) response; 
+    jresult = (jboolean) jenv->CallStaticBooleanMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[5], swigjobj, jrequest, jresponse);
+    jthrowable swigerror = jenv->ExceptionOccurred();
+    if (swigerror) {
+      jenv->ExceptionClear();
+      throw Swig::DirectorException(jenv, swigerror);
+    }
+    
+    c_result = jresult ? true : false; 
+  } else {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null upcall object in MsgSession::TransmitMessage ");
+  }
+  if (swigjobj) jenv->DeleteLocalRef(swigjobj);
+  return c_result;
+}
+
 void SwigDirector_SessionProxy::OnDisconnect() {
   JNIEnvWrapper swigjnienv(this) ;
   JNIEnv * jenv = swigjnienv.getJNIEnv() ;
   jobject swigjobj = (jobject) NULL ;
   
-  if (!swig_override[1]) {
+  if (!swig_override[2]) {
     MsgConnection::OnDisconnect();
     return;
   }
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
-    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[4], swigjobj);
+    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[6], swigjobj);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -822,13 +887,13 @@ void SwigDirector_SessionProxy::OnReconnect() {
   JNIEnv * jenv = swigjnienv.getJNIEnv() ;
   jobject swigjobj = (jobject) NULL ;
   
-  if (!swig_override[2]) {
+  if (!swig_override[3]) {
     MsgConnection::OnReconnect();
     return;
   }
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
-    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[5], swigjobj);
+    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[7], swigjobj);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -847,14 +912,14 @@ void SwigDirector_SessionProxy::OnNotification(MsgPacket *notification) {
   jobject swigjobj = (jobject) NULL ;
   jlong jnotification = 0 ;
   
-  if (!swig_override[3]) {
+  if (!swig_override[4]) {
     MsgSession::OnNotification(notification);
     return;
   }
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
     *((MsgPacket **)&jnotification) = (MsgPacket *) notification; 
-    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[6], swigjobj, jnotification);
+    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_methids[8], swigjobj, jnotification);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -877,6 +942,9 @@ void SwigDirector_SessionProxy::swig_connect_director(JNIEnv *jenv, jobject jsel
       "transmitMessage", "(Lorg/xvdr/msgexchange/Packet;)Lorg/xvdr/msgexchange/Packet;", NULL 
     },
     {
+      "transmitMessage", "(Lorg/xvdr/msgexchange/Packet;Lorg/xvdr/msgexchange/Packet;)Z", NULL 
+    },
+    {
       "onDisconnect", "()V", NULL 
     },
     {
@@ -896,7 +964,7 @@ void SwigDirector_SessionProxy::swig_connect_director(JNIEnv *jenv, jobject jsel
       baseclass = (jclass) jenv->NewGlobalRef(baseclass);
     }
     bool derived = (jenv->IsSameObject(baseclass, jcls) ? false : true);
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 5; ++i) {
       if (!methods[i].base_methid) {
         methods[i].base_methid = jenv->GetMethodID(baseclass, methods[i].mname, methods[i].mdesc);
         if (!methods[i].base_methid) return;
@@ -984,6 +1052,17 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Packet(
   (void)jcls;
   arg1 = *(MsgPacket **)&jarg1; 
   delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1createUid(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  MsgPacket *arg1 = (MsgPacket *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MsgPacket **)&jarg1; 
+  (arg1)->createUid();
 }
 
 
@@ -1590,6 +1669,20 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1print(J
 }
 
 
+SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1copy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  MsgPacket *arg1 = (MsgPacket *) 0 ;
+  MsgPacket *arg2 = (MsgPacket *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(MsgPacket **)&jarg1; 
+  arg2 = *(MsgPacket **)&jarg2; 
+  (arg1)->copy(arg2);
+}
+
+
 SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1headerLength_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
@@ -1878,7 +1971,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1readResponse(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1readResponse_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   MsgPacket *result = 0 ;
@@ -1893,7 +1986,25 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1re
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1transmitMessage(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1readResponse_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  MsgConnection *arg1 = (MsgConnection *) 0 ;
+  MsgPacket *arg2 = (MsgPacket *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(MsgConnection **)&jarg1; 
+  arg2 = *(MsgPacket **)&jarg2; 
+  result = (bool)(arg1)->ReadResponse(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1transmitMessage_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -1911,7 +2022,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1tr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1transmitMessageSwigExplicitConnection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1transmitMessageSwigExplicitConnection_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -1925,6 +2036,48 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1tr
   arg2 = *(MsgPacket **)&jarg2; 
   result = (MsgPacket *)(arg1)->MsgConnection::TransmitMessage(arg2);
   *(MsgPacket **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1transmitMessage_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+  jboolean jresult = 0 ;
+  MsgConnection *arg1 = (MsgConnection *) 0 ;
+  MsgPacket *arg2 = (MsgPacket *) 0 ;
+  MsgPacket *arg3 = (MsgPacket *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  (void)jarg3_;
+  arg1 = *(MsgConnection **)&jarg1; 
+  arg2 = *(MsgPacket **)&jarg2; 
+  arg3 = *(MsgPacket **)&jarg3; 
+  result = (bool)(arg1)->TransmitMessage(arg2,arg3);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1transmitMessageSwigExplicitConnection_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+  jboolean jresult = 0 ;
+  MsgConnection *arg1 = (MsgConnection *) 0 ;
+  MsgPacket *arg2 = (MsgPacket *) 0 ;
+  MsgPacket *arg3 = (MsgPacket *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  (void)jarg3_;
+  arg1 = *(MsgConnection **)&jarg1; 
+  arg2 = *(MsgPacket **)&jarg2; 
+  arg3 = *(MsgPacket **)&jarg3; 
+  result = (bool)(arg1)->MsgConnection::TransmitMessage(arg2,arg3);
+  jresult = (jboolean)result; 
   return jresult;
 }
 
@@ -2105,7 +2258,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProx
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1transmitMessage(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1transmitMessage_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   MsgSession *arg1 = (MsgSession *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -2123,7 +2276,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1transmitMessageSwigExplicitSessionProxy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1transmitMessageSwigExplicitSessionProxy_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   MsgSession *arg1 = (MsgSession *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -2137,6 +2290,48 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1
   arg2 = *(MsgPacket **)&jarg2; 
   result = (MsgPacket *)(arg1)->MsgSession::TransmitMessage(arg2);
   *(MsgPacket **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1transmitMessage_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+  jboolean jresult = 0 ;
+  MsgSession *arg1 = (MsgSession *) 0 ;
+  MsgPacket *arg2 = (MsgPacket *) 0 ;
+  MsgPacket *arg3 = (MsgPacket *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  (void)jarg3_;
+  arg1 = *(MsgSession **)&jarg1; 
+  arg2 = *(MsgPacket **)&jarg2; 
+  arg3 = *(MsgPacket **)&jarg3; 
+  result = (bool)(arg1)->TransmitMessage(arg2,arg3);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1transmitMessageSwigExplicitSessionProxy_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+  jboolean jresult = 0 ;
+  MsgSession *arg1 = (MsgSession *) 0 ;
+  MsgPacket *arg2 = (MsgPacket *) 0 ;
+  MsgPacket *arg3 = (MsgPacket *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  (void)jarg3_;
+  arg1 = *(MsgSession **)&jarg1; 
+  arg2 = *(MsgPacket **)&jarg2; 
+  arg3 = *(MsgPacket **)&jarg3; 
+  result = (bool)(arg1)->MsgSession::TransmitMessage(arg2,arg3);
+  jresult = (jboolean)result; 
   return jresult;
 }
 
@@ -2207,9 +2402,12 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_swig_1module_1i
   static struct {
     const char *method;
     const char *signature;
-  } methods[7] = {
+  } methods[9] = {
     {
-      "SwigDirector_Connection_transmitMessage", "(Lorg/xvdr/msgexchange/Connection;J)J" 
+      "SwigDirector_Connection_transmitMessage__SWIG_0", "(Lorg/xvdr/msgexchange/Connection;J)J" 
+    },
+    {
+      "SwigDirector_Connection_transmitMessage__SWIG_1", "(Lorg/xvdr/msgexchange/Connection;JJ)Z" 
     },
     {
       "SwigDirector_Connection_onDisconnect", "(Lorg/xvdr/msgexchange/Connection;)V" 
@@ -2218,7 +2416,10 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_swig_1module_1i
       "SwigDirector_Connection_onReconnect", "(Lorg/xvdr/msgexchange/Connection;)V" 
     },
     {
-      "SwigDirector_SessionProxy_transmitMessage", "(Lorg/xvdr/msgexchange/SessionProxy;J)J" 
+      "SwigDirector_SessionProxy_transmitMessage__SWIG_0", "(Lorg/xvdr/msgexchange/SessionProxy;J)J" 
+    },
+    {
+      "SwigDirector_SessionProxy_transmitMessage__SWIG_1", "(Lorg/xvdr/msgexchange/SessionProxy;JJ)Z" 
     },
     {
       "SwigDirector_SessionProxy_onDisconnect", "(Lorg/xvdr/msgexchange/SessionProxy;)V" 

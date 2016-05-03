@@ -18,6 +18,7 @@ public:
     SwigDirector_Connection(JNIEnv *jenv);
     virtual ~SwigDirector_Connection();
     virtual MsgPacket *TransmitMessage(MsgPacket *message);
+    virtual bool TransmitMessage(MsgPacket *request, MsgPacket *response);
     virtual void OnDisconnect();
     virtual void OnDisconnectSwigPublic() {
       MsgConnection::OnDisconnect();
@@ -28,10 +29,10 @@ public:
     }
 public:
     bool swig_overrides(int n) {
-      return (n < 3 ? swig_override[n] : false);
+      return (n < 4 ? swig_override[n] : false);
     }
 protected:
-    bool swig_override[3];
+    bool swig_override[4];
 };
 
 class SwigDirector_SessionProxy : public MsgSession, public Swig::Director {
@@ -41,6 +42,7 @@ public:
     SwigDirector_SessionProxy(JNIEnv *jenv);
     virtual ~SwigDirector_SessionProxy();
     virtual MsgPacket *TransmitMessage(MsgPacket *message);
+    virtual bool TransmitMessage(MsgPacket *request, MsgPacket *response);
     virtual void OnDisconnect();
     virtual void OnDisconnectSwigPublic() {
       MsgConnection::OnDisconnect();
@@ -55,10 +57,10 @@ public:
     }
 public:
     bool swig_overrides(int n) {
-      return (n < 4 ? swig_override[n] : false);
+      return (n < 5 ? swig_override[n] : false);
     }
 protected:
-    bool swig_override[4];
+    bool swig_override[5];
 };
 
 
