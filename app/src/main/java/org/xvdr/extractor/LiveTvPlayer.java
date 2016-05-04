@@ -2,7 +2,6 @@ package org.xvdr.extractor;
 
 import android.content.Context;
 
-import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.client.Connection;
 
 public class LiveTvPlayer extends Player {
@@ -43,19 +42,19 @@ public class LiveTvPlayer extends Player {
 
         // open server connection
         if(!open()) {
-            return Connection.NORESPONSE;
+            return Connection.STATUS_NORESPONSE;
         }
 
         int status = mConnection.openStream(channelUid, language, waitForKeyFrame, priority);
 
-        if(status != Connection.SUCCESS) {
+        if(status != Connection.STATUS_SUCCESS) {
             return status;
         }
 
         prepare();
         play();
 
-        return Connection.SUCCESS;
+        return Connection.STATUS_SUCCESS;
     }
 
 }

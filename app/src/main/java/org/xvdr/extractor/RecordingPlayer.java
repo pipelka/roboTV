@@ -34,7 +34,7 @@ public class RecordingPlayer extends Player {
 
         if(resp == null) {
             Log.e(TAG, "no response opening recording: " + recordingId);
-            return Connection.NORESPONSE;
+            return Connection.STATUS_NORESPONSE;
         }
 
         int status = (int)resp.getU32();
@@ -63,7 +63,7 @@ public class RecordingPlayer extends Player {
 
         prepare();
 
-        return Connection.SUCCESS;
+        return Connection.STATUS_SUCCESS;
     }
 
     public long getLastPosition(String id) {

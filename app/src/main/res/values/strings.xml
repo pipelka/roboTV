@@ -90,6 +90,7 @@
 
     <string name="search_results">Search results for \'%1$s\'</string>
     <string name="no_search_results">No search results found for \'%1$s\'</string>
-    <string name="service_connected">roboTV service connected</string>
 
+    <string name="receivers_busy">All receivers busy</string>
+    <string name="blocked_by_recording">Channel blocked by recording</string>
 </resources>

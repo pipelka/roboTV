@@ -222,8 +222,26 @@ public class RoboTvInputService extends TvInputService {
             // stream channel
             String language = SetupUtils.getLanguageISO3(mContext);
 
-            if(mPlayer.openStream(uid, language) != Connection.SUCCESS) {
-                mNotification.error(getResources().getString(R.string.failed_tune));
+            int status = mPlayer.openStream(uid, language);
+
+            if(status != Connection.STATUS_SUCCESS) {
+                notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
+                Log.d(TAG, "status: " + status);
+
+                switch(status) {
+                    case Connection.STATUS_RECEIVERS_BUSY:
+                        mNotification.notify(getResources().getString(R.string.receivers_busy));
+                        break;
+
+                    case Connection.STATUS_BLOCKED_BY_RECORDING:
+                        mNotification.notify(getResources().getString(R.string.blocked_by_recording));
+                        break;
+
+                    default:
+                        mNotification.error(getResources().getString(R.string.failed_tune));
+                        break;
+                }
+
                 return false;
             }
 

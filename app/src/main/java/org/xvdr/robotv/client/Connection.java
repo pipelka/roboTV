@@ -9,8 +9,10 @@ public class Connection extends Session {
 
     private static final String TAG = "XVDR";
 
-    public final static int NORESPONSE = -1;
-    public final static int SUCCESS = 0;
+    public final static int STATUS_NORESPONSE = -1;
+    public final static int STATUS_SUCCESS = 0;
+    public final static int STATUS_RECEIVERS_BUSY = 997;
+    public final static int STATUS_BLOCKED_BY_RECORDING = 1;
 
     private String mSessionName = "XVDR Client";
     private short mCompressionLevel = 0;
@@ -169,7 +171,7 @@ public class Connection extends Session {
         Packet resp = transmitMessage(req);
 
         if(resp == null) {
-            return NORESPONSE;
+            return STATUS_NORESPONSE;
         }
 
         return (int)resp.getU32();
