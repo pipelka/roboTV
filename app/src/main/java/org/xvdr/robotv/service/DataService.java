@@ -52,9 +52,10 @@ public class DataService extends Service implements Connection.Callback {
         // check if the server has changed
         String server = SetupUtils.getServer(this);
 
-        if(mConnection != null && mConnection.isOpen() && !mConnection.getHostname().equals(server)) {
+        if(mConnection != null && !mConnection.getHostname().equals(server)) {
             Log.i(TAG, "new server: " + server);
             mConnection.close();
+            mHandler.removeCallbacks(mOpenRunnable);
             mHandler.post(mOpenRunnable);
         }
 
@@ -84,6 +85,10 @@ public class DataService extends Service implements Connection.Callback {
     }
 
     private boolean open() {
+        if(mConnection.isOpen()) {
+            return true;
+        }
+
         return mConnection.open(SetupUtils.getServer(this));
     }
 
@@ -104,7 +109,7 @@ public class DataService extends Service implements Connection.Callback {
             return;
         }
 
-        // process atteched event
+        // process attached event
 
         final Event event = ArtworkUtils.packetToEvent(p);
 
