@@ -17,7 +17,7 @@ public class RecordingPlayer extends Player {
     private String mRecordingId;
 
     public RecordingPlayer(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) {
-        super(context, server, language, listener, audioPassthrough, wantedChannelConfiguration, 100);
+        super(context, server, language, listener, audioPassthrough, wantedChannelConfiguration, 200);
     }
 
     public int openRecording(String recordingId, boolean startAtLastPosition) {
