@@ -256,7 +256,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         PacketQueue outputTrack = mOutputTracks[track];
 
         // get next packet
-        PacketQueue.PacketHolder p = outputTrack.peek();
+        Allocation p = outputTrack.peek();
 
         if(p == null) {
             return NOTHING_READ;
@@ -265,9 +265,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         // check if we have a queued format change
         if(p.isFormat()) {
             outputTrack.poll();
-            formatHolder.format = p.format;
+            formatHolder.format = p.getFormat();
             mNeedFormatChange[track] = false;
-            mOutputTracks[track].release(p);
+            mAllocator.release(p);
+
             return FORMAT_READ;
         }
 
@@ -287,18 +288,14 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         if(p.isSample()) {
             outputTrack.poll();
 
-            Allocation buffer = p.buffer;
-
             // adpapt timestamps for playback speed
             sampleHolder.timeUs = mPlaybackAdjuster.adjustTimestamp(p.timeUs);
             sampleHolder.flags = p.flags;
-            sampleHolder.size = buffer.length();
+            sampleHolder.size = p.length();
 
             sampleHolder.ensureSpaceForWrite(sampleHolder.size);
-            sampleHolder.data.put(buffer.data(), 0, sampleHolder.size);
-
-            mAllocator.release(buffer);
-            mOutputTracks[track].release(p);
+            sampleHolder.data.put(p.data(), 0, sampleHolder.size);
+            mAllocator.release(p);
 
             return SAMPLE_READ;
         }

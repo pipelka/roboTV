@@ -1,5 +1,7 @@
 package org.xvdr.extractor;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -69,11 +71,8 @@ public class AdaptiveAllocator {
     }
 
     private Allocation findUnallocated() {
-        int i = m_list.size() - 1;
-
-        while(i >= 0) {
-            Allocation p = m_list.get(i--);
-
+        for(int i = 0; i < m_list.size(); i++) {
+            Allocation p = m_list.get(i);
             if(p.allocate()) {
                 return p;
             }
