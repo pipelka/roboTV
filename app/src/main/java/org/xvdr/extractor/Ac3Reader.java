@@ -97,7 +97,8 @@ final class Ac3Reader extends StreamReader {
                                      mDecoder.getChannels(),
                                      mDecoder.getSampleRate(),
                                      null,
-                                     stream.language);
+                                     stream.language,
+                                     C.ENCODING_PCM_16BIT);
             output.format(format);
             hasOutputFormat = true;
         }

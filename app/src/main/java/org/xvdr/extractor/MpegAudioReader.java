@@ -70,7 +70,8 @@ final class MpegAudioReader extends StreamReader {
                                      mDecoder.getChannels(),
                                      mDecoder.getSampleRate(),
                                      null,
-                                     stream.language);
+                                     stream.language,
+                                     C.ENCODING_PCM_16BIT);
             output.format(format);
             hasOutputFormat = true;
         }
