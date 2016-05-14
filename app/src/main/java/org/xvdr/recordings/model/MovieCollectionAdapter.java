@@ -1,5 +1,6 @@
 package org.xvdr.recordings.model;
 
+import android.content.Context;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
@@ -10,6 +11,7 @@ import android.util.ArrayMap;
 
 import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
+import org.xvdr.robotv.R;
 
 import java.util.Comparator;
 
@@ -20,6 +22,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     private ArrayMap<String, ListRow> mSeriesMap;
     private ArrayObjectAdapter mLatest;
     private ArrayObjectAdapter mTvShows;
+    private Context mContext;
 
     static public Comparator<Movie> compareTimestamps = new Comparator<Movie>() {
         @Override
@@ -29,15 +32,16 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     };
 
 
-    public MovieCollectionAdapter() {
+    public MovieCollectionAdapter(Context context) {
         super(new ListRowPresenter());
+        mContext = context;
         mCardPresenter = new MoviePresenter();
         mLatestCardPresenter = new LatestCardPresenter();
 
         mSeriesMap = new ArrayMap<>();
 
-        mLatest = getCategory("Latest", true, mLatestCardPresenter); // 0
-        mTvShows = getCategory("TV Shows", true, mCardPresenter); // 1
+        mLatest = getCategory(mContext.getString(R.string.latest_movies), true, mLatestCardPresenter); // 0
+        mTvShows = getCategory(mContext.getString(R.string.tv_shows), true, mCardPresenter); // 1
     }
 
     private Movie movieExists(ArrayObjectAdapter adapter, Movie movie) {
@@ -107,7 +111,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     }
 
     private ObjectAdapter getSeries(String title, String url, boolean addNew) {
-        ArrayObjectAdapter row = getCategory("TV Shows", true);
+        ArrayObjectAdapter row = getCategory(mContext.getString(R.string.tv_shows), true);
 
         if(row == null) {
             return null;
@@ -135,7 +139,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
         // create a new adapter for this series
         ArrayObjectAdapter seriesRowAdapter = new SortedArrayObjectAdapter(compareTimestamps, mCardPresenter);
-        ListRow listRow = new ListRow(new HeaderItem("Show: " + title), seriesRowAdapter);
+        ListRow listRow = new ListRow(new HeaderItem(mContext.getString(R.string.tv_show_single) + " " + title), seriesRowAdapter);
 
         if(mSeriesMap.isEmpty()) {
             add(2, listRow);

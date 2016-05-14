@@ -117,7 +117,7 @@ public class RecordingsFragment extends BrowseFragment {
             new MovieCollectionLoader(connection, SetupUtils.getLanguage(getActivity()), mAdapter).load(mListener);
         }
         else {
-            new MovieCollectionLoader(connection, SetupUtils.getLanguage(getActivity())).load(mListener);
+            new MovieCollectionLoader(getActivity(), connection, SetupUtils.getLanguage(getActivity())).load(mListener);
         }
     }
 
@@ -126,10 +126,15 @@ public class RecordingsFragment extends BrowseFragment {
             return;
         }
 
-        HeaderItem gridHeader = new HeaderItem(adapter.size(), "Settings");
+        HeaderItem gridHeader = new HeaderItem(
+            adapter.size(),
+            getActivity().getString(R.string.recordings_settings_title));
         ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(new PreferenceCardPresenter());
 
-        gridRowAdapter.add(new PreferenceCardPresenter.Style(1, "Setup", R.drawable.ic_settings_white_48dp));
+        gridRowAdapter.add(new PreferenceCardPresenter.Style(
+                               1,
+                               getActivity().getString(R.string.recordings_setup_title),
+                               R.drawable.ic_settings_white_48dp));
 
         adapter.add(new ListRow(gridHeader, gridRowAdapter));
 

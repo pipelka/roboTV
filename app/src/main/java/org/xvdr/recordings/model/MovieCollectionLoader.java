@@ -1,5 +1,6 @@
 package org.xvdr.recordings.model;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -41,8 +42,8 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
     private List<ArtworkItem> mArtworkQueue = new ArrayList<>();
     private MovieCollectionAdapter mCollection;
 
-    public MovieCollectionLoader(Connection connection, String language) {
-        this(connection, language, new MovieCollectionAdapter());
+    public MovieCollectionLoader(Context context, Connection connection, String language) {
+        this(connection, language, new MovieCollectionAdapter(context));
     }
 
     public MovieCollectionLoader(Connection connection, String language, MovieCollectionAdapter collection) {

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">robo.TV</string>
+    <string name="blocked_by_recording">Blockiert durch Aufnahme</string>
+    <string name="browse_title">roboTV Filme</string>
+    <string name="change_cover">Cover</string>
+    <string name="channel_not_found">Kanal nicht gefunden</string>
+    <string name="connect_unable">Verbindung zum Server fehlgeschlagen !</string>
+    <string name="connection_lost">Verbindung abgebrochen</string>
+    <string name="connection_restored">Verbindung wiederhergestellt</string>
+    <string name="empty_folder">Kein</string>
+    <string name="failed_connect">Verbindung zum Server fehlgeschlagen</string>
+    <string name="failed_tune">Kanal kann nicht wiedergegeben werden</string>
+    <string name="loading">Lade ...</string>
+    <string name="move_folder">Ordner</string>
+    <string name="no_search_results">Keine Ergebnisse für \'%1$s\' gefunden</string>
+    <string name="ok">Ok</string>
+    <string name="player_error">Wiedergabefehler</string>
+    <string name="receivers_busy">Alle Empfänger belegt</string>
+    <string name="recording_finished">beendet</string>
+    <string name="recording_started">gestartet</string>
+    <string name="recording_text">Aufnahme</string>
+    <string name="recordings">Aufnahmen</string>
+    <string name="schedule_recording">Aufnahme planen</string>
+    <string name="search_epg">EPG</string>
+    <string name="search_results">Suchergebnisser für \'%1$s\'</string>
+    <string name="service_connected">roboTV Dienst verbunden</string>
+    <string name="setup_activity">Einrichtung</string>
+    <string name="setup_import_title">Aktualisiere Kanalliste ...</string>
+    <string name="setup_language_desc">Bevorzugte Tonspur auswählen</string>
+    <string name="setup_language_title">Tonspur</string>
+    <string name="setup_passthrough_desc">Digitale Audio Ausgabe aktivieren. Bietet die höchste Tonqualität, wenn unterstützt</string>
+    <string name="setup_passthrough_title">AC3 Ausgabe</string>
+    <string name="setup_root_desc">roboTV Einrichten und Kanäle importieren</string>
+    <string name="setup_root_import_desc">Kanalliste aktualisieren</string>
+    <string name="setup_root_import_title">Kanäle importieren</string>
+    <string name="setup_root_language_title">Bevorzugte Tonspur</string>
+    <string name="setup_root_passthrough_disabled">Aus</string>
+    <string name="setup_root_passthrough_enabled">Ein</string>
+    <string name="setup_root_passthrough_title">AC3 Ausgabe</string>
+    <string name="setup_root_server_desc">roboTV Server Adresse</string>
+    <string name="setup_root_speakerconfig_digital_51">5.1 Surround Sound</string>
+    <string name="setup_root_speakerconfig_disabled">Deaktiviert</string>
+    <string name="setup_root_speakerconfig_stereo">Stereo</string>
+    <string name="setup_root_speakerconfig_surround">Surround</string>
+    <string name="setup_root_speakerconfig_title">Lautsprecher Konfiguration</string>
+    <string name="setup_root_title">roboTV Einrichtung</string>
+    <string name="setup_speakerconfig_desc">Ändern der Lautsprecher Konfiguration.</string>
+    <string name="timer_add_cancel">Abbruch</string>
+    <string name="timer_add_create">Timer erstellen</string>
+    <string name="timer_add_create_new_folder">Neuen Ordner anlegen</string>
+    <string name="timer_add_select_folder">Ordner auswählen</string>
+    <string name="timer_add_select_folder_none">Kein</string>
+    <string name="timer_new_folder">Neu</string>
+    <string name="timer_title">Timer hinzufügen</string>
+    <string name="toast_error">Fehler</string>
+    <string name="toast_information">Information</string>
+    <string name="watch">Abspielen</string>
+    <string name="related_movies">Ähnliche Filme</string>
+    <string name="latest_movies">Neueste</string>
+    <string name="recordings_settings_title">Einstellungen</string>
+    <string name="tv_shows">Serien</string>
+    <string name="tv_show_single">Serie:</string>
+    <string name="recordings_setup_title">Einrichtung</string>
+    <string name="setup_refreshrate_title">TV Bildwiederholrate</string>
+    <string name="setup_root_refreshrate_title">Bildwiederholrate</string>
+    <string name="setup_refreshrate_desc">Für die beste Bildqualität sollte die Bildwiederholrate der des TV Geräts entsprechen.</string>
+
+    <string-array name="languages_array">
+        <item>Englisch</item>
+        <item>Deutsch</item>
+        <item>Französisch</item>
+        <item>Spanisch</item>
+        <item>Tschechisch</item>
+        <item>Keine</item>
+    </string-array>
+</resources>

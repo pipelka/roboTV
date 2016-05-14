@@ -41,7 +41,7 @@
         <item>60 Hz</item>
     </string-array>
 
-    <string-array name="refresh_rate_value_array">
+    <string-array translatable="false" name="refresh_rate_value_array">
         <item>-1</item>
         <item>50</item>
         <item>60</item>
@@ -50,20 +50,11 @@
     <string name="browse_title">roboTV Movies</string>
     <string name="related_movies">Related Videos</string>
     <string name="ok">OK</string>
-    <string name="pause">Pause</string>
-    <string name="play">Play</string>
-    <string name="stop">Stop</string>
-    <string name="init_text">00:00</string>
-    <string name="play_pause_description">Play Pause Button</string>
     <string name="loading">Loading…</string>
     <string name="setup_activity">Setup</string>
     <string name="watch">Watch</string>
     <string name="change_cover">Cover</string>
     <string name="move_folder">Folder</string>
-    <string name="watch_subtext">Free</string>
-    <string name="video_error_media_load_timeout">Media loading timed out</string>
-    <string name="video_error_server_unaccessible">Media server was not reachable</string>
-    <string name="oops">Oops</string>
     <string name="recordings">Recordings</string>
     <string name="player_error">player error</string>
     <string name="toast_information">Information</string>
@@ -95,7 +86,7 @@
     <string name="blocked_by_recording">Channel blocked by recording</string>
 
     <string name="service_connected">roboTV service connected</string>
-    <string name="timer_add_desc">%1$s%2$s - %3$s</string>
+    <string name="timer_add_desc" translatable="false">%1$s%2$s - %3$s</string>
     <string name="timer_add_create">Create Timer</string>
     <string name="timer_add_select_folder">Select Folder</string>
     <string name="timer_add_cancel">Cancel</string>
@@ -106,4 +97,9 @@
     <string name="timer_add_create_new_folder">Create new folder</string>
     <string name="timer_add_select_folder_none">None</string>
     <string name="timer_new_folder">New</string>
+    <string name="tv_shows">TV Shows</string>
+    <string name="latest_movies">Latest</string>
+    <string name="tv_show_single">Show:</string>
+    <string name="recordings_settings_title">Settings</string>
+    <string name="recordings_setup_title">Setup</string>
 </resources>
