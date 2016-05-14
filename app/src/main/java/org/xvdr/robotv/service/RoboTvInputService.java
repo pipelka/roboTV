@@ -268,10 +268,20 @@ public class RoboTvInputService extends TvInputService {
             Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
 
             if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
-                notifyVideoAvailable();
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyVideoAvailable();
+                    }
+                });
             }
             else if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
-                notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
+                    }
+                });
             }
         }
 
