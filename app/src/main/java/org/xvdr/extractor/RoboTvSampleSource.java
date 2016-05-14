@@ -339,12 +339,14 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     @Override
     public void release() {
         Assertions.checkState(mReleaseCount > 0);
-        if (--mReleaseCount == 0) {
-            if (mLoader != null) {
+
+        if(--mReleaseCount == 0) {
+            if(mLoader != null) {
                 mLoader.release();
                 mLoader = null;
             }
-            for (int i = 0; i < TRACK_COUNT; i++) {
+
+            for(int i = 0; i < TRACK_COUNT; i++) {
                 mOutputTracks[i].clear();
                 mOutputTracks[i] = null;
             }

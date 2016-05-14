@@ -73,6 +73,7 @@ public class AdaptiveAllocator {
     private Allocation findUnallocated() {
         for(int i = 0; i < m_list.size(); i++) {
             Allocation p = m_list.get(i);
+
             if(p.allocate()) {
                 return p;
             }
