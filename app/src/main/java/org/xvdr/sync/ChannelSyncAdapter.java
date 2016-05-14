@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.net.Uri;
+import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.AnyRes;
 import android.support.annotation.NonNull;
@@ -275,11 +276,14 @@ public class ChannelSyncAdapter {
             values.put(TvContract.Channels.COLUMN_SEARCHABLE, 1);
             values.put(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA, Integer.toString(entry.uid));
 
-            values.put(TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI, getUriToResource(mContext, R.drawable.banner_timers).toString());
-            values.put(TvContract.Channels.COLUMN_APP_LINK_INTENT_URI, link);
-            values.put(TvContract.Channels.COLUMN_APP_LINK_TEXT, mContext.getString(R.string.timer_title));
-            values.put(TvContract.Channels.COLUMN_APP_LINK_COLOR, Utils.getColor(mContext, R.color.primary_color));
-            values.put(TvContract.Channels.COLUMN_APP_LINK_ICON_URI, "");
+            // channel link needs Android M
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                values.put(TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI, getUriToResource(mContext, R.drawable.banner_timers).toString());
+                values.put(TvContract.Channels.COLUMN_APP_LINK_INTENT_URI, link);
+                values.put(TvContract.Channels.COLUMN_APP_LINK_TEXT, mContext.getString(R.string.timer_title));
+                values.put(TvContract.Channels.COLUMN_APP_LINK_COLOR, Utils.getColor(mContext, R.color.primary_color));
+                values.put(TvContract.Channels.COLUMN_APP_LINK_ICON_URI, "");
+            }
 
             // insert new channel
             if(channelId == null) {
@@ -471,13 +475,17 @@ public class ChannelSyncAdapter {
             values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, event.getPlot());
             values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
             values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endTime * 1000);
-            values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_DATA, eventId);
             values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(event.getContentId()));
 
             // content rating
             if(parentalRating >= 4 && parentalRating <= 18) {
                 TvContentRating rating = TvContentRating.createRating("com.android.tv", "DVB", "DVB_" + parentalRating);
                 values.put(TvContract.Programs.COLUMN_CONTENT_RATING, rating.flattenToString());
+            }
+
+            // store eventId on flags
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_FLAG1, eventId);
             }
 
             // artwork
