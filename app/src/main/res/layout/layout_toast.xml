@@ -8,9 +8,9 @@
         android:layout_width="wrap_content"
         android:layout_height="80dp"
         android:background="@drawable/toast_bg"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="27dp"
         android:elevation="7dp"
-        android:layout_marginRight="25dp">
+        android:layout_marginRight="48dp">
 
         <ImageView
             android:layout_width="wrap_content"
