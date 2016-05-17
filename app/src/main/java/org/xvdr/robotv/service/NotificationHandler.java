@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -83,11 +82,6 @@ public class NotificationHandler {
             public void run() {
                 Log.d(TAG, "notify: " + message + " / " + title);
                 final Toast toast = new Toast(mContext);
-
-                final DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-                metrics.density = 2.0f;
-                metrics.scaledDensity = 2.0f;
-
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
                 View view = inflater.inflate(R.layout.layout_toast, null);
