@@ -28,7 +28,7 @@
         android:layout_gravity="center"
         android:visibility="visible"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_marginTop="25pt"
-        android:layout_marginRight="30pt"
-        android:layout_marginLeft="30pt"/>
+        android:layout_marginTop="40dp"
+        android:layout_marginRight="80dp"
+        android:layout_marginLeft="80dp"/>
 </FrameLayout>

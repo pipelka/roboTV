@@ -6,30 +6,31 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="40pt"
+        android:layout_height="80dp"
         android:background="@drawable/toast_bg"
-        android:layout_marginRight="20pt"
-        android:layout_marginBottom="20pt"
-        android:elevation="7dp">
+        android:layout_marginBottom="25dp"
+        android:elevation="7dp"
+        android:layout_marginRight="25dp">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="30pt"
+            android:layout_height="50dp"
             android:id="@+id/icon"
             android:src="@drawable/ic_info_outline_white_48dp"
-            android:layout_marginLeft="5pt"
-            android:layout_marginTop="5pt"
-            android:layout_marginBottom="5pt"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:adjustViewBounds="true"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:layout_gravity="center_vertical"
+            />
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:layout_marginRight="10pt"
-            android:layout_marginTop="2pt"
-            android:layout_marginBottom="2pt">
+            android:layout_margin="10dp"
+            android:layout_gravity="center_vertical">
 
             <TextView
                 android:layout_width="fill_parent"
@@ -37,12 +38,12 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Large Text"
                 android:id="@+id/title"
-                android:layout_marginLeft="5pt"
-                android:layout_marginTop="5pt"
-                android:layout_marginBottom="2pt"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="2dp"
                 android:textStyle="bold|italic"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                />
 
             <TextView
                 android:layout_width="fill_parent"
@@ -50,10 +51,10 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Medium Text"
                 android:id="@+id/message"
-                android:layout_marginLeft="5pt"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:layout_marginBottom="5pt"/>
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"/>
         </LinearLayout>
 
     </LinearLayout>
