@@ -28,7 +28,8 @@ The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [
 
 ## Building
 
-1. Set the SDK and NDK location in Android Studio (Project Structure) or "local.properties". Please downwload the Android NDK 11 and set the proper path.2
+1. Set the SDK and NDK location in Android Studio (Project Structure) or "local.properties".
+   Please download the Android NDK 11 and set the proper path.
 2. ./gradlew assembleDebug
 
 # Current Features
@@ -44,9 +45,13 @@ The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [
 - [x] AC3 passthrough
 - [x] Watch Recordings
 - [x] Timeshift support
+- [x] Schedule Recordings (create timers)
 
 # Planned Features
 
+- [ ] Edit timers
+- [ ] Delete recordings
+- [ ] Move recordings between folders
+- [ ] Teletext support
 - [ ] Timeshift Reverse Play
-- [ ] Schedule Recordings
 - [ ] H265 (UHD) Support (partly done)
