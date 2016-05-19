@@ -35,9 +35,9 @@ final class MpegAudioReader extends StreamReader {
     }
 
     @Override
-    public void consume(Allocation buffer, long pesTimeUs) {
+    public void consume(Allocation buffer) {
         if(mDecoder == null) {
-            consumeHw(buffer, pesTimeUs);
+            consumeHw(buffer);
             return;
         }
 
@@ -49,6 +49,8 @@ final class MpegAudioReader extends StreamReader {
         }
 
         Allocation chunk = mAllocator.allocate(length);
+        chunk.timeUs = buffer.timeUs;
+        chunk.flags = buffer.flags;
 
         if(!mDecoder.read(chunk.data(), 0, chunk.size())) {
             Log.e(TAG, "failed to read audio chunk");
@@ -76,10 +78,10 @@ final class MpegAudioReader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(chunk, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+        output.sampleData(chunk);
     }
 
-    private void consumeHw(Allocation buffer, long pesTimeUs) {
+    private void consumeHw(Allocation buffer) {
         byte[] data = buffer.data();
 
         if(!hasOutputFormat) {
@@ -103,7 +105,7 @@ final class MpegAudioReader extends StreamReader {
             }
         }
 
-        output.sampleData(buffer, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+        output.sampleData(buffer);
     }
 
 }

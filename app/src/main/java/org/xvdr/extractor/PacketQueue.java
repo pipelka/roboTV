@@ -30,10 +30,7 @@ public class PacketQueue extends ArrayBlockingQueue<Allocation> {
         }
     }
 
-    synchronized public void sampleData(Allocation buffer, long timeUs, int flags) {
-        buffer.timeUs = timeUs;
-        buffer.flags = flags;
-
+    synchronized public void sampleData(Allocation buffer) {
         try {
             put(buffer);
         }

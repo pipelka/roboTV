@@ -27,8 +27,8 @@ final class AdtsReader extends StreamReader {
     }
 
     @Override
-    public void consume(Allocation buffer, long pesTimeUs) {
-        output.sampleData(buffer, pesTimeUs, C.SAMPLE_FLAG_SYNC);
+    public void consume(Allocation buffer) {
+        output.sampleData(buffer);
     }
 
 }

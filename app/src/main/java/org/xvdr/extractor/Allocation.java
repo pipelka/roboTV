@@ -10,8 +10,8 @@ public class Allocation {
     private int mLength = 0;
     private MediaFormat mFormat = null;
 
-    public long timeUs;
-    public int flags;
+    public long timeUs = 0;
+    public int flags = 0;
 
     public Allocation(int size) {
         resize(size);

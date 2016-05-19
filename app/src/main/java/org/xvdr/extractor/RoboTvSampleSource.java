@@ -6,6 +6,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 
+import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
 import com.google.android.exoplayer.SampleHolder;
@@ -553,6 +554,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         p.readBuffer(buffer.data(), 0, length);
         buffer.setLength(length);
+        buffer.timeUs = timeUs;
+        buffer.flags = C.SAMPLE_FLAG_SYNC;
 
         // read timestamp
         long pos = p.getS64(); // current timestamp
@@ -563,9 +566,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         }
 
         // push buffer to reader
-        reader.consume(
-            buffer,
-            timeUs);
+        reader.consume(buffer);
 
         mLargestParsedTimestampUs = Math.max(mLargestParsedTimestampUs, timeUs);
     }
