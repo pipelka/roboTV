@@ -15,6 +15,7 @@ import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioTrack;
+import com.google.android.exoplayer.util.PriorityHandlerThread;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.msgexchange.Session;
@@ -66,6 +67,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     private MediaCodecAudioTrackRenderer mAudioRenderer = null;
 
     private Listener mListener;
+    private PriorityHandlerThread mHandlerThread;
     private Handler mHandler;
     private Surface mSurface;
     private String mServer;
@@ -107,7 +109,9 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mConnection = new Connection("roboTV Player", language, false);
         mConnection.addCallback(this);
 
-        mHandler = new Handler();
+        mHandlerThread = new PriorityHandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
     }
 
     public void release() {
@@ -129,6 +133,8 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         mVideoRenderer = null;
         mAudioRenderer = null;
         mSampleSource = null;
+
+        mHandlerThread.interrupt();
     }
 
     public void setSurface(Surface surface) {
