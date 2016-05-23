@@ -56,7 +56,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                     continue;
                 }
 
-                requestPacket();
+                if(!requestPacket()) {
+                    Thread.sleep(100);
+                }
             }
         }
     }
