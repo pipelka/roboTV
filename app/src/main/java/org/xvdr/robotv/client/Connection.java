@@ -133,8 +133,6 @@ public class Connection extends Session {
         req.setProtocolVersion(XVDRPROTOCOLVERSION);
         req.putU8(mCompressionLevel);
         req.putString(mSessionName);
-        req.putString(mLanguage);
-        req.putU8((short)mAudioType);
         req.putU8((short)(mEnableStatus ? 1 : 0));
 
         // read welcome
