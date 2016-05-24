@@ -159,6 +159,12 @@ public class DataService extends Service implements Connection.Callback {
 
     @Override
     public void onReconnect() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mConnection.login();
+            }
+        });
     }
 
 }
