@@ -51,7 +51,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         @Override
         public void load() throws IOException, InterruptedException {
             while(!mLoadCanceled) {
-                if(buffersFull()) {
+                if(bufferSizeMs() > 3000) {
                     Thread.sleep(50);
                     continue;
                 }
@@ -70,7 +70,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     final static public int TRACK_AUDIO = 1;
     final static public int TRACK_SUBTITLE = 2;
 
-    private AdaptiveAllocator mAllocator;
     private Connection mConnection;
     private StreamBundle mBundle;
     private Listener mListener;
@@ -83,7 +82,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     private int mTrackCount = 0;
     private int mTracksEnabledCount = 0;
-    private long mLargestParsedTimestampUs = Long.MIN_VALUE;
     private long mStreamPositionUs;
     private long mLastSeekPositionUs = 0;
     private int mChannelConfiguration;
@@ -116,16 +114,13 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     /**
      * Create a LiveTv SampleSource
      * @param connection the server connection to use
+     * @param handler message handler
      */
-    public RoboTvSampleSource(Connection connection) {
-        this(connection, new Handler());
-    }
-
     public RoboTvSampleSource(Connection connection, Handler handler) {
-        this(connection, handler, null, false, Player.CHANNELS_SURROUND, 400);
+        this(connection, handler, null, false, Player.CHANNELS_SURROUND);
     }
 
-    public RoboTvSampleSource(Connection connection, Handler handler, AudioCapabilities audioCapabilities, boolean audioPassthrough, int channelConfiguration, int queueSize) {
+    public RoboTvSampleSource(Connection connection, Handler handler, AudioCapabilities audioCapabilities, boolean audioPassthrough, int channelConfiguration) {
         mConnection = connection;
         mHandler = handler;
         mBundle = new StreamBundle();
@@ -139,19 +134,16 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mCurrentPositionTimeshift = mStartPositionTimeshift;
 
         // create output tracks
-        for(int i = 0; i < TRACK_COUNT; i++) {
-            mOutputTracks[i] = new PacketQueue(queueSize);
-            mPendingDiscontinuities[i] = false;
-        }
+        mOutputTracks[TRACK_VIDEO] = new PacketQueue(50, 64 * 1024);
+        mOutputTracks[TRACK_AUDIO] = new PacketQueue(50, 4 * 1024);
+        mOutputTracks[TRACK_SUBTITLE] = new PacketQueue(0, 0);
 
         mAudioCapabilities = audioCapabilities;
 
         mLoader = new Loader("roboTV:streamloader");
-        mAllocator = new AdaptiveAllocator(200, 32 * 1024);
 
         mResponse = new Packet();
         mRequest = mConnection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
-
 
         logChannelConfiguration(mAudioPassthrough, mChannelConfiguration);
     }
@@ -258,48 +250,27 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         // get output track
         PacketQueue outputTrack = mOutputTracks[track];
 
-        // get next packet
-        Allocation p = outputTrack.peek();
-
-        if(p == null) {
-            return NOTHING_READ;
-        }
-
         // check if we have a queued format change
-        if(p.isFormat()) {
-            outputTrack.poll();
-            formatHolder.format = p.getFormat();
+        if(outputTrack.readFormat(formatHolder)) {
             mNeedFormatChange[track] = false;
-            mAllocator.release(p);
-
             return FORMAT_READ;
         }
 
         // check if we need a format change (track enabled)
         if(mNeedFormatChange[track]) {
-            if(outputTrack.hasFormat()) {
-                formatHolder.format = outputTrack.getFormat();
-                mNeedFormatChange[track] = false;
-                return FORMAT_READ;
-            }
-            else {
+            if(!outputTrack.hasFormat()) {
                 return NOTHING_READ;
             }
+
+            formatHolder.format = outputTrack.getFormat();
+            mNeedFormatChange[track] = false;
+
+            return FORMAT_READ;
         }
 
         // check if we have sample data
-        if(p.isSample()) {
-            outputTrack.poll();
-
-            // adpapt timestamps for playback speed
-            sampleHolder.timeUs = mPlaybackAdjuster.adjustTimestamp(p.timeUs);
-            sampleHolder.flags = p.flags;
-            sampleHolder.size = p.length();
-
-            sampleHolder.ensureSpaceForWrite(sampleHolder.size);
-            sampleHolder.data.put(p.data(), 0, sampleHolder.size);
-            mAllocator.release(p);
-
+        if(outputTrack.readSample(sampleHolder)) {
+            sampleHolder.timeUs = mPlaybackAdjuster.adjustTimestamp(sampleHolder.timeUs);
             return SAMPLE_READ;
         }
 
@@ -325,7 +296,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
     @Override
     public long getBufferedPositionUs() {
-        return (mLargestParsedTimestampUs == Long.MIN_VALUE) ? mStreamPositionUs : mLargestParsedTimestampUs;
+        return Math.min(
+                   mOutputTracks[TRACK_VIDEO].getBufferedPositionUs(),
+                   mOutputTracks[TRACK_AUDIO].getBufferedPositionUs());
     }
 
     @Override
@@ -408,11 +381,11 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
             case MimeTypes.AUDIO_AC3:
                 boolean passthrough = mAudioPassthrough && mAudioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3);
-                reader = new Ac3Reader(outputTrack, stream, passthrough, mChannelConfiguration, mAllocator);
+                reader = new Ac3Reader(outputTrack, stream, passthrough, mChannelConfiguration);
                 break;
 
             case MimeTypes.AUDIO_MPEG:
-                reader = new MpegAudioReader(outputTrack, stream, false, mAllocator);
+                reader = new MpegAudioReader(outputTrack, stream, false);
                 break;
         }
 
@@ -552,7 +525,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         long timeUs = mTimestampAdjuster.adjustTimestamp(pts);
 
         // read buffer
-        Allocation buffer = mAllocator.allocate(length);
+        Allocation buffer = reader.output.allocate(length);
 
         p.readBuffer(buffer.data(), 0, length);
         buffer.setLength(length);
@@ -569,8 +542,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         // push buffer to reader
         reader.consume(buffer);
-
-        mLargestParsedTimestampUs = Math.max(mLargestParsedTimestampUs, timeUs);
     }
 
     private void postTracksChanged(final StreamBundle bundle) {
@@ -659,8 +630,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         return true;
     }
 
-    private boolean buffersFull() {
-        return mOutputTracks[1].isFull() || mOutputTracks[0].isFull();
+    private long bufferSizeMs() {
+        return Math.min(
+                   mOutputTracks[TRACK_VIDEO].bufferSizeMs(),
+                   mOutputTracks[TRACK_AUDIO].bufferSizeMs());
     }
 
     public long getStartPositionWallclock() {
@@ -713,8 +686,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             Log.d(TAG, "seek to position us: " + mLastSeekPositionUs);
 
             mCurrentPositionTimeshift = mSeekPosition;
-            mLargestParsedTimestampUs = Long.MIN_VALUE;
-
             mPlaybackAdjuster.seek(mLastSeekPositionUs);
 
             // empty packet queue

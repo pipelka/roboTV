@@ -13,11 +13,10 @@ public class RecordingPlayer extends Player {
     static final private String TAG = "RecordingPlayer";
 
     private int mDurationInMs = 0;
-    private long mLengthInBytes = 0;
     private String mRecordingId;
 
     public RecordingPlayer(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) {
-        super(context, server, language, listener, audioPassthrough, wantedChannelConfiguration, 200);
+        super(context, server, language, listener, audioPassthrough, wantedChannelConfiguration);
     }
 
     public int openRecording(String recordingId, boolean startAtLastPosition) {
@@ -45,11 +44,11 @@ public class RecordingPlayer extends Player {
         }
 
         resp.getU32(); // 0
-        mLengthInBytes = resp.getU64().longValue(); // length in bytes
+        long lengthInBytes = resp.getU64().longValue();
         resp.getU8(); // TS / PES
         mDurationInMs = (int) resp.getU32() * 1000; // length in milliseconds
 
-        Log.d(TAG, "length: " + mLengthInBytes + " bytes");
+        Log.d(TAG, "length: " + lengthInBytes + " bytes");
         Log.d(TAG, "duration: " + mDurationInMs / 1000 + " seconds");
 
         if(startAtLastPosition) {

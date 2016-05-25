@@ -12,6 +12,14 @@ abstract class StreamReader {
         this.stream = stream;
     }
 
+    public boolean isVideo() {
+        return (stream.content == StreamBundle.CONTENT_VIDEO);
+    }
+
+    public boolean isAudio() {
+        return (stream.content == StreamBundle.CONTENT_AUDIO);
+    }
+
     public abstract void consume(Allocation buffer);
 
 }

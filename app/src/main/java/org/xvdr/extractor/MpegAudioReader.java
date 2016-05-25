@@ -16,18 +16,16 @@ import org.xvdr.robotv.client.StreamBundle;
 final class MpegAudioReader extends StreamReader {
 
     private static final String TAG = "MpegAudioReader";
-    boolean hasOutputFormat = false;
 
-    AdaptiveAllocator mAllocator;
+    boolean hasOutputFormat = false;
     MpegAudioDecoder mDecoder;
 
-    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream, AdaptiveAllocator allocator) {
-        this(output, stream, false, allocator);
+    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream) {
+        this(output, stream, false);
     }
 
-    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream, boolean useHwDecoder, AdaptiveAllocator allocator) {
+    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream, boolean useHwDecoder) {
         super(output, stream);
-        mAllocator = allocator;
 
         if(!useHwDecoder) {
             mDecoder = new MpegAudioDecoder();
@@ -44,23 +42,23 @@ final class MpegAudioReader extends StreamReader {
         int length = mDecoder.decode(buffer.data(), 0, buffer.length());
 
         if(length == 0) {
-            mAllocator.release(buffer);
+            output.release(buffer);
             return;
         }
 
-        Allocation chunk = mAllocator.allocate(length);
+        Allocation chunk = output.allocate(length);
         chunk.timeUs = buffer.timeUs;
         chunk.flags = buffer.flags;
 
         if(!mDecoder.read(chunk.data(), 0, chunk.size())) {
             Log.e(TAG, "failed to read audio chunk");
-            mAllocator.release(buffer);
-            mAllocator.release(chunk);
+            output.release(buffer);
+            output.release(chunk);
             return;
         }
 
         chunk.setLength(length);
-        mAllocator.release(buffer);
+        output.release(buffer);
 
         if(!hasOutputFormat) {
             MediaFormat format = MediaFormat.createAudioFormat(

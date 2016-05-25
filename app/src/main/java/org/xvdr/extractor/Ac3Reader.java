@@ -18,21 +18,19 @@ final class Ac3Reader extends StreamReader {
     private boolean ac3PassThrough;
     private boolean hasOutputFormat = false;
 
-    AdaptiveAllocator mAllocator;
     AC3Decoder mDecoder;
 
-    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, AdaptiveAllocator allocator) {
-        this(output, stream, false, allocator);
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream) {
+        this(output, stream, false);
     }
 
-    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, AdaptiveAllocator allocator) {
-        this(output, stream, ac3PassThrough, Player.CHANNELS_SURROUND, allocator);
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough) {
+        this(output, stream, ac3PassThrough, Player.CHANNELS_SURROUND);
     }
 
-    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelConfiguration, AdaptiveAllocator allocator) {
+    public Ac3Reader(PacketQueue output, StreamBundle.Stream stream, boolean ac3PassThrough, int channelConfiguration) {
         super(output, stream);
         this.ac3PassThrough = ac3PassThrough;
-        mAllocator = allocator;
 
         if(ac3PassThrough) {
             output.format(MediaFormat.createAudioFormat(
@@ -74,19 +72,19 @@ final class Ac3Reader extends StreamReader {
             return;
         }
 
-        Allocation chunk = mAllocator.allocate(length);
+        Allocation chunk = output.allocate(length);
         chunk.timeUs = buffer.timeUs;
         chunk.flags = buffer.flags;
 
         if(!mDecoder.read(chunk.data(), 0, chunk.size())) {
             Log.e(TAG, "failed to read audio chunk");
-            mAllocator.release(buffer);
-            mAllocator.release(chunk);
+            output.release(buffer);
+            output.release(chunk);
             return;
         }
 
         chunk.setLength(length);
-        mAllocator.release(buffer);
+        output.release(buffer);
 
         if(!hasOutputFormat) {
             Log.i(TAG, "channels: " + mDecoder.getChannels());
