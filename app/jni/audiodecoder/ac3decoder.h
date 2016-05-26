@@ -21,7 +21,15 @@ public:
 
 	virtual ~AC3Decoder();
 
+    int decodeDirect(char* pchInput, int inputSize, int length) {
+        return decode(pchInput, 0, length);
+    }
+
 	int decode(char* BYTE, int offset, int length);
+
+    bool readDirect(char* pchInput, int inputSize, int length) {
+        return read(pchInput, 0, length);
+    }
 
 	bool read(char* BYTE, int offset, int length);
 

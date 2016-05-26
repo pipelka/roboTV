@@ -15,6 +15,24 @@
 %rename (Connection) MsgConnection;
 %rename (SessionProxy) MsgSession;
 
+%typemap(in) (char* pchInput, int inputSize) {
+  $1 = (char*)jenv->GetDirectBufferAddress($input);
+  $2 = (int)(jenv->GetDirectBufferCapacity($input));
+}
+%typemap(in) (char* pchOutput, int* outputSize) {
+  $1 = (char*)jenv->GetDirectBufferAddress($input);
+  $2 = &((int)(jenv->GetDirectBufferCapacity($input)));
+}
+
+/* These 3 typemaps tell SWIG what JNI and Java types to use */
+%typemap(jni)       (char* pchInput, int inputSize), (char* pchOutput, int* outputSize) "jobject"
+%typemap(jtype)     (char* pchInput, int inputSize), (char* pchOutput, int* outputSize) "java.nio.ByteBuffer"
+%typemap(jstype)    (char* pchInput, int inputSize), (char* pchOutput, int* outputSize) "java.nio.ByteBuffer"
+%typemap(javain)    (char* pchInput, int inputSize), (char* pchOutput, int* outputSize) "$javainput"
+%typemap(javaout)   (char* pchInput, int inputSize), (char* pchOutput, int* outputSize) {
+    return $jnicall;
+}
+
 %{
 #include "msgpacket.h"
 #include "msgconnection.h"
@@ -50,6 +68,12 @@
 
 		memcpy(buffer_dst, buffer_src, length);
 	}
+
+    void readBufferDirect(char* pchInput, int inputSize, int length) {
+		uint8_t* buffer_src = self->consume(length);
+		memcpy(pchInput, buffer_src, length);
+    }
+
 }
 
 

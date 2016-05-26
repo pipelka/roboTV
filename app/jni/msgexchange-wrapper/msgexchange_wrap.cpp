@@ -621,6 +621,10 @@ SWIGINTERN void MsgPacket_readBuffer(MsgPacket *self,char *BYTE,int offset,int l
 
 		memcpy(buffer_dst, buffer_src, length);
 	}
+SWIGINTERN void MsgPacket_readBufferDirect(MsgPacket *self,char *pchInput,int inputSize,int length){
+		uint8_t* buffer_src = self->consume(length);
+		memcpy(pchInput, buffer_src, length);
+    }
 
 
 /* ---------------------------------------------------
@@ -1848,6 +1852,25 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1readBuf
     jenv->ReleaseByteArrayElements(jarg2, (jbyte *) arg2, 0); 
   }
   
+}
+
+
+SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1readBufferDirect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jint jarg4) {
+  MsgPacket *arg1 = (MsgPacket *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MsgPacket **)&jarg1; 
+  {
+    arg2 = (char*)jenv->GetDirectBufferAddress(jarg2);
+    arg3 = (int)(jenv->GetDirectBufferCapacity(jarg2));
+  }
+  arg4 = (int)jarg4; 
+  MsgPacket_readBufferDirect(arg1,arg2,arg3,arg4);
 }
 
 
