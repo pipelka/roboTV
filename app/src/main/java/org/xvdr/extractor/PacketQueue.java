@@ -4,6 +4,7 @@ import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
 import com.google.android.exoplayer.SampleHolder;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 
 public class PacketQueue  {
@@ -82,11 +83,14 @@ public class PacketQueue  {
             return false;
         }
 
+        ByteBuffer buffer = a.data();
+        buffer.rewind();
+
         sampleHolder.flags = a.flags;
         sampleHolder.timeUs = a.timeUs;
         sampleHolder.size = a.length();
         sampleHolder.ensureSpaceForWrite(sampleHolder.size);
-        sampleHolder.data.put(a.data(), 0, sampleHolder.size);
+        sampleHolder.data.put(buffer); //put(a.data(), 0, sampleHolder.size);
 
         mSmallestTimestampUs = Math.max(mSmallestTimestampUs, sampleHolder.timeUs);
         poll();

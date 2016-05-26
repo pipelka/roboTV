@@ -10,6 +10,8 @@ import com.google.android.exoplayer.util.MpegAudioHeader;
 import org.xvdr.audio.MpegAudioDecoder;
 import org.xvdr.robotv.client.StreamBundle;
 
+import java.nio.ByteBuffer;
+
 /**
  * Processes a XVDR MPEG Audio stream.
  */
@@ -21,25 +23,16 @@ final class MpegAudioReader extends StreamReader {
     MpegAudioDecoder mDecoder;
 
     public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream) {
-        this(output, stream, false);
-    }
-
-    public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream, boolean useHwDecoder) {
         super(output, stream);
-
-        if(!useHwDecoder) {
-            mDecoder = new MpegAudioDecoder();
-        }
+        mDecoder = new MpegAudioDecoder();
     }
 
     @Override
     public void consume(Allocation buffer) {
-        if(mDecoder == null) {
-            consumeHw(buffer);
-            return;
-        }
+        ByteBuffer data = buffer.data();
+        data.rewind();
 
-        int length = mDecoder.decode(buffer.data(), 0, buffer.length());
+        int length = mDecoder.decodeDirect(data, buffer.length());
 
         if(length == 0) {
             output.release(buffer);
@@ -50,7 +43,7 @@ final class MpegAudioReader extends StreamReader {
         chunk.timeUs = buffer.timeUs;
         chunk.flags = buffer.flags;
 
-        if(!mDecoder.read(chunk.data(), 0, chunk.size())) {
+        if(!mDecoder.readDirect(chunk.data(), chunk.size())) {
             Log.e(TAG, "failed to read audio chunk");
             output.release(buffer);
             output.release(chunk);
@@ -77,33 +70,6 @@ final class MpegAudioReader extends StreamReader {
         }
 
         output.sampleData(chunk);
-    }
-
-    private void consumeHw(Allocation buffer) {
-        byte[] data = buffer.data();
-
-        if(!hasOutputFormat) {
-            int  header = ((data[0] << 24) | (data[1] << 16) | (data[2] <<  8) | data[3]);
-            MpegAudioHeader mpegAudioHeader = new MpegAudioHeader();
-
-            if(MpegAudioHeader.populateHeader(header, mpegAudioHeader)) {
-                MediaFormat mediaFormat = MediaFormat.createAudioFormat(
-                                              Integer.toString(stream.physicalId), // < trackId
-                                              mpegAudioHeader.mimeType,
-                                              mpegAudioHeader.bitrate,
-                                              MpegAudioHeader.MAX_FRAME_SIZE_BYTES,
-                                              C.UNKNOWN_TIME_US,
-                                              mpegAudioHeader.channels,
-                                              mpegAudioHeader.sampleRate,
-                                              null,
-                                              stream.language);
-
-                output.format(mediaFormat);
-                hasOutputFormat = true;
-            }
-        }
-
-        output.sampleData(buffer);
     }
 
 }

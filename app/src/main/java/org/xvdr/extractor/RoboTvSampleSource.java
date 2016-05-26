@@ -135,7 +135,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
 
         // create output tracks
         mOutputTracks[TRACK_VIDEO] = new PacketQueue(50, 64 * 1024);
-        mOutputTracks[TRACK_AUDIO] = new PacketQueue(50, 4 * 1024);
+        mOutputTracks[TRACK_AUDIO] = new PacketQueue(50, 8 * 1024);
         mOutputTracks[TRACK_SUBTITLE] = new PacketQueue(0, 0);
 
         mAudioCapabilities = audioCapabilities;
@@ -389,7 +389,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
                 break;
 
             case MimeTypes.AUDIO_MPEG:
-                reader = new MpegAudioReader(outputTrack, stream, false);
+                reader = new MpegAudioReader(outputTrack, stream);
                 break;
         }
 
@@ -531,7 +531,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         // read buffer
         Allocation buffer = reader.output.allocate(length);
 
-        p.readBuffer(buffer.data(), 0, length);
+        p.readBufferDirect(buffer.data(), length);
         buffer.setLength(length);
         buffer.timeUs = timeUs;
         buffer.flags = C.SAMPLE_FLAG_SYNC;

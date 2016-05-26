@@ -9,6 +9,8 @@ import com.google.android.exoplayer.util.MimeTypes;
 import org.xvdr.audio.AC3Decoder;
 import org.xvdr.robotv.client.StreamBundle;
 
+import java.nio.ByteBuffer;
+
 /**
  * Processes a XVDR AC3 stream.
  */
@@ -65,7 +67,10 @@ final class Ac3Reader extends StreamReader {
             return;
         }
 
-        int length = mDecoder.decode(buffer.data(), 0, buffer.length());
+        ByteBuffer data = buffer.data();
+        data.rewind();
+
+        int length = mDecoder.decodeDirect(data, buffer.length());
 
         if(length == 0) {
             Log.e(TAG, "Unable to decode frame data");
@@ -76,7 +81,7 @@ final class Ac3Reader extends StreamReader {
         chunk.timeUs = buffer.timeUs;
         chunk.flags = buffer.flags;
 
-        if(!mDecoder.read(chunk.data(), 0, chunk.size())) {
+        if(!mDecoder.readDirect(chunk.data(), chunk.size())) {
             Log.e(TAG, "failed to read audio chunk");
             output.release(buffer);
             output.release(chunk);

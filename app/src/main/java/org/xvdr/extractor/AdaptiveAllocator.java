@@ -1,5 +1,7 @@
 package org.xvdr.extractor;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,6 +32,7 @@ public class AdaptiveAllocator {
         Allocation p = findAllocation(neededSize);
 
         if(p != null) {
+            p.data().clear();
             return p;
         }
 
@@ -38,6 +41,7 @@ public class AdaptiveAllocator {
 
         if(p != null) {
             p.resize(neededSize);
+            p.data().clear();
             sort();
             return p;
         }
