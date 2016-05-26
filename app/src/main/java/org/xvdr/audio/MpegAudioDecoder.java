@@ -39,8 +39,16 @@ public class MpegAudioDecoder {
     this(audiodecoderJNI.new_MpegAudioDecoder(), true);
   }
 
+  public int decodeDirect(java.nio.ByteBuffer pchInput, int length) {
+    return audiodecoderJNI.MpegAudioDecoder_decodeDirect(swigCPtr, this, pchInput, length);
+  }
+
   public int decode(byte[] BYTE, int offset, int length) {
     return audiodecoderJNI.MpegAudioDecoder_decode(swigCPtr, this, BYTE, offset, length);
+  }
+
+  public boolean readDirect(java.nio.ByteBuffer pchInput, int length) {
+    return audiodecoderJNI.MpegAudioDecoder_readDirect(swigCPtr, this, pchInput, length);
   }
 
   public boolean read(byte[] BYTE, int offset, int length) {

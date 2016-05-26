@@ -219,6 +219,10 @@ public class Packet {
     msgexchangeJNI.Packet_readBuffer(swigCPtr, this, BYTE, offset, length);
   }
 
+  public void readBufferDirect(java.nio.ByteBuffer pchInput, int length) {
+    msgexchangeJNI.Packet_readBufferDirect(swigCPtr, this, pchInput, length);
+  }
+
   public final static int headerLength = msgexchangeJNI.Packet_headerLength_get();
   public final static int checkSumPos = msgexchangeJNI.Packet_checkSumPos_get();
   public final static int uncompressedPayloadLengthPos = msgexchangeJNI.Packet_uncompressedPayloadLengthPos_get();
