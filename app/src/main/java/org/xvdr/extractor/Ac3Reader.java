@@ -61,7 +61,7 @@ final class Ac3Reader extends StreamReader {
     }
 
     @Override
-    public void consume(Allocation buffer) {
+    public void consume(SampleBuffer buffer) {
         if(ac3PassThrough) {
             output.sampleData(buffer);
             return;
@@ -70,18 +70,18 @@ final class Ac3Reader extends StreamReader {
         ByteBuffer data = buffer.data();
         data.rewind();
 
-        int length = mDecoder.decodeDirect(data, buffer.length());
+        int length = mDecoder.decodeDirect(data, buffer.limit());
 
         if(length == 0) {
             Log.e(TAG, "Unable to decode frame data");
             return;
         }
 
-        Allocation chunk = output.allocate(length);
+        SampleBuffer chunk = output.allocate(length);
         chunk.timeUs = buffer.timeUs;
         chunk.flags = buffer.flags;
 
-        if(!mDecoder.readDirect(chunk.data(), chunk.size())) {
+        if(!mDecoder.readDirect(chunk.data(), chunk.capacity())) {
             Log.e(TAG, "failed to read audio chunk");
             output.release(buffer);
             output.release(chunk);

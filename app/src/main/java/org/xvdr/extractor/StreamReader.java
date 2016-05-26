@@ -20,6 +20,8 @@ abstract class StreamReader {
         return (stream.content == StreamBundle.CONTENT_AUDIO);
     }
 
-    public abstract void consume(Allocation buffer);
+    public void consume(SampleBuffer buffer) {
+        output.sampleData(buffer);
+    }
 
 }

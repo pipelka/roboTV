@@ -12,7 +12,7 @@ public class PacketQueue  {
     final private static String TAG = "PacketQueue";
 
     private AdaptiveAllocator mAllocator;
-    private ArrayDeque<Allocation> mQueue;
+    private ArrayDeque<SampleBuffer> mQueue;
 
     private MediaFormat mFormat;
 
@@ -25,13 +25,13 @@ public class PacketQueue  {
     }
 
     synchronized public void format(MediaFormat format) {
-        Allocation holder = new Allocation(format);
+        SampleBuffer holder = new SampleBuffer(format);
         mFormat = format;
 
         mQueue.add(holder);
     }
 
-    synchronized public void sampleData(Allocation buffer) {
+    synchronized public void sampleData(SampleBuffer buffer) {
         mLargestTimestampUs = Math.max(mLargestTimestampUs, buffer.timeUs);
 
         if(mSmallestTimestampUs == 0) {
@@ -57,14 +57,14 @@ public class PacketQueue  {
         return mLargestTimestampUs;
     }
 
-    private Allocation poll() {
-        Allocation a = mQueue.poll();
+    private SampleBuffer poll() {
+        SampleBuffer a = mQueue.poll();
         mAllocator.release(a);
         return a;
     }
 
     synchronized public boolean readFormat(MediaFormatHolder formatHolder) {
-        Allocation a = mQueue.peek();
+        SampleBuffer a = mQueue.peek();
 
         if(a == null || !a.isFormat()) {
             return false;
@@ -77,7 +77,7 @@ public class PacketQueue  {
     }
 
     synchronized public boolean readSample(SampleHolder sampleHolder) {
-        Allocation a = mQueue.peek();
+        SampleBuffer a = mQueue.peek();
 
         if(a == null || !a.isSample()) {
             return false;
@@ -88,7 +88,7 @@ public class PacketQueue  {
 
         sampleHolder.flags = a.flags;
         sampleHolder.timeUs = a.timeUs;
-        sampleHolder.size = a.length();
+        sampleHolder.size = a.limit();
         sampleHolder.ensureSpaceForWrite(sampleHolder.size);
         sampleHolder.data.put(buffer); //put(a.data(), 0, sampleHolder.size);
 
@@ -98,11 +98,11 @@ public class PacketQueue  {
         return true;
     }
 
-    synchronized public Allocation allocate(int bufferSize) {
+    synchronized public SampleBuffer allocate(int bufferSize) {
         return mAllocator.allocate(bufferSize);
     }
 
-    synchronized void release(Allocation a) {
+    synchronized void release(SampleBuffer a) {
         mAllocator.release(a);
     }
 

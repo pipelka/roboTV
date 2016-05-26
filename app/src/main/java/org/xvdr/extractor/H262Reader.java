@@ -29,8 +29,4 @@ final class H262Reader extends StreamReader {
                           stream.pixelAspectRatio));
     }
 
-    @Override
-    public void consume(Allocation buffer) {
-        output.sampleData(buffer);
-    }
 }

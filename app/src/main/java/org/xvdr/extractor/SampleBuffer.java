@@ -1,25 +1,23 @@
 package org.xvdr.extractor;
 
-import android.util.Log;
-
 import com.google.android.exoplayer.MediaFormat;
 
 import java.nio.ByteBuffer;
 
-public class Allocation {
+public class SampleBuffer {
 
     private ByteBuffer mData;
     private boolean mAllocated = false;
     private MediaFormat mFormat = null;
+    private static int mPartitionSize = 8192;
 
     public long timeUs = 0;
     public int flags = 0;
-
-    public Allocation(int size) {
+    public SampleBuffer(int size) {
         resize(size);
     }
 
-    public Allocation(MediaFormat format) {
+    public SampleBuffer(MediaFormat format) {
         mFormat = format;
     }
 
@@ -36,7 +34,7 @@ public class Allocation {
             return;
         }
 
-        size = ((size / 8192) + 1) * 8192;
+        size = ((size / mPartitionSize) + 1) * mPartitionSize;
 
         mData = ByteBuffer.allocateDirect(size);
     }
@@ -53,11 +51,11 @@ public class Allocation {
         mData.limit(length);
     }
 
-    public int length() {
+    public int limit() {
         return mData.limit();
     }
 
-    public int size() {
+    public int capacity() {
         return mData.capacity();
     }
 

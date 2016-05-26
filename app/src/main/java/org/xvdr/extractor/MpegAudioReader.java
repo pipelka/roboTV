@@ -5,7 +5,6 @@ import android.util.Log;
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.util.MimeTypes;
-import com.google.android.exoplayer.util.MpegAudioHeader;
 
 import org.xvdr.audio.MpegAudioDecoder;
 import org.xvdr.robotv.client.StreamBundle;
@@ -28,22 +27,22 @@ final class MpegAudioReader extends StreamReader {
     }
 
     @Override
-    public void consume(Allocation buffer) {
+    public void consume(SampleBuffer buffer) {
         ByteBuffer data = buffer.data();
         data.rewind();
 
-        int length = mDecoder.decodeDirect(data, buffer.length());
+        int length = mDecoder.decodeDirect(data, buffer.limit());
 
         if(length == 0) {
             output.release(buffer);
             return;
         }
 
-        Allocation chunk = output.allocate(length);
+        SampleBuffer chunk = output.allocate(length);
         chunk.timeUs = buffer.timeUs;
         chunk.flags = buffer.flags;
 
-        if(!mDecoder.readDirect(chunk.data(), chunk.size())) {
+        if(!mDecoder.readDirect(chunk.data(), chunk.capacity())) {
             Log.e(TAG, "failed to read audio chunk");
             output.release(buffer);
             output.release(chunk);

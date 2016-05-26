@@ -529,7 +529,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         long timeUs = mTimestampAdjuster.adjustTimestamp(pts);
 
         // read buffer
-        Allocation buffer = reader.output.allocate(length);
+        SampleBuffer buffer = reader.output.allocate(length);
 
         p.readBufferDirect(buffer.data(), length);
         buffer.setLength(length);

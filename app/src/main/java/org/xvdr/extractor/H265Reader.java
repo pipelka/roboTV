@@ -39,11 +39,6 @@ final class H265Reader extends StreamReader {
                           stream.pixelAspectRatio));
     }
 
-    @Override
-    public void consume(Allocation buffer) {
-        output.sampleData(buffer);
-    }
-
     private List<byte[]> assembleInitData() {
         byte[] sps = new byte[stream.spsLength + 4];
         byte[] pps = new byte[stream.ppsLength + 4];

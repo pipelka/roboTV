@@ -46,9 +46,9 @@ public class RecordingPlayer extends Player {
         resp.getU32(); // 0
         long lengthInBytes = resp.getU64().longValue();
         resp.getU8(); // TS / PES
-        mDurationInMs = (int) resp.getU32() * 1000; // length in milliseconds
+        mDurationInMs = (int) resp.getU32() * 1000; // limit in milliseconds
 
-        Log.d(TAG, "length: " + lengthInBytes + " bytes");
+        Log.d(TAG, "limit: " + lengthInBytes + " bytes");
         Log.d(TAG, "duration: " + mDurationInMs / 1000 + " seconds");
 
         if(startAtLastPosition) {

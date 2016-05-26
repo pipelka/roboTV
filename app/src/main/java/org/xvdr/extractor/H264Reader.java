@@ -40,11 +40,6 @@ final class H264Reader extends StreamReader {
                           stream.pixelAspectRatio));
     }
 
-    @Override
-    public void consume(Allocation buffer) {
-        output.sampleData(buffer);
-    }
-
     private void assembleInitData(List<byte[]> data) {
         byte[] initSps = new byte[stream.spsLength + 4];
         byte[] initPps = new byte[stream.ppsLength + 4];

@@ -1,7 +1,5 @@
 package org.xvdr.extractor;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,11 +9,11 @@ public class AdaptiveAllocator {
 
     final static String TAG = "AdaptiveAllocator";
 
-    private List<Allocation> m_list;
-    private Comparator<Allocation> mComparator = new Comparator<Allocation>() {
+    private List<SampleBuffer> m_list;
+    private Comparator<SampleBuffer> mComparator = new Comparator<SampleBuffer>() {
         @Override
-        public int compare(Allocation lhs, Allocation rhs) {
-            return lhs.size() < rhs.size() ? -1 : 1;
+        public int compare(SampleBuffer lhs, SampleBuffer rhs) {
+            return lhs.capacity() < rhs.capacity() ? -1 : 1;
         }
     };
 
@@ -23,13 +21,13 @@ public class AdaptiveAllocator {
         m_list = new ArrayList<>(initialBufferCount);
 
         for(int i = 0; i < initialBufferCount; i++) {
-            m_list.add(new Allocation(initalBufferSize));
+            m_list.add(new SampleBuffer(initalBufferSize));
         }
     }
 
-    synchronized public Allocation allocate(int neededSize) {
+    synchronized public SampleBuffer allocate(int neededSize) {
         // check for a suitable packet
-        Allocation p = findAllocation(neededSize);
+        SampleBuffer p = findAllocation(neededSize);
 
         if(p != null) {
             p.data().clear();
@@ -47,7 +45,7 @@ public class AdaptiveAllocator {
         }
 
         // add a new packet
-        p = new Allocation(neededSize);
+        p = new SampleBuffer(neededSize);
         m_list.add(p);
 
         p.allocate();
@@ -56,15 +54,15 @@ public class AdaptiveAllocator {
         return p;
     }
 
-    synchronized public void release(Allocation a) {
+    synchronized public void release(SampleBuffer a) {
         a.release();
     }
 
-    private Allocation findAllocation(int neededSize) {
+    private SampleBuffer findAllocation(int neededSize) {
         for(int i = 0; i < m_list.size(); i++) {
-            Allocation p = m_list.get(i);
+            SampleBuffer p = m_list.get(i);
 
-            if(p.size() >= neededSize && p.allocate()) {
+            if(p.capacity() >= neededSize && p.allocate()) {
                 return p;
             }
         }
@@ -72,10 +70,10 @@ public class AdaptiveAllocator {
         return null;
     }
 
-    private Allocation findUnallocated() {
+    private SampleBuffer findUnallocated() {
         int i = m_list.size() - 1;
         while(i >= 0) {
-            Allocation p = m_list.get(i--);
+            SampleBuffer p = m_list.get(i--);
 
             if(p.allocate()) {
                 return p;
@@ -91,7 +89,7 @@ public class AdaptiveAllocator {
 
     synchronized public void releaseAll() {
         for(int i = 0; i < m_list.size(); i++) {
-            Allocation a = m_list.get(i);
+            SampleBuffer a = m_list.get(i);
             a.release();
         }
     }

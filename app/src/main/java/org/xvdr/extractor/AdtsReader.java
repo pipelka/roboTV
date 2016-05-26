@@ -26,9 +26,4 @@ final class AdtsReader extends StreamReader {
                           stream.language));
     }
 
-    @Override
-    public void consume(Allocation buffer) {
-        output.sampleData(buffer);
-    }
-
 }
