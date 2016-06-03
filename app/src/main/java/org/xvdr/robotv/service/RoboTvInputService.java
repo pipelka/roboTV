@@ -62,7 +62,6 @@ public class RoboTvInputService extends TvInputService {
 
         private Uri mCurrentChannelUri;
         private String mInputId;
-        private Runnable mLastResetRunnable;
 
         private LiveTvPlayer mPlayer;
         private Context mContext;
@@ -117,7 +116,6 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onRelease() {
-            cancelReset();
             mPlayer.release();
             mHandlerThread.interrupt();
         }
@@ -308,41 +306,6 @@ public class RoboTvInputService extends TvInputService {
             onTune(mCurrentChannelUri);
         }
 
-        private void cancelReset() {
-            if(mLastResetRunnable == null) {
-                return;
-            }
-
-            mHandler.removeCallbacks(mLastResetRunnable);
-            mLastResetRunnable = null;
-        }
-
-        private void scheduleReset() {
-            // only for "SHIELD Android TV"
-            if(!Build.MODEL.equals("SHIELD Android TV")) {
-                return;
-            }
-
-            // schedule player reset
-            Runnable reset = new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "track reset");
-                    doReset();
-                    scheduleReset();
-                }
-            };
-
-            cancelReset();
-
-            mHandler.postDelayed(reset, 12 * 60 * 1000); // 12 minutes
-            mLastResetRunnable = reset;
-        }
-
-        private void doReset() {
-            mPlayer.reset();
-        }
-
         @Override
         public void onTracksChanged(StreamBundle bundle) {
             final List<TvTrackInfo> tracks = new ArrayList<>(16);
@@ -381,7 +344,6 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public void onVideoTrackChanged(StreamBundle.Stream stream) {
-            cancelReset();
             ContentValues values = new ContentValues();
 
             if(stream.height == 720) {
@@ -390,7 +352,6 @@ public class RoboTvInputService extends TvInputService {
 
             if(stream.height > 720 && stream.height <= 1080) {
                 values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_1080I);
-                scheduleReset();
             }
             else if(stream.height == 2160) {
                 values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_2160P);
