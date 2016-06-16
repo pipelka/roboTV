@@ -283,6 +283,10 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             return;
         }
 
+        if(wallclockTimeMs < mStartPositionTimeshift) {
+            wallclockTimeMs = mStartPositionTimeshift;
+        }
+
         Log.d(TAG, "seek to timestamp: " + wallclockTimeMs);
         Log.d(TAG, "current timestamp: " + mCurrentPositionTimeshift);
         Log.d(TAG, "seekbuffer start : " + mStartPositionTimeshift);
