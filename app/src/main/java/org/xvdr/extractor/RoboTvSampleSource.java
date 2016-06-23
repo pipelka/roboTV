@@ -96,7 +96,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
     final private PacketQueue[] mOutputTracks = new PacketQueue[TRACK_COUNT];
     private boolean[] mPendingDiscontinuities = new boolean[TRACK_COUNT];
 
-    final private SparseArray<StreamReader> mStreamReaders = new SparseArray(TRACK_COUNT);
+    final private SparseArray<StreamReader> mStreamReaders = new SparseArray<>(TRACK_COUNT);
     final private SparseBooleanArray mTrackEnabled = new SparseBooleanArray(TRACK_COUNT);
 
     final private Packet mRequest;
@@ -134,9 +134,9 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         mCurrentPositionTimeshift = mStartPositionTimeshift;
 
         // create output tracks
-        mOutputTracks[TRACK_VIDEO] = new PacketQueue(50, 64 * 1024);
-        mOutputTracks[TRACK_AUDIO] = new PacketQueue(50, 8 * 1024);
-        mOutputTracks[TRACK_SUBTITLE] = new PacketQueue(0, 0);
+        mOutputTracks[TRACK_VIDEO] = new PacketQueue(32, 64 * 1024);
+        mOutputTracks[TRACK_AUDIO] = new PacketQueue(32, 64 * 1024);
+        mOutputTracks[TRACK_SUBTITLE] = new PacketQueue(5, 1024);
 
         mAudioCapabilities = audioCapabilities;
 
@@ -528,13 +528,8 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         // adjust timestamp
         long timeUs = mTimestampAdjuster.adjustTimestamp(pts);
 
-        // read buffer
-        SampleBuffer buffer = reader.output.allocate(length);
-
-        p.readBuffer(buffer.data().array(), 0, length);
-        buffer.setLength(length);
-        buffer.timeUs = timeUs;
-        buffer.flags = C.SAMPLE_FLAG_SYNC;
+        // push buffer to reader
+        reader.consume(p, length, timeUs, C.SAMPLE_FLAG_SYNC);
 
         // read timestamp
         long pos = p.getS64(); // current timestamp
@@ -544,8 +539,6 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
             mCurrentPositionTimeshift = pos;
         }
 
-        // push buffer to reader
-        reader.consume(buffer);
     }
 
     private void postTracksChanged(final StreamBundle bundle) {

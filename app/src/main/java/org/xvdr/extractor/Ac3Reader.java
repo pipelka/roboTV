@@ -7,9 +7,8 @@ import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.audio.AC3Decoder;
+import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.client.StreamBundle;
-
-import java.nio.ByteBuffer;
 
 /**
  * Processes a XVDR AC3 stream.
@@ -19,6 +18,8 @@ final class Ac3Reader extends StreamReader {
     private static final String TAG = "Ac3Reader";
     private boolean ac3PassThrough;
     private boolean hasOutputFormat = false;
+
+    byte[] decodeBuffer;
 
     AC3Decoder mDecoder;
 
@@ -38,7 +39,7 @@ final class Ac3Reader extends StreamReader {
             output.format(MediaFormat.createAudioFormat(
                               Integer.toString(stream.physicalId),
                               MimeTypes.AUDIO_AC3,
-                              stream.bitRate,
+                              MediaFormat.NO_VALUE,
                               MediaFormat.NO_VALUE,
                               C.UNKNOWN_TIME_US,
                               stream.channels,
@@ -48,6 +49,7 @@ final class Ac3Reader extends StreamReader {
             return;
         }
 
+        decodeBuffer = new byte[64 * 1024];
         int decoderMode = AC3Decoder.LayoutDolby;
 
         if(channelConfiguration == Player.CHANNELS_DIGITAL51) {
@@ -61,42 +63,36 @@ final class Ac3Reader extends StreamReader {
     }
 
     @Override
-    public void consume(SampleBuffer buffer) {
+    public void consume(Packet p, int size, long timeUs, int flags) {
         if(ac3PassThrough) {
-            output.sampleData(buffer);
+            output.sampleData(p, size, timeUs, flags);
             return;
         }
 
-        ByteBuffer data = buffer.data();
-        data.rewind();
-
-        int length = mDecoder.decode(data.array(), 0, buffer.limit());
+        p.readBuffer(decodeBuffer, 0, size);
+        int length = mDecoder.decode(decodeBuffer, 0, size);
 
         if(length == 0) {
             Log.e(TAG, "Unable to decode frame data");
             return;
         }
 
-        SampleBuffer chunk = output.allocate(length);
-        chunk.timeUs = buffer.timeUs;
-        chunk.flags = buffer.flags;
-
-        if(!mDecoder.read(chunk.data().array(), 0, chunk.capacity())) {
-            Log.e(TAG, "failed to read audio chunk");
-            output.release(buffer);
-            output.release(chunk);
+        if(length > decodeBuffer.length) {
+            Log.e(TAG, "decode buffer too small !!!");
             return;
         }
 
-        chunk.setLength(length);
-        output.release(buffer);
+        if(!mDecoder.read(decodeBuffer, 0, length)) {
+            Log.e(TAG, "failed to read audio chunk");
+            return;
+        }
 
         if(!hasOutputFormat) {
             Log.i(TAG, "channels: " + mDecoder.getChannels());
             MediaFormat format = MediaFormat.createAudioFormat(
                                      Integer.toString(stream.physicalId), // < trackId
                                      MimeTypes.AUDIO_RAW,
-                                     mDecoder.getBitRate(),
+                                     MediaFormat.NO_VALUE,
                                      MediaFormat.NO_VALUE,
                                      C.UNKNOWN_TIME_US,
                                      mDecoder.getChannels(),
@@ -108,7 +104,7 @@ final class Ac3Reader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(chunk);
+        output.sampleData(decodeBuffer, length, timeUs, flags);
     }
 
 }

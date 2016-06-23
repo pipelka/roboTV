@@ -1,5 +1,8 @@
 package org.xvdr.extractor;
 
+import com.google.android.exoplayer.SampleHolder;
+
+import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.client.StreamBundle;
 
 abstract class StreamReader {
@@ -20,8 +23,8 @@ abstract class StreamReader {
         return (stream.content == StreamBundle.CONTENT_AUDIO);
     }
 
-    public void consume(SampleBuffer buffer) {
-        output.sampleData(buffer);
+    public void consume(Packet p, int size, long timeUs, int flags) {
+        output.sampleData(p, size, timeUs, flags);
     }
 
 }

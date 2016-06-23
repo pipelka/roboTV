@@ -3,42 +3,78 @@ package org.xvdr.extractor;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
 import com.google.android.exoplayer.SampleHolder;
+import com.google.android.exoplayer.upstream.DefaultAllocator;
 
-import java.nio.ByteBuffer;
+import org.xvdr.extractor.upstream.RollingSampleBuffer;
+import org.xvdr.msgexchange.Packet;
+
 import java.util.ArrayDeque;
 
-public class PacketQueue  {
+public class PacketQueue {
+
+    protected class FormatHolder {
+
+        public final MediaFormat format;
+        public final long timeUs;
+
+        public FormatHolder(MediaFormat format, long timeUs) {
+            this.format = format;
+            this.timeUs = timeUs;
+        }
+    }
 
     final private static String TAG = "PacketQueue";
 
-    private AdaptiveAllocator mAllocator;
-    private ArrayDeque<SampleBuffer> mQueue;
+    private RollingSampleBuffer rollingBuffer;
+    private ArrayDeque<FormatHolder> mFormatQueue;
 
     private MediaFormat mFormat;
 
     private long mLargestTimestampUs = 0;
     private long mSmallestTimestampUs = 0;
+    private SampleHolder mSampleHolder = new SampleHolder(SampleHolder.BUFFER_REPLACEMENT_MODE_DIRECT);
 
     public PacketQueue(int bufferCount, int bufferSize) {
-        mAllocator = new AdaptiveAllocator(bufferCount, bufferSize);
-        mQueue = new ArrayDeque<>(bufferCount);
+        rollingBuffer = new RollingSampleBuffer(new DefaultAllocator(bufferSize, bufferCount));
+        mFormatQueue = new ArrayDeque<>();
+    }
+
+    private long getCurrentTimeUs() {
+        if(!rollingBuffer.peekSample(mSampleHolder)) {
+            return 0;
+        }
+
+        return mSampleHolder.timeUs;
     }
 
     synchronized public void format(MediaFormat format) {
-        SampleBuffer holder = new SampleBuffer(format);
-        mFormat = format;
+        if(!hasFormat()) {
+            mFormat = format;
+        }
 
-        mQueue.add(holder);
+        mFormatQueue.push(new FormatHolder(format, getCurrentTimeUs()));
     }
 
-    synchronized public void sampleData(SampleBuffer buffer) {
-        mLargestTimestampUs = Math.max(mLargestTimestampUs, buffer.timeUs);
+    synchronized public void sampleData(Packet p, int size, long timeUs, int flags) {
+        mLargestTimestampUs = Math.max(mLargestTimestampUs, timeUs);
 
         if(mSmallestTimestampUs == 0) {
             mSmallestTimestampUs = mLargestTimestampUs;
         }
 
-        mQueue.add(buffer);
+        rollingBuffer.appendData(p, size);
+        rollingBuffer.commitSample(timeUs, flags, rollingBuffer.getWritePosition() - size, size);
+    }
+
+    synchronized public void sampleData(byte[] p, int size, long timeUs, int flags) {
+        mLargestTimestampUs = Math.max(mLargestTimestampUs, timeUs);
+
+        if(mSmallestTimestampUs == 0) {
+            mSmallestTimestampUs = mLargestTimestampUs;
+        }
+
+        rollingBuffer.appendData(p, size);
+        rollingBuffer.commitSample(timeUs, flags, rollingBuffer.getWritePosition() - size, size);
     }
 
     public MediaFormat getFormat() {
@@ -57,62 +93,43 @@ public class PacketQueue  {
         return mLargestTimestampUs;
     }
 
-    private SampleBuffer poll() {
-        SampleBuffer a = mQueue.poll();
-        mAllocator.release(a);
-        return a;
-    }
-
     synchronized public boolean readFormat(MediaFormatHolder formatHolder) {
-        SampleBuffer a = mQueue.peek();
-
-        if(a == null || !a.isFormat()) {
+        if(!rollingBuffer.peekSample(mSampleHolder)) {
             return false;
         }
 
-        formatHolder.format = a.getFormat();
-        poll();
+        FormatHolder h = mFormatQueue.peek();
 
+        if(h == null) {
+            return false;
+        }
+
+        if(h.timeUs > mSampleHolder.timeUs) {
+            return false;
+        }
+
+        mFormat = h.format;
+        formatHolder.format = h.format;
+
+        mFormatQueue.poll();
         return true;
     }
 
     synchronized public boolean readSample(SampleHolder sampleHolder) {
-        SampleBuffer a = mQueue.peek();
-
-        if(a == null || !a.isSample()) {
+        if(!rollingBuffer.readSample(sampleHolder)) {
             return false;
         }
 
-        ByteBuffer buffer = a.data();
-        buffer.rewind();
-
-        sampleHolder.flags = a.flags;
-        sampleHolder.timeUs = a.timeUs;
-        sampleHolder.size = a.limit();
-        sampleHolder.ensureSpaceForWrite(sampleHolder.size);
-        sampleHolder.data.put(buffer); //put(a.data(), 0, sampleHolder.size);
-
         mSmallestTimestampUs = Math.max(mSmallestTimestampUs, sampleHolder.timeUs);
-        poll();
-
         return true;
     }
 
-    synchronized public SampleBuffer allocate(int bufferSize) {
-        return mAllocator.allocate(bufferSize);
-    }
-
-    synchronized void release(SampleBuffer a) {
-        mAllocator.release(a);
-    }
-
     synchronized public boolean isEmpty() {
-        return (mQueue.peek() == null);
+        return rollingBuffer.isEmpty();
     }
 
     synchronized public void clear() {
-        mQueue.clear();
-        mAllocator.releaseAll();
+        rollingBuffer.clear();
         mLargestTimestampUs = 0;
         mSmallestTimestampUs = 0;
     }

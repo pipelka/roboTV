@@ -4,9 +4,11 @@ import android.util.Log;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
+import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.util.MimeTypes;
 
 import org.xvdr.audio.MpegAudioDecoder;
+import org.xvdr.msgexchange.Packet;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.nio.ByteBuffer;
@@ -21,36 +23,27 @@ final class MpegAudioReader extends StreamReader {
     boolean hasOutputFormat = false;
     MpegAudioDecoder mDecoder;
 
+    byte[] decodeBuffer;
+
     public MpegAudioReader(PacketQueue output, StreamBundle.Stream stream) {
         super(output, stream);
         mDecoder = new MpegAudioDecoder();
+        decodeBuffer = new byte[128 * 1024];
     }
 
     @Override
-    public void consume(SampleBuffer buffer) {
-        ByteBuffer data = buffer.data();
-        data.rewind();
-
-        int length = mDecoder.decode(data.array(), 0, buffer.limit());
+    public void consume(Packet p, int size, long timeUs, int flags) {
+        p.readBuffer(decodeBuffer, 0, size);
+        int length = mDecoder.decode(decodeBuffer, 0, size);
 
         if(length == 0) {
-            output.release(buffer);
             return;
         }
 
-        SampleBuffer chunk = output.allocate(length);
-        chunk.timeUs = buffer.timeUs;
-        chunk.flags = buffer.flags;
-
-        if(!mDecoder.read(chunk.data().array(), 0, chunk.capacity())) {
+        if(!mDecoder.read(decodeBuffer, 0, length)) {
             Log.e(TAG, "failed to read audio chunk");
-            output.release(buffer);
-            output.release(chunk);
             return;
         }
-
-        chunk.setLength(length);
-        output.release(buffer);
 
         if(!hasOutputFormat) {
             MediaFormat format = MediaFormat.createAudioFormat(
@@ -68,7 +61,7 @@ final class MpegAudioReader extends StreamReader {
             hasOutputFormat = true;
         }
 
-        output.sampleData(chunk);
+        output.sampleData(decodeBuffer, length, timeUs, flags);
     }
 
 }
