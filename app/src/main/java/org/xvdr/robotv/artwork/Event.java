@@ -13,6 +13,7 @@ public class Event {
     private int mYear;
     private int mEventId;
     private long mStartTime;
+    private int mChannelUid;
 
     private static String[] genreFilm = {
         "abenteuerfilm",
@@ -81,7 +82,12 @@ public class Event {
     }
 
     public Event(int contentId, String title, String subTitle, String plot, int durationSec, int eventId) {
+        this(contentId, title, subTitle, plot, durationSec, eventId, 0);
+    }
+
+    public Event(int contentId, String title, String subTitle, String plot, int durationSec, int eventId, int channelUid) {
         mContentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
+        mChannelUid = channelUid;
 
         // sometimes we can guess the sub genre from the title
         if(getGenre() == 0x40) {
@@ -128,8 +134,12 @@ public class Event {
         return mEventId;
     }
 
+    public int getChannelUid() {
+        return mChannelUid;
+    }
+
     public boolean isTvShow() {
-        return (getContentId() == 0x15);
+        return (getContentId() == 0x15 || getContentId() == 0x23);
     }
 
     static public int guessYearFromDescription(String description) {
@@ -138,6 +148,19 @@ public class Event {
 
         for(String word : words) {
             word = word.replaceAll("[^\\d]", "");
+
+            // skip empty
+            if(word.isEmpty()) {
+                continue;
+            }
+
+            // skip all not beginning with 1...
+            char c = word.charAt(0);
+
+            if(c != '1') {
+                continue;
+            }
+
             int year;
 
             try {
