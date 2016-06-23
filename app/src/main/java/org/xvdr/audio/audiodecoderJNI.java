@@ -17,18 +17,14 @@ public class audiodecoderJNI {
   public final static native int AC3Decoder_ChannelLayout_get(long jarg1, AC3Decoder jarg1_);
   public final static native long new_AC3Decoder(int jarg1);
   public final static native void delete_AC3Decoder(long jarg1);
-  public final static native int AC3Decoder_decodeDirect(long jarg1, AC3Decoder jarg1_, java.nio.ByteBuffer jarg2, int jarg4);
   public final static native int AC3Decoder_decode(long jarg1, AC3Decoder jarg1_, byte[] jarg2, int jarg3, int jarg4);
-  public final static native boolean AC3Decoder_readDirect(long jarg1, AC3Decoder jarg1_, java.nio.ByteBuffer jarg2, int jarg4);
   public final static native boolean AC3Decoder_read(long jarg1, AC3Decoder jarg1_, byte[] jarg2, int jarg3, int jarg4);
   public final static native int AC3Decoder_getChannels(long jarg1, AC3Decoder jarg1_);
   public final static native int AC3Decoder_getSampleRate(long jarg1, AC3Decoder jarg1_);
   public final static native int AC3Decoder_getBitRate(long jarg1, AC3Decoder jarg1_);
   public final static native long new_MpegAudioDecoder();
   public final static native void delete_MpegAudioDecoder(long jarg1);
-  public final static native int MpegAudioDecoder_decodeDirect(long jarg1, MpegAudioDecoder jarg1_, java.nio.ByteBuffer jarg2, int jarg4);
   public final static native int MpegAudioDecoder_decode(long jarg1, MpegAudioDecoder jarg1_, byte[] jarg2, int jarg3, int jarg4);
-  public final static native boolean MpegAudioDecoder_readDirect(long jarg1, MpegAudioDecoder jarg1_, java.nio.ByteBuffer jarg2, int jarg4);
   public final static native boolean MpegAudioDecoder_read(long jarg1, MpegAudioDecoder jarg1_, byte[] jarg2, int jarg3, int jarg4);
   public final static native int MpegAudioDecoder_getChannels(long jarg1, MpegAudioDecoder jarg1_);
   public final static native int MpegAudioDecoder_getSampleRate(long jarg1, MpegAudioDecoder jarg1_);

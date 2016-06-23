@@ -32,11 +32,6 @@ AC3Decoder::~AC3Decoder() {
 }
 
 int AC3Decoder::decode(char* BYTE, int offset, int length) {
-    if(BYTE == NULL) {
-		ALOG("decode: buffer == null");
-		return false;
-    }
-
 	sample_t level = 32767;
 	sample_t bias = 0;
 	int flags;
@@ -140,11 +135,6 @@ int AC3Decoder::decode(char* BYTE, int offset, int length) {
 }
 
 bool AC3Decoder::read(char* BYTE, int offset, int length) {
-    if(BYTE == NULL) {
-		ALOG("read: buffer == null");
-		return false;
-    }
-
 	if(length < mOutputBufferLength) {
 		ALOG("output buffer too small !");
 		return false;

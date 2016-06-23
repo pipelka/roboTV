@@ -67,7 +67,6 @@ public class msgexchangeJNI {
   public final static native int Packet_syncPos_get();
   public final static native void Packet_skipBuffer(long jarg1, Packet jarg1_, int jarg2);
   public final static native void Packet_readBuffer(long jarg1, Packet jarg1_, byte[] jarg2, int jarg3, int jarg4);
-  public final static native void Packet_readBufferDirect(long jarg1, Packet jarg1_, java.nio.ByteBuffer jarg2, int jarg4);
   public final static native long new_Connection();
   public final static native void delete_Connection(long jarg1);
   public final static native boolean Connection_open(long jarg1, Connection jarg1_, String jarg2, int jarg3);
