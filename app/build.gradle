@@ -11,7 +11,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 23
         versionCode 1
-        versionName "0.5.0.${gitAbbreviatedId}"
+        versionName "0.5.1.${gitAbbreviatedId}"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
 
