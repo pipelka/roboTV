@@ -104,12 +104,31 @@ public class msgexchangeJNI {
   public final static native void SessionProxy_onNotificationSwigExplicitSessionProxy(long jarg1, SessionProxy jarg1_, long jarg2, Packet jarg2_);
   public final static native void SessionProxy_director_connect(SessionProxy obj, long cptr, boolean mem_own, boolean weak_global);
   public final static native void SessionProxy_change_ownership(SessionProxy obj, long cptr, boolean take_or_release);
+  public final static native int Ac3Decoder_layoutStereo_get();
+  public final static native int Ac3Decoder_layoutDolby_get();
+  public final static native int Ac3Decoder_layout50_get();
+  public final static native int Ac3Decoder_layout51_get();
+  public final static native void Ac3Decoder_channelLayout_set(long jarg1, Ac3Decoder jarg1_, int jarg2);
+  public final static native int Ac3Decoder_channelLayout_get(long jarg1, Ac3Decoder jarg1_);
+  public final static native long new_Ac3Decoder(int jarg1);
+  public final static native void delete_Ac3Decoder(long jarg1);
+  public final static native int Ac3Decoder_decode(long jarg1, Ac3Decoder jarg1_, long jarg2, Packet jarg2_, int jarg3, byte[] jarg4, int jarg5, int jarg6);
+  public final static native int Ac3Decoder_getChannels(long jarg1, Ac3Decoder jarg1_);
+  public final static native int Ac3Decoder_getSampleRate(long jarg1, Ac3Decoder jarg1_);
+  public final static native int Ac3Decoder_getBitRate(long jarg1, Ac3Decoder jarg1_);
+  public final static native long new_MpegAudioDecoder();
+  public final static native void delete_MpegAudioDecoder(long jarg1);
+  public final static native int MpegAudioDecoder_decode(long jarg1, MpegAudioDecoder jarg1_, long jarg2, Packet jarg2_, int jarg3, byte[] jarg4, int jarg5, int jarg6);
+  public final static native int MpegAudioDecoder_getChannels(long jarg1, MpegAudioDecoder jarg1_);
+  public final static native int MpegAudioDecoder_getSampleRate(long jarg1, MpegAudioDecoder jarg1_);
 
 
 static {
 	try {
 		System.loadLibrary("gnustl_shared");
 		System.loadLibrary("msgexchange");
+		System.loadLibrary("a52");
+		System.loadLibrary("mad");
 		System.loadLibrary("msgexchange_wrapper");
 	}
 	catch (UnsatisfiedLinkError e) {
