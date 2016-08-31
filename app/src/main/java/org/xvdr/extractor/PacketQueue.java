@@ -32,11 +32,12 @@ public class PacketQueue {
 
     private long mLargestTimestampUs = 0;
     private long mSmallestTimestampUs = 0;
-    private SampleHolder mSampleHolder = new SampleHolder(SampleHolder.BUFFER_REPLACEMENT_MODE_DIRECT);
+    private SampleHolder mSampleHolder = new SampleHolder(SampleHolder.BUFFER_REPLACEMENT_MODE_NORMAL);
 
     public PacketQueue(int bufferCount, int bufferSize) {
         rollingBuffer = new RollingSampleBuffer(new DefaultAllocator(bufferSize, bufferCount));
         mFormatQueue = new ArrayDeque<>();
+        mSampleHolder.ensureSpaceForWrite(256 * 1024);
     }
 
     private long getCurrentTimeUs() {
