@@ -133,6 +133,9 @@ public class ChannelSyncAdapter {
     private ArtworkFetcher mArtwork;
     private String mInputId;
 
+    final private Packet mRequest;
+    final private Packet mResponse;
+
     private static final SparseArray<String> mCanonicalGenre = new SparseArray<String>() {
         {
             append(0x10, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
@@ -210,6 +213,8 @@ public class ChannelSyncAdapter {
         mInputId = inputId;
 
         mArtwork = new ArtworkFetcher(mConnection, SetupUtils.getLanguage(context));
+        mRequest = mConnection.CreatePacket(Connection.XVDR_EPG_GETFORCHANNEL);
+        mResponse = new Packet();
     }
 
     public void setProgressCallback(ProgressCallback callback) {
@@ -426,28 +431,26 @@ public class ChannelSyncAdapter {
         req.putU32(start);
         req.putU32(duration);
 
-        Packet resp = mConnection.transmitMessage(req);
-
-        if(resp == null) {
+        if(!mConnection.transmitMessage(mRequest, mResponse)) {
             Log.d(TAG, "error sending fetch epg request");
             return;
         }
 
-        resp.uncompress();
+        mResponse.uncompress();
 
         // add schedule
-        while(!resp.eop()) {
-            int eventId = (int)resp.getU32();
-            long startTime = resp.getU32();
-            long endTime = startTime + resp.getU32();
-            int content = (int)resp.getU32();
+        while(!mResponse.eop()) {
+            int eventId = (int)mResponse.getU32();
+            long startTime = mResponse.getU32();
+            long endTime = startTime + mResponse.getU32();
+            int content = (int)mResponse.getU32();
             int eventDuration = (int)(endTime - startTime);
-            long parentalRating = resp.getU32();
-            String title = resp.getString();
-            String plotOutline = resp.getString();
-            String plot = resp.getString();
-            String posterUrl = resp.getString();
-            String backgroundUrl = resp.getString();
+            long parentalRating = mResponse.getU32();
+            String title = mResponse.getString();
+            String plotOutline = mResponse.getString();
+            String plot = mResponse.getString();
+            String posterUrl = mResponse.getString();
+            String backgroundUrl = mResponse.getString();
 
             // invalid entry
             if(endTime <= startTime) {
