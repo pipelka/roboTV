@@ -107,3 +107,15 @@ bool MpegAudioDecoder::read(char* BYTE, int offset, int length) {
     memcpy(&BYTE[offset], mBuffer, sizeof(mBuffer));
     return true;
 }
+
+int MpegAudioDecoder::decode(MsgPacket* p, int src_length, char* BYTE, int offset, int dst_length) {
+    char* src_buffer = (char*)p->consume(src_length);
+
+    int length = decode(src_buffer, 0, src_length);
+
+    if(length == 0 || !read(BYTE, offset, length)) {
+        return 0;
+    }
+
+    return length;
+}

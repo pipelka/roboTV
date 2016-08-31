@@ -7,7 +7,7 @@ extern "C" {
 #include "a52.h"
 }
 
-class AC3Decoder : public Decoder {
+class Ac3Decoder : public Decoder {
 public:
 
 	enum {
@@ -17,13 +17,11 @@ public:
 		Layout51 = A52_3F2R | A52_LFE
 	} ChannelLayout;
 
-	AC3Decoder(int flags);
+	Ac3Decoder(int flags);
 
-	virtual ~AC3Decoder();
+	virtual ~Ac3Decoder();
 
-	int decode(char* BYTE, int offset, int length);
-
-	bool read(char* BYTE, int offset, int length);
+	int decode(MsgPacket* p, int src_length, char* BYTE, int offset, int dst_length);
 
 	int getChannels() {
 		return mChannels;
@@ -46,10 +44,6 @@ private:
     int mBitRate;
 
 	a52_state_t* mState;
-
-	int mOutputBufferLength;
-
-	uint8_t* mDecodeBuffer;
 };
 
 #endif // AC3_DECODER_H

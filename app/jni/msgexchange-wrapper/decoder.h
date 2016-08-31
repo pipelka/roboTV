@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "msgpacket.h"
+
 class Decoder {
 public:
 
@@ -11,9 +13,7 @@ public:
 
 	virtual ~Decoder() {};
 
-	virtual int decode(char* BYTE, int offset, int length) = 0;
-
-	virtual bool read(char* BYTE, int offset, int length) = 0;
+	virtual int decode(MsgPacket* p, int src_length, char* BYTE, int offset, int dst_length) = 0;
 
     virtual int getChannels() = 0;
 

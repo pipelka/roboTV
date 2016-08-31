@@ -14,11 +14,15 @@
 %rename (Packet) MsgPacket;
 %rename (Connection) MsgConnection;
 %rename (SessionProxy) MsgSession;
+%rename (Ac3Decoder) Ac3Decoder;
+%rename (MpegAudioDecoder) MpegAudioDecoder;
 
 %{
 #include "msgpacket.h"
 #include "msgconnection.h"
 #include "msgsession.h"
+#include "ac3decoder.h"
+#include "mpadecoder.h"
 %}
 
 
@@ -78,12 +82,27 @@
 
 %include "msgsession.h"
 
+
+//
+// AC3Decoder
+//
+
+%include "ac3decoder.h"
+
+//
+// MpegAudioDecoder
+//
+
+%include "mpadecoder.h"
+
 %pragma(java) jniclasscode=%{
 
 static {
 	try {
 		System.loadLibrary("gnustl_shared");
 		System.loadLibrary("msgexchange");
+		System.loadLibrary("a52");
+		System.loadLibrary("mad");
 		System.loadLibrary("msgexchange_wrapper");
 	}
 	catch (UnsatisfiedLinkError e) {
