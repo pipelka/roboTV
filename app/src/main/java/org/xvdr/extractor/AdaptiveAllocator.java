@@ -72,6 +72,7 @@ public class AdaptiveAllocator {
 
     private SampleBuffer findUnallocated() {
         int i = m_list.size() - 1;
+
         while(i >= 0) {
             SampleBuffer p = m_list.get(i--);
 

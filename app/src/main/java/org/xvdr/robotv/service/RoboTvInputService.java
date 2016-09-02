@@ -45,7 +45,13 @@ public class RoboTvInputService extends TvInputService {
         Intent serviceIntent = new Intent(this, DataService.class);
         startService(serviceIntent);
 
-        return new RoboTvSession(this, inputId);
+        TvInputService.Session session = new RoboTvSession(this, inputId);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            session.notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+        }
+
+        return session;
     }
 
     @Override
@@ -164,11 +170,27 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public long onTimeShiftGetStartPosition() {
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                return 0;
+            }
+
+            if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_READY) {
+                return TvInputManager.TIME_SHIFT_INVALID_TIME;
+            }
+
             return mPlayer.getStartPositionWallclock();
         }
 
         @Override
         public long onTimeShiftGetCurrentPosition() {
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                return 0;
+            }
+
+            if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_READY) {
+                return TvInputManager.TIME_SHIFT_INVALID_TIME;
+            }
+
             return mPlayer.getCurrentPositionWallclock();
         }
 
@@ -241,10 +263,6 @@ public class RoboTvInputService extends TvInputService {
                 }
 
                 return false;
-            }
-
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
             }
 
             Log.i(TAG, "successfully switched channel");

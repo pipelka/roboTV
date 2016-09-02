@@ -316,6 +316,14 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
     }
 
+    public int getPlaybackState() {
+        if(mExoPlayer == null || mSampleSource == null) {
+            return ExoPlayer.STATE_IDLE;
+        }
+
+        return mExoPlayer.getPlaybackState();
+    }
+
     static public String nameOfChannelConfiguration(int channelConfiguration) {
         switch(channelConfiguration) {
             case CHANNELS_DEFAULT:
