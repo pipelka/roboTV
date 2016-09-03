@@ -29,7 +29,14 @@ public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {
     @Override
     public void add(Object item) {
         mSortedItems.add(item);
-        super.add(mSortedItems.headSet(item).size(), item);
+        int index = mSortedItems.headSet(item).size();
+
+        if(index > size()) {
+            super.add(item);
+            return;
+        }
+
+        super.add(index, item);
     }
 
     @Override
