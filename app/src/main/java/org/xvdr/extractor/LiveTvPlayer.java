@@ -16,7 +16,7 @@ public class LiveTvPlayer extends Player {
      * @return returns the status of the operation
      */
     public int openStream(int channelUid, String language) {
-        return openStream(channelUid, language, false);
+        return openStream(channelUid, language, true);
     }
 
     /**
