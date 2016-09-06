@@ -45,13 +45,7 @@ public class RoboTvInputService extends TvInputService {
         Intent serviceIntent = new Intent(this, DataService.class);
         startService(serviceIntent);
 
-        TvInputService.Session session = new RoboTvSession(this, inputId);
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            session.notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
-        }
-
-        return session;
+        return  new RoboTvSession(this, inputId);
     }
 
     @Override
@@ -155,6 +149,7 @@ public class RoboTvInputService extends TvInputService {
 
             // post new tune request
             mHandler.post(mTune);
+
             return true;
         }
 
@@ -353,6 +348,10 @@ public class RoboTvInputService extends TvInputService {
             }
 
             notifyTracksChanged(tracks);
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+            }
         }
 
         @Override
