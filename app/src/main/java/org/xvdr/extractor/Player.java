@@ -53,8 +53,8 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     private static final int RENDERER_COUNT = 2;
-    protected static final int MIN_BUFFER_MS = 2000;
-    protected static final int MIN_REBUFFER_MS = 3000;
+    protected static final int MIN_BUFFER_MS = 1000;
+    protected static final int MIN_REBUFFER_MS = 2000;
 
     private static final int RENDERER_VIDEO = 0;
     private static final int RENDERER_AUDIO = 1;
