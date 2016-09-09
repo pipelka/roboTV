@@ -92,6 +92,7 @@ bool MsgConnection::Open(const char* hostname, int port) {
 	setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (sockval_t*)&val, sizeof(val));
 
 	setsock_keepalive(sockfd);
+    setsockopt(sockfd, SOL_SOCKET, SO_PRIORITY, &m_priority, sizeof(m_priority));
 
 	freeaddrinfo(result);
 
@@ -247,4 +248,12 @@ bool MsgConnection::pollfd(int fd, int timeout_ms, bool in) {
 
 const std::string& MsgConnection::GetHostname() {
 	return m_hostname;
+}
+
+void MsgConnection::SetPriority(int priority) {
+    m_priority = priority;
+}
+
+int MsgConnection::GetPriority() const {
+    return m_priority;
 }

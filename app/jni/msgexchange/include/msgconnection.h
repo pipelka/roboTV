@@ -131,6 +131,19 @@ public:
 	*/
 	const std::string& GetHostname();
 
+    /**
+    Set the network socket priority. Must be called before open()
+    @param priority kernel priority of the socket 1 (low) - 7 (high)
+    */
+    void SetPriority(int priority);
+
+    /**
+    Get the current socket priority
+    @return current priority
+    */
+
+    int GetPriority() const;
+
 protected:
 
 	/**
@@ -175,6 +188,8 @@ private:
 	std::string m_hostname;
 
 	int m_port;
+
+    int m_priority = 7;
 
 	std::atomic<bool> m_aborting;
 };
