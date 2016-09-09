@@ -70,7 +70,7 @@ final class Ac3Reader extends StreamReader {
         ByteBuffer data = buffer.data();
         data.rewind();
 
-        int length = mDecoder.decodeDirect(data, buffer.limit());
+        int length = mDecoder.decode(data.array(), 0, buffer.limit());
 
         if(length == 0) {
             Log.e(TAG, "Unable to decode frame data");
@@ -81,7 +81,7 @@ final class Ac3Reader extends StreamReader {
         chunk.timeUs = buffer.timeUs;
         chunk.flags = buffer.flags;
 
-        if(!mDecoder.readDirect(chunk.data(), chunk.capacity())) {
+        if(!mDecoder.read(chunk.data().array(), 0, chunk.capacity())) {
             Log.e(TAG, "failed to read audio chunk");
             output.release(buffer);
             output.release(chunk);

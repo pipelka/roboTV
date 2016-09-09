@@ -36,7 +36,7 @@ public class SampleBuffer {
 
         size = ((size / mPartitionSize) + 1) * mPartitionSize;
 
-        mData = ByteBuffer.allocateDirect(size);
+        mData = ByteBuffer.allocate(size);
     }
 
     MediaFormat getFormat() {

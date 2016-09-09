@@ -531,7 +531,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         // read buffer
         SampleBuffer buffer = reader.output.allocate(length);
 
-        p.readBufferDirect(buffer.data(), length);
+        p.readBuffer(buffer.data().array(), 0, length);
         buffer.setLength(length);
         buffer.timeUs = timeUs;
         buffer.flags = C.SAMPLE_FLAG_SYNC;
