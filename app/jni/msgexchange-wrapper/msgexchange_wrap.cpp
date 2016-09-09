@@ -2133,6 +2133,34 @@ SWIGEXPORT jstring JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1
 }
 
 
+SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1setPriority(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  MsgConnection *arg1 = (MsgConnection *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MsgConnection **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->SetPriority(arg2);
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1getPriority(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  MsgConnection *arg1 = (MsgConnection *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MsgConnection **)&jarg1; 
+  result = (int)((MsgConnection const *)arg1)->GetPriority();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1onDisconnect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   SwigDirector_Connection *darg = 0;

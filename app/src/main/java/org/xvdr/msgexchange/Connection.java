@@ -105,6 +105,14 @@ public class Connection {
     return msgexchangeJNI.Connection_getHostname(swigCPtr, this);
   }
 
+  public void setPriority(int priority) {
+    msgexchangeJNI.Connection_setPriority(swigCPtr, this, priority);
+  }
+
+  public int getPriority() {
+    return msgexchangeJNI.Connection_getPriority(swigCPtr, this);
+  }
+
   protected void onDisconnect() {
     if (getClass() == Connection.class) msgexchangeJNI.Connection_onDisconnect(swigCPtr, this); else msgexchangeJNI.Connection_onDisconnectSwigExplicitConnection(swigCPtr, this);
   }

@@ -84,6 +84,8 @@ public class msgexchangeJNI {
   public final static native boolean Connection_transmitMessageSwigExplicitConnection__SWIG_1(long jarg1, Connection jarg1_, long jarg2, Packet jarg2_, long jarg3, Packet jarg3_);
   public final static native void Connection_setTimeout(long jarg1, Connection jarg1_, int jarg2);
   public final static native String Connection_getHostname(long jarg1, Connection jarg1_);
+  public final static native void Connection_setPriority(long jarg1, Connection jarg1_, int jarg2);
+  public final static native int Connection_getPriority(long jarg1, Connection jarg1_);
   public final static native void Connection_onDisconnect(long jarg1, Connection jarg1_);
   public final static native void Connection_onDisconnectSwigExplicitConnection(long jarg1, Connection jarg1_);
   public final static native void Connection_onReconnect(long jarg1, Connection jarg1_);
