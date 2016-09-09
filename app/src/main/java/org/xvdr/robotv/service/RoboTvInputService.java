@@ -143,6 +143,7 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public boolean onTune(final Uri channelUri) {
+
             // remove pending tune request
             mHandler.removeCallbacks(mTune);
             mTune.setChannelUri(channelUri);
@@ -165,28 +166,40 @@ public class RoboTvInputService extends TvInputService {
 
         @Override
         public long onTimeShiftGetStartPosition() {
+
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                return 0;
+                return TvInputManager.TIME_SHIFT_INVALID_TIME;
             }
 
             if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_READY) {
                 return TvInputManager.TIME_SHIFT_INVALID_TIME;
             }
 
-            return mPlayer.getStartPositionWallclock();
+            long pos = mPlayer.getStartPositionWallclock();
+            if(pos <= 0) {
+                return TvInputManager.TIME_SHIFT_INVALID_TIME;
+            }
+
+            return pos;
         }
 
         @Override
         public long onTimeShiftGetCurrentPosition() {
+
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                return 0;
+                return TvInputManager.TIME_SHIFT_INVALID_TIME;
             }
 
             if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_READY) {
                 return TvInputManager.TIME_SHIFT_INVALID_TIME;
             }
 
-            return mPlayer.getCurrentPositionWallclock();
+            long pos = mPlayer.getCurrentPositionWallclock();
+            if(pos <= 0) {
+                return TvInputManager.TIME_SHIFT_INVALID_TIME;
+            }
+
+            return pos;
         }
 
         @Override
@@ -279,20 +292,14 @@ public class RoboTvInputService extends TvInputService {
             Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
 
             if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        notifyVideoAvailable();
-                    }
-                });
+                notifyVideoAvailable();
             }
             else if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
-                    }
-                });
+                notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
+
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
+                    notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+                }
             }
         }
 
@@ -303,8 +310,6 @@ public class RoboTvInputService extends TvInputService {
             mNotification.error(getResources().getString(R.string.player_error));
             Log.e(TAG, "onPlayerError");
             e.printStackTrace();
-
-            onTune(mCurrentChannelUri);
         }
 
         @Override
@@ -348,10 +353,6 @@ public class RoboTvInputService extends TvInputService {
             }
 
             notifyTracksChanged(tracks);
-
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
-            }
         }
 
         @Override

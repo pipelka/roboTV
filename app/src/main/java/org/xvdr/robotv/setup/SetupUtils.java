@@ -122,4 +122,16 @@ public class SetupUtils {
     public static String getRecordingFolder() {
         return mRecordingFolder;
     }
+
+    public static boolean getTimeshiftEnabled(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        return prefs.getBoolean("timeshift", false);
+    }
+
+    public static void setTimeshiftEnabled(Context context, boolean timeshift) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        SharedPreferences.Editor e = prefs.edit();
+        e.putBoolean("timeshift", timeshift);
+        e.apply();
+    }
 }
