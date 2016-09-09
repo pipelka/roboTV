@@ -125,13 +125,13 @@ public class msgexchangeJNI {
 
 static {
 	try {
-		System.loadLibrary("gnustl_shared");
-		System.loadLibrary("msgexchange");
 		System.loadLibrary("a52");
 		System.loadLibrary("mad");
+		System.loadLibrary("msgexchange");
 		System.loadLibrary("msgexchange_wrapper");
 	}
 	catch (UnsatisfiedLinkError e) {
+		e.printStackTrace();
 	}
 }
 

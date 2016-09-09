@@ -13,6 +13,24 @@ android {
         versionCode 1
         versionName "0.5.2.${gitAbbreviatedId}"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
+
+        ndk {
+            moduleName "robotv-jni"
+            abiFilters 'x86', 'armeabi-v7a'
+            stl "gnustl_shared"
+        }
+
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_PLATFORM=android-21'
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "jni/CMakeLists.txt"
+        }
     }
 
     buildTypes {
@@ -30,19 +48,6 @@ android {
         main {
             jniLibs.srcDirs = ['libs']
         }
-    }
-
-    task ndkBuild(type: Exec) {
-        def ndkDir = project.plugins.findPlugin('com.android.application').sdkHandler.getNdkFolder()
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            commandLine "$ndkDir/ndk-build.cmd", '-C', file("$projectDir").absolutePath
-        } else {
-            commandLine "$ndkDir/ndk-build", '-C', file("$projectDir").absolutePath
-        }
-    }
-
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn ndkBuild
     }
 }
 
