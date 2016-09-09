@@ -89,6 +89,7 @@ public class DataService extends Service implements Connection.Callback {
             return true;
         }
 
+        mConnection.setPriority(1); // low priority for DataService
         return mConnection.open(SetupUtils.getServer(this));
     }
 
