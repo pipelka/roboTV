@@ -152,6 +152,10 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     protected void prepare() {
+        if(mExoPlayer == null) {
+            return;
+        }
+
         // prepare player
         mExoPlayer.prepare(mVideoRenderer, mAudioRenderer);
 
