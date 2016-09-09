@@ -134,6 +134,7 @@ public class Connection extends Session {
         req.putU8(mCompressionLevel);
         req.putString(mSessionName);
         req.putU8((short)(mEnableStatus ? 1 : 0));
+        req.putU8((short)getPriority());
 
         // read welcome
         Packet resp = transmitMessage(req);
