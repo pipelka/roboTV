@@ -3,6 +3,7 @@ package org.xvdr.timers.fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -13,7 +14,9 @@ import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import org.xvdr.msgexchange.Packet;
 import org.xvdr.timers.activity.EpgSearchActivity;
@@ -111,6 +114,7 @@ public class TimerFragment extends BrowseFragment {
     private Connection mConnection;
     private ArtworkFetcher mArtwork;
     private String mChannelName;
+    private int mChannelUid;
     private EpgSearchLoader mLoader;
 
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -120,23 +124,21 @@ public class TimerFragment extends BrowseFragment {
         mConnection = new Connection("roboTV:addtimer", language);
         mArtwork = new ArtworkFetcher(mConnection, language);
 
-        int channelUid = getActivity().getIntent().getIntExtra("uid", 0);
+        mChannelUid = getActivity().getIntent().getIntExtra("uid", 0);
         mChannelName = getActivity().getIntent().getStringExtra("name");
-
-        setTitle(getString(R.string.timer_title));
-        setHeadersState(HEADERS_DISABLED);
-
-        setHeadersTransitionOnBackEnabled(true);
 
         int color_background = Utils.getColor(getActivity(), R.color.recordings_background);
         int color_brand = Utils.getColor(getActivity(), R.color.primary_color);
 
-        setBrandColor(color_brand);
-        setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));
-
         BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
         backgroundManager.setColor(color_background);
+
+        setTitle(getString(R.string.timer_title));
+        setHeadersTransitionOnBackEnabled(true);
+
+        setBrandColor(color_brand);
+        setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));
 
         setOnItemViewClickedListener(new OnItemViewClickedListener() {
             @Override
@@ -155,7 +157,13 @@ public class TimerFragment extends BrowseFragment {
         });
 
         mLoader = new EpgSearchLoader();
-        loadEpgForChannel(channelUid, mChannelName);
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                setHeadersState(HEADERS_DISABLED);
+                loadEpgForChannel(mChannelUid, mChannelName);
+            }
+        });
     }
 
     @Override
