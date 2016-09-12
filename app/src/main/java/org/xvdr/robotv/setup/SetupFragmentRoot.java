@@ -24,12 +24,14 @@ public class SetupFragmentRoot extends GuidedStepFragment {
     static final int ACTION_IMPORT = 4;
     static final int ACTION_PASSTHROUGH = 6;
     static final int ACTION_SPEAKERCONFIG = 7;
+    static final int ACTION_TIMESHIFT = 8;
 
     private GuidedAction mActionServer;
     private GuidedAction mActionLanguage;
     private GuidedAction mActionRefreshRate;
     private GuidedAction mActionPassthrough;
     private GuidedAction mActionSpeakerConfig;
+    private GuidedAction mActionTimeshift;
 
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
@@ -76,6 +78,12 @@ public class SetupFragmentRoot extends GuidedStepFragment {
         .hasNext(true)
         .build();
 
+        mActionTimeshift = new GuidedAction.Builder()
+        .id(ACTION_TIMESHIFT)
+        .title(getString(R.string.setup_root_timeshift_title))
+        .hasNext(true)
+        .build();
+
         actions.add(mActionServer);
         actions.add(mActionLanguage);
 
@@ -86,6 +94,8 @@ public class SetupFragmentRoot extends GuidedStepFragment {
         }
 
         actions.add(mActionSpeakerConfig);
+
+        actions.add(mActionTimeshift);
 
         if(SetupUtils.isRefreshRateChangeSupported()) {
             actions.add(mActionRefreshRate);
@@ -121,8 +131,8 @@ public class SetupFragmentRoot extends GuidedStepFragment {
 
         boolean passthrough = SetupUtils.getPassthrough(getActivity());
         mActionPassthrough.setDescription(
-            passthrough ? getString(R.string.setup_root_passthrough_enabled) :
-            getString(R.string.setup_root_passthrough_disabled));
+            passthrough ? getString(R.string.setup_root_item_enabled) :
+            getString(R.string.setup_root_item_disabled));
 
         int speakerConfig = SetupUtils.getSpeakerConfiguration(getActivity());
         mActionSpeakerConfig.setDescription(
@@ -136,6 +146,10 @@ public class SetupFragmentRoot extends GuidedStepFragment {
             mActionSpeakerConfig.setDescription(getString(R.string.setup_root_speakerconfig_disabled));
         }
 
+        boolean timeshift = SetupUtils.getTimeshiftEnabled(getActivity());
+        mActionTimeshift.setDescription(
+                timeshift ? getString(R.string.setup_root_item_enabled) :
+                        getString(R.string.setup_root_item_disabled));
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
@@ -160,6 +174,10 @@ public class SetupFragmentRoot extends GuidedStepFragment {
 
             case ACTION_SPEAKERCONFIG:
                 GuidedStepFragment.add(fm, new SetupFragmentSpeakerConfig());
+                break;
+
+            case ACTION_TIMESHIFT:
+                GuidedStepFragment.add(fm, new SetupFragmentTimeshift());
                 break;
 
             case ACTION_IMPORT:

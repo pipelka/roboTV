@@ -178,7 +178,9 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     }
 
     public void stop() {
-        mExoPlayer.stop();
+        if(mExoPlayer != null) {
+            mExoPlayer.stop();
+        }
     }
 
     protected boolean open() {

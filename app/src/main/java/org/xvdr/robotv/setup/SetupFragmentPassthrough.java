@@ -29,14 +29,14 @@ public class SetupFragmentPassthrough extends GuidedStepFragment {
 
         actions.add(new GuidedAction.Builder()
                     .id(0)
-                    .title(getString(R.string.setup_root_passthrough_disabled))
+                    .title(getString(R.string.setup_root_item_disabled))
                     .checkSetId(1)
                     .checked(!passthrough)
                     .build());
 
         actions.add(new GuidedAction.Builder()
                     .id(1)
-                    .title(getString(R.string.setup_root_passthrough_enabled))
+                    .title(getString(R.string.setup_root_item_enabled))
                     .checkSetId(1)
                     .checked(passthrough)
                     .build());

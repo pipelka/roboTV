@@ -35,8 +35,8 @@
     <string name="setup_root_import_desc">Kanalliste aktualisieren</string>
     <string name="setup_root_import_title">Kanäle importieren</string>
     <string name="setup_root_language_title">Bevorzugte Tonspur</string>
-    <string name="setup_root_passthrough_disabled">Aus</string>
-    <string name="setup_root_passthrough_enabled">Ein</string>
+    <string name="setup_root_item_disabled">Aus</string>
+    <string name="setup_root_item_enabled">Ein</string>
     <string name="setup_root_passthrough_title">AC3 Ausgabe</string>
     <string name="setup_root_server_desc">roboTV Server Adresse</string>
     <string name="setup_root_speakerconfig_digital_51">5.1 Surround Sound</string>
@@ -74,4 +74,6 @@
         <item>Tschechisch</item>
         <item>Keine</item>
     </string-array>
+    <string name="setup_root_timeshift_title">Timeshift</string>
+    <string name="setup_timeshift_desc">Zeitversetztes Live TV aktivieren</string>
 </resources>

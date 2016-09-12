@@ -68,8 +68,8 @@
     <string name="failed_connect">failed to connect to server</string>
     <string name="failed_tune">failed to tune channel</string>
     <string name="setup_root_passthrough_title">AC3 passthrough</string>
-    <string name="setup_root_passthrough_enabled">Enabled</string>
-    <string name="setup_root_passthrough_disabled">Disabled</string>
+    <string name="setup_root_item_enabled">Enabled</string>
+    <string name="setup_root_item_disabled">Disabled</string>
     <string name="setup_passthrough_title">AC3 passthrough</string>
     <string name="setup_passthrough_desc">Enable direct digital audio processing. If supported audio passthrough delivers the highest quality of audio playback.</string>
     <string name="setup_root_speakerconfig_title">Speaker Configuration</string>
@@ -102,4 +102,6 @@
     <string name="tv_show_single">Show:</string>
     <string name="recordings_settings_title">Settings</string>
     <string name="recordings_setup_title">Setup</string>
+    <string name="setup_root_timeshift_title">Timeshift</string>
+    <string name="setup_timeshift_desc">Enable timeshift for Live TV</string>
 </resources>
