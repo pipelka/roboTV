@@ -341,11 +341,12 @@ public final class RollingSampleBuffer {
     }
 
     public void appendData(byte[] buffer, int length) {
+        int offset = 0;
         while (length > 0) {
             int thisAppendLength = prepareForAppend(length);
             System.arraycopy(
                     buffer,
-                    0,
+                    offset,
                     lastAllocation.data,
                     lastAllocation.translateOffset(lastAllocationOffset),
                     thisAppendLength);
@@ -353,6 +354,7 @@ public final class RollingSampleBuffer {
             lastAllocationOffset += thisAppendLength;
             totalBytesWritten += thisAppendLength;
             length -= thisAppendLength;
+            offset += thisAppendLength;
         }
     }
 
