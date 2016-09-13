@@ -108,6 +108,9 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 return mResultRows;
             }
 
+            // uncompress respsonse
+            resp.uncompress();
+
             // process result
             while(!resp.eop() && !isCancelled()) {
                 final Event event = ArtworkUtils.packetToEvent(resp);

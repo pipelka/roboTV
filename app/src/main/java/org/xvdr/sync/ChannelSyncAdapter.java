@@ -449,6 +449,8 @@ public class ChannelSyncAdapter {
             return;
         }
 
+        resp.uncompress();
+
         // add schedule
         int i = 0;
 

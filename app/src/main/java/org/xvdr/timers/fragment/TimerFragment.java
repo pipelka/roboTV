@@ -55,6 +55,15 @@ public class TimerFragment extends BrowseFragment {
 
             Packet resp = mConnection.transmitMessage(req);
 
+            // check if we got a response
+            if(resp == null) {
+                mConnection.close();
+                return rowsAdapter;
+            }
+
+            // uncompress response
+            resp.uncompress();
+
             // add new row
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new EpgEventPresenter());
             HeaderItem header = new HeaderItem(params[0], mChannelName);

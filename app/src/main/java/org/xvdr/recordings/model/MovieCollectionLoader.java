@@ -77,6 +77,9 @@ public class MovieCollectionLoader extends AsyncTask<Connection, Void, MovieColl
             return null;
         }
 
+        // uncompress response
+        response.uncompress();
+
         while(!response.eop()) {
             final Movie movie = PacketAdapter.toMovie(response);
             final ArrayObjectAdapter adapter = mCollection.add(movie);
