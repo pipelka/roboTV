@@ -13,7 +13,6 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 
 import android.support.v17.leanback.widget.Row;
-import android.util.Log;
 import android.view.View;
 
 import org.xvdr.recordings.activity.DetailsActivity;
@@ -24,6 +23,8 @@ import org.xvdr.recordings.model.MovieCollectionLoader;
 import org.xvdr.recordings.presenter.PreferenceCardPresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.service.NotificationHandler;
+import org.xvdr.robotv.setup.SetupActivity;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.client.Connection;
 
@@ -38,6 +39,8 @@ public class RecordingsFragment extends BrowseFragment {
 
     private int color_background;
     private int color_brand;
+
+    private NotificationHandler mNotification;
 
     private MovieCollectionLoader.Listener mListener = new MovieCollectionLoader.Listener() {
         @Override
@@ -76,6 +79,8 @@ public class RecordingsFragment extends BrowseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mNotification = new NotificationHandler(getActivity());
+
         initUI();
         loadMovies(false);
         setupEventListeners();
@@ -103,7 +108,12 @@ public class RecordingsFragment extends BrowseFragment {
         }
 
         if(!connection.open(currentServer)) {
-            Log.e(TAG, "unable to open connection");
+            mNotification.error(getString(R.string.failed_connect));
+
+            Intent intent = new Intent(getActivity(), SetupActivity.class);
+            startActivity(intent);
+
+            return;
         }
 
         mLastServer = SetupUtils.getServer(getActivity());
