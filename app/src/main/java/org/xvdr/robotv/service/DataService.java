@@ -119,7 +119,12 @@ public class DataService extends Service implements Connection.Callback {
             public void run() {
                 try {
                     ArtworkHolder holder = m_artwork.fetchForEvent(event);
-                    mNotification.notify(message, event.getTitle(), holder.getBackgroundUrl());
+                    if(holder != null) {
+                        mNotification.notify(message, event.getTitle(), holder.getBackgroundUrl());
+                    }
+                    else {
+                        mNotification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
+                    }
                 }
                 catch(IOException e) {
                     e.printStackTrace();

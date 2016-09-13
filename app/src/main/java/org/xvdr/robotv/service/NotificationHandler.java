@@ -48,6 +48,11 @@ public class NotificationHandler {
 
 
     public void notify(final String message, final String title, final String imageUrl) {
+        if(imageUrl == null) {
+            NotificationHandler.this.notify(message, title, R.drawable.ic_info_outline_white_48dp);
+            return;
+        }
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -70,13 +75,18 @@ public class NotificationHandler {
                     NotificationHandler.this.notify(message, title, new BitmapDrawable(mContext.getResources(), bitmap));
                 }
                 else {
-                    NotificationHandler.this.notify(message, title, R.drawable.ic_movie_white_48dp);
+                    NotificationHandler.this.notify(message, title, R.drawable.ic_info_outline_white_48dp);
                 }
             }
         }).start();
     }
 
     public void notify(final String message, final String title, final Drawable d) {
+        if(d == null) {
+            notify(message, title, R.drawable.ic_info_outline_white_48dp);
+            return;
+        }
+
         mHandler.post(new Runnable() {
             @Override
             public void run() {
