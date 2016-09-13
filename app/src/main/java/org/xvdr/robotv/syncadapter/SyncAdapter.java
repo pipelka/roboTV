@@ -48,9 +48,11 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         Connection connection = new Connection("roboTV Sync Adapter");
+        connection.setPriority(1);
 
         if(!connection.open(SetupUtils.getServer(mContext))) {
             Log.e(TAG, "unable to connect to server");
+            return;
         }
 
         ChannelSyncAdapter adapter = new ChannelSyncAdapter(getContext(), inputId, connection);
