@@ -21,8 +21,8 @@ public class TrackInfoMapper {
                 builder.setVideoFrameRate(stream.fpsRate / stream.fpsScale);
             }
 
-            float stretchWidth = (float) stream.width * stream.pixelAspectRatio;
-            float factor = 1;
+            double stretchWidth = (double) stream.width * stream.pixelAspectRatio;
+            double factor = 1.0;
 
             // scale down picture (if larger than display)
             if(stream.width != 0 && stretchWidth > displayWidth) {

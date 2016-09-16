@@ -89,7 +89,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         public long fpsRate;
         public int width;
         public int height;
-        public float pixelAspectRatio;
+        public double pixelAspectRatio;
         public int spsLength;
         public byte[] sps = new byte[128];
         public int ppsLength;
@@ -229,16 +229,16 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
                 stream.height = (int) p.getU32();
                 stream.width = (int) p.getU32();
 
-                float aspect = (float)(p.getS64() / 10000.0);
+                double aspect = (float)(p.getS64() / 10000.0);
 
-                if(aspect < 1) {
-                    aspect = 1;
+                if(aspect < 1.0) {
+                    aspect = 1.0;
                 }
 
                 // roboTV sends the picture aspect ratio
                 // we have to convert it to the pixel aspect ratio
                 double value = (aspect * stream.height) / (double)stream.width;
-                stream.pixelAspectRatio = (float)Math.round(value * 1000) / 1000;
+                stream.pixelAspectRatio = (double)Math.round(value * 1000) / 1000;
 
                 stream.spsLength = p.getU8();
 

@@ -37,7 +37,7 @@ final class H264Reader extends StreamReader {
                           stream.height,
                           initializationData,
                           MediaFormat.NO_VALUE,
-                          stream.pixelAspectRatio));
+                          (float)stream.pixelAspectRatio));
     }
 
     private void assembleInitData(List<byte[]> data) {

@@ -26,7 +26,7 @@ final class H262Reader extends StreamReader {
                           stream.height,
                           null,
                           MediaFormat.NO_VALUE,
-                          stream.pixelAspectRatio));
+                          (float)stream.pixelAspectRatio));
     }
 
 }
