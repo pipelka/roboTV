@@ -2,6 +2,8 @@ package org.xvdr.robotv.artwork;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Event {
 
@@ -14,6 +16,8 @@ public class Event {
     private int mEventId;
     private long mStartTime;
     private int mChannelUid;
+
+    private static Pattern mYearPattern = Pattern.compile("\\b(19|20)\\d{2}\\b");
 
     private static String[] genreFilm = {
         "abenteuerfilm",
@@ -143,31 +147,18 @@ public class Event {
     }
 
     static public int guessYearFromDescription(String description) {
-        String[] words = description.split("[\\.,;)| ]");
+        int year = 0;
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 
-        for(String word : words) {
-            word = word.replaceAll("[^\\d]", "");
+        Matcher matches = mYearPattern.matcher(description);
 
-            // skip empty
-            if(word.isEmpty()) {
-                continue;
-            }
-
-            // skip all not beginning with 1...
-            char c = word.charAt(0);
-
-            if(c != '1') {
-                continue;
-            }
-
-            int year;
-
+        while (matches.find()) {
+            String word = matches.group();
             try {
                 year = Integer.parseInt(word);
             }
             catch(Exception e) {
-                year = 0;
+                return 0;
             }
 
             // found a match

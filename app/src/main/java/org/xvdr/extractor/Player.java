@@ -18,11 +18,11 @@ import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.util.PriorityHandlerThread;
 
 import org.xvdr.msgexchange.Packet;
-import org.xvdr.msgexchange.Session;
+import org.xvdr.msgexchange.SessionListener;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 
-public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampleSource.Listener, MediaCodecAudioTrackRenderer.EventListener, MediaCodecVideoTrackRenderer.EventListener {
+public class Player implements ExoPlayer.Listener, RoboTvSampleSource.Listener, MediaCodecAudioTrackRenderer.EventListener, MediaCodecVideoTrackRenderer.EventListener {
 
     private static final String TAG = "Player";
 
@@ -51,6 +51,34 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
         void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs);
     }
+
+    SessionListener mSessionListener = new SessionListener() {
+        public void onNotification(Packet p) {
+        }
+
+        public void onDisconnect() {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onDisconnect();
+                }
+            }, 3000);
+        }
+
+        public void onReconnect() {
+            if(mConnection == null) {
+                return;
+            }
+
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mConnection.login();
+                    mListener.onReconnect();
+                }
+            }, 3000);
+        }
+    };
 
     private static final int RENDERER_COUNT = 2;
     protected static final int MIN_BUFFER_MS = 1000;
@@ -105,7 +133,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
 
         // create connection
         mConnection = new Connection("roboTV Player", language, false);
-        mConnection.addCallback(this);
+        mConnection.setCallback(mSessionListener);
 
         mHandlerThread = new PriorityHandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
         mHandlerThread.start();
@@ -124,7 +152,7 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
         if(mConnection != null) {
             mConnection.closeStream();
             mConnection.close();
-            mConnection.removeAllCallbacks();
+            mConnection.setCallback(null);
             mConnection = null;
         }
 
@@ -360,35 +388,6 @@ public class Player implements ExoPlayer.Listener, Session.Callback, RoboTvSampl
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         mListener.onPlayerError(error);
-    }
-
-    @Override
-    public void onNotification(final Packet notification) {
-    }
-
-    @Override
-    public void onDisconnect() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mListener.onDisconnect();
-            }
-        });
-    }
-
-    @Override
-    public void onReconnect() {
-        if(mConnection == null) {
-            return;
-        }
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mConnection.login();
-                mListener.onReconnect();
-            }
-        }, 3000);
     }
 
     @Override

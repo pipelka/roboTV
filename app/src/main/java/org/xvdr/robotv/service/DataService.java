@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.xvdr.msgexchange.Packet;
+import org.xvdr.msgexchange.SessionListener;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
@@ -18,7 +19,7 @@ import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
 
-public class DataService extends Service implements Connection.Callback {
+public class DataService extends Service {
 
     Connection mConnection;
     Handler mHandler;
@@ -26,6 +27,44 @@ public class DataService extends Service implements Connection.Callback {
     ArtworkFetcher m_artwork;
 
     private static final String TAG = "DataService";
+
+    SessionListener mSessionListener = new SessionListener() {
+        public void onNotification(Packet p) {
+            String message;
+
+            // process only STATUS messages
+            if(p.getType() != Connection.XVDR_CHANNEL_STATUS) {
+                return;
+            }
+
+            int id = p.getMsgID();
+            Log.d(TAG, "notification id: " + id);
+
+            switch(id) {
+                case Connection.XVDR_STATUS_MESSAGE:
+                    p.getU32(); // type
+                    message = p.getString();
+                    mNotification.notify(message);
+                    break;
+
+                case Connection.XVDR_STATUS_RECORDING:
+                    onRecording(p);
+                    break;
+            }
+        }
+
+        public void onDisconnect() {
+        }
+
+        public void onReconnect() {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mConnection.login();
+                }
+            }, 3000);
+        }
+    };
 
     private Runnable mOpenRunnable = new Runnable() {
         @Override
@@ -72,7 +111,7 @@ public class DataService extends Service implements Connection.Callback {
             SetupUtils.getLanguage(this),
             true);
 
-        mConnection.addCallback(this);
+        mConnection.setCallback(mSessionListener);
 
         m_artwork = new ArtworkFetcher(mConnection, SetupUtils.getLanguage(this));
 
@@ -131,45 +170,6 @@ public class DataService extends Service implements Connection.Callback {
                     e.printStackTrace();
                     mNotification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
                 }
-            }
-        });
-    }
-
-    @Override
-    public void onNotification(Packet notification) {
-        String message;
-
-        // process only STATUS messages
-        if(notification.getType() != Connection.XVDR_CHANNEL_STATUS) {
-            return;
-        }
-
-        int id = notification.getMsgID();
-        Log.d(TAG, "notification id: " + id);
-
-        switch(id) {
-            case Connection.XVDR_STATUS_MESSAGE:
-                notification.getU32(); // type
-                message = notification.getString();
-                mNotification.notify(message);
-                break;
-
-            case Connection.XVDR_STATUS_RECORDING:
-                onRecording(notification);
-                break;
-        }
-    }
-
-    @Override
-    public void onDisconnect() {
-    }
-
-    @Override
-    public void onReconnect() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mConnection.login();
             }
         });
     }

@@ -1,11 +1,6 @@
-%module(directors="1", allprotected="1") msgexchange
-#pragma SWIG nowarn=503,516,401
+%module(directors="1") msgexchange
 
-#%include "typemaps.i"
-#%include "arrays_java.i"
 %include "std_string.i"
-#%include "std_map.i"
-#%include "std_vector.i"
 %include "stdint.i"
 %include "various.i"
 
@@ -16,6 +11,8 @@
 %rename (SessionProxy) MsgSession;
 %rename (Ac3Decoder) Ac3Decoder;
 %rename (MpegAudioDecoder) MpegAudioDecoder;
+%rename (SessionListener) SessionListener;
+%rename (Session) Session;
 
 %{
 #include "msgpacket.h"
@@ -23,6 +20,8 @@
 #include "msgsession.h"
 #include "ac3decoder.h"
 #include "mpadecoder.h"
+#include "sessionlistener.h"
+#include "session.h"
 %}
 
 
@@ -61,7 +60,6 @@
 // MsgConnection
 //
 
-%feature("director") MsgConnection;
 %ignore MsgConnection::pollfd;
 %ignore MsgConnection::Reconnect;
 %ignore MsgConnection::GetConnectionLost;
@@ -76,12 +74,23 @@
 // MsgSession
 //
 
-%feature("director") MsgSession;
 %newobject MsgSession::TransmitMessage;
 %ignore MsgSession::Run;
 
 %include "msgsession.h"
 
+//
+// SessionListener
+//
+
+%feature("director") SessionListener;
+%include "sessionlistener.h"
+
+//
+// Session
+//
+
+%include "session.h"
 
 //
 // AC3Decoder

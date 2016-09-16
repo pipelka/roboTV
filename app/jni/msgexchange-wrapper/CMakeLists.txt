@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_ZLIB=1 -std=c++11 -pthread -frtti
 add_library(msgexchange_wrapper SHARED
 	msgexchange_wrap.cpp
 	msgexchange_wrap.h
+	sessionlistener.h
 	ac3decoder.cpp
 	mpadecoder.cpp)
 
