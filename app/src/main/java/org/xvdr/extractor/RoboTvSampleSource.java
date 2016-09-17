@@ -610,7 +610,7 @@ public class RoboTvSampleSource implements SampleSource, SampleSource.SampleSour
         long p = mResponse.getS64();
 
         // sanity check
-        if(p < mCurrentPositionTimeshift) {
+        if(p < mCurrentPositionTimeshift && p > mStartPositionTimeshift) {
             mStartPositionTimeshift = p;
         }
 

@@ -141,18 +141,22 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
     @Override
     public long onTimeShiftGetStartPosition() {
+        long now = System.currentTimeMillis();
 
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return TvInputManager.TIME_SHIFT_INVALID_TIME;
+            return now;
         }
 
-        if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_READY) {
-            return TvInputManager.TIME_SHIFT_INVALID_TIME;
+        if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_BUFFERING) {
+            return now;
         }
 
         long pos = mPlayer.getStartPositionWallclock();
-        if(pos <= 0) {
-            return TvInputManager.TIME_SHIFT_INVALID_TIME;
+
+        // minimum timeshift start position ( now - 24hrs )
+        long minStartPosition = now - 1000 * 60 * 60 * 24;
+        if(pos <= minStartPosition) {
+            return minStartPosition;
         }
 
         return pos;
@@ -160,21 +164,17 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
     @Override
     public long onTimeShiftGetCurrentPosition() {
+        long now = System.currentTimeMillis();
 
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return TvInputManager.TIME_SHIFT_INVALID_TIME;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return now;
         }
 
-        if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_READY) {
-            return TvInputManager.TIME_SHIFT_INVALID_TIME;
+        if (mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_BUFFERING) {
+            return now;
         }
 
-        long pos = mPlayer.getCurrentPositionWallclock();
-        if(pos <= 0) {
-            return TvInputManager.TIME_SHIFT_INVALID_TIME;
-        }
-
-        return pos;
+        return mPlayer.getCurrentPositionWallclock();
     }
 
     @Override
@@ -204,14 +204,14 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
         Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
 
         if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
+                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+            }
+
             notifyVideoAvailable();
         }
         else if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
-
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
-                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
-            }
         }
     }
 
@@ -226,6 +226,10 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
     @Override
     public void onDisconnect() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
+            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_UNAVAILABLE);
+        }
+
         notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL);
         mNotification.error(getResources().getString(R.string.connection_lost));
     }
