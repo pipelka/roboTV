@@ -36,6 +36,7 @@ public class LiveTvPlayer extends Player {
      * @param priority priority of the received device on the server
      * @return returns the status of the operation
      */
+
     public synchronized int openStream(int channelUid, String language, boolean waitForKeyFrame, int priority) {
         // stop playback
         stop();

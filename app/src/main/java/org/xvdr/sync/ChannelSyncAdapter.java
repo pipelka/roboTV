@@ -339,7 +339,7 @@ public class ChannelSyncAdapter {
             }
 
             @Override
-            protected void onCancelled (Void result) {
+            protected void onCancelled(Void result) {
                 mChannelIconsTask = null;
                 Log.i(TAG, "syncing of channel icons cancelled.");
             }
@@ -561,8 +561,8 @@ public class ChannelSyncAdapter {
          */
         /** return uri */
         return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
-                               "://" + res.getResourcePackageName(resId)
-                               + '/' + res.getResourceTypeName(resId)
-                               + '/' + res.getResourceEntryName(resId));
+                         "://" + res.getResourcePackageName(resId)
+                         + '/' + res.getResourceTypeName(resId)
+                         + '/' + res.getResourceEntryName(resId));
     }
 }

@@ -78,12 +78,12 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
         // player init
         mPlayer = new LiveTvPlayer(
-                mContext,
-                SetupUtils.getServer(mContext),                 // XVDR server
-                SetupUtils.getLanguageISO3(mContext),           // Language
-                this,                                           // Listener
-                SetupUtils.getPassthrough(mContext),            // AC3 passthrough
-                SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
+            mContext,
+            SetupUtils.getServer(mContext),                 // XVDR server
+            SetupUtils.getLanguageISO3(mContext),           // Language
+            this,                                           // Listener
+            SetupUtils.getPassthrough(mContext),            // AC3 passthrough
+            SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
 
         mNotification = new NotificationHandler(mContext);
 
@@ -158,6 +158,7 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
         // minimum timeshift start position ( now - 24hrs )
         long minStartPosition = now - 1000 * 60 * 60 * 24;
+
         if(pos <= minStartPosition) {
             return minStartPosition;
         }
@@ -169,11 +170,11 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
     public long onTimeShiftGetCurrentPosition() {
         long now = System.currentTimeMillis();
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return now;
         }
 
-        if (mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_BUFFERING) {
+        if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_BUFFERING) {
             return now;
         }
 
@@ -249,12 +250,12 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
         // create video track (limit surface size to display size)
         TvTrackInfo info = TrackInfoMapper.findTrackInfo(
-                bundle,
-                StreamBundle.CONTENT_VIDEO,
-                0,
-                mDisplaySize.x,
-                mDisplaySize.y
-        );
+                               bundle,
+                               StreamBundle.CONTENT_VIDEO,
+                               0,
+                               mDisplaySize.x,
+                               mDisplaySize.y
+                           );
 
         if(info != null) {
             tracks.add(info);

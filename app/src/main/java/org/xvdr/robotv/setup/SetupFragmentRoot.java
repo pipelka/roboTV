@@ -148,8 +148,8 @@ public class SetupFragmentRoot extends GuidedStepFragment {
 
         boolean timeshift = SetupUtils.getTimeshiftEnabled(getActivity());
         mActionTimeshift.setDescription(
-                timeshift ? getString(R.string.setup_root_item_enabled) :
-                        getString(R.string.setup_root_item_disabled));
+            timeshift ? getString(R.string.setup_root_item_enabled) :
+            getString(R.string.setup_root_item_disabled));
     }
 
     public void onGuidedActionClicked(GuidedAction action) {

@@ -28,18 +28,18 @@ public class SetupFragmentTimeshift extends GuidedStepFragment {
         boolean timeshift = SetupUtils.getTimeshiftEnabled(getActivity());
 
         actions.add(new GuidedAction.Builder()
-                .id(0)
-                .title(getString(R.string.setup_root_item_disabled))
-                .checkSetId(1)
-                .checked(!timeshift)
-                .build());
+                    .id(0)
+                    .title(getString(R.string.setup_root_item_disabled))
+                    .checkSetId(1)
+                    .checked(!timeshift)
+                    .build());
 
         actions.add(new GuidedAction.Builder()
-                .id(1)
-                .title(getString(R.string.setup_root_item_enabled))
-                .checkSetId(1)
-                .checked(timeshift)
-                .build());
+                    .id(1)
+                    .title(getString(R.string.setup_root_item_enabled))
+                    .checkSetId(1)
+                    .checked(timeshift)
+                    .build());
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
