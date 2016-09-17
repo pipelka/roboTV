@@ -1,5 +1,6 @@
 package org.xvdr.robotv.service;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
@@ -61,11 +62,13 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
     }
 
     private TuneRunnable mTune = new TuneRunnable();
+    private ContentResolver mContentResolver;
 
     RoboTvSession(TvInputService context, String inputId) {
         super(context);
         mContext = context;
         mInputId = inputId;
+        mContentResolver =  mContext.getContentResolver();
 
         // get display width / height
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -297,7 +300,7 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
             values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_576I);
         }
 
-        if(mContext.getContentResolver().update(mCurrentChannelUri, values, null, null) != 1) {
+        if(mContentResolver.update(mCurrentChannelUri, values, null, null) != 1) {
             Log.e(TAG, "unable to update channel properties");
         }
 
@@ -323,7 +326,7 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
         Cursor cursor = null;
 
         try {
-            cursor = mContext.getContentResolver().query(channelUri, projection, null, null, null);
+            cursor = mContentResolver.query(channelUri, projection, null, null, null);
 
             if(cursor == null || cursor.getCount() == 0) {
                 mNotification.error(getResources().getString(R.string.channel_not_found));

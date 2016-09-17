@@ -29,12 +29,7 @@ import org.xvdr.robotv.client.Channels;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.timers.activity.TimerActivity;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,17 +124,14 @@ public class ChannelSyncAdapter {
         void onProgress(int done, int total);
 
         void onDone();
-
-        void onCancel();
     }
 
-    static final String TAG = "ChannelSyncAdapter";
+    private static final String TAG = "ChannelSyncAdapter";
 
     private Context mContext;
     private Connection mConnection;
     private ArtworkFetcher mArtwork;
     private String mInputId;
-    private boolean mCancelChannelSync = false;
 
     private static final SparseArray<String> mCanonicalGenre = new SparseArray<String>() {
         {
@@ -210,6 +202,7 @@ public class ChannelSyncAdapter {
     };
 
     private ProgressCallback mProgressCallback = null;
+    private SyncChannelIconsTask mChannelIconsTask = null;
 
     public ChannelSyncAdapter(Context context, String inputId, Connection connection) {
         mContext = context;
@@ -227,8 +220,6 @@ public class ChannelSyncAdapter {
         final SparseArray<Long> existingChannels = new SparseArray<>();
         final ContentResolver resolver = mContext.getContentResolver();
 
-        mCancelChannelSync = false;
-
         Log.i(TAG, "syncing channel list ...");
 
         // remove existing channels
@@ -239,7 +230,7 @@ public class ChannelSyncAdapter {
 
         // fetch existing channel list
 
-        getExistingChannels(mContext, mInputId, existingChannels);
+        getExistingChannels(resolver, mInputId, existingChannels);
 
         // update or insert channels
 
@@ -301,10 +292,6 @@ public class ChannelSyncAdapter {
 
             if(mProgressCallback != null) {
                 mProgressCallback.onProgress(++i, list.size());
-
-                if(mCancelChannelSync)  {
-                    mProgressCallback.onCancel();
-                }
             }
 
         }
@@ -331,63 +318,56 @@ public class ChannelSyncAdapter {
         Log.i(TAG, "synced channels");
     }
 
-    public void cancelSyncChannels() {
-        mCancelChannelSync = true;
-    }
-
     public void syncChannelIcons() {
-        final SparseArray<Long> existingChannels = new SparseArray<>();
+        // task already running
+        if(mChannelIconsTask != null) {
+            return;
+        }
 
-        getExistingChannels(mContext, mInputId, existingChannels);
+        Log.i(TAG, "syncing of channel icons started.");
 
-        Channels list = new Channels();
-        String language = SetupUtils.getLanguageISO3(mContext);
-
-        list.load(mConnection, language, new Channels.Callback() {
+        mChannelIconsTask = new SyncChannelIconsTask(mConnection, mContext, mInputId) {
             @Override
-            public void onChannel(final Channels.Entry entry) {
-                Long channelId = existingChannels.get(entry.uid);
-
-                if(channelId == null) {
-                    return;
-                }
-
-                final Uri uri = TvContract.buildChannelUri(channelId);
-
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        entry.iconURL = entry.iconURL.replace("darth", "192.168.16.10");
-                        fetchChannelLogo(uri, entry.iconURL);
-                    }
-                });
-
-                t.start();
-
-                try {
-                    t.join();
-                }
-                catch(InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+            protected Void doInBackground(Void... params) {
+                return super.doInBackground(params);
             }
-        });
+
+            @Override
+            protected void onPostExecute(Void result) {
+                mChannelIconsTask = null;
+                Log.i(TAG, "finished syncing channel icons.");
+            }
+
+            @Override
+            protected void onCancelled (Void result) {
+                mChannelIconsTask = null;
+                Log.i(TAG, "syncing of channel icons cancelled.");
+            }
+        };
+
+        mChannelIconsTask.execute(null, null, null);
     }
 
     public void syncEPG() {
         SparseArray<Long> existingChannels = new SparseArray<>();
-        getExistingChannels(mContext, mInputId, existingChannels);
+        getExistingChannels(mContext.getContentResolver(), mInputId, existingChannels);
 
         Log.i(TAG, "syncing epg ...");
 
         // fetch epg entries for each channel
         int size = existingChannels.size();
 
-        for(int i = 0; i < size; ++i) {
-            List<ContentValues> programs = new ArrayList<>();
+        ContentResolver resolver = mContext.getContentResolver();
+        List<ContentValues> programs = new ArrayList<>();
 
-            fetchEPGForChannel(existingChannels.keyAt(i), existingChannels.valueAt(i), programs);
+        for(int i = 0; i < size; ++i) {
+
+            programs.clear();
+            fetchEPGForChannel(resolver, existingChannels.keyAt(i), existingChannels.valueAt(i), programs);
+
+            if(programs.isEmpty()) {
+                continue;
+            }
 
             // populate database
             ArrayList<ContentProviderOperation> ops = new ArrayList<>();
@@ -397,7 +377,7 @@ public class ChannelSyncAdapter {
             }
 
             try {
-                mContext.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
+                resolver.applyBatch(TvContract.AUTHORITY, ops);
             }
             catch(RemoteException | OperationApplicationException e) {
                 Log.e(TAG, "Failed to insert programs.", e);
@@ -411,9 +391,8 @@ public class ChannelSyncAdapter {
         Log.i(TAG, "synced schedule for " + existingChannels.size() + " channels");
     }
 
-    private void fetchEPGForChannel(int uid, long channelId, List<ContentValues> programs) {
-        ContentResolver resolver = mContext.getContentResolver();
-        long duration = 60 * 60 * 24 * 2; // EPG duration to fetch (2 days)
+    private void fetchEPGForChannel(ContentResolver resolver, int uid, long channelId, List<ContentValues> programs) {
+        long duration = 60 * 60 * 12; // EPG duration to fetch (2 days)
         long start = System.currentTimeMillis() / 1000;
         long end = start + duration;
 
@@ -431,7 +410,6 @@ public class ChannelSyncAdapter {
         duration = end - start;
 
         if(duration <= 0) {
-            Log.i(TAG, "duration < 0");
             return;
         }
 
@@ -452,8 +430,6 @@ public class ChannelSyncAdapter {
         resp.uncompress();
 
         // add schedule
-        int i = 0;
-
         while(!resp.eop()) {
             int eventId = (int)resp.getU32();
             long startTime = resp.getU32();
@@ -466,6 +442,11 @@ public class ChannelSyncAdapter {
             String plot = resp.getString();
             String posterUrl = resp.getString();
             String backgroundUrl = resp.getString();
+
+            // invalid entry
+            if(endTime <= startTime) {
+                continue;
+            }
 
             Event event = new Event(content, title, plotOutline, plot, eventDuration, eventId);
 
@@ -513,50 +494,10 @@ public class ChannelSyncAdapter {
 
             // add event
             programs.add(values);
-            i++;
         }
-
-        Log.d(TAG, "synced " + i + " epg events");
     }
 
-    private void fetchChannelLogo(Uri channelUri, String address) {
-        URL sourceUrl;
-        OutputStream os;
-        InputStream in;
-        URLConnection urlConnection;
-        Uri channelLogoUri = TvContract.buildChannelLogoUri(channelUri);
-
-        try {
-            os = mContext.getContentResolver().openOutputStream(channelLogoUri);
-            sourceUrl = new URL(address);
-            urlConnection = sourceUrl.openConnection();
-            in = new BufferedInputStream(urlConnection.getInputStream());
-        }
-        catch(Exception e) {
-            return;
-        }
-
-        if(os == null) {
-            return;
-        }
-
-        byte[] buffer = new byte[32768];
-        int bytes_read;
-
-        try {
-            while((bytes_read = in.read(buffer)) > 0) {
-                os.write(buffer, 0, bytes_read);
-            }
-
-            in.close();
-            os.close();
-        }
-        catch(IOException e) {
-        }
-
-    }
-
-    public static void getExistingChannels(Context context, String inputId, SparseArray<Long> existingChannels) {
+    static void getExistingChannels(ContentResolver resolver, String inputId, SparseArray<Long> existingChannels) {
         // Create a map from original network ID to channel row ID for existing channels.
         existingChannels.clear();
 
@@ -564,7 +505,6 @@ public class ChannelSyncAdapter {
         String[] projection = {TvContract.Channels._ID, TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID};
 
         Cursor cursor = null;
-        ContentResolver resolver = context.getContentResolver();
 
         try {
             cursor = resolver.query(channelsUri, projection, null, null, null);
@@ -582,7 +522,7 @@ public class ChannelSyncAdapter {
         }
     }
 
-    public static long getLastProgramEndTimeMillis(ContentResolver resolver, Uri channelUri) {
+    private static long getLastProgramEndTimeMillis(ContentResolver resolver, Uri channelUri) {
         Uri uri = TvContract.buildProgramsUriForChannel(channelUri);
         String[] projection = {TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS};
         Cursor cursor = null;
@@ -610,14 +550,7 @@ public class ChannelSyncAdapter {
         return 0;
     }
 
-    /**
-     * get uri to any resource type
-     * @param context - context
-     * @param resId - resource id
-     * @throws Resources.NotFoundException if the given ID does not exist.
-     * @return - Uri to resource by given id
-     */
-    public static final Uri getUriToResource(@NonNull Context context, @AnyRes int resId) throws Resources.NotFoundException {
+    private static Uri getUriToResource(@NonNull Context context, @AnyRes int resId) throws Resources.NotFoundException {
         /** Return a Resources instance for your application's package. */
         Resources res = context.getResources();
         /**
@@ -626,11 +559,10 @@ public class ChannelSyncAdapter {
          * @throws NullPointerException if uriString is null
          * @return Uri for this given uri string
          */
-        Uri resUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
+        /** return uri */
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
                                "://" + res.getResourcePackageName(resId)
                                + '/' + res.getResourceTypeName(resId)
                                + '/' + res.getResourceEntryName(resId));
-        /** return uri */
-        return resUri;
     }
 }

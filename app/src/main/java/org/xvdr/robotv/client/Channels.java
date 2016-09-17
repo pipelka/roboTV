@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Channels extends ArrayList<Channels.Entry> {
 
     public interface Callback {
-        void onChannel(Entry entry);
+        boolean onChannel(Entry entry);
     }
 
     public class Entry {
@@ -72,7 +72,9 @@ public class Channels extends ArrayList<Channels.Entry> {
             e.radio = radio;
 
             if(callback != null) {
-                callback.onChannel(e);
+                if(!callback.onChannel(e)) {
+                    return false;
+                }
             }
             else {
                 add(e);

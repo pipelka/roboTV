@@ -44,9 +44,4 @@ public class SetupFragmentImport extends Fragment implements ChannelSyncAdapter.
         getActivity().setResult(Activity.RESULT_OK);
         getActivity().finish();
     }
-
-    @Override
-    public void onCancel() {
-        getActivity().finish();
-    }
 }
