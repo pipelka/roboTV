@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.graphics.drawable.Drawable;
 import android.media.AudioFormat;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
@@ -14,9 +15,9 @@ import org.xvdr.robotv.R;
 
 import java.util.List;
 
-public class SetupFragmentRoot extends GuidedStepFragment {
+public class SetupFragment extends GuidedStepFragment {
 
-    static final String TAG = "SetupFragmentRoot";
+    static final String TAG = "SetupFragment";
 
     static final int ACTION_SERVER = 1;
     static final int ACTION_LANGUAGE = 2;
@@ -33,6 +34,7 @@ public class SetupFragmentRoot extends GuidedStepFragment {
     private GuidedAction mActionSpeakerConfig;
     private GuidedAction mActionTimeshift;
 
+    @NonNull
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
         String title = getString(R.string.setup_root_title);
@@ -44,44 +46,47 @@ public class SetupFragmentRoot extends GuidedStepFragment {
     }
 
     @Override
-    public void onCreateActions(List actions, Bundle savedInstanceState) {
+    public void onCreateButtonActions(@NonNull List<GuidedAction> actions, Bundle savedInstanceState) {
+    }
+
+    @Override
+    public void onCreateActions(@NonNull List<GuidedAction> actions, Bundle savedInstanceState) {
         String server = SetupUtils.getServer(getActivity());
 
-        mActionServer = new GuidedAction.Builder()
+        mActionServer = new GuidedAction.Builder(getActivity())
         .id(ACTION_SERVER)
         .title(server)
         .description(getString(R.string.setup_root_server_desc))
         .editable(true)
         .build();
 
-        mActionLanguage = new GuidedAction.Builder()
+        mActionLanguage = new GuidedAction.Builder(getActivity())
         .id(ACTION_LANGUAGE)
         .title(getString(R.string.setup_root_language_title))
-        .hasNext(true)
         .build();
 
-        mActionRefreshRate = new GuidedAction.Builder()
+        mActionRefreshRate = new GuidedAction.Builder(getActivity())
         .id(ACTION_REFRESHRATE)
         .title(getString(R.string.setup_root_refreshrate_title))
-        .hasNext(true)
         .build();
 
-        mActionPassthrough = new GuidedAction.Builder()
+        mActionPassthrough = new GuidedAction.Builder(getActivity())
         .id(ACTION_PASSTHROUGH)
         .title(getString(R.string.setup_root_passthrough_title))
-        .hasNext(true)
+        .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
+        .checked(SetupUtils.getPassthrough(getActivity()))
         .build();
 
-        mActionSpeakerConfig = new GuidedAction.Builder()
+        mActionSpeakerConfig = new GuidedAction.Builder(getActivity())
         .id(ACTION_SPEAKERCONFIG)
         .title(getString(R.string.setup_root_speakerconfig_title))
-        .hasNext(true)
         .build();
 
-        mActionTimeshift = new GuidedAction.Builder()
+        mActionTimeshift = new GuidedAction.Builder(getActivity())
         .id(ACTION_TIMESHIFT)
         .title(getString(R.string.setup_root_timeshift_title))
-        .hasNext(true)
+        .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
+        .checked(SetupUtils.getTimeshiftEnabled(getActivity()))
         .build();
 
         actions.add(mActionServer);
@@ -101,10 +106,11 @@ public class SetupFragmentRoot extends GuidedStepFragment {
             actions.add(mActionRefreshRate);
         }
 
-        actions.add(new GuidedAction.Builder()
+        actions.add(new GuidedAction.Builder(getActivity())
                     .id(ACTION_IMPORT)
                     .title(getString(R.string.setup_root_import_title))
                     .description(getString(R.string.setup_root_import_desc))
+                    .hasNext(true)
                     .build());
     }
 
@@ -130,9 +136,7 @@ public class SetupFragmentRoot extends GuidedStepFragment {
         mActionRefreshRate.setDescription(refreshRates[refreshRateIndex]);
 
         boolean passthrough = SetupUtils.getPassthrough(getActivity());
-        mActionPassthrough.setDescription(
-            passthrough ? getString(R.string.setup_root_item_enabled) :
-            getString(R.string.setup_root_item_disabled));
+        mActionPassthrough.setChecked(passthrough);
 
         int speakerConfig = SetupUtils.getSpeakerConfiguration(getActivity());
         mActionSpeakerConfig.setDescription(
@@ -142,14 +146,8 @@ public class SetupFragmentRoot extends GuidedStepFragment {
             "");
         mActionSpeakerConfig.setEnabled(!passthrough);
 
-        if(passthrough) {
-            mActionSpeakerConfig.setDescription(getString(R.string.setup_root_speakerconfig_disabled));
-        }
-
         boolean timeshift = SetupUtils.getTimeshiftEnabled(getActivity());
-        mActionTimeshift.setDescription(
-            timeshift ? getString(R.string.setup_root_item_enabled) :
-            getString(R.string.setup_root_item_disabled));
+        mActionTimeshift.setChecked(timeshift);
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
@@ -169,7 +167,9 @@ public class SetupFragmentRoot extends GuidedStepFragment {
                 break;
 
             case ACTION_PASSTHROUGH:
-                GuidedStepFragment.add(fm, new SetupFragmentPassthrough());
+                mActionSpeakerConfig.setEnabled(!action.isChecked());
+                notifyActionChanged(findActionPositionById(ACTION_SPEAKERCONFIG));
+                SetupUtils.setPassthrough(getActivity(), action.isChecked());
                 break;
 
             case ACTION_SPEAKERCONFIG:
@@ -177,7 +177,7 @@ public class SetupFragmentRoot extends GuidedStepFragment {
                 break;
 
             case ACTION_TIMESHIFT:
-                GuidedStepFragment.add(fm, new SetupFragmentTimeshift());
+                SetupUtils.setTimeshiftEnabled(getActivity(), action.isChecked());
                 break;
 
             case ACTION_IMPORT:

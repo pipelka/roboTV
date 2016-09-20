@@ -31,7 +31,7 @@ public class SetupActivity extends Activity {
         Log.i(TAG, "creating roboTV connection ...");
         mConnection = new Connection("AndroidTV Settings");
 
-        GuidedStepFragment.addAsRoot(this, new SetupFragmentRoot(), android.R.id.content);
+        GuidedStepFragment.addAsRoot(this, new SetupFragment(), android.R.id.content);
     }
 
     public boolean registerChannels(final ChannelSyncAdapter.ProgressCallback progress) {

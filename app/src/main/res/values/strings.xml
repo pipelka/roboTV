@@ -4,8 +4,8 @@
     <string name="robotv_input_label" translatable="false">roboTV</string>
     <string name="connect_unable">Unable to connect to server !</string>
 
-    <string name="setup_root_server_desc">Enter the roboTV server address</string>
-    <string name="setup_root_language_title">Preferred audio language</string>
+    <string name="setup_root_server_desc">roboTV server address</string>
+    <string name="setup_root_language_title">Audio language</string>
     <string name="setup_root_refreshrate_title">TV refresh rate</string>
     <string name="setup_root_import_title">Import channels</string>
     <string name="setup_root_import_desc">Refresh TV channels</string>
@@ -102,6 +102,6 @@
     <string name="tv_show_single">Show:</string>
     <string name="recordings_settings_title">Settings</string>
     <string name="recordings_setup_title">Setup</string>
-    <string name="setup_root_timeshift_title">Timeshift</string>
+    <string name="setup_root_timeshift_title">Timeshift activated</string>
     <string name="setup_timeshift_desc">Enable timeshift for Live TV</string>
 </resources>

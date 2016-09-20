@@ -74,6 +74,6 @@
         <item>Tschechisch</item>
         <item>Keine</item>
     </string-array>
-    <string name="setup_root_timeshift_title">Timeshift</string>
+    <string name="setup_root_timeshift_title">Timeshift aktiviert</string>
     <string name="setup_timeshift_desc">Zeitversetztes Live TV aktivieren</string>
 </resources>
