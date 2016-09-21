@@ -1,5 +1,7 @@
 package org.xvdr.extractor;
 
+import android.util.Log;
+
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.MediaFormatHolder;
 import com.google.android.exoplayer.SampleHolder;
@@ -10,14 +12,14 @@ import org.xvdr.jniwrap.Packet;
 
 import java.util.ArrayDeque;
 
-public class PacketQueue {
+class PacketQueue {
 
-    protected class FormatHolder {
+    private class FormatHolder {
 
         public final MediaFormat format;
-        public final long timeUs;
+        final long timeUs;
 
-        public FormatHolder(MediaFormat format, long timeUs) {
+        FormatHolder(MediaFormat format, long timeUs) {
             this.format = format;
             this.timeUs = timeUs;
         }
@@ -32,31 +34,24 @@ public class PacketQueue {
 
     private long mLargestTimestampUs = 0;
     private long mSmallestTimestampUs = 0;
-    private SampleHolder mSampleHolder = new SampleHolder(SampleHolder.BUFFER_REPLACEMENT_MODE_NORMAL);
 
-    public PacketQueue(int bufferCount, int bufferSize) {
+    PacketQueue(int bufferCount, int bufferSize) {
         rollingBuffer = new RollingSampleBuffer(new DefaultAllocator(bufferSize, bufferCount));
         mFormatQueue = new ArrayDeque<>();
-        mSampleHolder.ensureSpaceForWrite(256 * 1024);
-    }
-
-    private long getCurrentTimeUs() {
-        if(!rollingBuffer.peekSample(mSampleHolder)) {
-            return 0;
-        }
-
-        return mSampleHolder.timeUs;
     }
 
     synchronized public void format(MediaFormat format) {
         if(!hasFormat()) {
             mFormat = format;
+            return;
         }
 
-        mFormatQueue.push(new FormatHolder(format, getCurrentTimeUs()));
+        Log.d(TAG, "scheduled format change for: " + mLargestTimestampUs + " at: " + mSmallestTimestampUs);
+        mFormat = format;
+        mFormatQueue.push(new FormatHolder(format, mLargestTimestampUs));
     }
 
-    synchronized public void sampleData(Packet p, int size, long timeUs, int flags) {
+    synchronized void sampleData(Packet p, int size, long timeUs, int flags) {
         mLargestTimestampUs = Math.max(mLargestTimestampUs, timeUs);
 
         if(mSmallestTimestampUs == 0) {
@@ -67,7 +62,7 @@ public class PacketQueue {
         rollingBuffer.commitSample(timeUs, flags, rollingBuffer.getWritePosition() - size, size);
     }
 
-    synchronized public void sampleData(byte[] p, int size, long timeUs, int flags) {
+    synchronized void sampleData(byte[] p, int size, long timeUs, int flags) {
         mLargestTimestampUs = Math.max(mLargestTimestampUs, timeUs);
 
         if(mSmallestTimestampUs == 0) {
@@ -82,32 +77,30 @@ public class PacketQueue {
         return mFormat;
     }
 
-    public boolean hasFormat() {
+    boolean hasFormat() {
         return (mFormat != null);
     }
 
-    public long bufferSizeMs() {
+    long bufferSizeMs() {
         return (mLargestTimestampUs - mSmallestTimestampUs) / 1000;
     }
 
-    public long getBufferedPositionUs() {
+    long getBufferedPositionUs() {
         return mLargestTimestampUs;
     }
 
-    synchronized public boolean readFormat(MediaFormatHolder formatHolder) {
-        if(!rollingBuffer.peekSample(mSampleHolder)) {
-            return false;
-        }
-
+    synchronized boolean readFormat(MediaFormatHolder formatHolder) {
         FormatHolder h = mFormatQueue.peek();
 
         if(h == null) {
             return false;
         }
 
-        if(h.timeUs > mSampleHolder.timeUs) {
+        if(mSmallestTimestampUs < h.timeUs) {
             return false;
         }
+
+        Log.d(TAG, "read format change at: " + mSmallestTimestampUs);
 
         mFormat = h.format;
         formatHolder.format = h.format;
@@ -116,7 +109,7 @@ public class PacketQueue {
         return true;
     }
 
-    synchronized public boolean readSample(SampleHolder sampleHolder) {
+    synchronized boolean readSample(SampleHolder sampleHolder) {
         if(!rollingBuffer.readSample(sampleHolder)) {
             return false;
         }
