@@ -403,7 +403,7 @@ public class ChannelSyncAdapter {
     }
 
     private void fetchEPGForChannel(ContentResolver resolver, int uid, long channelId, List<ContentValues> programs) {
-        long duration = 60 * 60 * 12; // EPG duration to fetch (2 days)
+        long duration = 60 * 60 * 24 * 2; // EPG duration to fetch (2 days)
         long start = System.currentTimeMillis() / 1000;
         long end = start + duration;
 
@@ -426,10 +426,10 @@ public class ChannelSyncAdapter {
 
         // fetch
 
-        Packet req = mConnection.CreatePacket(Connection.XVDR_EPG_GETFORCHANNEL);
-        req.putU32(uid);
-        req.putU32(start);
-        req.putU32(duration);
+        mRequest.createUid();
+        mRequest.putU32(uid);
+        mRequest.putU32(start);
+        mRequest.putU32(duration);
 
         if(!mConnection.transmitMessage(mRequest, mResponse)) {
             Log.d(TAG, "error sending fetch epg request");
