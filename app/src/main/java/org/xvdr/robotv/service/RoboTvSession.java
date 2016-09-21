@@ -122,6 +122,10 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
     @Override
     public boolean onTune(final Uri channelUri) {
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
+            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+        }
+
         // remove pending tune request
         mHandler.removeCallbacks(mTune);
         mTune.setChannelUri(channelUri);
@@ -208,10 +212,6 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
         Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
 
         if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
-                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
-            }
-
             notifyVideoAvailable();
         }
         else if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
