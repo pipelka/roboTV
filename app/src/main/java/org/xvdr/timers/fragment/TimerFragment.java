@@ -14,11 +14,9 @@ import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.timers.presenter.EpgEventPresenter;

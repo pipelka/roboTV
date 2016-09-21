@@ -6,9 +6,9 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.msgexchange;
+package org.xvdr.jniwrap;
 
-public class msgexchangeJNI {
+public class jniwrapJNI {
   public final static native long new_Packet__SWIG_0(int jarg1, int jarg2, long jarg3);
   public final static native long new_Packet__SWIG_1(int jarg1, int jarg2);
   public final static native long new_Packet__SWIG_2(int jarg1);
@@ -124,7 +124,7 @@ static {
 		System.loadLibrary("a52");
 		System.loadLibrary("mad");
 		System.loadLibrary("msgexchange");
-		System.loadLibrary("msgexchange_wrapper");
+		System.loadLibrary("jniwrap");
 	}
 	catch (UnsatisfiedLinkError e) {
 		e.printStackTrace();

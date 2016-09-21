@@ -6,7 +6,7 @@ import android.util.SparseIntArray;
 
 import com.google.android.exoplayer.util.MimeTypes;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 
 import java.util.ArrayList;
 

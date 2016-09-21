@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.msgexchange;
+package org.xvdr.jniwrap;
 
 public class MpegAudioDecoder {
   private transient long swigCPtr;
@@ -29,26 +29,26 @@ public class MpegAudioDecoder {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        msgexchangeJNI.delete_MpegAudioDecoder(swigCPtr);
+        jniwrapJNI.delete_MpegAudioDecoder(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public MpegAudioDecoder() {
-    this(msgexchangeJNI.new_MpegAudioDecoder(), true);
+    this(jniwrapJNI.new_MpegAudioDecoder(), true);
   }
 
   public int decode(Packet p, int src_length, byte[] BYTE, int offset, int dst_length) {
-    return msgexchangeJNI.MpegAudioDecoder_decode(swigCPtr, this, Packet.getCPtr(p), p, src_length, BYTE, offset, dst_length);
+    return jniwrapJNI.MpegAudioDecoder_decode(swigCPtr, this, Packet.getCPtr(p), p, src_length, BYTE, offset, dst_length);
   }
 
   public int getChannels() {
-    return msgexchangeJNI.MpegAudioDecoder_getChannels(swigCPtr, this);
+    return jniwrapJNI.MpegAudioDecoder_getChannels(swigCPtr, this);
   }
 
   public int getSampleRate() {
-    return msgexchangeJNI.MpegAudioDecoder_getSampleRate(swigCPtr, this);
+    return jniwrapJNI.MpegAudioDecoder_getSampleRate(swigCPtr, this);
   }
 
 }

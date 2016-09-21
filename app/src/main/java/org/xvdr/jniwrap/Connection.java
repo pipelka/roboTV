@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.msgexchange;
+package org.xvdr.jniwrap;
 
 public class Connection {
   private transient long swigCPtr;
@@ -29,72 +29,72 @@ public class Connection {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        msgexchangeJNI.delete_Connection(swigCPtr);
+        jniwrapJNI.delete_Connection(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Connection() {
-    this(msgexchangeJNI.new_Connection(), true);
+    this(jniwrapJNI.new_Connection(), true);
   }
 
   public boolean open(String hostname, int port) {
-    return msgexchangeJNI.Connection_open(swigCPtr, this, hostname, port);
+    return jniwrapJNI.Connection_open(swigCPtr, this, hostname, port);
   }
 
   public void abort() {
-    msgexchangeJNI.Connection_abort(swigCPtr, this);
+    jniwrapJNI.Connection_abort(swigCPtr, this);
   }
 
   public boolean close() {
-    return msgexchangeJNI.Connection_close(swigCPtr, this);
+    return jniwrapJNI.Connection_close(swigCPtr, this);
   }
 
   public boolean isOpen() {
-    return msgexchangeJNI.Connection_isOpen(swigCPtr, this);
+    return jniwrapJNI.Connection_isOpen(swigCPtr, this);
   }
 
   public boolean isAborting() {
-    return msgexchangeJNI.Connection_isAborting(swigCPtr, this);
+    return jniwrapJNI.Connection_isAborting(swigCPtr, this);
   }
 
   public boolean sendRequest(Packet request) {
-    return msgexchangeJNI.Connection_sendRequest(swigCPtr, this, Packet.getCPtr(request), request);
+    return jniwrapJNI.Connection_sendRequest(swigCPtr, this, Packet.getCPtr(request), request);
   }
 
   public Packet readResponse() {
-    long cPtr = msgexchangeJNI.Connection_readResponse__SWIG_0(swigCPtr, this);
+    long cPtr = jniwrapJNI.Connection_readResponse__SWIG_0(swigCPtr, this);
     return (cPtr == 0) ? null : new Packet(cPtr, false);
   }
 
   public boolean readResponse(Packet p) {
-    return msgexchangeJNI.Connection_readResponse__SWIG_1(swigCPtr, this, Packet.getCPtr(p), p);
+    return jniwrapJNI.Connection_readResponse__SWIG_1(swigCPtr, this, Packet.getCPtr(p), p);
   }
 
   public Packet transmitMessage(Packet message) {
-    long cPtr = msgexchangeJNI.Connection_transmitMessage__SWIG_0(swigCPtr, this, Packet.getCPtr(message), message);
+    long cPtr = jniwrapJNI.Connection_transmitMessage__SWIG_0(swigCPtr, this, Packet.getCPtr(message), message);
     return (cPtr == 0) ? null : new Packet(cPtr, true);
   }
 
   public boolean transmitMessage(Packet request, Packet response) {
-    return msgexchangeJNI.Connection_transmitMessage__SWIG_1(swigCPtr, this, Packet.getCPtr(request), request, Packet.getCPtr(response), response);
+    return jniwrapJNI.Connection_transmitMessage__SWIG_1(swigCPtr, this, Packet.getCPtr(request), request, Packet.getCPtr(response), response);
   }
 
   public void setTimeout(int timeout_ms) {
-    msgexchangeJNI.Connection_setTimeout(swigCPtr, this, timeout_ms);
+    jniwrapJNI.Connection_setTimeout(swigCPtr, this, timeout_ms);
   }
 
   public String getHostname() {
-    return msgexchangeJNI.Connection_getHostname(swigCPtr, this);
+    return jniwrapJNI.Connection_getHostname(swigCPtr, this);
   }
 
   public void setPriority(int priority) {
-    msgexchangeJNI.Connection_setPriority(swigCPtr, this, priority);
+    jniwrapJNI.Connection_setPriority(swigCPtr, this, priority);
   }
 
   public int getPriority() {
-    return msgexchangeJNI.Connection_getPriority(swigCPtr, this);
+    return jniwrapJNI.Connection_getPriority(swigCPtr, this);
   }
 
 }

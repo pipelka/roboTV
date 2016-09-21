@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.msgexchange;
+package org.xvdr.jniwrap;
 
-public class msgexchange {
+public class jniwrap {
 }

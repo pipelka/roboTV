@@ -2,7 +2,7 @@ package org.xvdr.robotv.artwork.provider;
 
 import android.util.Log;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.client.Connection;

@@ -3,7 +3,7 @@ package org.xvdr.extractor;
 import android.content.Context;
 import android.util.Log;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Connection;
 
 import java.math.BigInteger;

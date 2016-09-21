@@ -17,7 +17,7 @@ import com.google.android.exoplayer.upstream.Loader;
 import com.google.android.exoplayer.util.Assertions;
 import com.google.android.exoplayer.util.MimeTypes;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 

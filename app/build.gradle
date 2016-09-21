@@ -29,7 +29,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path "jni/CMakeLists.txt"
+            path "cpp/CMakeLists.txt"
         }
     }
 
@@ -41,12 +41,6 @@ android {
         }
         debug {
             archivesBaseName = "robotv"
-        }
-    }
-
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
         }
     }
 }

@@ -7,7 +7,7 @@ import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ListRow;
 import android.util.Log;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;

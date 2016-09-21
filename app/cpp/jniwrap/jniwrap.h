@@ -8,8 +8,8 @@
  * interface file instead.
  * ----------------------------------------------------------------------------- */
 
-#ifndef SWIG_msgexchange_WRAP_H_
-#define SWIG_msgexchange_WRAP_H_
+#ifndef SWIG_jniwrap_WRAP_H_
+#define SWIG_jniwrap_WRAP_H_
 
 class SwigDirector_SessionListener : public SessionListener, public Swig::Director {
 

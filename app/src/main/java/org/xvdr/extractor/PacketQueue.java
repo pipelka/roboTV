@@ -6,7 +6,7 @@ import com.google.android.exoplayer.SampleHolder;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
 
 import org.xvdr.extractor.upstream.RollingSampleBuffer;
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 
 import java.util.ArrayDeque;
 

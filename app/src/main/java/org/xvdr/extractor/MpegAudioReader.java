@@ -6,8 +6,8 @@ import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.util.MimeTypes;
 
-import org.xvdr.msgexchange.MpegAudioDecoder;
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.MpegAudioDecoder;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.StreamBundle;
 
 /**

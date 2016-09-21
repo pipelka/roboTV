@@ -18,7 +18,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;

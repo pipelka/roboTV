@@ -2,17 +2,13 @@ package org.xvdr.extractor.upstream;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.SampleHolder;
-import com.google.android.exoplayer.extractor.ExtractorInput;
 import com.google.android.exoplayer.upstream.Allocation;
 import com.google.android.exoplayer.upstream.Allocator;
-import com.google.android.exoplayer.upstream.DataSource;
 import com.google.android.exoplayer.util.Assertions;
 import com.google.android.exoplayer.util.ParsableByteArray;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 
-import java.io.EOFException;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingDeque;
 

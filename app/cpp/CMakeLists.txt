@@ -6,4 +6,4 @@ SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -fomit-frame-pointer -ffunction-sec
 add_subdirectory(liba52)
 add_subdirectory(libmad)
 add_subdirectory(msgexchange)
-add_subdirectory(msgexchange-wrapper)
+add_subdirectory(jniwrap)

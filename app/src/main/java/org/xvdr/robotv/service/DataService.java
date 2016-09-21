@@ -7,8 +7,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import org.xvdr.msgexchange.Packet;
-import org.xvdr.msgexchange.SessionListener;
+import org.xvdr.jniwrap.Packet;
+import org.xvdr.jniwrap.SessionListener;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;

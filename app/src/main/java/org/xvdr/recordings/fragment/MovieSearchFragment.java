@@ -15,7 +15,7 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.text.TextUtils;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;

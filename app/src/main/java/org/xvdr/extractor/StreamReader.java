@@ -2,7 +2,7 @@ package org.xvdr.extractor;
 
 import com.google.android.exoplayer.SampleHolder;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.StreamBundle;
 
 abstract class StreamReader {

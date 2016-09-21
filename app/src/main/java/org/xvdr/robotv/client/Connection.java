@@ -2,8 +2,8 @@ package org.xvdr.robotv.client;
 
 import android.util.Log;
 
-import org.xvdr.msgexchange.Packet;
-import org.xvdr.msgexchange.Session;
+import org.xvdr.jniwrap.Packet;
+import org.xvdr.jniwrap.Session;
 
 public class Connection extends Session {
 

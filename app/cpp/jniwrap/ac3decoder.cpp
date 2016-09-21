@@ -82,7 +82,7 @@ int Ac3Decoder::decode(MsgPacket* p, int src_length, char* BYTE, int offset, int
 			return 0;
 		}
 
-		float* sample = a52_samples(mState);
+		sample_t* sample = a52_samples(mState);
 
 		// copy block data for each channel
 		for(int c = 0; c < mChannels; c++) {

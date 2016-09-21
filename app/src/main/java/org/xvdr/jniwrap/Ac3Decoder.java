@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.msgexchange;
+package org.xvdr.jniwrap;
 
 public class Ac3Decoder {
   private transient long swigCPtr;
@@ -29,43 +29,43 @@ public class Ac3Decoder {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        msgexchangeJNI.delete_Ac3Decoder(swigCPtr);
+        jniwrapJNI.delete_Ac3Decoder(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void setChannelLayout(int value) {
-    msgexchangeJNI.Ac3Decoder_channelLayout_set(swigCPtr, this, value);
+    jniwrapJNI.Ac3Decoder_channelLayout_set(swigCPtr, this, value);
   }
 
   public int getChannelLayout() {
-    return msgexchangeJNI.Ac3Decoder_channelLayout_get(swigCPtr, this);
+    return jniwrapJNI.Ac3Decoder_channelLayout_get(swigCPtr, this);
   }
 
   public Ac3Decoder(int flags) {
-    this(msgexchangeJNI.new_Ac3Decoder(flags), true);
+    this(jniwrapJNI.new_Ac3Decoder(flags), true);
   }
 
   public int decode(Packet p, int src_length, byte[] BYTE, int offset, int dst_length) {
-    return msgexchangeJNI.Ac3Decoder_decode(swigCPtr, this, Packet.getCPtr(p), p, src_length, BYTE, offset, dst_length);
+    return jniwrapJNI.Ac3Decoder_decode(swigCPtr, this, Packet.getCPtr(p), p, src_length, BYTE, offset, dst_length);
   }
 
   public int getChannels() {
-    return msgexchangeJNI.Ac3Decoder_getChannels(swigCPtr, this);
+    return jniwrapJNI.Ac3Decoder_getChannels(swigCPtr, this);
   }
 
   public int getSampleRate() {
-    return msgexchangeJNI.Ac3Decoder_getSampleRate(swigCPtr, this);
+    return jniwrapJNI.Ac3Decoder_getSampleRate(swigCPtr, this);
   }
 
   public int getBitRate() {
-    return msgexchangeJNI.Ac3Decoder_getBitRate(swigCPtr, this);
+    return jniwrapJNI.Ac3Decoder_getBitRate(swigCPtr, this);
   }
 
-  public final static int layoutStereo = msgexchangeJNI.Ac3Decoder_layoutStereo_get();
-  public final static int layoutDolby = msgexchangeJNI.Ac3Decoder_layoutDolby_get();
-  public final static int layout50 = msgexchangeJNI.Ac3Decoder_layout50_get();
-  public final static int layout51 = msgexchangeJNI.Ac3Decoder_layout51_get();
+  public final static int layoutStereo = jniwrapJNI.Ac3Decoder_layoutStereo_get();
+  public final static int layoutDolby = jniwrapJNI.Ac3Decoder_layoutDolby_get();
+  public final static int layout50 = jniwrapJNI.Ac3Decoder_layout50_get();
+  public final static int layout51 = jniwrapJNI.Ac3Decoder_layout51_get();
 
 }

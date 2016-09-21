@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.msgexchange;
+package org.xvdr.jniwrap;
 
 public class SessionListener {
   private transient long swigCPtr;
@@ -29,7 +29,7 @@ public class SessionListener {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        msgexchangeJNI.delete_SessionListener(swigCPtr);
+        jniwrapJNI.delete_SessionListener(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -42,29 +42,29 @@ public class SessionListener {
 
   public void swigReleaseOwnership() {
     swigCMemOwn = false;
-    msgexchangeJNI.SessionListener_change_ownership(this, swigCPtr, false);
+    jniwrapJNI.SessionListener_change_ownership(this, swigCPtr, false);
   }
 
   public void swigTakeOwnership() {
     swigCMemOwn = true;
-    msgexchangeJNI.SessionListener_change_ownership(this, swigCPtr, true);
+    jniwrapJNI.SessionListener_change_ownership(this, swigCPtr, true);
   }
 
   public void onNotification(Packet p) {
-    msgexchangeJNI.SessionListener_onNotification(swigCPtr, this, Packet.getCPtr(p), p);
+    jniwrapJNI.SessionListener_onNotification(swigCPtr, this, Packet.getCPtr(p), p);
   }
 
   public void onDisconnect() {
-    msgexchangeJNI.SessionListener_onDisconnect(swigCPtr, this);
+    jniwrapJNI.SessionListener_onDisconnect(swigCPtr, this);
   }
 
   public void onReconnect() {
-    msgexchangeJNI.SessionListener_onReconnect(swigCPtr, this);
+    jniwrapJNI.SessionListener_onReconnect(swigCPtr, this);
   }
 
   public SessionListener() {
-    this(msgexchangeJNI.new_SessionListener(), true);
-    msgexchangeJNI.SessionListener_director_connect(this, swigCPtr, swigCMemOwn, true);
+    this(jniwrapJNI.new_SessionListener(), true);
+    jniwrapJNI.SessionListener_director_connect(this, swigCPtr, swigCMemOwn, true);
   }
 
 }

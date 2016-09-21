@@ -1,6 +1,6 @@
 package org.xvdr.recordings.model;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 
 public class PacketAdapter {
 

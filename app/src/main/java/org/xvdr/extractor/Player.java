@@ -17,8 +17,8 @@ import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.util.PriorityHandlerThread;
 
-import org.xvdr.msgexchange.Packet;
-import org.xvdr.msgexchange.SessionListener;
+import org.xvdr.jniwrap.Packet;
+import org.xvdr.jniwrap.SessionListener;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 

@@ -6,13 +6,13 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.msgexchange;
+package org.xvdr.jniwrap;
 
 public class Session extends SessionProxy {
   private transient long swigCPtr;
 
   protected Session(long cPtr, boolean cMemoryOwn) {
-    super(msgexchangeJNI.Session_SWIGUpcast(cPtr), cMemoryOwn);
+    super(jniwrapJNI.Session_SWIGUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
 
@@ -28,7 +28,7 @@ public class Session extends SessionProxy {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        msgexchangeJNI.delete_Session(swigCPtr);
+        jniwrapJNI.delete_Session(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -36,11 +36,11 @@ public class Session extends SessionProxy {
   }
 
   public Session() {
-    this(msgexchangeJNI.new_Session(), true);
+    this(jniwrapJNI.new_Session(), true);
   }
 
   public void setCallback(SessionListener listener) {
-    msgexchangeJNI.Session_setCallback(swigCPtr, this, SessionListener.getCPtr(listener), listener);
+    jniwrapJNI.Session_setCallback(swigCPtr, this, SessionListener.getCPtr(listener), listener);
   }
 
 }

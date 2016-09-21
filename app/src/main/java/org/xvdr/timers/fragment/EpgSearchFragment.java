@@ -15,7 +15,7 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.text.TextUtils;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Channels;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.recordings.model.Movie;

@@ -1,4 +1,4 @@
-%module(directors="1") msgexchange
+%module(directors="1") jniwrap
 
 %include "std_string.i"
 %include "stdint.i"
@@ -111,7 +111,7 @@ static {
 		System.loadLibrary("a52");
 		System.loadLibrary("mad");
 		System.loadLibrary("msgexchange");
-		System.loadLibrary("msgexchange_wrapper");
+		System.loadLibrary("jniwrap");
 	}
 	catch (UnsatisfiedLinkError e) {
 		e.printStackTrace();

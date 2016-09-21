@@ -1,6 +1,6 @@
 package org.xvdr.recordings.model;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Connection;
 
 import java.util.TreeSet;

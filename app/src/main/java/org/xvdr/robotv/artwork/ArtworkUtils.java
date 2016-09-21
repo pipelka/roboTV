@@ -1,6 +1,6 @@
 package org.xvdr.robotv.artwork;
 
-import org.xvdr.msgexchange.Packet;
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.client.Connection;
 

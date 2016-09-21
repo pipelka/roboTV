@@ -660,7 +660,7 @@ namespace Swig {
 
 namespace Swig {
   namespace {
-    jclass jclass_msgexchangeJNI = NULL;
+    jclass jclass_jniwrapJNI = NULL;
     jmethodID director_method_ids[3];
   }
 }
@@ -694,7 +694,7 @@ SWIGINTERN void MsgPacket_readBuffer(MsgPacket *self,char *BYTE,int offset,int l
  * C++ director class methods
  * --------------------------------------------------- */
 
-#include "msgexchange_wrap.h"
+#include "jniwrap.h"
 
 SwigDirector_SessionListener::SwigDirector_SessionListener(JNIEnv *jenv) : SessionListener(), Swig::Director(jenv) {
 }
@@ -717,7 +717,7 @@ void SwigDirector_SessionListener::onNotification(MsgPacket *p) {
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
     *((MsgPacket **)&jp) = (MsgPacket *) p; 
-    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_method_ids[0], swigjobj, jp);
+    jenv->CallStaticVoidMethod(Swig::jclass_jniwrapJNI, Swig::director_method_ids[0], swigjobj, jp);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -741,7 +741,7 @@ void SwigDirector_SessionListener::onDisconnect() {
   }
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
-    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_method_ids[1], swigjobj);
+    jenv->CallStaticVoidMethod(Swig::jclass_jniwrapJNI, Swig::director_method_ids[1], swigjobj);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -765,7 +765,7 @@ void SwigDirector_SessionListener::onReconnect() {
   }
   swigjobj = swig_get_self(jenv);
   if (swigjobj && jenv->IsSameObject(swigjobj, NULL) == JNI_FALSE) {
-    jenv->CallStaticVoidMethod(Swig::jclass_msgexchangeJNI, Swig::director_method_ids[2], swigjobj);
+    jenv->CallStaticVoidMethod(Swig::jclass_jniwrapJNI, Swig::director_method_ids[2], swigjobj);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -785,7 +785,7 @@ void SwigDirector_SessionListener::swig_connect_director(JNIEnv *jenv, jobject j
     jmethodID base_methid;
   } methods[] = {
     {
-      "onNotification", "(Lorg/xvdr/msgexchange/Packet;)V", NULL 
+      "onNotification", "(Lorg/xvdr/jniwrap/Packet;)V", NULL 
     },
     {
       "onDisconnect", "()V", NULL 
@@ -799,7 +799,7 @@ void SwigDirector_SessionListener::swig_connect_director(JNIEnv *jenv, jobject j
   
   if (swig_set_self(jenv, jself, swig_mem_own, weak_global)) {
     if (!baseclass) {
-      baseclass = jenv->FindClass("org/xvdr/msgexchange/SessionListener");
+      baseclass = jenv->FindClass("org/xvdr/jniwrap/SessionListener");
       if (!baseclass) return;
       baseclass = (jclass) jenv->NewGlobalRef(baseclass);
     }
@@ -825,7 +825,7 @@ void SwigDirector_SessionListener::swig_connect_director(JNIEnv *jenv, jobject j
 extern "C" {
 #endif
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Packet_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1Packet_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   uint16_t arg1 ;
   uint16_t arg2 ;
@@ -843,7 +843,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Packet_1_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Packet_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1Packet_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
   jlong jresult = 0 ;
   uint16_t arg1 ;
   uint16_t arg2 ;
@@ -859,7 +859,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Packet_1_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Packet_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1Packet_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   uint16_t arg1 ;
   MsgPacket *result = 0 ;
@@ -873,7 +873,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Packet_1_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Packet_1_1SWIG_13(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1Packet_1_1SWIG_13(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   MsgPacket *result = 0 ;
   
@@ -885,7 +885,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Packet_1_
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Packet(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1Packet(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   
   (void)jenv;
@@ -895,7 +895,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Packet(
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1createUid(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1createUid(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   
   (void)jenv;
@@ -906,7 +906,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1createU
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1putString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1putString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -928,7 +928,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1put
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1putU8(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1putU8(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint8_t arg2 ;
@@ -945,7 +945,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1put
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1putU16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1putU16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t arg2 ;
@@ -962,7 +962,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1put
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1putS16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1putS16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   int16_t arg2 ;
@@ -979,7 +979,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1put
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1putU32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1putU32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint32_t arg2 ;
@@ -996,7 +996,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1put
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1putS32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1putS32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   int32_t arg2 ;
@@ -1013,7 +1013,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1put
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1putU64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1putU64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint64_t arg2 ;
@@ -1055,7 +1055,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1put
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1putS64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1putS64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   int64_t arg2 ;
@@ -1072,7 +1072,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1put
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   
   (void)jenv;
@@ -1083,7 +1083,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1clear(J
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1rewind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1rewind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   
   (void)jenv;
@@ -1094,7 +1094,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1rewind(
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   char *result = 0 ;
@@ -1109,7 +1109,7 @@ SWIGEXPORT jstring JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getS
 }
 
 
-SWIGEXPORT jshort JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getU8(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jshort JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getU8(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jshort jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint8_t result;
@@ -1124,7 +1124,7 @@ SWIGEXPORT jshort JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getU8
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getU16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getU16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t result;
@@ -1139,7 +1139,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getU16(
 }
 
 
-SWIGEXPORT jshort JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getS16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jshort JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getS16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jshort jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   int16_t result;
@@ -1154,7 +1154,7 @@ SWIGEXPORT jshort JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getS1
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getU32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getU32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint32_t result;
@@ -1169,7 +1169,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getU32
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getS32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getS32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   int32_t result;
@@ -1184,7 +1184,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getS32(
 }
 
 
-SWIGEXPORT jobject JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getU64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jobject JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getU64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jobject jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint64_t result;
@@ -1215,7 +1215,7 @@ SWIGEXPORT jobject JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getU
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getS64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getS64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   int64_t result;
@@ -1230,7 +1230,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getS64
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1setClientID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1setClientID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t arg2 ;
   
@@ -1243,7 +1243,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1setClie
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getClientID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getClientID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t result;
@@ -1258,7 +1258,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getClie
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1eop(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1eop(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   bool result;
@@ -1273,7 +1273,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1eop
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1freeze(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1freeze(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   
   (void)jenv;
@@ -1284,7 +1284,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1freeze(
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getPacketLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getPacketLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint32_t result;
@@ -1299,7 +1299,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getPac
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getPayloadLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getPayloadLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint32_t result;
@@ -1314,7 +1314,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getPay
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getUID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getUID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint32_t result;
@@ -1329,7 +1329,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getUID
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getMsgID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getMsgID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t result;
@@ -1344,7 +1344,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getMsgI
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t result;
@@ -1359,7 +1359,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getType
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getCheckSum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getCheckSum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint32_t result;
@@ -1374,7 +1374,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getChe
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getPayloadCheckSum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getPayloadCheckSum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint32_t result;
@@ -1389,7 +1389,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getPay
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1disablePayloadCheckSum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1disablePayloadCheckSum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   
   (void)jenv;
@@ -1400,7 +1400,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1disable
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getProtocolVersion(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1getProtocolVersion(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t result;
@@ -1415,7 +1415,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1getProt
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1setProtocolVersion(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1setProtocolVersion(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t arg2 ;
   
@@ -1428,7 +1428,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1setProt
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1setMsgID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1setMsgID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t arg2 ;
   
@@ -1441,7 +1441,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1setMsgI
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1setType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1setType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   uint16_t arg2 ;
   
@@ -1454,7 +1454,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1setType
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1compress(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1compress(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   int arg2 ;
@@ -1471,7 +1471,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1com
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1isCompressed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1isCompressed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   bool result;
@@ -1486,7 +1486,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1isC
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1uncompress(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1uncompress(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   bool result;
@@ -1501,7 +1501,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1unc
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1print(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1print(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   
   (void)jenv;
@@ -1512,7 +1512,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1print(J
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1copy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1copy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
   
@@ -1526,7 +1526,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1copy(JN
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1headerLength_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1headerLength_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1538,7 +1538,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1headerL
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1checkSumPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1checkSumPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1550,7 +1550,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1checkSu
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1uncompressedPayloadLengthPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1uncompressedPayloadLengthPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1562,7 +1562,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1uncompr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1payloadLengthPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1payloadLengthPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1574,7 +1574,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1payload
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1payloadCheckSumPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1payloadCheckSumPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1586,7 +1586,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1payload
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1protocolVersionPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1protocolVersionPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1598,7 +1598,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1protoco
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1clientIDPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1clientIDPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1610,7 +1610,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1clientI
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1typePos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1typePos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1622,7 +1622,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1typePos
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1msgIDPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1msgIDPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1634,7 +1634,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1msgIDPo
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1uIDPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1uIDPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1646,7 +1646,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1uIDPos_
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1syncPos_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1syncPos_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1658,7 +1658,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1syncPos
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1skipBuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1skipBuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   int arg2 ;
   
@@ -1671,7 +1671,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1skipBuf
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1readBuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1readBuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
   MsgPacket *arg1 = (MsgPacket *) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
@@ -1694,7 +1694,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Packet_1readBuf
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Connection(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1Connection(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   MsgConnection *result = 0 ;
   
@@ -1706,7 +1706,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Connectio
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Connection(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1Connection(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   
   (void)jenv;
@@ -1716,7 +1716,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Connect
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
   jboolean jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -1740,7 +1740,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1abort(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1abort(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   
   (void)jenv;
@@ -1751,7 +1751,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1abo
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   bool result;
@@ -1766,7 +1766,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1isOpen(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1isOpen(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   bool result;
@@ -1781,7 +1781,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1isAborting(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1isAborting(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   bool result;
@@ -1796,7 +1796,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1sendRequest(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1sendRequest(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -1814,7 +1814,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1readResponse_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1readResponse_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   MsgPacket *result = 0 ;
@@ -1829,7 +1829,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1re
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1readResponse_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1readResponse_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -1847,7 +1847,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1transmitMessage_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1transmitMessage_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -1865,7 +1865,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1tr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1transmitMessage_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1transmitMessage_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jboolean jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -1886,7 +1886,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1setTimeout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1setTimeout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   int arg2 ;
   
@@ -1899,7 +1899,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1set
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1getHostname(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1getHostname(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   std::string *result = 0 ;
@@ -1914,7 +1914,7 @@ SWIGEXPORT jstring JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1setPriority(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1setPriority(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   int arg2 ;
   
@@ -1927,7 +1927,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1set
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1getPriority(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Connection_1getPriority(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MsgConnection *arg1 = (MsgConnection *) 0 ;
   int result;
@@ -1942,7 +1942,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Connection_1get
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1SessionProxy(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1SessionProxy(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   MsgSession *result = 0 ;
   
@@ -1954,7 +1954,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1SessionPr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1SessionProxy(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1SessionProxy(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   MsgSession *arg1 = (MsgSession *) 0 ;
   
   (void)jenv;
@@ -1964,7 +1964,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Session
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionProxy_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
   jboolean jresult = 0 ;
   MsgSession *arg1 = (MsgSession *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -1988,7 +1988,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProx
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionProxy_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   MsgSession *arg1 = (MsgSession *) 0 ;
   bool result;
@@ -2003,7 +2003,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProx
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1terminate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionProxy_1terminate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   MsgSession *arg1 = (MsgSession *) 0 ;
   bool result;
@@ -2018,7 +2018,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProx
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1transmitMessage_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionProxy_1transmitMessage_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   MsgSession *arg1 = (MsgSession *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -2036,7 +2036,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1transmitMessage_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jboolean JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionProxy_1transmitMessage_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jboolean jresult = 0 ;
   MsgSession *arg1 = (MsgSession *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -2057,7 +2057,7 @@ SWIGEXPORT jboolean JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProx
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1SessionListener(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1SessionListener(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   SessionListener *arg1 = (SessionListener *) 0 ;
   
   (void)jenv;
@@ -2067,7 +2067,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Session
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener_1onNotification(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionListener_1onNotification(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   SessionListener *arg1 = (SessionListener *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
   
@@ -2081,7 +2081,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener_1onDisconnect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionListener_1onDisconnect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   SessionListener *arg1 = (SessionListener *) 0 ;
   
   (void)jenv;
@@ -2092,7 +2092,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener_1onReconnect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionListener_1onReconnect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   SessionListener *arg1 = (SessionListener *) 0 ;
   
   (void)jenv;
@@ -2103,7 +2103,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1SessionListener(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1SessionListener(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   SessionListener *result = 0 ;
   
@@ -2115,7 +2115,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1SessionLi
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener_1director_1connect(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jswig_mem_own, jboolean jweak_global) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionListener_1director_1connect(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jswig_mem_own, jboolean jweak_global) {
   SessionListener *obj = *((SessionListener **)&objarg);
   (void)jcls;
   SwigDirector_SessionListener *director = dynamic_cast<SwigDirector_SessionListener *>(obj);
@@ -2125,7 +2125,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener_1change_1ownership(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jtake_or_release) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionListener_1change_1ownership(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jtake_or_release) {
   SessionListener *obj = *((SessionListener **)&objarg);
   SwigDirector_SessionListener *director = dynamic_cast<SwigDirector_SessionListener *>(obj);
   (void)jcls;
@@ -2135,7 +2135,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionListener
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Session(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1Session(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   Session *result = 0 ;
   
@@ -2147,7 +2147,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Session(J
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Session(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1Session(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Session *arg1 = (Session *) 0 ;
   
   (void)jenv;
@@ -2157,7 +2157,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Session
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Session_1setCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Session_1setCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   Session *arg1 = (Session *) 0 ;
   SessionListener *arg2 = (SessionListener *) 0 ;
   
@@ -2171,7 +2171,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Session_1setCal
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1layoutStereo_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1layoutStereo_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2183,7 +2183,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1lay
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1layoutDolby_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1layoutDolby_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2195,7 +2195,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1lay
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1layout50_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1layout50_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2207,7 +2207,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1lay
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1layout51_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1layout51_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2219,7 +2219,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1lay
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1channelLayout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1channelLayout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
   int arg2 ;
   
@@ -2232,7 +2232,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1cha
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1channelLayout_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1channelLayout_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
   int result;
@@ -2247,7 +2247,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1cha
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Ac3Decoder(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1Ac3Decoder(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int arg1 ;
   Ac3Decoder *result = 0 ;
@@ -2261,7 +2261,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1Ac3Decode
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Ac3Decoder(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1Ac3Decoder(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
   
   (void)jenv;
@@ -2271,7 +2271,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1Ac3Deco
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jbyteArray jarg4, jint jarg5, jint jarg6) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jbyteArray jarg4, jint jarg5, jint jarg6) {
   jint jresult = 0 ;
   Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -2303,7 +2303,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1dec
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
   int result;
@@ -2318,7 +2318,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1get
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
   int result;
@@ -2333,7 +2333,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1get
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1getBitRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1getBitRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
   int result;
@@ -2348,7 +2348,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Ac3Decoder_1get
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1MpegAudioDecoder(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1MpegAudioDecoder(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   MpegAudioDecoder *result = 0 ;
   
@@ -2360,7 +2360,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_new_1MpegAudio
 }
 
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1MpegAudioDecoder(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1MpegAudioDecoder(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
   
   (void)jenv;
@@ -2370,7 +2370,7 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_delete_1MpegAud
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_MpegAudioDecoder_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jbyteArray jarg4, jint jarg5, jint jarg6) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_MpegAudioDecoder_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jbyteArray jarg4, jint jarg5, jint jarg6) {
   jint jresult = 0 ;
   MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
   MsgPacket *arg2 = (MsgPacket *) 0 ;
@@ -2402,7 +2402,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_MpegAudioDecode
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_MpegAudioDecoder_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_MpegAudioDecoder_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
   int result;
@@ -2417,7 +2417,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_MpegAudioDecode
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_MpegAudioDecoder_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_MpegAudioDecoder_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
   int result;
@@ -2432,7 +2432,7 @@ SWIGEXPORT jint JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_MpegAudioDecode
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_SessionProxy_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
@@ -2440,7 +2440,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_SessionProxy_1
     return baseptr;
 }
 
-SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Session_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Session_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
@@ -2448,7 +2448,7 @@ SWIGEXPORT jlong JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_Session_1SWIGU
     return baseptr;
 }
 
-SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_swig_1module_1init(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_swig_1module_1init(JNIEnv *jenv, jclass jcls) {
   int i;
   
   static struct {
@@ -2456,17 +2456,17 @@ SWIGEXPORT void JNICALL Java_org_xvdr_msgexchange_msgexchangeJNI_swig_1module_1i
     const char *signature;
   } methods[3] = {
     {
-      "SwigDirector_SessionListener_onNotification", "(Lorg/xvdr/msgexchange/SessionListener;J)V" 
+      "SwigDirector_SessionListener_onNotification", "(Lorg/xvdr/jniwrap/SessionListener;J)V" 
     },
     {
-      "SwigDirector_SessionListener_onDisconnect", "(Lorg/xvdr/msgexchange/SessionListener;)V" 
+      "SwigDirector_SessionListener_onDisconnect", "(Lorg/xvdr/jniwrap/SessionListener;)V" 
     },
     {
-      "SwigDirector_SessionListener_onReconnect", "(Lorg/xvdr/msgexchange/SessionListener;)V" 
+      "SwigDirector_SessionListener_onReconnect", "(Lorg/xvdr/jniwrap/SessionListener;)V" 
     }
   };
-  Swig::jclass_msgexchangeJNI = (jclass) jenv->NewGlobalRef(jcls);
-  if (!Swig::jclass_msgexchangeJNI) return;
+  Swig::jclass_jniwrapJNI = (jclass) jenv->NewGlobalRef(jcls);
+  if (!Swig::jclass_jniwrapJNI) return;
   for (i = 0; i < (int) (sizeof(methods)/sizeof(methods[0])); ++i) {
     Swig::director_method_ids[i] = jenv->GetStaticMethodID(jcls, methods[i].method, methods[i].signature);
     if (!Swig::director_method_ids[i]) return;
