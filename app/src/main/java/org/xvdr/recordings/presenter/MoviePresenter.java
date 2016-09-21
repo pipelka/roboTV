@@ -1,6 +1,7 @@
 package org.xvdr.recordings.presenter;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.view.View;
@@ -31,8 +32,10 @@ public class MoviePresenter extends Presenter {
         }
 
         protected void updateCardViewImage(Context context, String link) {
+            Drawable drawableUnknown = context.getDrawable(R.drawable.recording_unkown);
+
             if(link == null || link.isEmpty()) {
-                mCardView.setMainImage(context.getDrawable(R.drawable.recording_unkown));
+                mCardView.setMainImage(drawableUnknown);
                 return;
             }
 
@@ -40,8 +43,9 @@ public class MoviePresenter extends Presenter {
             .load(link)
             .resize(266, 400)
             .centerCrop()
-            .error(context.getDrawable(R.drawable.recording_unkown))
-            .placeholder(context.getDrawable(R.drawable.recording_unkown))
+            .placeholder(drawableUnknown)
+            .error(drawableUnknown)
+            .placeholder(drawableUnknown)
             .into(mImageCardViewTarget);
         }
     }
