@@ -27,16 +27,7 @@ final class Ac3Reader extends StreamReader {
 
         if(ac3PassThrough) {
             Log.i(TAG, "AC3 passthrough enabled");
-            output.format(MediaFormat.createAudioFormat(
-                              Integer.toString(stream.physicalId),
-                              MimeTypes.AUDIO_AC3,
-                              stream.bitRate,
-                              MediaFormat.NO_VALUE,
-                              C.UNKNOWN_TIME_US,
-                              stream.channels,
-                              stream.sampleRate,
-                              null,
-                              stream.language));
+            createFormat();
             return;
         }
 
@@ -55,7 +46,7 @@ final class Ac3Reader extends StreamReader {
     @Override
     public void consume(Packet p, int size, long timeUs, int flags) {
         if(ac3PassThrough) {
-            output.sampleData(p, size, timeUs, flags);
+            consume(p, size, timeUs, flags);
             return;
         }
 
@@ -66,7 +57,7 @@ final class Ac3Reader extends StreamReader {
             return;
         }
 
-        if(!output.hasFormat()) {
+        if(!hasFormat()) {
             Log.i(TAG, "channels: " + mDecoder.getChannels());
             MediaFormat format = MediaFormat.createAudioFormat(
                                      Integer.toString(stream.physicalId), // < trackId
@@ -79,10 +70,10 @@ final class Ac3Reader extends StreamReader {
                                      null,
                                      stream.language,
                                      C.ENCODING_PCM_16BIT);
-            output.format(format);
+            format(format);
         }
 
-        output.sampleData(decodeBuffer, length, timeUs, flags);
+        consume(decodeBuffer, length, timeUs, flags);
     }
 
 }

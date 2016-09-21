@@ -1,7 +1,5 @@
 package org.xvdr.extractor;
 
-import android.util.Log;
-
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.util.MimeTypes;
@@ -34,7 +32,7 @@ final class MpegAudioReader extends StreamReader {
             return;
         }
 
-        if(!output.hasFormat()) {
+        if(!hasFormat()) {
             MediaFormat format = MediaFormat.createAudioFormat(
                                      Integer.toString(stream.physicalId), // < trackId
                                      MimeTypes.AUDIO_RAW,
@@ -46,10 +44,10 @@ final class MpegAudioReader extends StreamReader {
                                      null,
                                      stream.language,
                                      C.ENCODING_PCM_16BIT);
-            output.format(format);
+            format(format);
         }
 
-        output.sampleData(decodeBuffer, length, timeUs, flags);
+        consume(decodeBuffer, length, timeUs, flags);
     }
 
 }

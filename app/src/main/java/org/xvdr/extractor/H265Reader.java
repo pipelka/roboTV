@@ -1,9 +1,5 @@
 package org.xvdr.extractor;
 
-import com.google.android.exoplayer.C;
-import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.util.MimeTypes;
-
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.util.Collections;
@@ -26,17 +22,7 @@ final class H265Reader extends StreamReader {
             initializationData = assembleInitData();
         }
 
-        output.format(MediaFormat.createVideoFormat(
-                          Integer.toString(stream.physicalId), // << trackId
-                          MimeTypes.VIDEO_H265,
-                          MediaFormat.NO_VALUE,
-                          MediaFormat.NO_VALUE,
-                          C.UNKNOWN_TIME_US,
-                          stream.width,
-                          stream.height,
-                          initializationData,
-                          MediaFormat.NO_VALUE,
-                          (float)stream.pixelAspectRatio));
+        createFormat(initializationData);
     }
 
     private List<byte[]> assembleInitData() {
