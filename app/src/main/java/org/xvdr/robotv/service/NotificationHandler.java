@@ -48,7 +48,7 @@ public class NotificationHandler {
 
 
     public void notify(final String message, final String title, final String imageUrl) {
-        if(imageUrl == null) {
+        if(imageUrl == null || imageUrl.isEmpty()) {
             NotificationHandler.this.notify(message, title, R.drawable.ic_info_outline_white_48dp);
             return;
         }
