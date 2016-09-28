@@ -55,10 +55,6 @@ class PositionReference {
         endPosition = pos;
     }
 
-    long getCurrentPosition() {
-        return currentPosition;
-    }
-
     long positionFromTimeUs(long timeUs) {
         long diffMs = (timeUs - this.timeUs) / 1000;
         return currentPosition + diffMs;

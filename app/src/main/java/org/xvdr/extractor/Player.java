@@ -231,7 +231,19 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public long getCurrentPosition() {
-        return position.getCurrentPosition();
+        long timeUs = mExoPlayer.getCurrentPosition() * 1000;
+        long pos = position.positionFromTimeUs(timeUs);
+
+        if(pos < position.getStartPosition()) {
+            pos = position.getStartPosition();
+        }
+
+        return pos;
+    }
+
+    public long getBufferedPosition() {
+        long timeUs = mExoPlayer.getBufferedPosition() * 1000;
+        return position.positionFromTimeUs(timeUs);
     }
 
     public long getDuration() {

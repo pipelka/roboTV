@@ -202,9 +202,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
             notifyVideoAvailable();
         }
-        else if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
-            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
-        }
     }
 
     // Listener implementation
