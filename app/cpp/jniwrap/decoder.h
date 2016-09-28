@@ -11,9 +11,13 @@ public:
 
 	Decoder(int flags) : mFlags(flags) {};
 
+	inline int getFlags() {
+		return mFlags;
+	}
+
 	virtual ~Decoder() {};
 
-	virtual int decode(MsgPacket* p, int src_length, char* BYTE, int offset, int dst_length) = 0;
+	virtual int decode(uint8_t* srcBuffer, int srcLength, uint8_t* dstBuffer, int dstLength) = 0;
 
     virtual int getChannels() = 0;
 

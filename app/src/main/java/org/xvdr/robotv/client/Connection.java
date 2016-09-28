@@ -180,6 +180,24 @@ public class Connection extends Session {
         return (int)resp.getU32();
     }
 
+    public int openRecording(String recordingId) {
+        Packet req = CreatePacket(Connection.XVDR_RECSTREAM_OPEN, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        req.putString(recordingId);
+
+        Packet resp = transmitMessage(req);
+
+        if(resp == null) {
+            Log.e(TAG, "no response opening recording: " + recordingId);
+            return Connection.STATUS_NORESPONSE;
+        }
+
+        if(resp == null) {
+            return STATUS_NORESPONSE;
+        }
+
+        return (int)resp.getU32();
+    }
+
     public boolean closeStream() {
         Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_CLOSE, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
         return (transmitMessage(req) != null);
@@ -198,4 +216,16 @@ public class Connection extends Session {
         return response.getString();
     }
 
+    public long seek(long position) {
+        Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_SEEK, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        req.putS64(position);
+
+        Packet resp = transmitMessage(req);
+
+        if(resp == null) {
+            return -1;
+        }
+
+        return resp.getS64();
+    }
 }

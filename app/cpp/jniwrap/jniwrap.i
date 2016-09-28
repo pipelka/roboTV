@@ -9,8 +9,6 @@
 %rename (Packet) MsgPacket;
 %rename (Connection) MsgConnection;
 %rename (SessionProxy) MsgSession;
-%rename (Ac3Decoder) Ac3Decoder;
-%rename (MpegAudioDecoder) MpegAudioDecoder;
 %rename (SessionListener) SessionListener;
 %rename (Session) Session;
 
@@ -18,8 +16,6 @@
 #include "msgpacket.h"
 #include "msgconnection.h"
 #include "msgsession.h"
-#include "ac3decoder.h"
-#include "mpadecoder.h"
 #include "sessionlistener.h"
 #include "session.h"
 %}
@@ -52,6 +48,11 @@
 		uint8_t* buffer_dst = (uint8_t*)&BYTE[offset];
 
 		memcpy(buffer_dst, buffer_src, length);
+	}
+
+	void writeBuffer(char* BYTE, int offset, int length) {
+		uint8_t* buffer_src = (uint8_t*)&BYTE[offset];
+		self->put_Blob(buffer_src, length);
 	}
 }
 
@@ -91,18 +92,6 @@
 //
 
 %include "session.h"
-
-//
-// AC3Decoder
-//
-
-%include "ac3decoder.h"
-
-//
-// MpegAudioDecoder
-//
-
-%include "mpadecoder.h"
 
 %pragma(java) jniclasscode=%{
 

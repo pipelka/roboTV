@@ -211,12 +211,20 @@ public class Packet {
     jniwrapJNI.Packet_copy(swigCPtr, this, Packet.getCPtr(p), p);
   }
 
+  public int remaining() {
+    return jniwrapJNI.Packet_remaining(swigCPtr, this);
+  }
+
   public void skipBuffer(int length) {
     jniwrapJNI.Packet_skipBuffer(swigCPtr, this, length);
   }
 
   public void readBuffer(byte[] BYTE, int offset, int length) {
     jniwrapJNI.Packet_readBuffer(swigCPtr, this, BYTE, offset, length);
+  }
+
+  public void writeBuffer(byte[] BYTE, int offset, int length) {
+    jniwrapJNI.Packet_writeBuffer(swigCPtr, this, BYTE, offset, length);
   }
 
   public final static int headerLength = jniwrapJNI.Packet_headerLength_get();

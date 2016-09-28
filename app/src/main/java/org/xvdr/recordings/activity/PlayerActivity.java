@@ -10,11 +10,13 @@ import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.view.SurfaceView;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Format;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.xvdr.extractor.Player;
-import org.xvdr.extractor.RecordingPlayer;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
 import org.xvdr.recordings.model.Movie;
@@ -23,11 +25,13 @@ import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.client.StreamBundle;
 
+import java.io.IOException;
+
 public class PlayerActivity extends Activity implements Player.Listener {
 
     public static final String TAG = "PlayerActivity";
 
-    private RecordingPlayer mPlayer;
+    private Player mPlayer;
     private PlaybackOverlayFragment mControls;
     private Movie mSelectedMovie;
     private MediaSession mSession;
@@ -38,14 +42,18 @@ public class PlayerActivity extends Activity implements Player.Listener {
         setContentView(R.layout.activity_player);
 
         mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
-        mPlayer = new RecordingPlayer(
-            this,
-            SetupUtils.getServer(this),
-            SetupUtils.getLanguageISO3(this),
-            this,
-            SetupUtils.getPassthrough(this),
-            SetupUtils.getSpeakerConfiguration(this)
-        );
+        try {
+            mPlayer = new Player(
+                this,
+                SetupUtils.getServer(this),
+                SetupUtils.getLanguageISO3(this),
+                this,
+                SetupUtils.getPassthrough(this)
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
 
         mSession = new MediaSession(this, "roboTV Movie");
         mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -98,7 +106,21 @@ public class PlayerActivity extends Activity implements Player.Listener {
         long position = getCurrentTime();
 
         PlaybackState.Builder stateBuilder = new PlaybackState.Builder();
-        stateBuilder.setState(mControls.getPlaybackState(), position, 1.0f);
+
+        int playerState = mPlayer.getPlaybackState();
+        int state = PlaybackState.STATE_NONE;
+
+        if(playerState == ExoPlayer.STATE_BUFFERING) {
+            state = PlaybackState.STATE_BUFFERING;
+        }
+        else if(mPlayer.isPaused()) {
+            state = PlaybackState.STATE_PAUSED;
+        }
+        else if(!mPlayer.isPaused()) {
+            state = PlaybackState.STATE_PLAYING;
+        }
+
+        stateBuilder.setState(state, position, 1.0f);
 
         mSession.setPlaybackState(stateBuilder.build());
     }
@@ -119,14 +141,15 @@ public class PlayerActivity extends Activity implements Player.Listener {
         }
 
         String id = mSelectedMovie.getId();
-        mPlayer.openRecording(id, true);
+
+        mPlayer.open(Player.createRecordingUri(id));
         mControls.togglePlayback(true);
 
         mSession.setActive(true);
     }
 
     public int getCurrentTime() {
-        return Math.max((int)(mPlayer.getCurrentPositionWallclock() - mPlayer.getStartPositionWallclock()), 0);
+        return Math.max((int)(mPlayer.getCurrentPosition() - mPlayer.getStartPosition()), 0);
     }
 
     public int getTotalTime() {
@@ -138,11 +161,13 @@ public class PlayerActivity extends Activity implements Player.Listener {
             return (int)mSelectedMovie.getDurationMs();
         }
 
-        if(mPlayer.getEndPositionWallclock() == -1) {
-            return mPlayer.getDurationMs();
+        long duration = mPlayer.getDuration();
+
+        if(duration == C.TIME_UNSET) {
+            return 0;
         }
 
-        return (int)(mPlayer.getEndPositionWallclock() - mPlayer.getStartPositionWallclock());
+        return (int)duration;
     }
 
     @Override
@@ -164,6 +189,9 @@ public class PlayerActivity extends Activity implements Player.Listener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(mPlayer != null) {
+            mPlayer.release();
+        }
     }
 
     @Override
@@ -180,7 +208,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
         mControls.stopProgressAutomation();
 
-        mPlayer.setLastPosition(getCurrentTime());
+        //mPlayer.setLastPosition(getCurrentTime()); - TODO
         mPlayer.stop();
         mPlayer.release();
         mPlayer = null;
@@ -193,15 +221,15 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     public void fastForward(int timeMs) {
-        mPlayer.seekTo(mPlayer.getCurrentPositionWallclock() + timeMs);
+        mPlayer.seek(mPlayer.getCurrentPosition() + timeMs);
     }
 
     public void rewind(int timeMs) {
-        mPlayer.seekTo(mPlayer.getCurrentPositionWallclock() - timeMs);
+        mPlayer.seek(mPlayer.getCurrentPosition() - timeMs);
     }
 
     public void restart() {
-        mPlayer.seekTo(mPlayer.getStartPositionWallclock());
+        mPlayer.seek(mPlayer.getStartPosition());
     }
 
     @Override
@@ -223,15 +251,11 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     @Override
-    public void onAudioTrackChanged(StreamBundle.Stream stream) {
+    public void onAudioTrackChanged(Format format) {
     }
 
     @Override
-    public void onVideoTrackChanged(StreamBundle.Stream stream) {
-    }
-
-    @Override
-    public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+    public void onVideoTrackChanged(Format format) {
     }
 
 }

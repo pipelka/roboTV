@@ -9,7 +9,7 @@ import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 
-import com.google.android.exoplayer.audio.AudioCapabilities;
+import com.google.android.exoplayer2.audio.AudioCapabilities;
 
 import org.xvdr.robotv.R;
 

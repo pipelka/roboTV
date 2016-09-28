@@ -2,6 +2,7 @@ package org.xvdr.recordings.fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
@@ -13,8 +14,6 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.text.TextUtils;
-
-import com.google.android.exoplayer.util.PriorityHandlerThread;
 
 import org.xvdr.recordings.activity.CoverSearchActivity;
 import org.xvdr.recordings.presenter.ArtworkPresenter;
@@ -67,7 +66,7 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
     }
 
     private ArrayObjectAdapter mRowsAdapter;
-    private PriorityHandlerThread mHandlerThread;
+    private HandlerThread mHandlerThread;
     private Handler mHandler;
     private SearchRunnable mDelayedLoad;
 
@@ -75,7 +74,7 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mHandlerThread = new PriorityHandlerThread("robotv:coversearchhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
+        mHandlerThread = new HandlerThread("robotv:coversearchhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
 

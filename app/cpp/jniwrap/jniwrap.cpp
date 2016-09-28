@@ -674,8 +674,6 @@ namespace Swig {
 #include "msgpacket.h"
 #include "msgconnection.h"
 #include "msgsession.h"
-#include "ac3decoder.h"
-#include "mpadecoder.h"
 #include "sessionlistener.h"
 #include "session.h"
 
@@ -687,6 +685,10 @@ SWIGINTERN void MsgPacket_readBuffer(MsgPacket *self,char *BYTE,int offset,int l
 		uint8_t* buffer_dst = (uint8_t*)&BYTE[offset];
 
 		memcpy(buffer_dst, buffer_src, length);
+	}
+SWIGINTERN void MsgPacket_writeBuffer(MsgPacket *self,char *BYTE,int offset,int length){
+		uint8_t* buffer_src = (uint8_t*)&BYTE[offset];
+		self->put_Blob(buffer_src, length);
 	}
 
 
@@ -818,8 +820,6 @@ void SwigDirector_SessionListener::swig_connect_director(JNIEnv *jenv, jobject j
     }
   }
 }
-
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -1526,6 +1526,21 @@ SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1copy(JNIEnv *je
 }
 
 
+SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1remaining(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  MsgPacket *arg1 = (MsgPacket *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MsgPacket **)&jarg1; 
+  result = (int)((MsgPacket const *)arg1)->remaining();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1headerLength_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
@@ -1687,6 +1702,29 @@ SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1readBuffer(JNIE
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
   MsgPacket_readBuffer(arg1,arg2,arg3,arg4);
+  {
+    jenv->ReleaseByteArrayElements(jarg2, (jbyte *) arg2, 0); 
+  }
+  
+}
+
+
+SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Packet_1writeBuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3, jint jarg4) {
+  MsgPacket *arg1 = (MsgPacket *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MsgPacket **)&jarg1; 
+  {
+    arg2 = (char *) jenv->GetByteArrayElements(jarg2, 0); 
+  }
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
+  MsgPacket_writeBuffer(arg1,arg2,arg3,arg4);
   {
     jenv->ReleaseByteArrayElements(jarg2, (jbyte *) arg2, 0); 
   }
@@ -2168,267 +2206,6 @@ SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Session_1setCallback(JN
   arg1 = *(Session **)&jarg1; 
   arg2 = *(SessionListener **)&jarg2; 
   (arg1)->setCallback(arg2);
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1layoutStereo_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (int)Ac3Decoder::LayoutStereo;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1layoutDolby_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (int)Ac3Decoder::LayoutDolby;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1layout50_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (int)Ac3Decoder::Layout50;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1layout51_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (int)Ac3Decoder::Layout51;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1channelLayout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(Ac3Decoder **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1 && sizeof(int) == sizeof((arg1)->ChannelLayout)) *(int*)(void*)&((arg1)->ChannelLayout) = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1channelLayout_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(Ac3Decoder **)&jarg1; 
-  result = (int) ((arg1)->ChannelLayout);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1Ac3Decoder(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jlong jresult = 0 ;
-  int arg1 ;
-  Ac3Decoder *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  result = (Ac3Decoder *)new Ac3Decoder(arg1);
-  *(Ac3Decoder **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1Ac3Decoder(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(Ac3Decoder **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jbyteArray jarg4, jint jarg5, jint jarg6) {
-  jint jresult = 0 ;
-  Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
-  MsgPacket *arg2 = (MsgPacket *) 0 ;
-  int arg3 ;
-  char *arg4 = (char *) 0 ;
-  int arg5 ;
-  int arg6 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(Ac3Decoder **)&jarg1; 
-  arg2 = *(MsgPacket **)&jarg2; 
-  arg3 = (int)jarg3; 
-  {
-    arg4 = (char *) jenv->GetByteArrayElements(jarg4, 0); 
-  }
-  arg5 = (int)jarg5; 
-  arg6 = (int)jarg6; 
-  result = (int)(arg1)->decode(arg2,arg3,arg4,arg5,arg6);
-  jresult = (jint)result; 
-  {
-    jenv->ReleaseByteArrayElements(jarg4, (jbyte *) arg4, 0); 
-  }
-  
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(Ac3Decoder **)&jarg1; 
-  result = (int)(arg1)->getChannels();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(Ac3Decoder **)&jarg1; 
-  result = (int)(arg1)->getSampleRate();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_Ac3Decoder_1getBitRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  Ac3Decoder *arg1 = (Ac3Decoder *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(Ac3Decoder **)&jarg1; 
-  result = (int)(arg1)->getBitRate();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_new_1MpegAudioDecoder(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  MpegAudioDecoder *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (MpegAudioDecoder *)new MpegAudioDecoder();
-  *(MpegAudioDecoder **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_delete_1MpegAudioDecoder(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(MpegAudioDecoder **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_MpegAudioDecoder_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jbyteArray jarg4, jint jarg5, jint jarg6) {
-  jint jresult = 0 ;
-  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
-  MsgPacket *arg2 = (MsgPacket *) 0 ;
-  int arg3 ;
-  char *arg4 = (char *) 0 ;
-  int arg5 ;
-  int arg6 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(MpegAudioDecoder **)&jarg1; 
-  arg2 = *(MsgPacket **)&jarg2; 
-  arg3 = (int)jarg3; 
-  {
-    arg4 = (char *) jenv->GetByteArrayElements(jarg4, 0); 
-  }
-  arg5 = (int)jarg5; 
-  arg6 = (int)jarg6; 
-  result = (int)(arg1)->decode(arg2,arg3,arg4,arg5,arg6);
-  jresult = (jint)result; 
-  {
-    jenv->ReleaseByteArrayElements(jarg4, (jbyte *) arg4, 0); 
-  }
-  
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_MpegAudioDecoder_1getChannels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(MpegAudioDecoder **)&jarg1; 
-  result = (int)(arg1)->getChannels();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_xvdr_jniwrap_jniwrapJNI_MpegAudioDecoder_1getSampleRate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  MpegAudioDecoder *arg1 = (MpegAudioDecoder *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(MpegAudioDecoder **)&jarg1; 
-  result = (int)(arg1)->getSampleRate();
-  jresult = (jint)result; 
-  return jresult;
 }
 
 

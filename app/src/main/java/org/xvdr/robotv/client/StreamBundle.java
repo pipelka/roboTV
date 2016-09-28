@@ -4,8 +4,9 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
-import com.google.android.exoplayer.util.MimeTypes;
+import com.google.android.exoplayer2.util.MimeTypes;
 
+import org.xvdr.extractor.BufferPacket;
 import org.xvdr.jniwrap.Packet;
 
 import java.util.ArrayList;
@@ -111,6 +112,14 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         public String getMimeType() {
             return getMimeTypeFromType(type);
         }
+
+        public float getFrameRate() {
+            if(fpsScale != 0 && fpsRate != 0) {
+                return fpsRate / fpsScale;
+            }
+
+            return 0;
+        }
     }
 
     public StreamBundle() {
@@ -195,11 +204,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         }
     }
 
-    public synchronized void updateFromPacket(final Packet p) {
-        if(p.getMsgID() != Connection.XVDR_STREAM_CHANGE) {
-            return;
-        }
-
+    public synchronized void updateFromPacket(BufferPacket p) {
         clear();
 
         int streamCount = p.getU8();

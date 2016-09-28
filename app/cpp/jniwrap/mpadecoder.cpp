@@ -38,10 +38,10 @@ void MpegAudioDecoder::finish() {
     mad_stream_finish(&mStream);
 }
 
-int MpegAudioDecoder::decode(char* BYTE, int offset, int length) {
+int MpegAudioDecoder::decode(uint8_t* buffer, int length) {
 
     // fill input buffer
-    memcpy(&mInputBuffer[mInputLength], &BYTE[offset], length);
+    memcpy(&mInputBuffer[mInputLength], buffer, length);
     mInputLength += length;
 
     if(mInputLength < 2048) {
@@ -97,23 +97,21 @@ void MpegAudioDecoder::prepareBuffer(const struct mad_header *header, struct mad
     }
 }
 
-bool MpegAudioDecoder::read(char* BYTE, int offset, int length) {
+bool MpegAudioDecoder::read(uint8_t* buffer, int length) {
     if(length < sizeof(mBuffer)) {
         ALOG("output buffer too small !");
         return false;
     }
 
     // copy buffer
-    memcpy(&BYTE[offset], mBuffer, sizeof(mBuffer));
+    memcpy(buffer, mBuffer, sizeof(mBuffer));
     return true;
 }
 
-int MpegAudioDecoder::decode(MsgPacket* p, int src_length, char* BYTE, int offset, int dst_length) {
-    char* src_buffer = (char*)p->consume(src_length);
+int MpegAudioDecoder::decode(uint8_t* src_buffer, int src_length, uint8_t* dst_buffer, int dst_length) {
+    int length = decode(src_buffer, src_length);
 
-    int length = decode(src_buffer, 0, src_length);
-
-    if(length == 0 || !read(BYTE, offset, length)) {
+    if(length == 0 || !read(dst_buffer, length)) {
         return 0;
     }
 

@@ -21,7 +21,7 @@ public:
 
 	virtual ~Ac3Decoder();
 
-	int decode(MsgPacket* p, int src_length, char* BYTE, int offset, int dst_length);
+	int decode(uint8_t* srcBuffer, int srcLength, uint8_t* dstBuffer, int dstLength);
 
 	int getChannels() {
 		return mChannels;

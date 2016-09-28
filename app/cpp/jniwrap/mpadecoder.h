@@ -14,7 +14,7 @@ public:
 
 	virtual ~MpegAudioDecoder();
 
-	int decode(MsgPacket* p, int src_length, char* BYTE, int offset, int dst_length);
+	int decode(uint8_t* src_buffer, int src_length, uint8_t* dst_buffer, int dst_length);
 
 	int getChannels() {
 		return mChannels;
@@ -32,9 +32,9 @@ private:
 
     void prepareBuffer(struct mad_header const *header, struct mad_pcm *pcm);
 
-    int decode(char* BYTE, int offset, int length);
+    int decode(uint8_t* buffer, int length);
 
-    bool read(char* BYTE, int offset, int length);
+    bool read(uint8_t* buffer, int length);
 
 	int mChannels;
 

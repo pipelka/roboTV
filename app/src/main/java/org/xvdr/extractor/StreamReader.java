@@ -1,24 +1,31 @@
 package org.xvdr.extractor;
 
-import com.google.android.exoplayer.C;
-import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.util.MimeTypes;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.extractor.ExtractorInput;
+import com.google.android.exoplayer2.extractor.TrackOutput;
 
-import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.StreamBundle;
 
+import java.io.IOException;
 import java.util.List;
 
-abstract class StreamReader {
+class StreamReader {
 
-    private final PacketQueue output;
+    private static final String TAG = "StreamReader";
+
+    private final TrackOutput output;
     public final StreamBundle.Stream stream;
-    private boolean hasFormat;
 
-    protected StreamReader(PacketQueue output, StreamBundle.Stream stream) {
+    StreamReader(TrackOutput output, StreamBundle.Stream stream) {
         this.output = output;
         this.stream = stream;
-        this.hasFormat = false;
+
+        createFormat();
+    }
+
+    public TrackOutput output() {
+        return output;
     }
 
     public boolean isVideo() {
@@ -29,57 +36,56 @@ abstract class StreamReader {
         return (stream.content == StreamBundle.CONTENT_AUDIO);
     }
 
-    public void consume(Packet p, int size, long timeUs, int flags) {
-        output.sampleData(p, size, timeUs, flags);
+    protected void consume(ExtractorInput input, int size, long timeUs, int flags) throws IOException, InterruptedException {
+        int length = size;
+
+        while(length > 0) {
+            length -= output.sampleData(input, length, false);
+        }
+
+        output.sampleMetadata(timeUs, flags, size, 0, null);
     }
 
-    protected void consume(byte[] p, int size, long timeUs, int flags) {
-        output.sampleData(p, size, timeUs, flags);
-    }
-
-    protected boolean createFormat() {
+    private boolean createFormat() {
         return createFormat(null);
     }
 
-    protected boolean createFormat(List<byte[]> initializationData) {
+    private boolean createFormat(List<byte[]> initializationData) {
+        String mimeType = stream.getMimeType();
+
         if(isAudio()) {
-            format(MediaFormat.createAudioFormat(
+            output.format(Format.createAudioSampleFormat(
                     Integer.toString(stream.physicalId),
-                    stream.getMimeType(),
-                    stream.bitRate,
-                    MediaFormat.NO_VALUE,
-                    C.UNKNOWN_TIME_US,
+                    mimeType,
+                    null,
+                    Format.NO_VALUE,
+                    Format.NO_VALUE,
                     stream.channels,
                     stream.sampleRate,
-                    null,
+                    C.ENCODING_PCM_16BIT,
+                    null, null,
+                    0,
                     stream.language));
             return true;
         }
 
         if(isVideo()) {
-            format(MediaFormat.createVideoFormat(
+            output.format(Format.createVideoSampleFormat(
                     Integer.toString(stream.physicalId), // << trackId
-                    stream.getMimeType(),
-                    MediaFormat.NO_VALUE,
-                    MediaFormat.NO_VALUE,
-                    C.UNKNOWN_TIME_US       ,
+                    mimeType,
+                    null,
+                    Format.NO_VALUE,
+                    Format.NO_VALUE,
                     stream.width,
                     stream.height,
+                    stream.getFrameRate(),
                     initializationData,
-                    MediaFormat.NO_VALUE,
-                    (float)stream.pixelAspectRatio));
+                    0,
+                    (float)stream.pixelAspectRatio,
+                    null));
             return true;
         }
 
         return false;
-    }
-
-    protected boolean hasFormat() {
-        return this.hasFormat;
-    }
-
-    protected void format(MediaFormat format) {
-        output.format(format);
-        this.hasFormat = true;
     }
 }

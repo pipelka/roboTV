@@ -54,6 +54,7 @@ public class jniwrapJNI {
   public final static native boolean Packet_uncompress(long jarg1, Packet jarg1_);
   public final static native void Packet_print(long jarg1, Packet jarg1_);
   public final static native void Packet_copy(long jarg1, Packet jarg1_, long jarg2, Packet jarg2_);
+  public final static native int Packet_remaining(long jarg1, Packet jarg1_);
   public final static native int Packet_headerLength_get();
   public final static native int Packet_checkSumPos_get();
   public final static native int Packet_uncompressedPayloadLengthPos_get();
@@ -67,6 +68,7 @@ public class jniwrapJNI {
   public final static native int Packet_syncPos_get();
   public final static native void Packet_skipBuffer(long jarg1, Packet jarg1_, int jarg2);
   public final static native void Packet_readBuffer(long jarg1, Packet jarg1_, byte[] jarg2, int jarg3, int jarg4);
+  public final static native void Packet_writeBuffer(long jarg1, Packet jarg1_, byte[] jarg2, int jarg3, int jarg4);
   public final static native long new_Connection();
   public final static native void delete_Connection(long jarg1);
   public final static native boolean Connection_open(long jarg1, Connection jarg1_, String jarg2, int jarg3);
@@ -100,23 +102,6 @@ public class jniwrapJNI {
   public final static native long new_Session();
   public final static native void delete_Session(long jarg1);
   public final static native void Session_setCallback(long jarg1, Session jarg1_, long jarg2, SessionListener jarg2_);
-  public final static native int Ac3Decoder_layoutStereo_get();
-  public final static native int Ac3Decoder_layoutDolby_get();
-  public final static native int Ac3Decoder_layout50_get();
-  public final static native int Ac3Decoder_layout51_get();
-  public final static native void Ac3Decoder_channelLayout_set(long jarg1, Ac3Decoder jarg1_, int jarg2);
-  public final static native int Ac3Decoder_channelLayout_get(long jarg1, Ac3Decoder jarg1_);
-  public final static native long new_Ac3Decoder(int jarg1);
-  public final static native void delete_Ac3Decoder(long jarg1);
-  public final static native int Ac3Decoder_decode(long jarg1, Ac3Decoder jarg1_, long jarg2, Packet jarg2_, int jarg3, byte[] jarg4, int jarg5, int jarg6);
-  public final static native int Ac3Decoder_getChannels(long jarg1, Ac3Decoder jarg1_);
-  public final static native int Ac3Decoder_getSampleRate(long jarg1, Ac3Decoder jarg1_);
-  public final static native int Ac3Decoder_getBitRate(long jarg1, Ac3Decoder jarg1_);
-  public final static native long new_MpegAudioDecoder();
-  public final static native void delete_MpegAudioDecoder(long jarg1);
-  public final static native int MpegAudioDecoder_decode(long jarg1, MpegAudioDecoder jarg1_, long jarg2, Packet jarg2_, int jarg3, byte[] jarg4, int jarg5, int jarg6);
-  public final static native int MpegAudioDecoder_getChannels(long jarg1, MpegAudioDecoder jarg1_);
-  public final static native int MpegAudioDecoder_getSampleRate(long jarg1, MpegAudioDecoder jarg1_);
 
 
 static {

@@ -14,35 +14,36 @@ import android.media.tv.TvTrackInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
 
-import com.google.android.exoplayer.ExoPlayer;
-import com.google.android.exoplayer.util.PriorityHandlerThread;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Format;
 
-import org.xvdr.extractor.LiveTvPlayer;
+import org.xvdr.extractor.Player;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.tv.TrackInfoMapper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Listener {
+class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     private static final String TAG = "TVSession";
 
     private Uri mCurrentChannelUri;
     private String mInputId;
 
-    private LiveTvPlayer mPlayer;
+    private Player mPlayer;
     private TvInputService mContext;
 
-    private PriorityHandlerThread mHandlerThread;
+    private HandlerThread mHandlerThread;
     private Handler mHandler;
     private NotificationHandler mNotification;
 
@@ -76,25 +77,33 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
         display.getSize(mDisplaySize);
 
-        // player init
-        mPlayer = new LiveTvPlayer(
-            mContext,
-            SetupUtils.getServer(mContext),                 // XVDR server
-            SetupUtils.getLanguageISO3(mContext),           // Language
-            this,                                           // Listener
-            SetupUtils.getPassthrough(mContext),            // AC3 passthrough
-            SetupUtils.getSpeakerConfiguration(mContext));  // channel layout
-
         mNotification = new NotificationHandler(mContext);
 
-        mHandlerThread = new PriorityHandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
+        mHandlerThread = new HandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
+
+        // player init
+        try {
+            mPlayer = new Player(
+                mContext,
+                SetupUtils.getServer(mContext),                 // Server
+                SetupUtils.getLanguageISO3(mContext),           // Language
+                this,                                           // Listener
+                SetupUtils.getPassthrough(mContext),            // AC3 passthrough
+                SetupUtils.getSpeakerConfiguration(mContext));  // preferred channel configuration
+        }
+        catch (IOException e) {
+            mNotification.error(getResources().getString(R.string.connect_unable));
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onRelease() {
-        mPlayer.release();
+        if(mPlayer != null) {
+            mPlayer.release();
+        }
         mHandlerThread.interrupt();
     }
 
@@ -116,7 +125,9 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
     @Override
     public void onSetStreamVolume(float volume) {
-        mPlayer.setStreamVolume(volume);
+        if(mPlayer != null) {
+            mPlayer.setStreamVolume(volume);
+        }
     }
 
     @Override
@@ -148,52 +159,31 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
     @Override
     public long onTimeShiftGetStartPosition() {
-        long now = System.currentTimeMillis();
-
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return now;
+            return TvInputManager.TIME_SHIFT_INVALID_TIME;
         }
 
-        if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_BUFFERING) {
-            return now;
-        }
-
-        long pos = mPlayer.getStartPositionWallclock();
-
-        // minimum timeshift start position ( now - 24hrs )
-        long minStartPosition = now - 1000 * 60 * 60 * 24;
-
-        if(pos <= minStartPosition) {
-            return minStartPosition;
-        }
-
-        return pos;
+        return mPlayer.getStartPosition();
     }
 
     @Override
     public long onTimeShiftGetCurrentPosition() {
-        long now = System.currentTimeMillis();
-
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return now;
+            return TvInputManager.TIME_SHIFT_INVALID_TIME;
         }
 
-        if(mPlayer == null || mPlayer.getPlaybackState() < ExoPlayer.STATE_BUFFERING) {
-            return now;
-        }
-
-        return mPlayer.getCurrentPositionWallclock();
+        return mPlayer.getCurrentPosition();
     }
 
     @Override
     public void onTimeShiftSeekTo(long timeMs) {
-        mPlayer.seekTo(timeMs);
+        mPlayer.seek(timeMs);
     }
 
     @Override
     public void onTimeShiftSetPlaybackParams(PlaybackParams params) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mPlayer.setPlaybackSpeed((int) params.getSpeed());
+            mPlayer.setPlaybackParams(params);
         }
     }
 
@@ -209,8 +199,6 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
-
         if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
             notifyVideoAvailable();
         }
@@ -276,25 +264,27 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
     }
 
     @Override
-    public void onAudioTrackChanged(StreamBundle.Stream stream) {
-        notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, Integer.toString(stream.physicalId));
+    public void onAudioTrackChanged(Format format) {
+        notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, format.id);
     }
 
     @Override
-    public void onVideoTrackChanged(StreamBundle.Stream stream) {
+    public void onVideoTrackChanged(Format format) {
         ContentValues values = new ContentValues();
 
-        if(stream.height == 720) {
+        int height = format.height;
+
+        if(height == 720) {
             values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_720P);
         }
 
-        if(stream.height > 720 && stream.height <= 1080) {
+        if(height > 720 && height <= 1080) {
             values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_1080I);
         }
-        else if(stream.height == 2160) {
+        else if(height == 2160) {
             values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_2160P);
         }
-        else if(stream.height == 4320) {
+        else if(height == 4320) {
             values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_4320P);
         }
         else {
@@ -305,12 +295,7 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
             Log.e(TAG, "unable to update channel properties");
         }
 
-        notifyTrackSelected(TvTrackInfo.TYPE_VIDEO, Integer.toString(stream.physicalId));
-    }
-
-    @Override
-    public void onAudioTrackUnderrun(int i, long l, long l1) {
-        Log.e(TAG, "audio track underrun");
+        notifyTrackSelected(TvTrackInfo.TYPE_VIDEO, format.id);
     }
 
     private boolean tune(Uri channelUri) {
@@ -322,7 +307,7 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
         notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
         String[] projection = {TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID};
-        int uid = 0;
+        int channelUid = 0;
 
         Cursor cursor = null;
 
@@ -335,7 +320,7 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
             }
 
             cursor.moveToNext();
-            uid = cursor.getInt(0);
+            channelUid = cursor.getInt(0);
         }
         finally {
             if(cursor != null) {
@@ -345,11 +330,12 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
 
         mCurrentChannelUri = channelUri;
 
-        // start player
-        // stream channel
-        String language = SetupUtils.getLanguageISO3(mContext);
+        Uri uri = Player.createLiveUri(channelUid);
 
-        int status = mPlayer.openStream(uid, language);
+        mPlayer.open(uri);
+        mPlayer.play();
+
+        /*int status = mPlayer.openStream(, language);
 
         if(status != Connection.STATUS_SUCCESS) {
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
@@ -370,7 +356,7 @@ class RoboTvSession extends TvInputService.Session implements LiveTvPlayer.Liste
             }
 
             return false;
-        }
+        }*/
 
         Log.i(TAG, "successfully switched channel");
         return true;

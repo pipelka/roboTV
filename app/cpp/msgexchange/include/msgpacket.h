@@ -442,6 +442,9 @@ public:
 	*/
 	void copy(MsgPacket* p);
 
+	inline int remaining() const {
+		return m_usage - m_readposition;
+	}
 	/**
 	Receive packet from socket.
 	Create a new packet from incoming socket data
