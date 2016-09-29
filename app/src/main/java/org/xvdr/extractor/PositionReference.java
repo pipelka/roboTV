@@ -11,6 +11,8 @@ class PositionReference {
     private long endPosition;
     private long currentPosition;
 
+    private boolean trickPlayMode = false;
+
     final private TimestampAdjuster timestampAdjuster = new TimestampAdjuster(TimestampAdjuster.DO_NOT_OFFSET);
 
     PositionReference() {
@@ -70,5 +72,13 @@ class PositionReference {
 
     void resetTimestamp() {
         timestampAdjuster.reset();
+    }
+
+    void setTrickPlayMode(boolean mode) {
+        trickPlayMode = mode;
+    }
+
+    boolean getTrickPlayMode() {
+        return trickPlayMode;
     }
 }

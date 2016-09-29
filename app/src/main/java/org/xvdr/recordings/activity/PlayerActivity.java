@@ -195,10 +195,6 @@ public class PlayerActivity extends Activity implements Player.Listener {
         finishAndRemoveTask();
     }
 
-    public void playPause(boolean doPlay) {
-        mPlayer.pause(!doPlay);
-    }
-
     public void fastForward(int timeMs) {
         mPlayer.seek(mPlayer.getCurrentPosition() + timeMs);
     }
@@ -217,12 +213,12 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     @Override
     public void onDisconnect() {
-        playPause(false);
+        mPlayer.pause();
     }
 
     @Override
     public void onReconnect() {
-        playPause(true);
+        mPlayer.play();
     }
 
     @Override

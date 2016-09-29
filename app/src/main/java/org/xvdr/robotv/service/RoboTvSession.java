@@ -149,12 +149,12 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public void onTimeShiftPause() {
-        mPlayer.pause(true);
+        mPlayer.pause();
     }
 
     @Override
     public void onTimeShiftResume() {
-        mPlayer.pause(false);
+        mPlayer.play();
     }
 
     @Override

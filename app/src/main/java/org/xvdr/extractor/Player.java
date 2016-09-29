@@ -41,12 +41,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     private static final String TAG = "Player";
 
-    public final static int CHANNELS_DEFAULT = 0;
-    public final static int CHANNELS_STEREO = 2;
-    public final static int CHANNELS_SURROUND = 4;
-    public final static int CHANNELS_DIGITAL51 = 6;
-
-    private final static int WIND_UPDATE_PERIOD_MS = 1000;
+    final static int CHANNELS_DEFAULT = 0;
+    final static int CHANNELS_STEREO = 2;
+    final static int CHANNELS_SURROUND = 4;
+    final static int CHANNELS_DIGITAL51 = 6;
 
     public interface Listener  {
 
@@ -78,13 +76,12 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     final private RoboTvDataSourceFactory dataSourceFactory;
     final private RoboTvExtractor.Factory extractorFactory;
     final private PositionReference position;
+    final private TrickPlayController trickPlayController;
 
     private Context mContext;
 
     private boolean mAudioPassthrough;
     private int mChannelConfiguration;
-
-    private Runnable mWindRunnable = null;
 
     static public Uri createLiveUri(int channelUid) {
         return Uri.parse("robotv://livetv/" + channelUid);
@@ -118,14 +115,13 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         }
 
         mHandler = new Handler();
-
         position = new PositionReference();
 
         mVideoRenderer = new MediaCodecVideoRenderer(
                 mContext,
                 MediaCodecSelector.DEFAULT,
                 MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-                2000, // joining time
+                5000, // joining time
                 null,
                 true,
                 mHandler,
@@ -156,9 +152,9 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         DefaultLoadControl loadControl = new DefaultLoadControl(
                 new DefaultAllocator(C.DEFAULT_BUFFER_SEGMENT_SIZE),
                 2000,
-                3000,
-                1000,
-                2000
+                5000,
+                0,
+                3000
         );
 
         mExoPlayer = ExoPlayerFactory.newInstance(renderers, trackSelector, loadControl);
@@ -168,6 +164,8 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         dataSourceFactory.connect(server);
 
         extractorFactory = new RoboTvExtractor.Factory(position, this);
+
+        trickPlayController = new TrickPlayController(mHandler, position, mExoPlayer);
     }
 
     public void release() {
@@ -182,8 +180,6 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         mVideoRenderer = null;
         mInternalAudioRenderer = null;
-
-        //mHandlerThread.interrupt();
     }
 
     public void setSurface(Surface surface) {
@@ -192,18 +188,16 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     public void setStreamVolume(float volume) {
         // TODO - implement stream volume
-        /*if(mInternalAudioRenderer != null) {
-            mExoPlayer.sendMessage(mInternalAudioRenderer, MediaCodecAudioTrackRenderer.MSG_SET_VOLUME, volume);
-        }*/
     }
 
     public void play() {
+        trickPlayController.stop();
         mExoPlayer.setPlayWhenReady(true);
     }
 
-    public void pause(boolean on) {
-        mExoPlayer.setPlayWhenReady(!on);
-        //setPlaybackParams(1);
+    public void pause() {
+        trickPlayController.stop();
+        mExoPlayer.setPlayWhenReady(false);
     }
 
     public boolean isPaused() {
@@ -212,6 +206,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     public void stop() {
         trackSelector.clearAudioTrack();
+        trickPlayController.reset();
         mExoPlayer.stop();
         position.reset();
     }
@@ -279,39 +274,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         mExoPlayer.seekTo(p / 1000);
     }
 
-    private void stopWinding() {
-        if(mWindRunnable == null) {
-            return;
-        }
-
-        mHandler.removeCallbacks(mWindRunnable);
-        mWindRunnable = null;
-    }
-
-    private void startWinding(final int speed) {
-        stopWinding();
-
-        mWindRunnable = new Runnable() {
-            @Override
-            public void run() {
-                long diff = speed * WIND_UPDATE_PERIOD_MS;
-                long pos = getCurrentPosition() + diff;
-
-                Log.d(TAG, "position: " + pos);
-                mExoPlayer.seekTo(pos / 1000);
-
-                mHandler.postDelayed(mWindRunnable, WIND_UPDATE_PERIOD_MS);
-            }
-        };
-
-        mHandler.postDelayed(mWindRunnable, WIND_UPDATE_PERIOD_MS);
-    }
-
     @TargetApi(23)
     public void setPlaybackParams(PlaybackParams params) {
-        params.allowDefaults();
-        sendMessage(mInternalAudioRenderer, C.MSG_SET_PLAYBACK_PARAMS, params);
-        sendMessage(mExoAudioRenderer, C.MSG_SET_PLAYBACK_PARAMS, params);
+        Log.d(TAG, "speed: " + params.getSpeed());
+        trickPlayController.start(params.getSpeed());
     }
 
     private void sendMessage(ExoPlayer.ExoPlayerComponent target, int messageType, Object message) {
@@ -329,7 +295,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         }
     }
 
-    static String nameOfChannelConfiguration(int channelConfiguration) {
+    private static String nameOfChannelConfiguration(int channelConfiguration) {
         switch(channelConfiguration) {
             case CHANNELS_DEFAULT:
                 return "default (unknown)";

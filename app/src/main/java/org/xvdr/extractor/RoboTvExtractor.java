@@ -167,6 +167,10 @@ class RoboTvExtractor implements Extractor {
 
     @Override
     synchronized public void seek(long p) {
+        if(p == 0) {
+            return;
+        }
+
         position.resetTimestamp();
         Log.d(TAG, "seek: " + p);
     }

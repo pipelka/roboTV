@@ -12,13 +12,12 @@ import org.xvdr.robotv.client.Connection;
 
 import java.io.IOException;
 
-public class RoboTvDataSource implements DataSource {
+class RoboTvDataSource implements DataSource {
 
     private final static String TAG = RoboTvDataSource.class.getName();
 
     private String language;
     private Uri uri;
-    private boolean keyFrameMode = false;
     private boolean streaming = false;
 
     final private Connection connection;
@@ -113,16 +112,12 @@ public class RoboTvDataSource implements DataSource {
         uri = null;
     }
 
-    public void setKeyFrameMode(boolean keyFrameMode) {
-        this.keyFrameMode = keyFrameMode;
-    }
-
     @Override
     synchronized public int read(byte[] buffer, int offset, int readLength) throws IOException {
         // request a new packet if we have completely consumed the old one
         if(response.eop()) {
             request.createUid();
-            request.putU8(keyFrameMode ? (short)1 : (short)0);
+            request.putU8(position.getTrickPlayMode() ? (short)1 : (short)0);
 
             if(!connection.transmitMessage(request, response)) {
                 throw new IOException("failed to request packet from server");

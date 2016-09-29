@@ -317,7 +317,12 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
 
     public void togglePlayback(boolean playPause) {
-        ((PlayerActivity) getActivity()).playPause(playPause);
+        if(playPause) {
+            player.play();
+        }
+        else {
+            player.pause();
+        }
         playbackStateChanged();
     }
 }

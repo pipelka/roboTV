@@ -11,9 +11,9 @@ import java.nio.ByteBuffer;
 
 class Ac3Decoder extends RoboTvAudioDecoder {
 
-    final public static int AC3_LAYOUT_STEREO = 2;
-    final public static int AC3_LAYOUT_DOLBY = 10;
-    final public static int AC3_LAYOUT_SURROUND51 = 21; // 3F2R + LFE
+    final static int AC3_LAYOUT_STEREO = 2;
+    final static int AC3_LAYOUT_DOLBY = 10;
+    final static int AC3_LAYOUT_SURROUND51 = 21; // 3F2R + LFE
 
     private final long context;
 
