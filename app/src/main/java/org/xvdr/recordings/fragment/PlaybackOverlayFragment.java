@@ -21,6 +21,7 @@ import android.util.Log;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import org.xvdr.extractor.Player;
 import org.xvdr.recordings.activity.PlayerActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.presenter.DetailsDescriptionPresenter;
@@ -29,11 +30,17 @@ import org.xvdr.robotv.R;
 
 public class PlaybackOverlayFragment extends android.support.v17.leanback.app.PlaybackOverlayFragment {
 
+    private Player player;
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     /* For cardImage loading to playbackRow */
     public class PicassoPlaybackControlsRowTarget implements Target {
         PlaybackControlsRow mPlaybackControlsRow;
 
-        public PicassoPlaybackControlsRowTarget(PlaybackControlsRow playbackControlsRow) {
+        PicassoPlaybackControlsRowTarget(PlaybackControlsRow playbackControlsRow) {
             mPlaybackControlsRow = playbackControlsRow;
         }
 
@@ -175,7 +182,6 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     private void addPlaybackControlsRow() {
         mPlaybackControlsRow = new PlaybackControlsRow(mSelectedMovie);
 
-        mPlaybackControlsRow.setTotalTime(getTotalDurationMs());
         mPlaybackControlsRow.setCurrentTime(0);
         mPlaybackControlsRow.setBufferedProgress(0);
 
@@ -221,18 +227,10 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    int currentTime = getCurrentTime();
-                    int totalTime = getTotalDurationMs();
+                    mPlaybackControlsRow.setTotalTime((int) player.getDuration());
+                    mPlaybackControlsRow.setCurrentTime((int) player.getDurationSinceStart());
 
-                    if(currentTime <= totalTime) {
-                        int oldTotalTime = mPlaybackControlsRow.getTotalTime();
-                        mPlaybackControlsRow.setTotalTime(totalTime);
-                        mPlaybackControlsRow.setCurrentTime(currentTime);
-
-                        if(oldTotalTime != totalTime) {
-                            mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
-                        }
-                    }
+                    mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
 
                     ((PlayerActivity)getActivity()).updatePlaybackState();
 
@@ -251,7 +249,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
     public void playbackStateChanged() {
-        mPlaybackControlsRow.setTotalTime(getTotalDurationMs());
+        mPlaybackControlsRow.setTotalTime((int) player.getDuration());
 
         if(mCurrentPlaybackState != PlaybackState.STATE_PLAYING) {
             mCurrentPlaybackState = PlaybackState.STATE_PLAYING;
@@ -270,35 +268,10 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
             notifyChanged(mPlayPauseAction);
         }
 
-        int currentTime = getCurrentTime();
+        int currentTime = (int) player.getDurationSinceStart();
         mPlaybackControlsRow.setCurrentTime(currentTime);
         mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
 
-    }
-
-    public int getPlaybackState() {
-        return mCurrentPlaybackState;
-    }
-
-    private int getCurrentTime() {
-        PlayerActivity activity = (PlayerActivity) getActivity();
-
-        if(activity == null) {
-            return 0;
-        }
-
-        return activity.getCurrentTime();
-    }
-
-    private int getTotalDurationMs() {
-        PlayerActivity activity = (PlayerActivity) getActivity();
-
-        if(activity == null) {
-            return 0;
-        }
-
-        int total = activity.getTotalTime();
-        return total;
     }
 
     private void notifyChanged(Action action) {
@@ -313,7 +286,6 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
         if(adapter.indexOf(action) >= 0) {
             adapter.notifyArrayItemRangeChanged(adapter.indexOf(action), 1);
-            return;
         }
     }
 

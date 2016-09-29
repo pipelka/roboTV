@@ -10,7 +10,6 @@ import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.view.SurfaceView;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
 import com.squareup.picasso.Picasso;
@@ -54,6 +53,8 @@ public class PlayerActivity extends Activity implements Player.Listener {
             e.printStackTrace();
             return;
         }
+
+        mControls.setPlayer(mPlayer);
 
         mSession = new MediaSession(this, "roboTV Movie");
         mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -103,7 +104,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     public void updatePlaybackState() {
-        long position = getCurrentTime();
+        long position = mPlayer.getDurationSinceStart();
 
         PlaybackState.Builder stateBuilder = new PlaybackState.Builder();
 
@@ -146,28 +147,6 @@ public class PlayerActivity extends Activity implements Player.Listener {
         mControls.togglePlayback(true);
 
         mSession.setActive(true);
-    }
-
-    public int getCurrentTime() {
-        return Math.max((int)(mPlayer.getCurrentPosition() - mPlayer.getStartPosition()), 0);
-    }
-
-    public int getTotalTime() {
-        if(mSelectedMovie == null) {
-            return 0;
-        }
-
-        if(mPlayer == null) {
-            return (int)mSelectedMovie.getDurationMs();
-        }
-
-        long duration = mPlayer.getDuration();
-
-        if(duration == C.TIME_UNSET) {
-            return 0;
-        }
-
-        return (int)duration;
     }
 
     @Override
