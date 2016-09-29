@@ -1,6 +1,9 @@
 package org.xvdr.extractor;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.media.PlaybackParams;
 import android.net.Uri;
@@ -17,6 +20,8 @@ import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.audio.AudioCapabilities;
+import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -25,6 +30,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
@@ -60,8 +66,9 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         void onVideoTrackChanged(Format format);
     }
 
-    private MediaCodecVideoRenderer mVideoRenderer = null;
-    private RoboTvAudioRenderer mAudioRenderer = null;
+    private Renderer mVideoRenderer = null;
+    private Renderer mInternalAudioRenderer = null;
+    private Renderer mExoAudioRenderer = null;
 
     private Listener mListener;
     private Handler mHandler;
@@ -97,14 +104,20 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) throws IOException {
+        AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
+
         mContext = context;
         mListener = listener;
         mAudioPassthrough = audioPassthrough;
-        mChannelConfiguration = CHANNELS_DIGITAL51;
+        mAudioPassthrough = audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3) && audioPassthrough;
+        mChannelConfiguration = Math.min(audioCapabilities.getMaxChannelCount(), wantedChannelConfiguration);
 
-        //mHandlerThread = new HandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
-        //mHandlerThread.start();
-        //mHandler = new Handler(mHandlerThread.getLooper());
+        Log.i(TAG, "audio passthrough: " + (mAudioPassthrough ? "enabled" : "disabled"));
+
+        if(!mAudioPassthrough) {
+            Log.i(TAG, "audio channel configuration: " + nameOfChannelConfiguration(mChannelConfiguration));
+        }
+
         mHandler = new Handler();
 
         position = new PositionReference();
@@ -120,11 +133,22 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
                 this,
                 50);
 
-        mAudioRenderer = new RoboTvAudioRenderer(
+        mInternalAudioRenderer = new RoboTvAudioRenderer(
                 mHandler,
-                null);
+                null,
+                mAudioPassthrough,
+                mChannelConfiguration);
 
-        Renderer[] renderers = { mVideoRenderer, mAudioRenderer };
+        mExoAudioRenderer = new MediaCodecAudioRenderer(
+                MediaCodecSelector.DEFAULT,
+                null,
+                true,
+                mHandler,
+                null,
+                audioCapabilities,
+                AudioManager.STREAM_MUSIC);
+
+        Renderer[] renderers = { mVideoRenderer, mInternalAudioRenderer, mExoAudioRenderer };
 
         trackSelector = new DefaultTrackSelector(mHandler);
         trackSelector.addListener(this);
@@ -158,7 +182,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         dataSourceFactory.release();
 
         mVideoRenderer = null;
-        mAudioRenderer = null;
+        mInternalAudioRenderer = null;
 
         //mHandlerThread.interrupt();
     }
@@ -169,8 +193,8 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     public void setStreamVolume(float volume) {
         // TODO - implement stream volume
-        /*if(mAudioRenderer != null) {
-            mExoPlayer.sendMessage(mAudioRenderer, MediaCodecAudioTrackRenderer.MSG_SET_VOLUME, volume);
+        /*if(mInternalAudioRenderer != null) {
+            mExoPlayer.sendMessage(mInternalAudioRenderer, MediaCodecAudioTrackRenderer.MSG_SET_VOLUME, volume);
         }*/
     }
 
@@ -204,17 +228,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         mExoPlayer.prepare(source);
 
-        ExoPlayer.ExoPlayerMessage[] messages = {
-                new ExoPlayer.ExoPlayerMessage(mVideoRenderer, C.MSG_SET_SURFACE,  mSurface)
-        };
-
-        if (mSurface == null) {
-            mExoPlayer.blockingSendMessages(messages);
-        }
-        else {
-            mExoPlayer.sendMessages(messages);
-        }
-
+        sendMessage(mVideoRenderer, C.MSG_SET_SURFACE, mSurface, true);
         return true;
     }
 
@@ -289,41 +303,26 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         mHandler.postDelayed(mWindRunnable, WIND_UPDATE_PERIOD_MS);
     }
 
+    @TargetApi(23)
     public void setPlaybackParams(PlaybackParams params) {
-        /*Log.d(TAG, "playback speed: " + speed);
+        params.allowDefaults();
+        sendMessage(mInternalAudioRenderer, C.MSG_SET_PLAYBACK_PARAMS, params);
+        sendMessage(mExoAudioRenderer, C.MSG_SET_PLAYBACK_PARAMS, params);
+    }
 
-        // just shift timestamps if we're paused
-        if(isPaused() && speed != 1) {
-            startWinding(speed);
-            return;
-        }
+    private void sendMessage(ExoPlayer.ExoPlayerComponent target, int messageType, Object message) {
+        sendMessage(target, messageType, message, false);
+    }
 
-        if(mWindRunnable != null) {
-            stopWinding();
-            mExoPlayer.seekTo(getCurrentPosition() / 1000);
-        }
+    private void sendMessage(ExoPlayer.ExoPlayerComponent target, int messageType, Object message, boolean blocking) {
+        ExoPlayer.ExoPlayerMessage msg = new ExoPlayer.ExoPlayerMessage(target, messageType, message);
 
-        // TODO - reverse playback
-        if(speed < 0) {
-            return;
-        }*/
-
-        // TODO - handle trick play
-        /*if(speed == mSampleSource.getPlaybackSpeed()) {
-            return;
-        }*/
-
-        // remove pending audio
-        /*mSampleSource.clearAudioTrack();
-
-        if(speed == 1) {
-            mExoPlayer.setSelectedTrack(RoboTvSampleSource.TRACK_AUDIO, ExoPlayer.TRACK_DEFAULT);
+        if(blocking) {
+            mExoPlayer.blockingSendMessages(msg);
         }
         else {
-            mExoPlayer.setSelectedTrack(RoboTvSampleSource.TRACK_AUDIO, ExoPlayer.TRACK_DISABLED);
+            mExoPlayer.sendMessages();
         }
-
-        mSampleSource.setPlaybackParams((int)speed);*/
     }
 
     static String nameOfChannelConfiguration(int channelConfiguration) {
@@ -418,15 +417,21 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         for(int i = 0; i < trackInfo.rendererCount; i++) {
             TrackSelection selection = trackInfo.getTrackSelection(i);
+
+            // skip disabled renderers
+            if(selection == null) {
+                continue;
+            }
+
             Format format = selection.getSelectedFormat();
 
             // selected audio track
-            if(format.sampleMimeType.startsWith("audio")) {
+            if(MimeTypes.isAudio(format.sampleMimeType)) {
                 mListener.onAudioTrackChanged(format);
             }
 
             // selected video track
-            if(format.sampleMimeType.startsWith("video")) {
+            if(MimeTypes.isVideo(format.sampleMimeType)) {
                 mListener.onVideoTrackChanged(format);
             }
         }

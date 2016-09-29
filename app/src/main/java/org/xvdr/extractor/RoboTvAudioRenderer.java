@@ -18,18 +18,29 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
     private static final int NUM_BUFFERS = 16;
 
     private RoboTvAudioDecoder decoder;
+    private boolean ac3Passthrough;
+    private int ac3Layout = Ac3Decoder.AC3_LAYOUT_SURROUND51;
 
-    RoboTvAudioRenderer(Handler eventHandler, AudioRendererEventListener eventListener) {
-        super(eventHandler, eventListener, null, AudioManager.STREAM_MUSIC);
-    }
+    RoboTvAudioRenderer(Handler eventHandler, AudioRendererEventListener eventListener, boolean ac3Passthrough, int channelConfiguration) {
+        super(eventHandler, eventListener);
+        this.ac3Passthrough = ac3Passthrough;
 
-    RoboTvAudioRenderer(Handler eventHandler, AudioRendererEventListener eventListener, AudioCapabilities audioCapabilities, int streamType) {
-        super(eventHandler, eventListener, audioCapabilities, streamType);
+        switch(channelConfiguration) {
+            case Player.CHANNELS_DIGITAL51:
+                ac3Layout = Ac3Decoder.AC3_LAYOUT_SURROUND51;
+                break;
+            case Player.CHANNELS_STEREO:
+                ac3Layout = Ac3Decoder.AC3_LAYOUT_STEREO;
+                break;
+            case Player.CHANNELS_SURROUND:
+                ac3Layout = Ac3Decoder.AC3_LAYOUT_DOLBY;
+                break;
+        }
     }
 
     @Override
     public int supportsFormat(Format format) throws ExoPlaybackException {
-        if(format.sampleMimeType.equals(MimeTypes.AUDIO_AC3)){
+        if(format.sampleMimeType.equals(MimeTypes.AUDIO_AC3) && !ac3Passthrough){
             return FORMAT_HANDLED;
         }
 
@@ -49,7 +60,7 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
         decoder = null;
 
         if(format.sampleMimeType.equals(MimeTypes.AUDIO_AC3)){
-            decoder = new Ac3Decoder(new DecoderInputBuffer[NUM_BUFFERS], new SimpleOutputBuffer[NUM_BUFFERS], format);
+            decoder = new Ac3Decoder(new DecoderInputBuffer[NUM_BUFFERS], new SimpleOutputBuffer[NUM_BUFFERS], ac3Layout);
         }
 
         if(format.sampleMimeType.equals(MimeTypes.AUDIO_MPEG)){
