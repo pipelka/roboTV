@@ -26,7 +26,6 @@ import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
@@ -75,7 +74,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     private Surface mSurface;
 
     final private ExoPlayer mExoPlayer;
-    final private DefaultTrackSelector trackSelector;
+    final private RoboTvTrackSelector trackSelector;
     final private RoboTvDataSourceFactory dataSourceFactory;
     final private RoboTvExtractor.Factory extractorFactory;
     final private PositionReference position;
@@ -150,7 +149,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         Renderer[] renderers = { mVideoRenderer, mInternalAudioRenderer, mExoAudioRenderer };
 
-        trackSelector = new DefaultTrackSelector(mHandler);
+        trackSelector = new RoboTvTrackSelector(mHandler);
         trackSelector.addListener(this);
         trackSelector.setPreferredLanguages(language);
 
@@ -212,6 +211,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public void stop() {
+        trackSelector.clearAudioTrack();
         mExoPlayer.stop();
         position.reset();
     }
@@ -232,8 +232,8 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         return true;
     }
 
-    public boolean selectAudioTrack(int trackId) {
-        return true; // TODO - implement selectAudioTrack
+    public void selectAudioTrack(String trackId) {
+        trackSelector.selectAudioTrack(trackId);
     }
 
     public long getStartPosition() {
@@ -258,6 +258,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     public long getBufferedPosition() {
         long timeUs = mExoPlayer.getBufferedPosition() * 1000;
         return position.positionFromTimeUs(timeUs);
+    }
+
+    public long getDurationSinceStart() {
+        return getCurrentPosition() - getStartPosition();
     }
 
     public long getDuration() {

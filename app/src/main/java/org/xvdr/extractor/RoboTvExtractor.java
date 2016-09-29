@@ -1,7 +1,6 @@
 package org.xvdr.extractor;
 
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.extractor.Extractor;
@@ -10,7 +9,6 @@ import com.google.android.exoplayer2.extractor.ExtractorOutput;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.extractor.PositionHolder;
 import com.google.android.exoplayer2.extractor.SeekMap;
-import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
@@ -183,7 +181,6 @@ class RoboTvExtractor implements Extractor {
 
         if(streamManager.size() == 0) {
             streamManager.createStreams(output, bundle);
-            return;
         }
         else {
             streamManager.updateStreams(bundle);

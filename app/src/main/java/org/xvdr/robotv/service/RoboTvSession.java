@@ -193,8 +193,11 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public boolean onSelectTrack(int type, String trackId) {
-        return type == TvTrackInfo.TYPE_AUDIO && mPlayer.selectAudioTrack(Integer.parseInt(trackId));
+        if(type == TvTrackInfo.TYPE_AUDIO) {
+            mPlayer.selectAudioTrack(trackId);
+        }
 
+        return true;
     }
 
     @Override
