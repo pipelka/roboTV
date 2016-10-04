@@ -25,9 +25,8 @@ import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.upstream.DefaultAllocator;
+import com.google.android.exoplayer2.trackselection.TrackSelections;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
@@ -149,8 +148,8 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         Renderer[] renderers = { mVideoRenderer, mInternalAudioRenderer, mExoAudioRenderer };
 
         trackSelector = new RoboTvTrackSelector(mHandler);
+        trackSelector.setParameters(new RoboTvTrackSelector.Parameters().withPreferredAudioLanguage(language));
         trackSelector.addListener(this);
-        trackSelector.setPreferredLanguages(language);
 
         mExoPlayer = ExoPlayerFactory.newInstance(renderers, trackSelector, new RoboTvLoadControl());
         mExoPlayer.addListener(this);
@@ -376,13 +375,13 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     @Override
-    public void onTracksChanged(MappingTrackSelector.TrackInfo trackInfo) {
+    public void onTrackSelectionsChanged(TrackSelections trackSelections) {
         if(mListener == null) {
             return;
         }
 
-        for(int i = 0; i < trackInfo.rendererCount; i++) {
-            TrackSelection selection = trackInfo.getTrackSelection(i);
+        for(int i = 0; i < trackSelections.length; i++) {
+            TrackSelection selection = trackSelections.get(i);
 
             // skip disabled renderers
             if(selection == null) {
@@ -401,7 +400,6 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
                 mListener.onVideoTrackChanged(format);
             }
         }
-
     }
 
     @Override
