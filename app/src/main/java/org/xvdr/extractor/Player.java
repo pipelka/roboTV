@@ -11,13 +11,12 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 
-
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
@@ -149,15 +148,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         trackSelector.addListener(this);
         trackSelector.setPreferredLanguages(language);
 
-        DefaultLoadControl loadControl = new DefaultLoadControl(
-                new DefaultAllocator(C.DEFAULT_BUFFER_SEGMENT_SIZE),
-                2000,
-                5000,
-                0,
-                3000
-        );
-
-        mExoPlayer = ExoPlayerFactory.newInstance(renderers, trackSelector, loadControl);
+        mExoPlayer = ExoPlayerFactory.newInstance(renderers, trackSelector, new RoboTvLoadControl());
         mExoPlayer.addListener(this);
 
         dataSourceFactory = new RoboTvDataSourceFactory(position, language, this);
