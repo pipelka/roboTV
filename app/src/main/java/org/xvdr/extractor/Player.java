@@ -16,10 +16,10 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
+import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
@@ -35,7 +35,7 @@ import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-public class Player implements ExoPlayer.EventListener, VideoRendererEventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, RoboTvTrackSelector.EventListener {
+public class Player implements ExoPlayer.EventListener, VideoRendererEventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, RoboTvTrackSelector.EventListener, AudioRendererEventListener {
 
     private static final String TAG = "Player";
 
@@ -402,4 +402,30 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
             mListener.onStreamError(status);
         }
     }
+
+    @Override
+    public void onAudioEnabled(DecoderCounters counters) {
+    }
+
+    @Override
+    public void onAudioSessionId(int audioSessionId) {
+    }
+
+    @Override
+    public void onAudioDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
+    }
+
+    @Override
+    public void onAudioInputFormatChanged(Format format) {
+        mListener.onAudioTrackChanged(format);
+    }
+
+    @Override
+    public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+    }
+
+    @Override
+    public void onAudioDisabled(DecoderCounters counters) {
+    }
+
 }
