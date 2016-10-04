@@ -160,8 +160,8 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public long onTimeShiftGetStartPosition() {
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return TvInputManager.TIME_SHIFT_INVALID_TIME;
+        if(mPlayer == null) {
+            return System.currentTimeMillis();
         }
 
         return mPlayer.getStartPosition();
@@ -169,8 +169,8 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public long onTimeShiftGetCurrentPosition() {
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return TvInputManager.TIME_SHIFT_INVALID_TIME;
+        if(mPlayer == null) {
+            return System.currentTimeMillis();
         }
 
         return mPlayer.getCurrentPosition();
@@ -183,9 +183,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public void onTimeShiftSetPlaybackParams(PlaybackParams params) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mPlayer.setPlaybackParams(params);
-        }
+        mPlayer.setPlaybackParams(params);
     }
 
     @Override

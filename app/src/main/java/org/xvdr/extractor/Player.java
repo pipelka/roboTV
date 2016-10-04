@@ -235,13 +235,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     public long getCurrentPosition() {
         long timeUs = mExoPlayer.getCurrentPosition() * 1000;
-        long pos = position.positionFromTimeUs(timeUs);
-
-        if(pos < position.getStartPosition()) {
-            pos = position.getStartPosition();
-        }
-
-        return pos;
+        return Math.max(position.positionFromTimeUs(timeUs), position.getStartPosition());
     }
 
     public long getBufferedPosition() {
@@ -262,7 +256,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public void seek(long position) {
-        long p = this.position.timeUsFromPosition(position);
+        long p = this.position.timeUsFromPosition(Math.max(position, this.position.getStartPosition()));
 
         Log.d(TAG, "seek position   : " + (position / 1000) + " sec");
         mExoPlayer.seekTo(p / 1000);

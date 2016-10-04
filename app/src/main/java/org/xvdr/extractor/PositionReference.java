@@ -24,6 +24,7 @@ class PositionReference {
         endPosition = C.TIME_UNSET;
         currentPosition = startPosition;
     }
+
     void set(long timeUs, long wallClockTime) {
         this.timeUs = timeUs;
         this.currentPosition = wallClockTime;
@@ -34,10 +35,6 @@ class PositionReference {
     }
 
     void setStartPosition(long pos) {
-        // start position is monotonic increasing (and behind current position)
-        if(pos > currentPosition || pos <= startPosition) {
-            return;
-        }
         startPosition = pos;
     }
 
@@ -81,4 +78,5 @@ class PositionReference {
     boolean getTrickPlayMode() {
         return trickPlayMode;
     }
+
 }
