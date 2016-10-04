@@ -41,10 +41,12 @@ class TrickPlayController {
         startTime = System.currentTimeMillis();
         startPosition = position.positionFromTimeUs(player.getCurrentPosition() * 1000);
         playbackSpeed = (int) speed;
-        started = true;
         position.setTrickPlayMode(true);
 
-        handler.post(doTick);
+        if(!started) {
+            handler.post(doTick);
+        }
+        started = true;
     }
 
     private void tick() {
@@ -62,13 +64,10 @@ class TrickPlayController {
 
         handler.removeCallbacks(doTick);
         position.setTrickPlayMode(false);
-        player.setPlayWhenReady(true);
-        started = false;
-    }
 
-    void reset() {
-        stop();
+        tick();
         playbackSpeed = 1;
+        started = false;
+        player.setPlayWhenReady(true);
     }
 }
-
