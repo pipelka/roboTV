@@ -233,4 +233,12 @@ public class PlayerActivity extends Activity implements Player.Listener {
     public void onVideoTrackChanged(Format format) {
     }
 
+    @Override
+    public void onRenderedFirstFrame(Surface surface) {
+    }
+
+    @Override
+    public void onStreamError(int status) {
+    }
+
 }

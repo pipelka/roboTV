@@ -8,10 +8,9 @@ import org.xvdr.jniwrap.Packet;
 import org.xvdr.jniwrap.SessionListener;
 import org.xvdr.robotv.client.Connection;
 
-import java.io.IOError;
 import java.io.IOException;
 
-public class RoboTvDataSourceFactory implements DataSource.Factory {
+class RoboTvDataSourceFactory implements DataSource.Factory {
 
     private Connection connection;
 
@@ -24,6 +23,7 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
 
         void onReconnect();
 
+        void onStreamError(int status);
     }
 
     private SessionListener sessionListener = new SessionListener() {
@@ -62,12 +62,20 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
     };
 
     RoboTvDataSourceFactory(PositionReference position, String language, Listener listener) {
+        this.listener = listener;
+
         connection = new Connection("roboTV:streaming", language);
         connection.setCallback(sessionListener);
 
-        dataSource = new RoboTvDataSource(position, connection, language);
+        dataSource = new RoboTvDataSource(position, connection, language, new RoboTvDataSource.Listener() {
+            @Override
+            public void onOpenStreamError(int status) {
+                if(RoboTvDataSourceFactory.this.listener != null) {
+                    RoboTvDataSourceFactory.this.listener.onStreamError(status);
+                }
+            }
+        });
 
-        this.listener = listener;
     }
 
     @Override

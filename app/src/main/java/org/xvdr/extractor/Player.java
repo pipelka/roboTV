@@ -36,7 +36,7 @@ import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-public class Player implements ExoPlayer.EventListener, VideoRendererEventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, MappingTrackSelector.EventListener {
+public class Player implements ExoPlayer.EventListener, VideoRendererEventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, RoboTvTrackSelector.EventListener {
 
     private static final String TAG = "Player";
 
@@ -60,6 +60,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         void onAudioTrackChanged(Format format);
 
         void onVideoTrackChanged(Format format);
+
+        void onRenderedFirstFrame(Surface surface);
+
+        void onStreamError(int status);
     }
 
     private Renderer mVideoRenderer = null;
@@ -354,6 +358,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     @Override
     public void onRenderedFirstFrame(Surface surface) {
+        mListener.onRenderedFirstFrame(surface);
     }
 
     @Override
@@ -399,4 +404,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     }
 
+    @Override
+    public void onStreamError(int status) {
+        if(mListener != null) {
+            mListener.onStreamError(status);
+        }
+    }
 }

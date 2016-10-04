@@ -25,6 +25,7 @@ import com.google.android.exoplayer2.Format;
 
 import org.xvdr.extractor.Player;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.tv.TrackInfoMapper;
@@ -202,6 +203,9 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
+            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
+        }
         if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
             notifyVideoAvailable();
         }
@@ -298,6 +302,28 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         notifyTrackSelected(TvTrackInfo.TYPE_VIDEO, format.id);
     }
 
+    @Override
+    public void onRenderedFirstFrame(Surface surface) {
+        notifyVideoAvailable();
+    }
+
+    @Override
+    public void onStreamError(int status) {
+        switch(status) {
+            case Connection.STATUS_RECEIVERS_BUSY:
+                mNotification.notify(getResources().getString(R.string.receivers_busy));
+                break;
+
+            case Connection.STATUS_BLOCKED_BY_RECORDING:
+                mNotification.notify(getResources().getString(R.string.blocked_by_recording));
+                break;
+
+            default:
+                mNotification.error(getResources().getString(R.string.failed_tune));
+                break;
+        }
+    }
+
     private boolean tune(Uri channelUri) {
         if(mPlayer == null) {
             return false;
@@ -334,29 +360,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         mPlayer.open(uri);
         mPlayer.play();
-
-        /*int status = mPlayer.openStream(, language);
-
-        if(status != Connection.STATUS_SUCCESS) {
-            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
-            Log.d(TAG, "status: " + status);
-
-            switch(status) {
-                case Connection.STATUS_RECEIVERS_BUSY:
-                    mNotification.notify(getResources().getString(R.string.receivers_busy));
-                    break;
-
-                case Connection.STATUS_BLOCKED_BY_RECORDING:
-                    mNotification.notify(getResources().getString(R.string.blocked_by_recording));
-                    break;
-
-                default:
-                    mNotification.error(getResources().getString(R.string.failed_tune));
-                    break;
-            }
-
-            return false;
-        }*/
 
         Log.i(TAG, "successfully switched channel");
         return true;

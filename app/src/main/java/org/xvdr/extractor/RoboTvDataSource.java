@@ -11,10 +11,17 @@ import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Connection;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 
 class RoboTvDataSource implements DataSource {
 
     private final static String TAG = RoboTvDataSource.class.getName();
+
+    public interface Listener {
+
+        void onOpenStreamError(int status);
+
+    }
 
     private String language;
     private Uri uri;
@@ -24,11 +31,13 @@ class RoboTvDataSource implements DataSource {
     final private Packet request;
     final private Packet response;
     final private PositionReference position;
+    final private Listener listener;
 
-    RoboTvDataSource(PositionReference position, Connection connection, String language) {
+    RoboTvDataSource(PositionReference position, Connection connection, String language, Listener listener) {
         this.language = language;
         this.connection = connection;
         this.position = position;
+        this.listener = listener;
 
         response = new Packet();
         request = connection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
@@ -49,7 +58,8 @@ class RoboTvDataSource implements DataSource {
         // check if we should seek
         if(streaming && (lastUri != null && uri.equals(lastUri))) {
             long seekPosition = dataSpec.position;
-            Log.d(TAG, "start at position: " + seekPosition);
+            Log.d(TAG, "seek to position: " + seekPosition);
+
             connection.seek(seekPosition);
             return C.LENGTH_UNSET;
         }
@@ -67,42 +77,55 @@ class RoboTvDataSource implements DataSource {
         String type = uri.getHost();
         switch(type) {
             case "livetv":
-                openLiveTv(uri);
+                streaming = openLiveTv(uri);
                 break;
             case "recording":
-                openRecording(uri);
+                streaming = openRecording(uri);
                 break;
             default:
                 throw new IOException("unsupported stream type: " + type + ")");
         }
 
-        streaming = true;
         return C.LENGTH_UNSET;
     }
 
-    private void openLiveTv(Uri uri) throws IOException {
+    private boolean openLiveTv(Uri uri) throws IOException {
         String path = uri.getPath();
         int channelUid = Integer.parseInt(path.substring(1));
 
         int status = connection.openStream(channelUid, language, false, 50);
 
-        if (status != Connection.STATUS_SUCCESS) {
-            throw new IOException("unable to start streaming (status " + status + ")");
+        if (status == Connection.STATUS_SUCCESS) {
+            Log.d(TAG, "live stream opened");
+            return true;
         }
 
-        Log.d(TAG, "live stream opened");
+        Log.e(TAG, "unable to open live stream (status: " + status + ")");
+
+        if(listener != null) {
+            listener.onOpenStreamError(status);
+        }
+
+        return false;
     }
 
-    private void openRecording(Uri uri) throws IOException {
+    private boolean openRecording(Uri uri) throws IOException {
         String recordingId = uri.getPath().substring(1);
 
         int status = connection.openRecording(recordingId);
 
-        if (status != Connection.STATUS_SUCCESS) {
-            throw new IOException("unable to open recording (status " + status + ")");
+        if (status == Connection.STATUS_SUCCESS) {
+            Log.d(TAG, "recording opened");
+            return true;
         }
 
-        Log.d(TAG, "recording opened");
+        Log.e(TAG, "unable to open recording (status: " + status + ")");
+
+        if(listener != null) {
+            listener.onOpenStreamError(status);
+        }
+
+        return false;
     }
 
     public void release() {
@@ -115,7 +138,12 @@ class RoboTvDataSource implements DataSource {
     @Override
     synchronized public int read(byte[] buffer, int offset, int readLength) throws IOException {
         // request a new packet if we have completely consumed the old one
-        if(response.eop()) {
+        while(response.eop()) {
+
+            if(Thread.interrupted()) {
+                throw new InterruptedIOException();
+            }
+
             request.createUid();
             request.putU8(position.getTrickPlayMode() ? (short)1 : (short)0);
 
@@ -124,8 +152,14 @@ class RoboTvDataSource implements DataSource {
             }
 
             // empty packet ??
-            if(response.eop()) {
-                return 0;
+            try {
+                if(response.eop()) {
+                    Thread.sleep(100);
+                    continue;
+                }
+            }
+            catch (InterruptedException e) {
+                throw new InterruptedIOException();
             }
 
             // start position of stream (wallclock time)
