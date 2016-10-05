@@ -104,4 +104,6 @@
     <string name="recordings_setup_title">Setup</string>
     <string name="setup_root_timeshift_title">Timeshift activated</string>
     <string name="setup_timeshift_desc">Enable timeshift for Live TV</string>
+    <string name="audiotrack">Audiotrack</string>
+    <string name="fail_to_load_movielist">Fail to load movie data from server</string>
 </resources>

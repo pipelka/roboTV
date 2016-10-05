@@ -127,6 +127,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                         new Action(
                             ACTION_EDIT,
                             getResources().getString(R.string.change_cover),
+                            null,
                             null
                         )
                        );
@@ -134,6 +135,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                         new Action(
                             ACTION_MOVE,
                             getResources().getString(R.string.move_folder),
+                            null,
                             null
                         )
                        );

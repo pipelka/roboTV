@@ -51,6 +51,11 @@ public class RecordingsFragment extends BrowseFragment {
 
         @Override
         public void onCompleted(MovieCollectionAdapter adapter) {
+            if(adapter == null) {
+                mNotification.error(getString(R.string.fail_to_load_movielist));
+                return;
+            }
+
             FragmentManager fragmentManager = getFragmentManager();
 
             if(fragmentManager != null) {

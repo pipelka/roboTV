@@ -15,7 +15,12 @@ public class PicassoBackgroundManagerTarget implements Target {
 
     @Override
     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
-        this.mBackgroundManager.setBitmap(bitmap);
+        try {
+            this.mBackgroundManager.setBitmap(bitmap);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

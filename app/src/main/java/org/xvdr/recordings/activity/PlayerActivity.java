@@ -8,8 +8,10 @@ import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.view.Surface;
 import android.view.SurfaceView;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
 import com.squareup.picasso.Picasso;
@@ -43,13 +45,15 @@ public class PlayerActivity extends Activity implements Player.Listener {
         mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
         try {
             mPlayer = new Player(
-                this,
-                SetupUtils.getServer(this),
-                SetupUtils.getLanguageISO3(this),
-                this,
-                SetupUtils.getPassthrough(this)
-            );
-        } catch (IOException e) {
+                    this,
+                    SetupUtils.getServer(this),                     // Server
+                    SetupUtils.getLanguageISO3(this),               // Language
+                    this,                                           // Listener
+                    SetupUtils.getPassthrough(this),                // AC3 passthrough
+                    SetupUtils.getSpeakerConfiguration(this),       // preferred channel configuration
+                    new DefaultLoadControl());                      // Default LoadControl
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return;
         }
@@ -195,18 +199,6 @@ public class PlayerActivity extends Activity implements Player.Listener {
         finishAndRemoveTask();
     }
 
-    public void fastForward(int timeMs) {
-        mPlayer.seek(mPlayer.getCurrentPosition() + timeMs);
-    }
-
-    public void rewind(int timeMs) {
-        mPlayer.seek(mPlayer.getCurrentPosition() - timeMs);
-    }
-
-    public void restart() {
-        mPlayer.seek(mPlayer.getStartPosition());
-    }
-
     @Override
     public void onPlayerError(Exception e) {
     }
@@ -222,11 +214,23 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     @Override
-    public void onTracksChanged(StreamBundle bundle) {
+    public void onTracksChanged(final StreamBundle bundle) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mControls.updateAudioTracks(bundle);
+            }
+        });
     }
 
     @Override
-    public void onAudioTrackChanged(Format format) {
+    public void onAudioTrackChanged(final Format format) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mControls.updateAudioTrackSelection(Long.parseLong(format.id));
+            }
+        });
     }
 
     @Override
