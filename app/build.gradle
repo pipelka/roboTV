@@ -3,8 +3,8 @@ import org.apache.tools.ant.taskdefs.condition.Os
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.2'
+    compileSdkVersion project.ext.compileSdkVersion
+    buildToolsVersion project.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "org.xvdr.robotv"
@@ -49,5 +49,5 @@ dependencies {
     compile 'com.android.support:leanback-v17:24.2.1'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.google.android.exoplayer:exoplayer:r2.0.0'
+    compile files('libs/library.jar')
 }

@@ -5,6 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.novoda:bintray-release:0.3.4'
         classpath 'org.ajoberstar:grgit:1.1.0'
     }
 }
@@ -12,6 +13,11 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+    }
+    project.ext {
+        compileSdkVersion=24
+        targetSdkVersion=24
+        buildToolsVersion='24.0.2'
     }
 }
 
