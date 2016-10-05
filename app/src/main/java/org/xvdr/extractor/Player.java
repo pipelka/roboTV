@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
@@ -102,6 +103,18 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) throws IOException {
+        this(
+            context,
+            server,
+            language,
+            listener,
+            audioPassthrough,
+            wantedChannelConfiguration,
+            new RoboTvLoadControl()
+        );
+    }
+
+    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration, LoadControl loadControl) throws IOException {
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
         mContext = context;
@@ -151,7 +164,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         trackSelector.setParameters(new RoboTvTrackSelector.Parameters().withPreferredAudioLanguage(language));
         trackSelector.addListener(this);
 
-        mExoPlayer = ExoPlayerFactory.newInstance(renderers, trackSelector, new RoboTvLoadControl());
+        mExoPlayer = ExoPlayerFactory.newInstance(renderers, trackSelector, loadControl);
         mExoPlayer.addListener(this);
 
         dataSourceFactory = new RoboTvDataSourceFactory(position, language, this);
