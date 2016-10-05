@@ -29,6 +29,7 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelections;
 import com.google.android.exoplayer2.util.MimeTypes;
+import com.google.android.exoplayer2.util.PriorityHandlerThread;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
@@ -71,6 +72,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     private Renderer mExoAudioRenderer = null;
 
     private Listener mListener;
+    private PriorityHandlerThread handlerThread;
     private Handler mHandler;
     private Surface mSurface;
 
@@ -129,7 +131,11 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
             Log.i(TAG, "audio channel configuration: " + nameOfChannelConfiguration(mChannelConfiguration));
         }
 
-        mHandler = new Handler();
+        handlerThread = new PriorityHandlerThread("roboTV:player", PriorityHandlerThread.NORM_PRIORITY);
+        handlerThread.start();
+
+        mHandler = new Handler(handlerThread.getLooper());
+
         position = new PositionReference();
 
         mVideoRenderer = new MediaCodecVideoRenderer(
@@ -225,7 +231,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
                 uri,
                 dataSourceFactory,
                 extractorFactory,
-                null, null
+                mHandler, null
         );
 
         mExoPlayer.prepare(source);
