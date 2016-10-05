@@ -8,7 +8,7 @@ import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.robotv.client.StreamBundle;
 
-public class StreamManager extends SparseArray<StreamReader> {
+class StreamManager extends SparseArray<StreamReader> {
 
     private static final String TAG = "StreamManager";
 
@@ -56,33 +56,35 @@ public class StreamManager extends SparseArray<StreamReader> {
 
             // there's a new pid in the stream. try to find a reader (pid) that is currently
             // unused (managed by StreamManager but not present in the StreamBundle)
-            StreamReader reader = null;
+            StreamReader maybeUnusedReader = null;
+            int maybeUnusedPid = 0;
+
             for(int i = 0; i < size(); i++) {
-                int p = keyAt(i);
-                reader = get(p);
+                maybeUnusedReader = valueAt(i);
+                maybeUnusedPid = keyAt(i);
 
                 // skip dead entries
-                if(reader == null) {
+                if(maybeUnusedReader == null) {
                     continue;
                 }
 
-                // skip if the pid of the reader is in the bundle
-                int maybeUnusedPid = reader.stream.physicalId;
-                if(bundle.getStreamOfPid(maybeUnusedPid) != null) {
-                    reader = null;
-                    continue;
+                // exit if we found an unused reader
+                if(bundle.getStreamOfPid(maybeUnusedPid) == null) {
+                    break;
                 }
+
+                maybeUnusedReader = null;
             }
 
             // found unused reader ?
-            if(reader != null) {
-                remove(reader.stream.physicalId);
-                put(pid, new StreamReader(reader.output(), stream));
-                Log.i(TAG, "replaced unused stream " + reader.stream.physicalId + " with new stream " + pid);
-                return;
+            if(maybeUnusedReader != null) {
+                remove(maybeUnusedPid);
+                put(pid, new StreamReader(maybeUnusedReader.output(), stream));
+                Log.i(TAG, "replaced unused stream " + maybeUnusedPid + " with new stream " + pid);
             }
-
-            Log.i(TAG, "no more space for new stream " + pid);
+            else {
+                Log.i(TAG, "no more space for new stream " + pid);
+            }
         }
     }
 }
