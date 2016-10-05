@@ -31,7 +31,7 @@ class Ac3Decoder extends RoboTvAudioDecoder {
      * @param inputBuffers  An array of nulls that will be used to store references to input buffers.
      * @param outputBuffers An array of nulls that will be used to store references to output buffers.
      */
-    protected Ac3Decoder(DecoderInputBuffer[] inputBuffers, SimpleOutputBuffer[] outputBuffers, int layout) {
+    Ac3Decoder(DecoderInputBuffer[] inputBuffers, SimpleOutputBuffer[] outputBuffers, int layout) {
         super(inputBuffers, outputBuffers);
         setInitialInputBufferSize(4096);
         context = init(layout);

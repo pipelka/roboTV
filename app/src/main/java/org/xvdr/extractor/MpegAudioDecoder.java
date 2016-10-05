@@ -4,7 +4,6 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.audio.AudioDecoderException;
 import com.google.android.exoplayer2.decoder.DecoderInputBuffer;
-import com.google.android.exoplayer2.decoder.SimpleDecoder;
 import com.google.android.exoplayer2.decoder.SimpleOutputBuffer;
 import com.google.android.exoplayer2.util.MimeTypes;
 
@@ -28,7 +27,7 @@ class MpegAudioDecoder extends RoboTvAudioDecoder {
      * @param inputBuffers  An array of nulls that will be used to store references to input buffers.
      * @param outputBuffers An array of nulls that will be used to store references to output buffers.
      */
-    protected MpegAudioDecoder(DecoderInputBuffer[] inputBuffers, SimpleOutputBuffer[] outputBuffers, Format format) {
+    MpegAudioDecoder(DecoderInputBuffer[] inputBuffers, SimpleOutputBuffer[] outputBuffers, Format format) {
         super(inputBuffers, outputBuffers);
         setInitialInputBufferSize(4096);
         context = init();

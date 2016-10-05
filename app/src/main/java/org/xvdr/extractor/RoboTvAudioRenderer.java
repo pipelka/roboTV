@@ -1,11 +1,11 @@
 package org.xvdr.extractor;
 
-import android.media.AudioManager;
 import android.os.Handler;
+import android.util.Log;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioDecoderException;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.SimpleDecoderAudioRenderer;
@@ -15,7 +15,9 @@ import com.google.android.exoplayer2.util.MimeTypes;
 
 class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
 
-    private static final int NUM_BUFFERS = 16;
+    private static final String TAG = "RoboTvAudioRenderer";
+
+    private static final int NUM_BUFFERS = 2;
 
     private RoboTvAudioDecoder decoder;
     private boolean ac3Passthrough;
@@ -72,7 +74,27 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
 
     @Override
     public Format getOutputFormat() {
-        return decoder.getOutputFormat();
+        Format inputFormat = super.getOutputFormat();
+        Format outputFormat = decoder.getOutputFormat();
+
+        Format format = Format.createAudioSampleFormat(
+                inputFormat.id,
+                outputFormat.sampleMimeType,
+                null,
+                Format.NO_VALUE,
+                Format.NO_VALUE,
+                outputFormat.channelCount > 0 ? outputFormat.channelCount : inputFormat.channelCount,
+                outputFormat.sampleRate > 0 ? outputFormat.sampleRate : inputFormat.sampleRate,
+                C.ENCODING_PCM_16BIT,
+                null, null,
+                0,
+                inputFormat.language);
+
+        Log.d(TAG, "output format:");
+        Log.d(TAG, "Channels: " + format.channelCount);
+        Log.d(TAG, "Samplerate: " + format.sampleRate + " Hz");
+
+        return format;
     }
 
 }
