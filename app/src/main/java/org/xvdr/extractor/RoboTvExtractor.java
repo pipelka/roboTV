@@ -136,16 +136,11 @@ class RoboTvExtractor implements Extractor {
 
         StreamReader reader = streamManager.get(pid);
 
-        if(reader == null) {
-            Log.d(TAG, "invalid stream pid: " + pid);
-        }
-
         // convert TS -> timeUs
         long timeUs = position.adjustTimestamp(pts);
 
         // unknown stream ?
         if(reader == null) {
-            Log.d(TAG, "packet skipped");
             input.skipFully(size);
             input.skipFully(8);
             return RESULT_CONTINUE;
@@ -159,18 +154,12 @@ class RoboTvExtractor implements Extractor {
 
         scratch.read(input, 8);
 
-        long p = scratch.getU64();
-        position.set(timeUs, p);
-
+        position.set(timeUs, scratch.getU64());
         return RESULT_CONTINUE;
     }
 
     @Override
     synchronized public void seek(long p) {
-        if(p == 0) {
-            return;
-        }
-
         position.resetTimestamp();
         Log.d(TAG, "seek: " + p);
     }
@@ -184,9 +173,11 @@ class RoboTvExtractor implements Extractor {
         bundle.updateFromPacket(p);
 
         if(streamManager.size() == 0) {
+            Log.d(TAG, "create streams");
             streamManager.createStreams(output, bundle);
         }
         else {
+            Log.d(TAG, "update streams");
             streamManager.updateStreams(bundle);
         }
 
