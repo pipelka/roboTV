@@ -21,6 +21,8 @@ public class FolderList extends TreeSet<String> {
             return null;
         }
 
+        response.uncompress();
+
         FolderList result = new FolderList();
 
         while(!response.eop()) {
