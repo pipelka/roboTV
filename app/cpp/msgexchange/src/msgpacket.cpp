@@ -553,7 +553,7 @@ bool MsgPacket::readstream(std::istream& in, MsgPacket& p) {
 	uint8_t* header = p.getPacket();
 
 	if(header == NULL) {
-		return NULL;
+		return false;
 	}
 
 	// try to find sync
@@ -646,7 +646,7 @@ bool MsgPacket::compress(int level) {
 	uLongf compressedsize = uncompressedsize;
 
 	if(compressed == NULL) {
-		return NULL;
+		return false;
 	}
 
 	if(::compress2(compressed, &compressedsize, getPayload(), uncompressedsize, level) != Z_OK) {
