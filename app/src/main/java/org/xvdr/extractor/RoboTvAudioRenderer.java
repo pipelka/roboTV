@@ -74,21 +74,7 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
 
     @Override
     public Format getOutputFormat() {
-        Format inputFormat = super.getOutputFormat();
-        Format outputFormat = decoder.getOutputFormat();
-
-        Format format = Format.createAudioSampleFormat(
-                inputFormat.id,
-                outputFormat.sampleMimeType,
-                null,
-                Format.NO_VALUE,
-                Format.NO_VALUE,
-                outputFormat.channelCount > 0 ? outputFormat.channelCount : inputFormat.channelCount,
-                outputFormat.sampleRate > 0 ? outputFormat.sampleRate : inputFormat.sampleRate,
-                C.ENCODING_PCM_16BIT,
-                null, null,
-                0,
-                inputFormat.language);
+        Format format = decoder.getOutputFormat();
 
         Log.d(TAG, "output format:");
         Log.d(TAG, "Channels: " + format.channelCount);

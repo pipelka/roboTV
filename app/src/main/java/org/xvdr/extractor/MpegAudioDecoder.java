@@ -29,7 +29,7 @@ class MpegAudioDecoder extends RoboTvAudioDecoder {
      */
     MpegAudioDecoder(DecoderInputBuffer[] inputBuffers, SimpleOutputBuffer[] outputBuffers, Format format) {
         super(inputBuffers, outputBuffers);
-        setInitialInputBufferSize(4096);
+        setInitialInputBufferSize(8192);
         context = init();
     }
 
@@ -45,7 +45,7 @@ class MpegAudioDecoder extends RoboTvAudioDecoder {
 
     @Override
     protected AudioDecoderException decode(DecoderInputBuffer inputBuffer, SimpleOutputBuffer outputBuffer, boolean reset) {
-        ByteBuffer outputData = outputBuffer.init(inputBuffer.timeUs, 32768);
+        ByteBuffer outputData = outputBuffer.init(inputBuffer.timeUs, 1152*4);
 
         int size = decode(context, inputBuffer.data, inputBuffer.data.limit(), outputData);
 
