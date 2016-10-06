@@ -23,7 +23,9 @@ import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
+import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
+import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -155,8 +157,29 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
                 mAudioPassthrough,
                 mChannelConfiguration);
 
+        // codecSelector disabling MPEG audio (handled by RoboTvAudioDecoder)
+        MediaCodecSelector codecSelector = new MediaCodecSelector() {
+            @Override
+            public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder) throws MediaCodecUtil.DecoderQueryException {
+                if(mimeType.equals(MimeTypes.AUDIO_MPEG)) {
+                    return null;
+                }
+
+                if(mimeType.equals(MimeTypes.AUDIO_AC3) && !mAudioPassthrough) {
+                    return null;
+                }
+
+                return MediaCodecUtil.getDecoderInfo(mimeType, requiresSecureDecoder);
+            }
+
+            @Override
+            public MediaCodecInfo getPassthroughDecoderInfo() throws MediaCodecUtil.DecoderQueryException {
+                return MediaCodecUtil.getPassthroughDecoderInfo();
+            }
+        };
+
         mExoAudioRenderer = new MediaCodecAudioRenderer(
-                MediaCodecSelector.DEFAULT,
+                codecSelector,
                 null,
                 true,
                 mHandler,
