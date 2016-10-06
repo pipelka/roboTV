@@ -17,42 +17,26 @@ public:
 	int decode(uint8_t* src_buffer, int src_length, uint8_t* dst_buffer, int dst_length);
 
 	int getChannels() {
-		return mChannels;
+		return m_channels;
 	}
 
     int getSampleRate() {
-		return mSampleRate;
+		return m_sampleRate;
 	}
 
 private:
 
-    void init();
+	int m_channels;
 
-    void finish();
+	int m_sampleRate;
 
-    void prepareBuffer(struct mad_header const *header, struct mad_pcm *pcm);
+    struct mad_stream m_stream;
 
-    int decode(uint8_t* buffer, int length);
+    struct mad_frame m_frame;
 
-    bool read(uint8_t* buffer, int length);
+    struct mad_synth m_synth;
 
-	int mChannels;
-
-	int mSampleRate;
-
-    struct mad_stream mStream;
-
-    struct mad_frame mFrame;
-
-    struct mad_synth mSynth;
-
-    struct mad_header mHeader;
-
-    uint8_t mInputBuffer[4096];
-
-    int mInputLength;
-
-    int8_t mBuffer[1152*4];
+    struct mad_header m_header;
 };
 
 #endif // MPEGAUDIO_DECODER_H

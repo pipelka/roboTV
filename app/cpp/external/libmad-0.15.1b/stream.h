@@ -24,7 +24,7 @@
 
 # include "bit.h"
 
-# define MAD_BUFFER_GUARD	8
+# define MAD_BUFFER_GUARD	0
 # define MAD_BUFFER_MDLEN	(511 + 2048 + MAD_BUFFER_GUARD)
 
 enum mad_error {

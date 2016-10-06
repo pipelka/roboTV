@@ -17,68 +17,49 @@ inline int scale(mad_fixed_t sample) {
 }
 
 MpegAudioDecoder::MpegAudioDecoder() : Decoder(0) {
-    init();
-    mInputLength = 0;
+    mad_stream_init(&m_stream);
+    mad_frame_init(&m_frame);
+    mad_synth_init(&m_synth);
+    mad_header_init(&m_header);
 }
 
 MpegAudioDecoder::~MpegAudioDecoder() {
-    finish();
+    mad_synth_finish(&m_synth);
+    mad_frame_finish(&m_frame);
+    mad_stream_finish(&m_stream);
 }
 
-void MpegAudioDecoder::init() {
-    mad_stream_init(&mStream);
-    mad_frame_init(&mFrame);
-    mad_synth_init(&mSynth);
-    mad_header_init(&mHeader);
-}
+int MpegAudioDecoder::decode(uint8_t* src_buffer, int src_length, uint8_t* dst_buffer, int dst_length) {
 
-void MpegAudioDecoder::finish() {
-    mad_synth_finish(&mSynth);
-    mad_frame_finish(&mFrame);
-    mad_stream_finish(&mStream);
-}
-
-int MpegAudioDecoder::decode(uint8_t* buffer, int length) {
-
-    // fill input buffer
-    memcpy(&mInputBuffer[mInputLength], buffer, length);
-    mInputLength += length;
-
-    if(mInputLength < 2048) {
+    if(dst_length < 1152 * 4) {
+        ALOG("output buffer too small !");
         return 0;
     }
+
+    // make libmad happy - it needs at least 2 samples
+    memcpy(src_buffer + src_length, src_buffer, src_length);
+    src_length = src_length * 2;
 
     // fill stream buffer
-    mad_stream_buffer(&mStream, (const unsigned char*)mInputBuffer, mInputLength);
+    mad_stream_buffer(&m_stream, (const unsigned char*)src_buffer, src_length);
 
-    if(mad_header_decode(&mHeader, &mStream) == -1) {
-        ALOG("unable to decode header (error: %s)", mad_stream_errorstr(&mStream));
+    if(mad_header_decode(&m_header, &m_stream) == -1) {
+        ALOG("unable to decode header (error: %s)", mad_stream_errorstr(&m_stream));
         return 0;
     }
 
-    if(mad_frame_decode(&mFrame, &mStream) == -1) {
-        ALOG("unable to decode frame (error: %s)", mad_stream_errorstr(&mStream));
+    if(mad_frame_decode(&m_frame, &m_stream) == -1) {
+        ALOG("unable to decode frame (error: %s)", mad_stream_errorstr(&m_stream));
         return 0;
     }
 
-    mad_synth_frame(&mSynth, &mFrame);
-    struct mad_pcm* pcm = &mSynth.pcm;
+    mad_synth_frame(&m_synth, &m_frame);
+    struct mad_pcm* pcm = &m_synth.pcm;
 
     // get stream properties
-    mSampleRate = pcm->samplerate;
-    mChannels = 2;
+    m_sampleRate = pcm->samplerate;
+    m_channels = 2;
 
-    // convert samples
-    prepareBuffer(&mHeader, &mSynth.pcm);
-
-    // move input buffer
-    memmove(mInputBuffer, &mInputBuffer[length], mInputLength - length);
-    mInputLength -= length;
-
-    return sizeof(mBuffer);
-}
-
-void MpegAudioDecoder::prepareBuffer(const struct mad_header *header, struct mad_pcm *pcm) {
     int nsamples = pcm->length;
 
     const mad_fixed_t* left_ch = pcm->samples[0];
@@ -88,32 +69,12 @@ void MpegAudioDecoder::prepareBuffer(const struct mad_header *header, struct mad
         right_ch = pcm->samples[0];
     }
 
-    signed short* buffer = (signed short*)mBuffer;
-    signed int sample;
+    signed short* buffer = (signed short*)dst_buffer;
 
     while (nsamples--) {
         *buffer++ = scale(*left_ch++);
         *buffer++ = scale(*right_ch++);
     }
-}
 
-bool MpegAudioDecoder::read(uint8_t* buffer, int length) {
-    if(length < sizeof(mBuffer)) {
-        ALOG("output buffer too small !");
-        return false;
-    }
-
-    // copy buffer
-    memcpy(buffer, mBuffer, sizeof(mBuffer));
-    return true;
-}
-
-int MpegAudioDecoder::decode(uint8_t* src_buffer, int src_length, uint8_t* dst_buffer, int dst_length) {
-    int length = decode(src_buffer, src_length);
-
-    if(length == 0 || !read(dst_buffer, length)) {
-        return 0;
-    }
-
-    return length;
+    return 1152 * 4;
 }
