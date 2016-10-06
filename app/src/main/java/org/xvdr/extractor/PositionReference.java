@@ -1,7 +1,7 @@
 package org.xvdr.extractor;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.extractor.ts.TimestampAdjuster;
+import com.google.android.exoplayer2.extractor.TimestampAdjuster;
 
 class PositionReference {
 
