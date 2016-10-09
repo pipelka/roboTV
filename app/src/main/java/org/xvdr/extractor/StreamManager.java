@@ -1,9 +1,10 @@
 package org.xvdr.extractor;
 
-import android.util.Log;
 import android.util.SparseArray;
 
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.extractor.ExtractorOutput;
+import com.google.android.exoplayer2.extractor.TrackOutput;
 import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.robotv.client.StreamBundle;
@@ -11,6 +12,14 @@ import org.xvdr.robotv.client.StreamBundle;
 class StreamManager extends SparseArray<StreamReader> {
 
     private static final String TAG = "StreamManager";
+
+    private static final int MAX_OUTPUT_TRACKS = 8;
+
+    private final TrackOutput[] trackOutput;
+
+    StreamManager() {
+        trackOutput = new TrackOutput[MAX_OUTPUT_TRACKS];
+    }
 
     private boolean isSteamSupported(StreamBundle.Stream stream) {
         switch (stream.getMimeType()) {
@@ -26,65 +35,34 @@ class StreamManager extends SparseArray<StreamReader> {
     }
 
     void createStreams(ExtractorOutput output, StreamBundle bundle) {
-        for(StreamBundle.Stream stream: bundle) {
-            int pid = stream.physicalId;
-
-            if(isSteamSupported(stream)) {
-                put(pid, new StreamReader(output.track(pid), stream));
-            }
+        // pre-create output tracks
+        for(int i = 0; i < MAX_OUTPUT_TRACKS; i++) {
+            trackOutput[i] = output.track(i);
         }
+
+        updateStreams(bundle);
 
         output.endTracks();
     }
 
     void updateStreams(StreamBundle bundle) {
+        int index = 0;
+        clear();
+
+        // create stream readers
         for(StreamBundle.Stream stream: bundle) {
             int pid = stream.physicalId;
 
-            // skip unsupported stream types
-            if(!isSteamSupported(stream)) {
-                continue;
+            if(isSteamSupported(stream)) {
+                put(pid, new StreamReader(trackOutput[index++], stream));
             }
+        }
 
-            // check if we already have a stream of that pid and replace the old stream
-            StreamReader currentReader = get(pid);
-            if(currentReader != null) {
-                Log.i(TAG, "updated stream with pid " + pid);
-                put(pid, new StreamReader(currentReader.output(), stream));
-                continue;
-            }
-
-            // there's a new pid in the stream. try to find a reader (pid) that is currently
-            // unused (managed by StreamManager but not present in the StreamBundle)
-            StreamReader maybeUnusedReader = null;
-            int maybeUnusedPid = 0;
-
-            for(int i = 0; i < size(); i++) {
-                maybeUnusedReader = valueAt(i);
-                maybeUnusedPid = keyAt(i);
-
-                // skip dead entries
-                if(maybeUnusedReader == null) {
-                    continue;
-                }
-
-                // exit if we found an unused reader
-                if(bundle.getStreamOfPid(maybeUnusedPid) == null) {
-                    break;
-                }
-
-                maybeUnusedReader = null;
-            }
-
-            // found unused reader ?
-            if(maybeUnusedReader != null) {
-                remove(maybeUnusedPid);
-                put(pid, new StreamReader(maybeUnusedReader.output(), stream));
-                Log.i(TAG, "replaced unused stream " + maybeUnusedPid + " with new stream " + pid);
-            }
-            else {
-                Log.i(TAG, "no more space for new stream " + pid);
-            }
+        // fill remaining tracks
+        for(int i = index; i < MAX_OUTPUT_TRACKS; i++) {
+            Format format = Format.createContainerFormat("", null, null,
+                    MimeTypes.VIDEO_UNKNOWN, Format.NO_VALUE);
+            trackOutput[i].format(format);
         }
     }
 }
