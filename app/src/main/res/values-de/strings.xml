@@ -78,4 +78,5 @@
     <string name="setup_timeshift_desc">Zeitversetztes Live TV aktivieren</string>
     <string name="audiotrack">Tonspur</string>
     <string name="fail_to_load_movielist">Liste der Aufnahmen konnte nicht geladen werden</string>
+    <string name="error_open_recording">Fehler beim Wiedergeben der Aufnahme</string>
 </resources>

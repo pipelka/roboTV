@@ -23,6 +23,7 @@ import org.xvdr.recordings.fragment.VideoDetailsFragment;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.service.NotificationHandler;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.client.StreamBundle;
 
@@ -36,11 +37,14 @@ public class PlayerActivity extends Activity implements Player.Listener {
     private PlaybackOverlayFragment mControls;
     private Movie mSelectedMovie;
     private MediaSession mSession;
+    private NotificationHandler notificationHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+
+        notificationHandler = new NotificationHandler(this);
 
         mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
         try {
@@ -50,8 +54,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
                     SetupUtils.getLanguageISO3(this),               // Language
                     this,                                           // Listener
                     SetupUtils.getPassthrough(this),                // AC3 passthrough
-                    SetupUtils.getSpeakerConfiguration(this),       // preferred channel configuration
-                    new DefaultLoadControl());                      // Default LoadControl
+                    SetupUtils.getSpeakerConfiguration(this));      // preferred channel configuration
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -243,6 +246,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     @Override
     public void onStreamError(int status) {
+        notificationHandler.error(getString(R.string.error_open_recording));
     }
 
 }
