@@ -44,6 +44,7 @@ class RoboTvDataSource implements DataSource {
     }
 
     @Override
+
     synchronized public long open(DataSpec dataSpec) throws IOException {
         // the uri should be something like:
         // robotv://type/channeluid (e.g. robotv://livetv/5475634 )
@@ -75,13 +76,16 @@ class RoboTvDataSource implements DataSource {
         Log.d(TAG, "start streaming: " + uri.toString());
 
         String type = uri.getHost();
+
         switch(type) {
             case "livetv":
                 streaming = openLiveTv(uri);
                 break;
+
             case "recording":
                 streaming = openRecording(uri);
                 break;
+
             default:
                 throw new IOException("unsupported stream type: " + type + ")");
         }
@@ -95,7 +99,7 @@ class RoboTvDataSource implements DataSource {
 
         int status = connection.openStream(channelUid, language, false, 50);
 
-        if (status == Connection.STATUS_SUCCESS) {
+        if(status == Connection.STATUS_SUCCESS) {
             Log.d(TAG, "live stream opened");
             return true;
         }
@@ -114,7 +118,7 @@ class RoboTvDataSource implements DataSource {
 
         int status = connection.openRecording(recordingId);
 
-        if (status == Connection.STATUS_SUCCESS) {
+        if(status == Connection.STATUS_SUCCESS) {
             Log.d(TAG, "recording opened");
             return true;
         }
@@ -136,6 +140,7 @@ class RoboTvDataSource implements DataSource {
     }
 
     @Override
+
     synchronized public int read(byte[] buffer, int offset, int readLength) throws IOException {
         // request a new packet if we have completely consumed the old one
         while(response.eop()) {
@@ -158,7 +163,7 @@ class RoboTvDataSource implements DataSource {
                     continue;
                 }
             }
-            catch (InterruptedException e) {
+            catch(InterruptedException e) {
                 throw new InterruptedIOException();
             }
 

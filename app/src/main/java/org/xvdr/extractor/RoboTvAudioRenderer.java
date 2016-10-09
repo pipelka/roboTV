@@ -31,9 +31,11 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
             case Player.CHANNELS_DIGITAL51:
                 ac3Layout = Ac3Decoder.AC3_LAYOUT_SURROUND51;
                 break;
+
             case Player.CHANNELS_STEREO:
                 ac3Layout = Ac3Decoder.AC3_LAYOUT_STEREO;
                 break;
+
             case Player.CHANNELS_SURROUND:
                 ac3Layout = Ac3Decoder.AC3_LAYOUT_DOLBY;
                 break;
@@ -42,11 +44,11 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
 
     @Override
     public int supportsFormat(Format format) throws ExoPlaybackException {
-        if(format.sampleMimeType.equals(MimeTypes.AUDIO_AC3) && !ac3Passthrough){
+        if(format.sampleMimeType.equals(MimeTypes.AUDIO_AC3) && !ac3Passthrough) {
             return FORMAT_HANDLED;
         }
 
-        if(format.sampleMimeType.equals(MimeTypes.AUDIO_MPEG)){
+        if(format.sampleMimeType.equals(MimeTypes.AUDIO_MPEG)) {
             return FORMAT_HANDLED;
         }
 
@@ -61,11 +63,11 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
     protected RoboTvAudioDecoder createDecoder(Format format) throws AudioDecoderException {
         decoder = null;
 
-        if(format.sampleMimeType.equals(MimeTypes.AUDIO_AC3)){
+        if(format.sampleMimeType.equals(MimeTypes.AUDIO_AC3)) {
             decoder = new Ac3Decoder(new DecoderInputBuffer[NUM_BUFFERS], new SimpleOutputBuffer[NUM_BUFFERS], ac3Layout);
         }
 
-        if(format.sampleMimeType.equals(MimeTypes.AUDIO_MPEG)){
+        if(format.sampleMimeType.equals(MimeTypes.AUDIO_MPEG)) {
             decoder = new MpegAudioDecoder(new DecoderInputBuffer[NUM_BUFFERS], new SimpleOutputBuffer[NUM_BUFFERS], format);
         }
 

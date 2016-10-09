@@ -22,7 +22,7 @@ class StreamManager extends SparseArray<StreamReader> {
     }
 
     private boolean isSteamSupported(StreamBundle.Stream stream) {
-        switch (stream.getMimeType()) {
+        switch(stream.getMimeType()) {
             case MimeTypes.VIDEO_MPEG2:
             case MimeTypes.VIDEO_H264:
             case MimeTypes.VIDEO_H265:
@@ -50,7 +50,7 @@ class StreamManager extends SparseArray<StreamReader> {
         clear();
 
         // create stream readers
-        for(StreamBundle.Stream stream: bundle) {
+        for(StreamBundle.Stream stream : bundle) {
             int pid = stream.physicalId;
 
             if(isSteamSupported(stream)) {
@@ -61,7 +61,7 @@ class StreamManager extends SparseArray<StreamReader> {
         // fill remaining tracks
         for(int i = index; i < MAX_OUTPUT_TRACKS; i++) {
             Format format = Format.createContainerFormat("", null, null,
-                    MimeTypes.VIDEO_UNKNOWN, Format.NO_VALUE);
+                            MimeTypes.VIDEO_UNKNOWN, Format.NO_VALUE);
             trackOutput[i].format(format);
         }
     }

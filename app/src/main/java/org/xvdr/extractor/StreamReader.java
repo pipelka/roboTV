@@ -55,34 +55,34 @@ class StreamReader {
 
         if(isAudio()) {
             output.format(Format.createAudioSampleFormat(
-                    Integer.toString(stream.physicalId),
-                    mimeType,
-                    null,
-                    Format.NO_VALUE,
-                    Format.NO_VALUE,
-                    stream.channels,
-                    stream.sampleRate,
-                    C.ENCODING_PCM_16BIT,
-                    null, null,
-                    0,
-                    stream.language));
+                              Integer.toString(stream.physicalId),
+                              mimeType,
+                              null,
+                              Format.NO_VALUE,
+                              Format.NO_VALUE,
+                              stream.channels,
+                              stream.sampleRate,
+                              C.ENCODING_PCM_16BIT,
+                              null, null,
+                              0,
+                              stream.language));
             return true;
         }
 
         if(isVideo()) {
             output.format(Format.createVideoSampleFormat(
-                    Integer.toString(stream.physicalId), // << trackId
-                    mimeType,
-                    null,
-                    Format.NO_VALUE,
-                    Format.NO_VALUE,
-                    stream.width,
-                    stream.height,
-                    stream.getFrameRate(),
-                    initializationData,
-                    0,
-                    (float)stream.pixelAspectRatio,
-                    null));
+                              Integer.toString(stream.physicalId), // << trackId
+                              mimeType,
+                              null,
+                              Format.NO_VALUE,
+                              Format.NO_VALUE,
+                              stream.width,
+                              stream.height,
+                              stream.getFrameRate(),
+                              initializationData,
+                              0,
+                              (float)stream.pixelAspectRatio,
+                              null));
             return true;
         }
 

@@ -152,8 +152,9 @@ public class Event {
 
         Matcher matches = mYearPattern.matcher(description);
 
-        while (matches.find()) {
+        while(matches.find()) {
             String word = matches.group();
+
             try {
                 year = Integer.parseInt(word);
             }

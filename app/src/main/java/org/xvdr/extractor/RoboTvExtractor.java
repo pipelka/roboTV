@@ -87,6 +87,7 @@ class RoboTvExtractor implements Extractor {
     }
 
     @Override
+
     synchronized public int read(ExtractorInput input, PositionHolder seekPosition) throws IOException, InterruptedException {
         // read packet header
 
@@ -159,6 +160,7 @@ class RoboTvExtractor implements Extractor {
     }
 
     @Override
+
     synchronized public void seek(long p) {
         position.resetTimestamp();
         Log.d(TAG, "seek: " + p);

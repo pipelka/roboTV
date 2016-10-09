@@ -45,7 +45,7 @@ class MpegAudioDecoder extends RoboTvAudioDecoder {
 
     @Override
     protected AudioDecoderException decode(DecoderInputBuffer inputBuffer, SimpleOutputBuffer outputBuffer, boolean reset) {
-        ByteBuffer outputData = outputBuffer.init(inputBuffer.timeUs, 1152*4);
+        ByteBuffer outputData = outputBuffer.init(inputBuffer.timeUs, 1152 * 4);
 
         int size = decode(context, inputBuffer.data, inputBuffer.data.limit(), outputData);
 
@@ -72,7 +72,7 @@ class MpegAudioDecoder extends RoboTvAudioDecoder {
         int sampleRate = getSampleRate(context);
 
         return Format.createAudioSampleFormat(null, MimeTypes.AUDIO_RAW, null, Format.NO_VALUE,
-                Format.NO_VALUE, channelCount, sampleRate, C.ENCODING_PCM_16BIT, null, null, 0, null);
+                                              Format.NO_VALUE, channelCount, sampleRate, C.ENCODING_PCM_16BIT, null, null, 0, null);
     }
 
 }

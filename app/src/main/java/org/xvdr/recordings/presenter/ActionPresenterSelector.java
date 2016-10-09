@@ -29,15 +29,17 @@ public class ActionPresenterSelector extends PresenterSelector {
     private final Presenter mOneLineActionPresenter = new OneLineActionPresenter();
     private final Presenter mTwoLineActionPresenter = new TwoLineActionPresenter();
     private final Presenter[] mPresenters = new Presenter[] {
-            mOneLineActionPresenter, mTwoLineActionPresenter};
+        mOneLineActionPresenter, mTwoLineActionPresenter
+    };
 
     @Override
     public Presenter getPresenter(Object item) {
         Action action = (Action) item;
 
-        if (TextUtils.isEmpty(action.getLabel2())) {
+        if(TextUtils.isEmpty(action.getLabel2())) {
             return mOneLineActionPresenter;
-        } else {
+        }
+        else {
             return mTwoLineActionPresenter;
         }
     }
@@ -60,21 +62,23 @@ public class ActionPresenterSelector extends PresenterSelector {
     }
 
     private void setActionIcon(ActionViewHolder viewHolder, Drawable icon) {
-        if (icon != null) {
+        if(icon != null) {
             final int startPadding = viewHolder.view.getResources()
-                    .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_with_icon_padding_start);
+                                     .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_with_icon_padding_start);
             final int endPadding = viewHolder.view.getResources()
-                    .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_with_icon_padding_end);
+                                   .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_with_icon_padding_end);
             viewHolder.view.setPaddingRelative(startPadding, 0, endPadding, 0);
-        } else {
+        }
+        else {
             final int padding = viewHolder.view.getResources()
-                    .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_padding_horizontal);
+                                .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_padding_horizontal);
             viewHolder.view.setPaddingRelative(padding, 0, padding, 0);
         }
 
-        if (viewHolder.mLayoutDirection == View.LAYOUT_DIRECTION_RTL) {
+        if(viewHolder.mLayoutDirection == View.LAYOUT_DIRECTION_RTL) {
             viewHolder.mButton.setCompoundDrawablesWithIntrinsicBounds(null, null, icon, null);
-        } else {
+        }
+        else {
             viewHolder.mButton.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
         }
     }
@@ -83,7 +87,7 @@ public class ActionPresenterSelector extends PresenterSelector {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(android.support.v17.leanback.R.layout.lb_action_1_line, parent, false);
+                     .inflate(android.support.v17.leanback.R.layout.lb_action_1_line, parent, false);
             return new ActionViewHolder(v, parent.getLayoutDirection());
         }
 
@@ -110,7 +114,7 @@ public class ActionPresenterSelector extends PresenterSelector {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(android.support.v17.leanback.R.layout.lb_action_2_lines, parent, false);
+                     .inflate(android.support.v17.leanback.R.layout.lb_action_2_lines, parent, false);
             return new ActionViewHolder(v, parent.getLayoutDirection());
         }
 
@@ -126,11 +130,14 @@ public class ActionPresenterSelector extends PresenterSelector {
             vh.mAction = action;
             CharSequence line1 = action.getLabel1();
             CharSequence line2 = action.getLabel2();
-            if (TextUtils.isEmpty(line1)) {
+
+            if(TextUtils.isEmpty(line1)) {
                 vh.mButton.setText(line2);
-            } else if (TextUtils.isEmpty(line2)) {
+            }
+            else if(TextUtils.isEmpty(line2)) {
                 vh.mButton.setText(line1);
-            } else {
+            }
+            else {
                 vh.mButton.setText(line1 + "\n" + line2);
             }
         }

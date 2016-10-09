@@ -78,7 +78,7 @@ class Ac3Decoder extends RoboTvAudioDecoder {
         int sampleRate = getSampleRate(context);
 
         return Format.createAudioSampleFormat(null, MimeTypes.AUDIO_RAW, null, Format.NO_VALUE,
-                Format.NO_VALUE, channelCount, sampleRate, C.ENCODING_PCM_16BIT, null, null, 0, null);
+                                              Format.NO_VALUE, channelCount, sampleRate, C.ENCODING_PCM_16BIT, null, null, 0, null);
     }
 
 }

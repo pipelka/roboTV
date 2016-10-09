@@ -141,21 +141,21 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         position = new PositionReference();
 
         mVideoRenderer = new MediaCodecVideoRenderer(
-                mContext,
-                MediaCodecSelector.DEFAULT,
-                MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-                5000, // joining time
-                null,
-                true,
-                mHandler,
-                this,
-                50);
+            mContext,
+            MediaCodecSelector.DEFAULT,
+            MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
+            5000, // joining time
+            null,
+            true,
+            mHandler,
+            this,
+            50);
 
         mInternalAudioRenderer = new RoboTvAudioRenderer(
-                mHandler,
-                null,
-                mAudioPassthrough,
-                mChannelConfiguration);
+            mHandler,
+            null,
+            mAudioPassthrough,
+            mChannelConfiguration);
 
         // codecSelector disabling MPEG audio (handled by RoboTvAudioDecoder)
         MediaCodecSelector codecSelector = new MediaCodecSelector() {
@@ -179,13 +179,13 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         };
 
         mExoAudioRenderer = new MediaCodecAudioRenderer(
-                codecSelector,
-                null,
-                true,
-                mHandler,
-                null,
-                audioCapabilities,
-                AudioManager.STREAM_MUSIC);
+            codecSelector,
+            null,
+            true,
+            mHandler,
+            null,
+            audioCapabilities,
+            AudioManager.STREAM_MUSIC);
 
         Renderer[] renderers = { mVideoRenderer, mInternalAudioRenderer, mExoAudioRenderer };
 
@@ -251,10 +251,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         stop();
 
         MediaSource source = new ExtractorMediaSource(
-                uri,
-                dataSourceFactory,
-                extractorFactory,
-                mHandler, null
+            uri,
+            dataSourceFactory,
+            extractorFactory,
+            mHandler, null
         );
 
         mExoPlayer.prepare(source);

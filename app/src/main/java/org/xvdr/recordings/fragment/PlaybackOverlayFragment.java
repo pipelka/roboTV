@@ -227,8 +227,8 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
     private void setAudioTrackActionColor(ColorAction action, long id) {
         action.setColor(
-                (id == action.getId()) ? Utils.getColor(getActivity(), R.color.primary_color) :
-                        Utils.getColor(getActivity(), R.color.default_background)
+            (id == action.getId()) ? Utils.getColor(getActivity(), R.color.primary_color) :
+            Utils.getColor(getActivity(), R.color.default_background)
         );
     }
 
@@ -254,24 +254,24 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
             Log.d(TAG, "pid: " + stream.physicalId);
 
             String audioType =
-                    (stream.channels == 6) ? "5.1" :
-                    (stream.channels == 5) ? "5.0" :
-                    (stream.channels == 2) ? "Stereo" :
-                    "";
+                (stream.channels == 6) ? "5.1" :
+                (stream.channels == 5) ? "5.0" :
+                (stream.channels == 2) ? "Stereo" :
+                "";
 
             int audioFormatIcon =
-                    (stream.getMimeType().equals(MimeTypes.AUDIO_AC3)) ? R.drawable.ic_launcher_dd :
-                    (stream.getMimeType().equals(MimeTypes.AUDIO_MPEG)) ? R.drawable.ic_launcher_stereo :
-                    R.drawable.ic_audiotrack_white_48dp;
+                (stream.getMimeType().equals(MimeTypes.AUDIO_AC3)) ? R.drawable.ic_launcher_dd :
+                (stream.getMimeType().equals(MimeTypes.AUDIO_MPEG)) ? R.drawable.ic_launcher_stereo :
+                R.drawable.ic_audiotrack_white_48dp;
 
             // translate track language
             Locale l = new Locale.Builder().setLanguage(stream.language).build();
 
             ColorAction action = new ColorAction(
-                    stream.physicalId,
-                    audioType,
-                    l.getDisplayLanguage(),
-                    getResources().getDrawable(audioFormatIcon, null)
+                stream.physicalId,
+                audioType,
+                l.getDisplayLanguage(),
+                getResources().getDrawable(audioFormatIcon, null)
             );
 
             setAudioTrackActionColor(action, selectedTrackId);
@@ -366,6 +366,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         else {
             player.pause();
         }
+
         playbackStateChanged();
     }
 }

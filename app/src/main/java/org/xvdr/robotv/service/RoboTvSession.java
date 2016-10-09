@@ -94,7 +94,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
                 SetupUtils.getPassthrough(mContext),            // AC3 passthrough
                 SetupUtils.getSpeakerConfiguration(mContext));  // preferred channel configuration
         }
-        catch (IOException e) {
+        catch(IOException e) {
             mNotification.error(getResources().getString(R.string.connect_unable));
             e.printStackTrace();
         }
@@ -105,6 +105,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         if(mPlayer != null) {
             mPlayer.release();
         }
+
         mHandlerThread.interrupt();
     }
 
@@ -204,6 +205,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
         }
+
         if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
             notifyVideoAvailable();
         }

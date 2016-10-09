@@ -46,6 +46,7 @@ class TrickPlayController {
         if(!started) {
             handler.post(doTick);
         }
+
         started = true;
     }
 

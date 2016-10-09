@@ -47,16 +47,17 @@ public class PlayerActivity extends Activity implements Player.Listener {
         notificationHandler = new NotificationHandler(this);
 
         mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
+
         try {
             mPlayer = new Player(
-                    this,
-                    SetupUtils.getServer(this),                     // Server
-                    SetupUtils.getLanguageISO3(this),               // Language
-                    this,                                           // Listener
-                    SetupUtils.getPassthrough(this),                // AC3 passthrough
-                    SetupUtils.getSpeakerConfiguration(this));      // preferred channel configuration
+                this,
+                SetupUtils.getServer(this),                     // Server
+                SetupUtils.getLanguageISO3(this),               // Language
+                this,                                           // Listener
+                SetupUtils.getPassthrough(this),                // AC3 passthrough
+                SetupUtils.getSpeakerConfiguration(this));      // preferred channel configuration
         }
-        catch (IOException e) {
+        catch(IOException e) {
             e.printStackTrace();
             return;
         }
@@ -175,6 +176,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         if(mPlayer != null) {
             mPlayer.release();
         }

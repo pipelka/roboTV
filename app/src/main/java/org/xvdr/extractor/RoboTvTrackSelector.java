@@ -93,7 +93,7 @@ class RoboTvTrackSelector extends DefaultTrackSelector {
                     Format format = trackGroup.getFormat(trackIndex);
                     int trackScore = getScoreFromFormat(format);
 
-                    if (trackScore > selectedTrackScore) {
+                    if(trackScore > selectedTrackScore) {
                         selectedGroup = trackGroup;
                         selectedTrackIndex = trackIndex;
                         selectedTrackScore = trackScore;
@@ -101,6 +101,7 @@ class RoboTvTrackSelector extends DefaultTrackSelector {
                 }
             }
         }
+
         return selectedGroup == null ? null : new FixedTrackSelection(selectedGroup, selectedTrackIndex);
     }
 
