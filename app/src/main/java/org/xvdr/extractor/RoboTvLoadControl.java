@@ -1,7 +1,5 @@
 package org.xvdr.extractor;
 
-import android.util.Log;
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Renderer;
@@ -10,13 +8,11 @@ import com.google.android.exoplayer2.trackselection.TrackSelections;
 import com.google.android.exoplayer2.upstream.Allocator;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 
-public class RoboTvLoadControl  implements LoadControl {
-
-    private static final String TAG = "RoboTvLoadControl";
+class RoboTvLoadControl  implements LoadControl {
 
     private final DefaultAllocator allocator;
 
-    public RoboTvLoadControl() {
+    RoboTvLoadControl() {
         allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
     }
 
@@ -45,7 +41,7 @@ public class RoboTvLoadControl  implements LoadControl {
 
     @Override
     public boolean shouldStartPlayback(long bufferedDurationUs, boolean rebuffering) {
-        return rebuffering ? (bufferedDurationUs >= 2000) : (bufferedDurationUs > 0);
+        return true;
     }
 
     @Override
@@ -56,7 +52,7 @@ public class RoboTvLoadControl  implements LoadControl {
         // When this happens ExoPlayer's buffers run dry because
         // it thinks there is plenty of data available (but it's
         // not). The effect is that playback simply stops.
-        if(bufferedDurationUs > 1000 * 1000 * 60 * 60) {
+        if(bufferedDurationUs > 1000L * 1000 * 60 * 60) {
             return true;
         }
 
