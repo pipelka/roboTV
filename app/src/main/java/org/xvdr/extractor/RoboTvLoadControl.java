@@ -1,5 +1,7 @@
 package org.xvdr.extractor;
 
+import android.util.Log;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Renderer;
@@ -9,6 +11,8 @@ import com.google.android.exoplayer2.upstream.Allocator;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 
 public class RoboTvLoadControl  implements LoadControl {
+
+    private static final String TAG = "RoboTvLoadControl";
 
     private final DefaultAllocator allocator;
 
@@ -46,6 +50,17 @@ public class RoboTvLoadControl  implements LoadControl {
 
     @Override
     public boolean shouldContinueLoading(long bufferedDurationUs) {
+        // WORKAROUND: sometimes we get insane high values here
+        // it's currently unknown if it's a ExoPlayer2 or roboTV
+        // issue.
+        // When this happens ExoPlayer's buffers run dry because
+        // it thinks there is plenty of data available (but it's
+        // not). The effect is that playback simply stops.
+        if(bufferedDurationUs > 1000 * 1000 * 60 * 60) {
+            return true;
+        }
+
+        // we buffer up to 5 seconds
         return (bufferedDurationUs < 5000000);
     }
 }
