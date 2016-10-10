@@ -241,9 +241,15 @@ public class ChannelSyncAdapter {
 
         int i = 0;
 
-        // epg search intent
-
         for(Channels.Entry entry : list) {
+
+            // skip obsolete channels
+            if(entry.name.endsWith("OBSOLETE")) {
+                continue;
+            }
+
+            // epg search intent
+
             Intent intent = new Intent(mContext, TimerActivity.class);
             intent.putExtra("uid", entry.uid);
             intent.putExtra("name", entry.name);
