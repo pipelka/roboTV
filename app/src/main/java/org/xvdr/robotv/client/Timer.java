@@ -34,7 +34,7 @@ public class Timer {
         request.putU32(startTime + duration + mPostEndRecording); // end time
         request.putU32(0); // day
         request.putU32(0); // weeksdays
-        request.putString(name); // recording name
+        request.putString(mapRecordingName(name)); // recording name
         request.putString(""); // aux
 
         Packet response = mConnection.transmitMessage(request);
@@ -44,5 +44,9 @@ public class Timer {
         }
 
         return response.getU32() == 0;
+    }
+
+    private String mapRecordingName(String name) {
+        return name.replace(' ', '_').replace(':', '_');
     }
 }
