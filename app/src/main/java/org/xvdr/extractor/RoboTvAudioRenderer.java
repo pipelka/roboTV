@@ -17,7 +17,7 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
 
     private static final String TAG = "RoboTvAudioRenderer";
 
-    private static final int NUM_BUFFERS = 2;
+    private static final int NUM_BUFFERS = 16;
 
     private RoboTvAudioDecoder decoder;
     private boolean ac3Passthrough;
