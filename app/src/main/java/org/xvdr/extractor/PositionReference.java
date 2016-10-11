@@ -23,6 +23,7 @@ class PositionReference {
         startPosition = System.currentTimeMillis();
         endPosition = C.TIME_UNSET;
         currentPosition = startPosition;
+        timestampAdjuster.reset();
     }
 
     void set(long timeUs, long wallClockTime) {
@@ -65,10 +66,6 @@ class PositionReference {
 
     long adjustTimestamp(long ts) {
         return timestampAdjuster.adjustTsTimestamp(ts);
-    }
-
-    void resetTimestamp() {
-        timestampAdjuster.reset();
     }
 
     void setTrickPlayMode(boolean mode) {

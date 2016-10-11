@@ -46,16 +46,6 @@ class RoboTvLoadControl  implements LoadControl {
 
     @Override
     public boolean shouldContinueLoading(long bufferedDurationUs) {
-        // WORKAROUND: sometimes we get insane high values here
-        // it's currently unknown if it's a ExoPlayer2 or roboTV
-        // issue.
-        // When this happens ExoPlayer's buffers run dry because
-        // it thinks there is plenty of data available (but it's
-        // not). The effect is that playback simply stops.
-        if(bufferedDurationUs > 1000L * 1000 * 60 * 60) {
-            return true;
-        }
-
         // we buffer up to 5 seconds
         return (bufferedDurationUs < 5000000);
     }

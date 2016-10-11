@@ -137,15 +137,15 @@ class RoboTvExtractor implements Extractor {
 
         StreamReader reader = streamManager.get(pid);
 
-        // convert TS -> timeUs
-        long timeUs = position.adjustTimestamp(pts);
-
         // unknown stream ?
         if(reader == null) {
             input.skipFully(size);
             input.skipFully(8);
             return RESULT_CONTINUE;
         }
+
+        // convert TS -> timeUs
+        long timeUs = position.adjustTimestamp(pts);
 
         // consume stream data
         reader.consume(input, size, timeUs, C.BUFFER_FLAG_KEY_FRAME);
@@ -162,7 +162,6 @@ class RoboTvExtractor implements Extractor {
     @Override
 
     synchronized public void seek(long p) {
-        position.resetTimestamp();
         Log.d(TAG, "seek: " + p);
     }
 
