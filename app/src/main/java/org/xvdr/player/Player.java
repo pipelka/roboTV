@@ -227,7 +227,8 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public void setStreamVolume(float volume) {
-        // TODO - implement stream volume
+        sendMessage(internalAudioRenderer, C.MSG_SET_VOLUME, volume);
+        sendMessage(exoAudioRenderer, C.MSG_SET_VOLUME, volume);
     }
 
     public void play() {
