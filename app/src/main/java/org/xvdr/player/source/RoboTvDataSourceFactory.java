@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player.source;
 
 import android.os.Handler;
 
@@ -6,18 +6,19 @@ import com.google.android.exoplayer2.upstream.DataSource;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.jniwrap.SessionListener;
+import org.xvdr.player.PositionReference;
 import org.xvdr.robotv.client.Connection;
 
 import java.io.IOException;
 
-class RoboTvDataSourceFactory implements DataSource.Factory {
+public class RoboTvDataSourceFactory implements DataSource.Factory {
 
     private Connection connection;
 
     final private Listener listener;
     final private RoboTvDataSource dataSource;
 
-    interface Listener {
+    public interface Listener {
 
         void onDisconnect();
 
@@ -61,7 +62,7 @@ class RoboTvDataSourceFactory implements DataSource.Factory {
         }
     };
 
-    RoboTvDataSourceFactory(PositionReference position, String language, Listener listener) {
+    public RoboTvDataSourceFactory(PositionReference position, String language, Listener listener) {
         this.listener = listener;
 
         connection = new Connection("roboTV:streaming", language);

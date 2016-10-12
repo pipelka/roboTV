@@ -26,7 +26,7 @@ import com.google.android.exoplayer2.util.MimeTypes;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import org.xvdr.extractor.Player;
+import org.xvdr.player.Player;
 import org.xvdr.recordings.activity.PlayerActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.presenter.ActionPresenterSelector;

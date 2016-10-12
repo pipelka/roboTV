@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player.extractor;
 
 import android.util.SparseArray;
 

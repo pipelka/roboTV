@@ -23,7 +23,7 @@ import android.view.WindowManager;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
 
-import org.xvdr.extractor.Player;
+import org.xvdr.player.Player;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;

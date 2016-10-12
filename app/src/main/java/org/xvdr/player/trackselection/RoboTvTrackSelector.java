@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player.trackselection;
 
 import android.os.Handler;
 
@@ -13,12 +13,12 @@ import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.util.MimeTypes;
 
-class RoboTvTrackSelector extends DefaultTrackSelector {
+public class RoboTvTrackSelector extends DefaultTrackSelector {
 
     private String audioTrackId;
     private String audioLanguage;
 
-    RoboTvTrackSelector(Handler eventHandler) {
+    public RoboTvTrackSelector(Handler eventHandler) {
         super(eventHandler);
     }
 
@@ -123,12 +123,12 @@ class RoboTvTrackSelector extends DefaultTrackSelector {
         return trackScore;
     }
 
-    void selectAudioTrack(String trackId) {
+    public void selectAudioTrack(String trackId) {
         audioTrackId = trackId;
         invalidate();
     }
 
-    void clearAudioTrack() {
+    public void clearAudioTrack() {
         audioTrackId = null;
         invalidate();
     }

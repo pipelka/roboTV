@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player.extractor;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;

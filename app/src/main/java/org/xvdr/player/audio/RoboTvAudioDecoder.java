@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player.audio;
 
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.audio.AudioDecoderException;

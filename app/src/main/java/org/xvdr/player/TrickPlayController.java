@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player;
 
 import android.os.Handler;
 

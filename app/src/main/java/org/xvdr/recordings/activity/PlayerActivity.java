@@ -11,13 +11,12 @@ import android.os.Bundle;
 import android.view.Surface;
 import android.view.SurfaceView;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import org.xvdr.extractor.Player;
+import org.xvdr.player.Player;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
 import org.xvdr.recordings.model.Movie;

@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -35,6 +35,10 @@ import com.google.android.exoplayer2.util.PriorityHandlerThread;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
+import org.xvdr.player.audio.RoboTvAudioRenderer;
+import org.xvdr.player.extractor.RoboTvExtractor;
+import org.xvdr.player.source.RoboTvDataSourceFactory;
+import org.xvdr.player.trackselection.RoboTvTrackSelector;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
@@ -43,10 +47,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     private static final String TAG = "Player";
 
-    final static int CHANNELS_DEFAULT = 0;
-    final static int CHANNELS_STEREO = 2;
-    final static int CHANNELS_SURROUND = 4;
-    final static int CHANNELS_DIGITAL51 = 6;
+    public final static int CHANNELS_DEFAULT = 0;
+    public final static int CHANNELS_STEREO = 2;
+    public final static int CHANNELS_SURROUND = 4;
+    public final static int CHANNELS_DIGITAL51 = 6;
 
     public interface Listener  {
 

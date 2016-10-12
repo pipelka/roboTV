@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player.source;
 
 import android.net.Uri;
 import android.util.Log;
@@ -8,6 +8,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
 
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.player.PositionReference;
 import org.xvdr.robotv.client.Connection;
 
 import java.io.IOException;

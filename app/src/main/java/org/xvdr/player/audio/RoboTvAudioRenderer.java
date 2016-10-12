@@ -1,9 +1,8 @@
-package org.xvdr.extractor;
+package org.xvdr.player.audio;
 
 import android.os.Handler;
 import android.util.Log;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.audio.AudioDecoderException;
@@ -13,7 +12,9 @@ import com.google.android.exoplayer2.decoder.DecoderInputBuffer;
 import com.google.android.exoplayer2.decoder.SimpleOutputBuffer;
 import com.google.android.exoplayer2.util.MimeTypes;
 
-class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
+import org.xvdr.player.Player;
+
+public class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
 
     private static final String TAG = "RoboTvAudioRenderer";
 
@@ -23,7 +24,7 @@ class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
     private boolean ac3Passthrough;
     private int ac3Layout = Ac3Decoder.AC3_LAYOUT_SURROUND51;
 
-    RoboTvAudioRenderer(Handler eventHandler, AudioRendererEventListener eventListener, boolean ac3Passthrough, int channelConfiguration) {
+    public RoboTvAudioRenderer(Handler eventHandler, AudioRendererEventListener eventListener, boolean ac3Passthrough, int channelConfiguration) {
         super(eventHandler, eventListener);
         this.ac3Passthrough = ac3Passthrough;
 

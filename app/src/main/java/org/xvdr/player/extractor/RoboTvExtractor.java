@@ -1,4 +1,4 @@
-package org.xvdr.extractor;
+package org.xvdr.player.extractor;
 
 import android.util.Log;
 
@@ -10,22 +10,24 @@ import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.extractor.PositionHolder;
 import com.google.android.exoplayer2.extractor.SeekMap;
 
+import org.xvdr.player.BufferPacket;
+import org.xvdr.player.PositionReference;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-class RoboTvExtractor implements Extractor {
+public class RoboTvExtractor implements Extractor {
 
     private static final String TAG = RoboTvExtractor.class.getName();
 
-    static class Factory implements ExtractorsFactory {
+    public static class Factory implements ExtractorsFactory {
 
         private RoboTvExtractor extractor = null;
         final private Listener listener;
         final private PositionReference position;
 
-        Factory(PositionReference position, Listener listener) {
+        public Factory(PositionReference position, Listener listener) {
             this.listener = listener;
             this.position = position;
         }
@@ -54,7 +56,7 @@ class RoboTvExtractor implements Extractor {
         }
     }
 
-    interface Listener {
+    public interface Listener {
         void onTracksChanged(StreamBundle bundle);
     }
 
