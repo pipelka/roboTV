@@ -54,6 +54,9 @@ class TrickPlayController {
         long diff = (System.currentTimeMillis() - startTime) * playbackSpeed;
         long seekPosition = startPosition + diff;
 
+        // clamp to end position
+        seekPosition = Math.min(seekPosition, position.getEndPosition());
+
         long timeUs = position.timeUsFromPosition(seekPosition);
         player.seekTo(timeUs / 1000);
     }
