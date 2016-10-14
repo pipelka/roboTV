@@ -6,7 +6,7 @@ import com.google.android.exoplayer2.ExoPlayer;
 
 class TrickPlayController {
 
-    final private long TICK_TIME = 1000;
+    final private long TICK_TIME = 500;
 
     final private PositionReference position;
     final private ExoPlayer player;
