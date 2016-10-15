@@ -398,6 +398,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     @Override
     public void onRenderedFirstFrame(Surface surface) {
+        if(trickPlayController.activated()) {
+            trickPlayController.postTick();
+        }
+
         listener.onRenderedFirstFrame(surface);
     }
 

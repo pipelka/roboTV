@@ -6,8 +6,6 @@ import com.google.android.exoplayer2.ExoPlayer;
 
 class TrickPlayController {
 
-    final private long TICK_TIME = 500;
-
     final private PositionReference position;
     final private ExoPlayer player;
     final private Handler handler;
@@ -21,7 +19,6 @@ class TrickPlayController {
         @Override
         public void run() {
             tick();
-            handler.postDelayed(doTick, TICK_TIME);
         }
     };
 
@@ -44,7 +41,7 @@ class TrickPlayController {
         position.setTrickPlayMode(true);
 
         if(!started) {
-            handler.post(doTick);
+            postTick();
         }
 
         started = true;
@@ -73,5 +70,13 @@ class TrickPlayController {
         playbackSpeed = 1;
         started = false;
         player.setPlayWhenReady(true);
+    }
+
+    void postTick() {
+        handler.post(doTick);
+    }
+
+    boolean activated() {
+        return started;
     }
 }
