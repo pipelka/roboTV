@@ -141,7 +141,6 @@ class RoboTvDataSource implements DataSource {
     }
 
     @Override
-
     synchronized public int read(byte[] buffer, int offset, int readLength) throws IOException {
         // request a new packet if we have completely consumed the old one
         while(response.eop()) {

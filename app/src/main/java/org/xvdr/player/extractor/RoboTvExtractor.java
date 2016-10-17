@@ -89,7 +89,6 @@ public class RoboTvExtractor implements Extractor {
     }
 
     @Override
-
     synchronized public int read(ExtractorInput input, PositionHolder seekPosition) throws IOException, InterruptedException {
         // read packet header
 
