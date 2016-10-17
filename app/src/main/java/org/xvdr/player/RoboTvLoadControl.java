@@ -46,7 +46,7 @@ class RoboTvLoadControl  implements LoadControl {
 
     @Override
     public boolean shouldContinueLoading(long bufferedDurationUs) {
-        // we buffer up to 5 seconds
-        return (bufferedDurationUs < 5000000);
+        // we buffer up to 5 seconds (or at least 128kb)
+        return (bufferedDurationUs < 5000000 || allocator.getTotalBytesAllocated() < 128 * 1024);
     }
 }
