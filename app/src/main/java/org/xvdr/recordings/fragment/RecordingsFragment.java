@@ -1,6 +1,5 @@
 package org.xvdr.recordings.fragment;
 
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BackgroundManager;
@@ -8,72 +7,38 @@ import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
+import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
+import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 
 import android.support.v17.leanback.widget.Row;
+import android.util.Log;
 import android.view.View;
 
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
-import org.xvdr.recordings.model.MovieCollectionLoader;
 import org.xvdr.recordings.presenter.PreferenceCardPresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.service.NotificationHandler;
-import org.xvdr.robotv.setup.SetupActivity;
-import org.xvdr.robotv.setup.SetupUtils;
-import org.xvdr.robotv.client.Connection;
+import org.xvdr.robotv.service.DataService;
+import org.xvdr.robotv.service.DataServiceClient;
 
-public class RecordingsFragment extends BrowseFragment {
+import java.util.Collection;
+
+public class RecordingsFragment extends BrowseFragment implements DataServiceClient.Listener {
 
     private final static String TAG = "RecordingsFragment";
 
-    private SpinnerFragment mSpinnerFragment;
     private MovieCollectionAdapter mAdapter;
-    private ArrayObjectAdapter mRowAdapter = null;
-    private String mLastServer = "";
 
     private int color_background;
     private int color_brand;
-
-    private NotificationHandler mNotification;
-
-    private MovieCollectionLoader.Listener mListener = new MovieCollectionLoader.Listener() {
-        @Override
-        public void onStart() {
-            mSpinnerFragment = new SpinnerFragment();
-            getFragmentManager().beginTransaction().add(R.id.container, mSpinnerFragment).commit();
-        }
-
-        @Override
-        public void onCompleted(MovieCollectionAdapter adapter) {
-            if(adapter == null) {
-                mNotification.error(getString(R.string.fail_to_load_movielist));
-                return;
-            }
-
-            FragmentManager fragmentManager = getFragmentManager();
-
-            if(fragmentManager != null) {
-                getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
-            }
-
-            if(mAdapter == null) {
-                mAdapter = adapter;
-                setAdapter(adapter);
-                setupPreferences(adapter);
-            }
-
-            if(mRowAdapter != null) {
-                mRowAdapter.notifyArrayItemRangeChanged(0, mRowAdapter.size());
-                mRowAdapter = null;
-            }
-        }
-    };
+    private int selectedRow = -1;
+    private int selectedItem = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,17 +49,13 @@ public class RecordingsFragment extends BrowseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mNotification = new NotificationHandler(getActivity());
-
         initUI();
-        loadMovies(false);
         setupEventListeners();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadMovies(true);
     }
 
     @Override
@@ -102,38 +63,43 @@ public class RecordingsFragment extends BrowseFragment {
         super.onDestroy();
     }
 
-    private void loadMovies(boolean onlyUpdate) {
-        Connection connection = new Connection("roboTV recordings");
-
-        String currentServer = SetupUtils.getServer(getActivity());
-
-        if(!mLastServer.equals(currentServer)) {
-            onlyUpdate = false;
-            mAdapter = null;
-        }
-
-        if(!connection.open(currentServer)) {
-            mNotification.error(getString(R.string.failed_connect));
-
-            Intent intent = new Intent(getActivity(), SetupActivity.class);
-            startActivity(intent);
-
+    synchronized private void loadMovies(Collection<Movie> collection) {
+        if(collection.size() == 0) {
             return;
         }
 
-        mLastServer = SetupUtils.getServer(getActivity());
+        mAdapter = new MovieCollectionAdapter(getActivity());
+        mAdapter.addAll(collection);
 
-        if(onlyUpdate) {
-            if(mAdapter == null) {
-                connection.close();
-                return;
+        setupPreferences(mAdapter);
+        mAdapter.cleanup();
+
+        setAdapter(mAdapter);
+
+        // update current row
+        if(selectedRow >= 0 && selectedRow < mAdapter.size()) {
+            try {
+                setSelectedPosition(selectedRow, true, new ListRowPresenter.SelectItemViewHolderTask(selectedItem));
             }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+    }
 
-            new MovieCollectionLoader(connection, SetupUtils.getLanguage(getActivity()), mAdapter).load(mListener);
-        }
-        else {
-            new MovieCollectionLoader(getActivity(), connection, SetupUtils.getLanguage(getActivity())).load(mListener);
-        }
+    @Override
+    public OnItemViewSelectedListener getOnItemViewSelectedListener() {
+        return new OnItemViewSelectedListener() {
+
+            @Override
+            public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
+                selectedRow = getSelectedPosition();
+                ListRow listRow = (ListRow) row;
+                ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
+                selectedItem = rowAdapter.indexOf(item);
+            }
+        };
     }
 
     private void setupPreferences(ArrayObjectAdapter adapter) {
@@ -178,6 +144,8 @@ public class RecordingsFragment extends BrowseFragment {
 
     private void setupEventListeners() {
         setOnItemViewClickedListener(getDefaultItemClickedListener());
+        setOnItemViewSelectedListener(getOnItemViewSelectedListener());
+
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -194,11 +162,15 @@ public class RecordingsFragment extends BrowseFragment {
                 if(item instanceof Movie) {
                     Movie movie = (Movie) item;
 
+                    selectedRow = getSelectedPosition();
+                    ListRow listRow = (ListRow) row;
+                    ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
+                    selectedItem = rowAdapter.indexOf(item);
+
                     if(movie.isSeriesHeader()) {
                         mAdapter.setSeriesRow(movie.getTitle());
                     }
                     else {
-                        mRowAdapter = mAdapter.getCategory(movie);
                         Intent intent = new Intent(getActivity(), DetailsActivity.class);
                         intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
                         startActivity(intent);
@@ -214,4 +186,19 @@ public class RecordingsFragment extends BrowseFragment {
         };
     }
 
+    @Override
+    public void onServiceConnected(DataService service) {
+        loadMovies(service.getMovieCollection());
+    }
+
+    @Override
+    public void onServiceDisconnected(DataService service) {
+    }
+
+    @Override
+    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection) {
+        if(getActivity() != null) {
+            loadMovies(collection);
+        }
+    }
 }

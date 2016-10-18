@@ -13,7 +13,9 @@ import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
 import org.xvdr.robotv.R;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 
 public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
@@ -37,6 +39,13 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         mContext = context;
         mCardPresenter = new MoviePresenter();
         mLatestCardPresenter = new LatestCardPresenter();
+
+        clear();
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
 
         mSeriesMap = new ArrayMap<>();
 
@@ -68,13 +77,27 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         return getCategory(category, addNew, mCardPresenter);
     }
 
-    private ListRow findRow(String category) {
+    public ListRow findRow(String category) {
         ListRow listrow;
 
         for(int i = 0; i < size(); i++) {
             listrow = (ListRow)get(i);
 
             if(listrow.getHeaderItem().getName().equalsIgnoreCase(category)) {
+                return listrow;
+            }
+        }
+
+        return null;
+    }
+
+    public ListRow findRow(long id) {
+        ListRow listrow;
+
+        for(int i = 0; i < size(); i++) {
+            listrow = (ListRow)get(i);
+
+            if(listrow.getId() == id) {
                 return listrow;
             }
         }
@@ -97,10 +120,12 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
             return null;
         }
 
-        HeaderItem header = new HeaderItem(size() - 1, category);
+        HeaderItem header = new HeaderItem(size(), category);
         ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(compareTimestamps, presenter);
 
         listrow = new ListRow(header, listRowAdapter);
+        listrow.setId(size());
+
         add(listrow);
 
         return listRowAdapter;
@@ -227,6 +252,14 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
 
         if(tvShowsRow != null && tvShowsRow.getAdapter().size() == 0) {
             remove(tvShowsRow);
+        }
+    }
+
+    public void addAll(Collection<Movie> movieCollection) {
+        Iterator<Movie> i = movieCollection.iterator();
+        while(i.hasNext()) {
+            Movie movie = i.next();
+            add(movie);
         }
     }
 }

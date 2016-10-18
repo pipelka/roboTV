@@ -1,20 +1,23 @@
 package org.xvdr.timers.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 
-import org.xvdr.recordings.model.FolderList;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.Connection;
+import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.setup.SetupUtils;
+import org.xvdr.timers.activity.TimerActivity;
 
 import java.util.List;
+import java.util.TreeSet;
 
 public class CreateTimerFragmentFolder extends CreateTimerStepFragment {
 
-    protected FolderList mFolderList;
+    protected TreeSet<String> mFolderList;
 
+    @NonNull
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
         return createGuidance(getString(R.string.timer_add_select_folder));
@@ -22,12 +25,7 @@ public class CreateTimerFragmentFolder extends CreateTimerStepFragment {
 
     @Override
     public void onCreateActions(List actions, Bundle savedInstanceState) {
-        Connection connection = new Connection("roboTV:createTimerFolders", SetupUtils.getLanguage(getActivity()));
-        connection.open(SetupUtils.getServer(getActivity()));
-
-        mFolderList = FolderList.load(connection);
-
-        connection.close();
+        mFolderList = ((TimerActivity) getActivity()).getFolderList();
 
         String currentFolder = SetupUtils.getRecordingFolder();
         String newFolder = currentFolder.equals("") ? getString(R.string.timer_new_folder) : currentFolder;
@@ -66,7 +64,13 @@ public class CreateTimerFragmentFolder extends CreateTimerStepFragment {
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
-        SetupUtils.setRecordingFolder(action.getTitle().toString());
+        if(action.getId() != 0) {
+            SetupUtils.setRecordingFolder(action.getTitle().toString());
+        }
+        else {
+            SetupUtils.setRecordingFolder("");
+        }
+
         getFragmentManager().popBackStack();
     }
 

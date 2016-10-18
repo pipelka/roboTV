@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.SpeechRecognitionCallback;
 
+import org.xvdr.recordings.fragment.CoverSearchFragment;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.artwork.ArtworkUtils;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.setup.SetupUtils;
+import org.xvdr.robotv.service.DataService;
+import org.xvdr.robotv.service.DataServiceClient;
+
+import java.util.Collection;
 
 public class CoverSearchActivity extends Activity {
 
@@ -19,15 +21,36 @@ public class CoverSearchActivity extends Activity {
     public static final String EXTRA_MOVIE = "extra_movie";
 
     SearchFragment mFragment;
+    DataService service;
     Movie mMovie;
+    private DataServiceClient dataClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cover);
 
-        mFragment = (SearchFragment) getFragmentManager().findFragmentById(R.id.search);
+        // start data service
+        dataClient = new DataServiceClient(this, new DataServiceClient.Listener() {
 
+            @Override
+            public void onServiceConnected(DataService service) {
+                CoverSearchActivity.this.service = service;
+            }
+
+            @Override
+            public void onServiceDisconnected(DataService service) {
+                CoverSearchActivity.this.service = null;
+            }
+
+            @Override
+            public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection) {
+            }
+        });
+
+        dataClient.bind();
+
+        mFragment = (SearchFragment) getFragmentManager().findFragmentById(R.id.search);
         mFragment.setSpeechRecognitionCallback(new SpeechRecognitionCallback() {
             @Override
             public void recognizeSpeech() {
@@ -39,13 +62,17 @@ public class CoverSearchActivity extends Activity {
         mFragment.setSearchQuery(mMovie.getTitle(), false);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dataClient.unbind();
+    }
+
     public void setArtwork(ArtworkHolder holder) {
-        Connection connection = new Connection("roboTV movie artwork");
-        connection.open(SetupUtils.getServer(this));
+        if(service != null) {
+            service.setMovieArtwork(mMovie, holder);
+        }
 
-        ArtworkUtils.setMovieArtwork(connection, mMovie, holder);
-
-        connection.close();
         finishAndRemoveTask();
     }
 

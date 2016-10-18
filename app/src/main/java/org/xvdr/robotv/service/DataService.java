@@ -9,6 +9,9 @@ import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.jniwrap.SessionListener;
+import org.xvdr.recordings.model.Movie;
+import org.xvdr.recordings.model.MovieCollectionLoaderTask;
+import org.xvdr.recordings.model.PacketAdapter;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
@@ -18,15 +21,33 @@ import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.TreeSet;
 
-public class DataService extends Service {
+public class DataService extends Service implements MovieCollectionLoaderTask.Listener {
 
-    Connection mConnection;
-    Handler mHandler;
-    NotificationHandler mNotification;
-    ArtworkFetcher m_artwork;
+    private final IBinder binder = new Binder();
+    Connection connection;
+    Handler handler;
+    NotificationHandler notification;
+    ArtworkFetcher artwork;
+    Collection<Movie> movieCollection;
+    TreeSet<String> folderList;
+
+    private MovieCollectionLoaderTask loaderTask;
 
     private static final String TAG = "DataService";
+
+    interface Listener {
+        void onMovieCollectionUpdated(Collection<Movie> collection);
+    }
+
+    public class Binder extends android.os.Binder {
+        DataService getService() {
+            return DataService.this;
+        }
+    }
 
     SessionListener mSessionListener = new SessionListener() {
         public void onNotification(Packet p) {
@@ -44,11 +65,15 @@ public class DataService extends Service {
                 case Connection.XVDR_STATUS_MESSAGE:
                     p.getU32(); // type
                     message = p.getString();
-                    mNotification.notify(message);
+                    notification.notify(message);
                     break;
 
                 case Connection.XVDR_STATUS_RECORDING:
                     onRecording(p);
+                    break;
+
+                case Connection.XVDR_STATUS_RECORDINGSCHANGE:
+                    loadMovieCollection();
                     break;
             }
         }
@@ -57,10 +82,10 @@ public class DataService extends Service {
         }
 
         public void onReconnect() {
-            mHandler.postDelayed(new Runnable() {
+            handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mConnection.login();
+                    connection.login();
                 }
             }, 3000);
         }
@@ -70,18 +95,25 @@ public class DataService extends Service {
         @Override
         public void run() {
             if(!open()) {
-                mHandler.postDelayed(mOpenRunnable, 2 * 1000);
+                handler.postDelayed(mOpenRunnable, 2 * 1000);
                 return;
             }
 
-            mNotification.notify(getResources().getString(R.string.service_connected));
+            notification.notify(getResources().getString(R.string.service_connected));
         }
     };
+
+    private final ArrayList<Listener> listeners = new ArrayList<>();
+
+    public DataService() {
+        movieCollection = new ArrayList<>(500);
+        folderList = new TreeSet<>();
+    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
     @Override
@@ -91,11 +123,11 @@ public class DataService extends Service {
         // check if the server has changed
         String server = SetupUtils.getServer(this);
 
-        if(mConnection != null && !mConnection.getHostname().equals(server)) {
+        if(connection != null && !connection.getHostname().equals(server)) {
             Log.i(TAG, "new server: " + server);
-            mConnection.close();
-            mHandler.removeCallbacks(mOpenRunnable);
-            mHandler.post(mOpenRunnable);
+            connection.close();
+            handler.removeCallbacks(mOpenRunnable);
+            handler.post(mOpenRunnable);
         }
 
         return START_STICKY;
@@ -103,33 +135,40 @@ public class DataService extends Service {
 
     @Override
     public void onCreate() {
-        mHandler = new Handler();
-        mNotification = new NotificationHandler(this);
+        handler = new Handler();
+        notification = new NotificationHandler(this);
 
-        mConnection = new Connection(
+        connection = new Connection(
             "roboTV:dataservice",
             SetupUtils.getLanguage(this),
             true);
 
-        mConnection.setCallback(mSessionListener);
+        connection.setCallback(mSessionListener);
 
-        m_artwork = new ArtworkFetcher(mConnection, SetupUtils.getLanguage(this));
+        artwork = new ArtworkFetcher(connection, SetupUtils.getLanguage(this));
 
-        mHandler.post(mOpenRunnable);
+        handler.post(mOpenRunnable);
     }
 
     @Override
     public void onDestroy() {
-        mConnection.close();
+        connection.close();
     }
 
     private boolean open() {
-        if(mConnection.isOpen()) {
+        if(connection.isOpen()) {
             return true;
         }
 
-        mConnection.setPriority(1); // low priority for DataService
-        return mConnection.open(SetupUtils.getServer(this));
+        connection.setPriority(1); // low priority for DataService
+        if(!connection.open(SetupUtils.getServer(this))) {
+            return false;
+        }
+
+        // movie collection loader
+        loadMovieCollection();
+
+        return true;
     }
 
     private void onRecording(Packet p) {
@@ -145,7 +184,7 @@ public class DataService extends Service {
         // we do not have an event attached
 
         if(p.eop()) {
-            mNotification.notify(message, title, R.drawable.ic_movie_white_48dp);
+            notification.notify(message, title, R.drawable.ic_movie_white_48dp);
             return;
         }
 
@@ -153,25 +192,120 @@ public class DataService extends Service {
 
         final Event event = ArtworkUtils.packetToEvent(p);
 
-        mHandler.post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 try {
-                    ArtworkHolder holder = m_artwork.fetchForEvent(event);
+                    ArtworkHolder holder = artwork.fetchForEvent(event);
 
                     if(holder != null) {
-                        mNotification.notify(message, event.getTitle(), holder.getBackgroundUrl());
+                        notification.notify(message, event.getTitle(), holder.getBackgroundUrl());
                     }
                     else {
-                        mNotification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
+                        notification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
                     }
                 }
                 catch(IOException e) {
                     e.printStackTrace();
-                    mNotification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
+                    notification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
                 }
             }
         });
     }
 
+    public void setMovieArtwork(Movie movie, ArtworkHolder holder) {
+        // update local movie list
+        String id = movie.getId();
+        for(Movie m : movieCollection) {
+            if (m.getId().equals(id)) {
+                Log.d(TAG, "updating movie entry " + id);
+                m.setArtwork(holder);
+                break;
+            }
+        }
+
+        // update on server
+        ArtworkUtils.setMovieArtwork(connection, movie, holder);
+        postMovieCollectionUpdated(movieCollection);
+    }
+
+    public Collection<Movie> getMovieCollection() {
+        return movieCollection;
+    }
+
+    public TreeSet<String> getFolderList() {
+        return folderList;
+    }
+
+    protected void loadMovieCollection() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                loaderTask = new MovieCollectionLoaderTask(connection, SetupUtils.getLanguage(DataService.this));
+                loaderTask.load(DataService.this);
+            }
+        });
+    }
+
+    protected void updateFolderList() {
+        String seriesFolder = connection.getConfig("SeriesFolder");
+
+        for(Movie movie : movieCollection) {
+            String category = movie.getCategory();
+
+            if (!seriesFolder.isEmpty() && category.startsWith(seriesFolder + "/")) {
+                continue;
+            }
+
+            if (category.equals(PacketAdapter.FOLDER_UNSORTED)) {
+                continue;
+            }
+
+            folderList.add(movie.getCategory());
+        }
+
+        if (!seriesFolder.isEmpty()) {
+            folderList.add(seriesFolder);
+        }
+    }
+
+    public void registerListener(Listener listener) {
+        listeners.add(listener);
+    }
+
+    public void unregisterListener(Listener listener) {
+        listeners.remove(listener);
+    }
+
+    // MovieCollectionLoaderTask
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "started loading movies");
+    }
+
+    @Override
+    public void onCompleted(Collection<Movie> list) {
+        if(list == null) {
+            return; // TODO - notification load failed
+        }
+
+        Log.d(TAG, "finished loading (" + list.size() + " movies)");
+
+        movieCollection = list;
+        updateFolderList();
+        Log.d(TAG, "loaded " + folderList.size() + " folders");
+        postMovieCollectionUpdated(movieCollection);
+    }
+
+    private void postMovieCollectionUpdated(final Collection<Movie> list) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+            for (int i = 0; i < listeners.size(); i++) {
+                listeners.get(i).onMovieCollectionUpdated(list);
+            }
+            }
+        });
+    }
 }
