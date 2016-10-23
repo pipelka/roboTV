@@ -31,7 +31,7 @@ public class PositionReference {
         this.currentPosition = wallClockTime;
     }
 
-    long getStartPosition() {
+    public long getStartPosition() {
         return startPosition;
     }
 
@@ -47,7 +47,7 @@ public class PositionReference {
         return endPosition - startPosition;
     }
 
-    long getEndPosition() {
+    public long getEndPosition() {
         return endPosition;
     }
 
@@ -60,7 +60,7 @@ public class PositionReference {
         return currentPosition + diffMs;
     }
 
-    long timeUsFromPosition(long position) {
+    public long timeUsFromPosition(long position) {
         return timeUs + (position - currentPosition) * 1000;
     }
 
@@ -75,5 +75,4 @@ public class PositionReference {
     public boolean getTrickPlayMode() {
         return trickPlayMode;
     }
-
 }

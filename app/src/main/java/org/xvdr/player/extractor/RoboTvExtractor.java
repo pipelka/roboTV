@@ -156,7 +156,13 @@ public class RoboTvExtractor implements Extractor {
 
         scratch.read(input, 8);
 
-        position.set(timeUs, scratch.getU64());
+        long pos = scratch.getU64();
+
+        // sanity check if position is within the range
+        if(position.getStartPosition() < pos && pos < position.getEndPosition()) {
+            position.set(timeUs, pos);
+        }
+
         return RESULT_CONTINUE;
     }
 

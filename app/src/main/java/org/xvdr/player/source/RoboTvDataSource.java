@@ -167,12 +167,21 @@ class RoboTvDataSource implements DataSource {
                 throw new InterruptedIOException();
             }
 
-            // start position of stream (wallclock time)
-            position.setStartPosition(response.getS64());
+            // start position of stream (wallclock time) - monotonic increasing
+            long pos = response.getS64();
+            if(pos > position.getStartPosition()) {
+                position.setStartPosition(pos);
+            }
 
-            // end position of stream - if any (wallclock time)
-            long endPosition = response.getS64();
-            position.setEndPosition(endPosition == 0 ? C.TIME_UNSET : endPosition);
+            // end position of stream - if any (wallclock time) - monotonic increasing
+            pos = response.getS64();
+            if(pos == 0) {
+                pos = System.currentTimeMillis();
+            }
+
+            if(pos > position.getEndPosition()) {
+                position.setEndPosition(pos);
+            }
         }
 
         readLength = Math.min(readLength, response.remaining());
