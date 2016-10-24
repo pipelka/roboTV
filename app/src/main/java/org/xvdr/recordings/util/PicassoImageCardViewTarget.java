@@ -28,6 +28,6 @@ public class PicassoImageCardViewTarget implements Target {
 
     @Override
     public void onPrepareLoad(Drawable drawable) {
-        // Do nothing, default_background manager has its own transitions
+        mImageCardView.setMainImage(drawable);
     }
 }

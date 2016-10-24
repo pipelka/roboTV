@@ -107,4 +107,5 @@
     <string name="audiotrack">Audiotrack</string>
     <string name="fail_to_load_movielist">Fail to load movie data from server</string>
     <string name="error_open_recording">Error opening recording</string>
+    <string name="movie_actions">Actions</string>
 </resources>

@@ -44,7 +44,7 @@ public class CoverSearchActivity extends Activity {
             }
 
             @Override
-            public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection) {
+            public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
             }
         });
 

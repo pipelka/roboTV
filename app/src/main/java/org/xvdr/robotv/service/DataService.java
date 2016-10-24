@@ -9,6 +9,7 @@ import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.jniwrap.SessionListener;
+import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionLoaderTask;
 import org.xvdr.recordings.model.PacketAdapter;
@@ -27,6 +28,9 @@ import java.util.TreeSet;
 
 public class DataService extends Service implements MovieCollectionLoaderTask.Listener {
 
+    public static final int STATUS_Collection_Busy = 0;
+    public static final int STATUS_Collection_Ready = 1;
+
     private final IBinder binder = new Binder();
     Connection connection;
     Handler handler;
@@ -39,8 +43,8 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
     private static final String TAG = "DataService";
 
-    interface Listener {
-        void onMovieCollectionUpdated(Collection<Movie> collection);
+    public interface Listener {
+        void onMovieCollectionUpdated(Collection<Movie> collection, int status);
     }
 
     public class Binder extends android.os.Binder {
@@ -241,6 +245,11 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         handler.post(new Runnable() {
             @Override
             public void run() {
+
+                for (int i = 0; i < listeners.size(); i++) {
+                    listeners.get(i).onMovieCollectionUpdated(null, STATUS_Collection_Busy);
+                }
+
                 loaderTask = new MovieCollectionLoaderTask(connection, SetupUtils.getLanguage(DataService.this));
                 loaderTask.load(DataService.this);
             }
@@ -277,6 +286,15 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         listeners.remove(listener);
     }
 
+    public Collection<Movie> getRelatedContent(Movie movie) {
+        RelatedContentExtractor contentExtractor = new RelatedContentExtractor(movieCollection);
+        if(movie.isSeries()) {
+            return contentExtractor.getSeries(movie.getCategory());
+        }
+
+        return contentExtractor.getRelatedMovies(movie);
+    }
+
     // MovieCollectionLoaderTask
 
     @Override
@@ -303,7 +321,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
             @Override
             public void run() {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).onMovieCollectionUpdated(list);
+                listeners.get(i).onMovieCollectionUpdated(list, STATUS_Collection_Ready);
             }
             }
         });

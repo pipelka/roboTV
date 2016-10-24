@@ -25,7 +25,7 @@ public class PicassoBackgroundManagerTarget implements Target {
 
     @Override
     public void onBitmapFailed(Drawable drawable) {
-        //this.mBackgroundManager.setDrawable(drawable);
+        mBackgroundManager.setDrawable(drawable);
     }
 
     @Override

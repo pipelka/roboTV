@@ -1,9 +1,11 @@
 package org.xvdr.recordings.fragment;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
+import android.support.v17.leanback.app.ProgressBarManager;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
@@ -14,14 +16,18 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 
 import android.support.v17.leanback.widget.Row;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+
+import com.squareup.picasso.Picasso;
 
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
 import org.xvdr.recordings.presenter.PreferenceCardPresenter;
+import org.xvdr.recordings.util.PicassoBackgroundManagerTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
@@ -34,6 +40,8 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     private final static String TAG = "RecordingsFragment";
 
     private MovieCollectionAdapter mAdapter;
+    BackgroundManager backgroundManager;
+    private PicassoBackgroundManagerTarget backgroundManagerTarget;
 
     private int color_background;
     private int color_brand;
@@ -84,7 +92,6 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
             catch(Exception e) {
                 e.printStackTrace();
             }
-            return;
         }
     }
 
@@ -98,8 +105,31 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
                 ListRow listRow = (ListRow) row;
                 ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
                 selectedItem = rowAdapter.indexOf(item);
+
+                if(item instanceof Movie) {
+                    Movie movie = (Movie) item;
+                    updateBackground(movie.getBackgroundImageUrl());
+                }
             }
         };
+    }
+
+    private void updateBackground(String url) {
+        Log.d(TAG, "updateBackground: '" + url + "'");
+
+        if(url == null || url.isEmpty() || !url.endsWith(".jpg")) {
+            backgroundManager.setDrawable(null);
+            backgroundManager.setColor(color_background);
+            return;
+        }
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Picasso.with(getActivity())
+                .load(url)
+                .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
+                .resize(metrics.widthPixels, metrics.heightPixels)
+                .into(backgroundManagerTarget);
     }
 
     private void setupPreferences(ArrayObjectAdapter adapter) {
@@ -122,9 +152,12 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     }
 
     private void setBackground() {
-        BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
+        backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
         backgroundManager.setColor(color_background);
+        backgroundManager.setDimLayer(new ColorDrawable(Utils.getColor(getActivity(), R.color.dim_background)));
+
+        backgroundManagerTarget = new PicassoBackgroundManagerTarget(backgroundManager);
     }
 
     private void initUI() {
@@ -196,8 +229,23 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     }
 
     @Override
-    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection) {
-        if(getActivity() != null) {
+    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
+        if(getActivity() == null) {
+            return;
+        }
+
+        ProgressBarManager manager = getProgressBarManager();
+
+        if(status == DataService.STATUS_Collection_Busy) {
+            manager.enableProgressBar();
+            manager.show();
+        }
+        else if(status == DataService.STATUS_Collection_Ready) {
+            manager.disableProgressBar();
+            manager.hide();
+        }
+
+        if(collection != null) {
             loadMovies(collection);
         }
     }

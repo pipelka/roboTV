@@ -36,7 +36,7 @@ public class ActionPresenterSelector extends PresenterSelector {
     public Presenter getPresenter(Object item) {
         Action action = (Action) item;
 
-        if(TextUtils.isEmpty(action.getLabel2())) {
+        if(action.getLabel2() == null) {
             return mOneLineActionPresenter;
         }
         else {
@@ -130,6 +130,8 @@ public class ActionPresenterSelector extends PresenterSelector {
             vh.mAction = action;
             CharSequence line1 = action.getLabel1();
             CharSequence line2 = action.getLabel2();
+
+            vh.mButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
             if(TextUtils.isEmpty(line1)) {
                 vh.mButton.setText(line2);

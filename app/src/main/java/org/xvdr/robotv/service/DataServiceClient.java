@@ -16,21 +16,27 @@ public class DataServiceClient {
     public interface Listener {
         void onServiceConnected(DataService service);
         void onServiceDisconnected(DataService service);
-        void onMovieCollectionUpdated(DataService service, Collection<Movie> collection);
+        void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status);
     }
 
     private DataService service;
     private Context context;
     private Listener listener;
+    private Object lock = new Object();
+
     Handler handler;
 
     private DataService.Listener dataServiceListener = new DataService.Listener() {
         @Override
-        public void onMovieCollectionUpdated(final Collection<Movie> collection) {
+        public void onMovieCollectionUpdated(final Collection<Movie> collection, final int status) {
+            if(listener == null) {
+                return;
+            }
+
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    listener.onMovieCollectionUpdated(service, collection);
+                    listener.onMovieCollectionUpdated(service, collection, status);
                 }
             });
         }
@@ -46,6 +52,10 @@ public class DataServiceClient {
             service.registerListener(dataServiceListener);
 
             if(listener == null) {
+                /*synchronized(lock) {
+                    lock.notifyAll();
+                }*/
+
                 return;
             }
 
@@ -53,6 +63,7 @@ public class DataServiceClient {
                 @Override
                 public void run() {
                     listener.onServiceConnected(service);
+                    listener.onMovieCollectionUpdated(service, null, DataService.STATUS_Collection_Busy);
                 }
             });
         }
@@ -75,6 +86,10 @@ public class DataServiceClient {
         }
     };
 
+    public DataServiceClient(Context context) {
+        this(context, null);
+    }
+
     public DataServiceClient(Context context, Listener listener) {
         this.context = context;
         this.listener = listener;
@@ -84,7 +99,21 @@ public class DataServiceClient {
     public boolean bind() {
         Intent serviceIntent = new Intent(context, DataService.class);
         context.startService(serviceIntent);
-        return context.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+
+        boolean success = context.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+
+        /*if(listener == null) {
+            synchronized(lock) {
+                try {
+                    lock.wait(2000);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }*/
+
+        return success;
     }
 
     public void unbind() {

@@ -22,8 +22,9 @@ public class ColorAction extends Action {
         super(id, label1, label2, icon);
     }
 
-    public void setColor(int color) {
+    public ColorAction setColor(int color) {
         this.color = color;
+        return this;
     }
 
     public int getColor() {

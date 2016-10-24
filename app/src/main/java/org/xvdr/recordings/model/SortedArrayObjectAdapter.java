@@ -4,7 +4,9 @@ import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.PresenterSelector;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {
@@ -37,6 +39,14 @@ public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {
         }
 
         super.add(index, item);
+    }
+
+    public void addAll(Collection items) {
+        Iterator i = items.iterator();
+
+        while(i.hasNext()) {
+            add(i.next());
+        }
     }
 
     @Override
