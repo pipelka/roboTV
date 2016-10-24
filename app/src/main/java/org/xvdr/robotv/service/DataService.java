@@ -305,7 +305,8 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     @Override
     public void onCompleted(Collection<Movie> list) {
         if(list == null) {
-            return; // TODO - notification load failed
+            postMovieCollectionUpdated(null);
+            return;
         }
 
         Log.d(TAG, "finished loading (" + list.size() + " movies)");

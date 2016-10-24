@@ -20,6 +20,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
+import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
 
 import org.xvdr.recordings.activity.DetailsActivity;
@@ -42,6 +43,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     private MovieCollectionAdapter mAdapter;
     BackgroundManager backgroundManager;
     private PicassoBackgroundManagerTarget backgroundManagerTarget;
+    private Picasso picasso;
 
     private int color_background;
     private int color_brand;
@@ -56,6 +58,10 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        picasso = new Picasso.Builder(getActivity())
+                .memoryCache(new LruCache(10 * 1024 * 1024))
+                .build();
 
         initUI();
         setupEventListeners();
@@ -125,11 +131,10 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
 
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        Picasso.with(getActivity())
-                .load(url)
-                .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
-                .resize(metrics.widthPixels, metrics.heightPixels)
-                .into(backgroundManagerTarget);
+
+        picasso.load(url)
+            .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
+            .into(backgroundManagerTarget);
     }
 
     private void setupPreferences(ArrayObjectAdapter adapter) {
@@ -233,6 +238,8 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         if(getActivity() == null) {
             return;
         }
+
+        Log.d(TAG, "onMovieCollectionUpdated status=" + status);
 
         ProgressBarManager manager = getProgressBarManager();
 

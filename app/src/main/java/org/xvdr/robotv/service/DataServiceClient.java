@@ -52,10 +52,6 @@ public class DataServiceClient {
             service.registerListener(dataServiceListener);
 
             if(listener == null) {
-                /*synchronized(lock) {
-                    lock.notifyAll();
-                }*/
-
                 return;
             }
 
@@ -63,7 +59,6 @@ public class DataServiceClient {
                 @Override
                 public void run() {
                     listener.onServiceConnected(service);
-                    listener.onMovieCollectionUpdated(service, null, DataService.STATUS_Collection_Busy);
                 }
             });
         }
@@ -100,20 +95,7 @@ public class DataServiceClient {
         Intent serviceIntent = new Intent(context, DataService.class);
         context.startService(serviceIntent);
 
-        boolean success = context.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
-
-        /*if(listener == null) {
-            synchronized(lock) {
-                try {
-                    lock.wait(2000);
-                }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }*/
-
-        return success;
+        return context.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
     }
 
     public void unbind() {

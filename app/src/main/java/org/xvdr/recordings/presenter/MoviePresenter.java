@@ -12,10 +12,13 @@ import org.xvdr.recordings.util.PicassoImageCardViewTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
+import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
 
 
 public class MoviePresenter extends Presenter {
+
+    static Picasso picasso = null;
 
     static public class ViewHolder extends Presenter.ViewHolder {
         private ImageCardView mCardView;
@@ -39,7 +42,7 @@ public class MoviePresenter extends Presenter {
                 return;
             }
 
-            Picasso.with(context)
+            picasso
             .load(link)
             .resize(266, 400)
             .centerCrop()
@@ -52,6 +55,12 @@ public class MoviePresenter extends Presenter {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
+        if(picasso == null) {
+            picasso = new Picasso.Builder(parent.getContext())
+                    .memoryCache(new LruCache(10 * 1024 * 1024))
+                    .build();
+        }
+
         ImageCardView cardView = new ImageCardView(parent.getContext());
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
