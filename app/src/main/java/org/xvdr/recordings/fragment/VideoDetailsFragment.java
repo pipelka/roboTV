@@ -3,7 +3,6 @@ package org.xvdr.recordings.fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.DetailsFragment;
@@ -13,18 +12,19 @@ import android.support.v17.leanback.widget.BaseOnItemViewClickedListener;
 import android.support.v17.leanback.widget.ClassPresenterSelector;
 import android.support.v17.leanback.widget.DetailsOverviewRow;
 import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnActionClickedListener;
-import android.support.v17.leanback.widget.PlaybackControlsRow;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.xvdr.recordings.activity.CoverSearchActivity;
 import org.xvdr.recordings.activity.PlayerActivity;
@@ -35,18 +35,13 @@ import org.xvdr.recordings.presenter.ActionPresenterSelector;
 import org.xvdr.recordings.presenter.ColorAction;
 import org.xvdr.recordings.presenter.DetailsDescriptionPresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
-import org.xvdr.recordings.presenter.MoviePresenter;
-import org.xvdr.recordings.util.PicassoBackgroundManagerTarget;
+import org.xvdr.recordings.util.BackgroundManagerTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.DataServiceClient;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
 import java.util.Collection;
-import java.util.Comparator;
 
 public class VideoDetailsFragment extends DetailsFragment {
 
@@ -59,17 +54,52 @@ public class VideoDetailsFragment extends DetailsFragment {
     private static final int ACTION_MOVE = 3;
 
     private Movie mSelectedMovie;
+    private BackgroundManager backgroundManager;
+    BackgroundManagerTarget backgroundManagerTarget;
 
-    private Target mBackgroundTarget;
-    private DisplayMetrics mMetrics;
     private DataServiceClient dataClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dataClient = new DataServiceClient(getActivity());
+        initBackground();
+
+        dataClient = new DataServiceClient(getActivity(), new DataServiceClient.Listener() {
+            @Override
+            public void onServiceConnected(DataService service) {
+                initDetails();
+            }
+
+            @Override
+            public void onServiceDisconnected(DataService service) {
+            }
+
+            @Override
+            public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
+            }
+        });
         dataClient.bind();
+
+        setOnItemViewClickedListener(new BaseOnItemViewClickedListener() {
+            @Override
+            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Object row) {
+                if(item instanceof ColorAction) {
+                    ColorAction action = (ColorAction) item;
+                    if(action.getId() == ACTION_EDIT) {
+                        Intent intent = new Intent(getActivity(), CoverSearchActivity.class);
+                        intent.putExtra(EXTRA_MOVIE, mSelectedMovie);
+                        startActivity(intent);
+                        getActivity().finishAndRemoveTask();
+                    }
+                    else if(action.getId() == ACTION_MOVE) {
+                    }
+                }
+                else if(item instanceof Movie) {
+                    playbackMovie((Movie) item);
+                }
+            }
+        });
 
         mSelectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
     }
@@ -83,18 +113,13 @@ public class VideoDetailsFragment extends DetailsFragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        initBackground();
-        new DetailRowBuilderTask().execute(mSelectedMovie);
     }
 
     private void initBackground() {
-        BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
+        backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
-        mBackgroundTarget = new PicassoBackgroundManagerTarget(backgroundManager);
 
-        mMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(mMetrics);
+        backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
 
         if(mSelectedMovie != null && !TextUtils.isEmpty(mSelectedMovie.getBackgroundImageUrl())) {
             updateBackground(mSelectedMovie.getBackgroundImageUrl());
@@ -106,141 +131,112 @@ public class VideoDetailsFragment extends DetailsFragment {
             return;
         }
 
-        Picasso.with(getActivity())
-        .load(url)
+        Glide.with(getActivity())
+        .load(url).asBitmap().skipMemoryCache(true)
         .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
-        .resize(mMetrics.widthPixels, mMetrics.heightPixels)
-        .into(mBackgroundTarget);
+        .into(backgroundManagerTarget);
     }
 
-    private class DetailRowBuilderTask extends AsyncTask<Movie, Integer, DetailsOverviewRow> {
-        @Override
-        protected DetailsOverviewRow doInBackground(Movie... movies) {
-            mSelectedMovie = movies[0];
-            String url = mSelectedMovie.getCardImageUrl();
+    private void initDetails() {
+        ClassPresenterSelector ps = new ClassPresenterSelector();
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(ps);
 
-            DetailsOverviewRow row = new DetailsOverviewRow(mSelectedMovie);
-
-            try {
-                if(!(url == null || url.isEmpty())) {
-                    Bitmap poster = Picasso.with(getActivity())
-                                    .load(url)
-                                    .resize(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()),
-                                            Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
-                                    .error(getResources().getDrawable(R.drawable.recording_unkown, null))
-                                    .placeholder(getResources().getDrawable(R.drawable.recording_unkown, null))
-                                    .centerCrop()
-                                    .get();
-                    row.setImageBitmap(getActivity(), poster);
-                }
-                else {
-                    row.setImageDrawable(getResources().getDrawable(R.drawable.recording_unkown, null));
-                }
-            }
-            catch(Exception e) {
-                e.printStackTrace();
-            }
-
-            return row;
-        }
-
-        @Override
-        protected void onPostExecute(DetailsOverviewRow detailRow) {
-            if(detailRow == null) {
-                return;
-            }
-
-            SparseArrayObjectAdapter actions = new SparseArrayObjectAdapter();
-
-            actions.set(0,
-                    new Action(
-                            ACTION_WATCH,
-                            null,
-                            getResources().getString(R.string.watch),
-                            getResources().getDrawable(R.drawable.ic_play_arrow_white_48dp, null)
-                    )
-            );
-
-            detailRow.setActionsAdapter(actions);
-
-            ClassPresenterSelector ps = new ClassPresenterSelector();
-            DetailsOverviewRowPresenter dorPresenter =
+        DetailsOverviewRowPresenter dorPresenter =
                 new DetailsOverviewRowPresenter(new DetailsDescriptionPresenter());
-            // set detail background and style
-            dorPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.primary_color));
-            dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
-                @Override
-                public void onActionClicked(Action action) {
-                    if(action.getId() == ACTION_WATCH) {
-                        playbackMovie(mSelectedMovie);
-                    }
+
+        // set detail background and style
+        dorPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.primary_color));
+        dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
+            @Override
+            public void onActionClicked(Action action) {
+                if(action.getId() == ACTION_WATCH) {
+                    playbackMovie(mSelectedMovie);
                 }
-            });
-
-            ps.addClassPresenter(DetailsOverviewRow.class, dorPresenter);
-            ps.addClassPresenter(ListRow.class,
-                                 new ListRowPresenter());
-
-
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(ps);
-            adapter.add(detailRow);
-            setExtraActions(adapter);
-            loadRelatedContent(adapter);
-            setAdapter(adapter);
-
-            setOnItemViewClickedListener(new BaseOnItemViewClickedListener() {
-                @Override
-                public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Object row) {
-                    if(item instanceof ColorAction) {
-                        ColorAction action = (ColorAction) item;
-                        if(action.getId() == ACTION_EDIT) {
-                            Intent intent = new Intent(getActivity(), CoverSearchActivity.class);
-                            intent.putExtra(EXTRA_MOVIE, mSelectedMovie);
-                            startActivity(intent);
-                            getActivity().finishAndRemoveTask();
-                        }
-                        else if(action.getId() == ACTION_MOVE) {
-                        }
-                    }
-                    else if(item instanceof Movie) {
-                        playbackMovie((Movie) item);
-                    }
-                }
-            });
-        }
-
-        private void playbackMovie(Movie movie) {
-            Intent intent = new Intent(getActivity(), PlayerActivity.class);
-            intent.putExtra(EXTRA_MOVIE, movie);
-            intent.putExtra(EXTRA_SHOULD_AUTO_START, true);
-            startActivity(intent);
-            getActivity().finishAndRemoveTask();
-        }
-
-        private void loadRelatedContent(ArrayObjectAdapter adapter) {
-            DataService service = dataClient.getService();
-
-            if(service == null) {
-                Log.d(TAG, "service is null");
-                return;
             }
+        });
 
-            Collection<Movie> collection = service.getRelatedContent(mSelectedMovie);
+        ps.addClassPresenter(DetailsOverviewRow.class, dorPresenter);
+        ps.addClassPresenter(ListRow.class,
+                new ListRowPresenter());
 
-            if(collection == null) {
-                return;
-            }
+        addDetailRow(adapter, mSelectedMovie);
 
-            SortedArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(
-                    MovieCollectionAdapter.compareTimestamps,
-                    new LatestCardPresenter());
+        setExtraActions(adapter);
+        loadRelatedContent(adapter);
 
-            listRowAdapter.addAll(collection);
+        setAdapter(adapter);
+    }
 
-            HeaderItem header = new HeaderItem(0, getString(R.string.related_movies));
-            adapter.add(new ListRow(header, listRowAdapter));
+    private void addDetailRow(ArrayObjectAdapter adapter, Movie movie) {
+        final DetailsOverviewRow row = new DetailsOverviewRow(mSelectedMovie);
+        String url = movie.getCardImageUrl();
+
+
+        if(url == null || url.isEmpty()) {
+            row.setImageDrawable(getResources().getDrawable(R.drawable.recording_unkown, null));
         }
 
+        SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                row.setImageBitmap(getActivity(), resource);
+            }
+        };
+
+        Glide.with(getActivity())
+                .load(url).asBitmap()
+                .override(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()), Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
+                .error(getResources().getDrawable(R.drawable.recording_unkown, null))
+                .placeholder(getResources().getDrawable(R.drawable.recording_unkown, null))
+                .centerCrop()
+                .into(target);
+
+        SparseArrayObjectAdapter actions = new SparseArrayObjectAdapter();
+
+        actions.set(0,
+                new Action(
+                        ACTION_WATCH,
+                        null,
+                        getResources().getString(R.string.watch),
+                        getResources().getDrawable(R.drawable.ic_play_arrow_white_48dp, null)
+                )
+        );
+
+        row.setActionsAdapter(actions);
+
+        adapter.add(row);
+    }
+
+    private void playbackMovie(Movie movie) {
+        Intent intent = new Intent(getActivity(), PlayerActivity.class);
+        intent.putExtra(EXTRA_MOVIE, movie);
+        intent.putExtra(EXTRA_SHOULD_AUTO_START, true);
+        startActivity(intent);
+        getActivity().finishAndRemoveTask();
+    }
+
+    private void loadRelatedContent(ArrayObjectAdapter adapter) {
+        DataService service = dataClient.getService();
+
+        if(service == null) {
+            Log.d(TAG, "service is null");
+            return;
+        }
+
+        Collection<Movie> collection = service.getRelatedContent(mSelectedMovie);
+
+        if(collection == null) {
+            return;
+        }
+
+        SortedArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(
+                MovieCollectionAdapter.compareTimestamps,
+                new LatestCardPresenter());
+
+        listRowAdapter.addAll(collection);
+
+        HeaderItem header = new HeaderItem(0, getString(R.string.related_movies));
+        adapter.add(new ListRow(header, listRowAdapter));
     }
 
     private void setExtraActions(ArrayObjectAdapter adapter) {

@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
@@ -60,14 +60,13 @@ public class NotificationHandler {
                 Bitmap bitmap = null;
 
                 try {
-                    bitmap = Picasso.with(mContext)
-                             .load(imageUrl)
-                             .resize(Utils.dpToPx(R.integer.artwork_background_width_small, mContext),
+                    bitmap = Glide.with(mContext)
+                             .load(imageUrl).asBitmap().centerCrop()
+                             .into(Utils.dpToPx(R.integer.artwork_background_width_small, mContext),
                                      Utils.dpToPx(R.integer.artwork_background_height_small, mContext))
-                             .centerCrop()
                              .get();
                 }
-                catch(IOException e) {
+                catch(Exception e) {
                     e.printStackTrace();
                 }
 

@@ -1,7 +1,9 @@
 package org.xvdr.recordings.fragment;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
@@ -20,15 +22,16 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
-import com.squareup.picasso.LruCache;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
 import org.xvdr.recordings.presenter.PreferenceCardPresenter;
-import org.xvdr.recordings.util.PicassoBackgroundManagerTarget;
+import org.xvdr.recordings.util.BackgroundManagerTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
@@ -41,9 +44,8 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     private final static String TAG = "RecordingsFragment";
 
     private MovieCollectionAdapter mAdapter;
-    BackgroundManager backgroundManager;
-    private PicassoBackgroundManagerTarget backgroundManagerTarget;
-    private Picasso picasso;
+    private BackgroundManager backgroundManager;
+    private BackgroundManagerTarget backgroundManagerTarget;
 
     private int color_background;
     private int color_brand;
@@ -58,10 +60,6 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        picasso = new Picasso.Builder(getActivity())
-                .memoryCache(new LruCache(10 * 1024 * 1024))
-                .build();
 
         initUI();
         setupEventListeners();
@@ -129,10 +127,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
             return;
         }
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        picasso.load(url)
+        Glide.with(this).load(url).asBitmap().skipMemoryCache(true)
             .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
             .into(backgroundManagerTarget);
     }
@@ -162,7 +157,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         backgroundManager.setColor(color_background);
         backgroundManager.setDimLayer(new ColorDrawable(Utils.getColor(getActivity(), R.color.dim_background)));
 
-        backgroundManagerTarget = new PicassoBackgroundManagerTarget(backgroundManager);
+        backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
     }
 
     private void initUI() {

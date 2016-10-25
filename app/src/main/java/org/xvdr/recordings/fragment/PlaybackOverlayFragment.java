@@ -2,7 +2,6 @@ package org.xvdr.recordings.fragment;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,9 +21,10 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.exoplayer2.util.MimeTypes;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.xvdr.player.Player;
 import org.xvdr.recordings.activity.PlayerActivity;
@@ -47,30 +47,13 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         this.player = player;
     }
 
-    /* For cardImage loading to playbackRow */
-    public class PicassoPlaybackControlsRowTarget implements Target {
-        PlaybackControlsRow mPlaybackControlsRow;
-
-        PicassoPlaybackControlsRowTarget(PlaybackControlsRow playbackControlsRow) {
-            mPlaybackControlsRow = playbackControlsRow;
-        }
-
+    private SimpleTarget<Bitmap> controlsRowTarget = new SimpleTarget<Bitmap>() {
         @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
-            mPlaybackControlsRow.setImageBitmap(PlaybackOverlayFragment.this.getActivity(), bitmap);
+        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+            mPlaybackControlsRow.setImageBitmap(PlaybackOverlayFragment.this.getActivity(), resource);
             mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
         }
-
-        @Override
-        public void onBitmapFailed(Drawable drawable) {
-            mPlaybackControlsRow.setImageDrawable(drawable);
-        }
-
-        @Override
-        public void onPrepareLoad(Drawable drawable) {
-            // Do nothing, default_background manager has its own transitions
-        }
-    }
+    };
 
     private static final String TAG = PlaybackOverlayFragment.class.getSimpleName();
     private static final int DEFAULT_UPDATE_PERIOD = 1000;
@@ -89,8 +72,6 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     private PlaybackControlsRow.SkipPreviousAction mSkipPreviousAction;
     private PlaybackControlsRow.FastForwardAction mFastForwardAction;
     private PlaybackControlsRow.RewindAction mRewindAction;
-
-    private PicassoPlaybackControlsRowTarget mPlaybackControlsRowTarget;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -172,11 +153,11 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
             return;
         }
 
-        Picasso.with(getActivity())
-        .load(url)
-        .resize(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()),
+        Glide.with(getActivity())
+        .load(url).asBitmap()
+        .override(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()),
                 Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
-        .into(mPlaybackControlsRowTarget);
+        .into(controlsRowTarget);
     }
 
     private void addPlaybackControlsRow() {
@@ -184,8 +165,6 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
         mPlaybackControlsRow.setCurrentTime(0);
         mPlaybackControlsRow.setBufferedProgress(0);
-
-        mPlaybackControlsRowTarget = new PicassoPlaybackControlsRowTarget(mPlaybackControlsRow);
 
         mRowsAdapter.add(mPlaybackControlsRow);
 

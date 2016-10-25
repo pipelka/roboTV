@@ -6,9 +6,8 @@ import android.support.v17.leanback.widget.Presenter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
-import org.xvdr.recordings.util.PicassoImageCardViewTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkHolder;
@@ -18,31 +17,29 @@ public class ArtworkPresenter extends Presenter {
 
     static class ViewHolder extends Presenter.ViewHolder {
         private ImageCardView mCardView;
-        private PicassoImageCardViewTarget mImageCardViewTarget;
 
         public ViewHolder(View view) {
             super(view);
             mCardView = (ImageCardView) view;
-            mImageCardViewTarget = new PicassoImageCardViewTarget(mCardView);
         }
 
-        public ImageCardView getCardView() {
+        ImageCardView getCardView() {
             return mCardView;
         }
 
-        protected void updateCardViewImage(Context context, String link) {
+        void updateCardViewImage(Context context, String link) {
             if(link == null || link.isEmpty()) {
                 mCardView.setMainImage(context.getDrawable(R.drawable.recording_unkown));
                 return;
             }
 
-            Picasso.with(context)
+            Glide.with(context)
             .load(link)
-            .resize(266, 400)
+            .override(266, 400)
             .centerCrop()
             .error(context.getDrawable(R.drawable.recording_unkown))
             .placeholder(context.getDrawable(R.drawable.recording_unkown))
-            .into(mImageCardViewTarget);
+            .into(mCardView.getMainImageView());
         }
     }
 

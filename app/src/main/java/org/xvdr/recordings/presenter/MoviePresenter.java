@@ -7,27 +7,20 @@ import android.support.v17.leanback.widget.Presenter;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+
 import org.xvdr.recordings.model.Movie;
-import org.xvdr.recordings.util.PicassoImageCardViewTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
-import com.squareup.picasso.LruCache;
-import com.squareup.picasso.Picasso;
-
-
 public class MoviePresenter extends Presenter {
-
-    static Picasso picasso = null;
 
     static public class ViewHolder extends Presenter.ViewHolder {
         private ImageCardView mCardView;
-        private PicassoImageCardViewTarget mImageCardViewTarget;
 
         public ViewHolder(View view) {
             super(view);
             mCardView = (ImageCardView) view;
-            mImageCardViewTarget = new PicassoImageCardViewTarget(mCardView);
         }
 
         public ImageCardView getCardView() {
@@ -42,25 +35,18 @@ public class MoviePresenter extends Presenter {
                 return;
             }
 
-            picasso
+            Glide.with(mCardView.getContext())
             .load(link)
-            .resize(266, 400)
+            .override(266, 400)
             .centerCrop()
-            .placeholder(drawableUnknown)
             .error(drawableUnknown)
             .placeholder(drawableUnknown)
-            .into(mImageCardViewTarget);
+            .into(mCardView.getMainImageView());
         }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        if(picasso == null) {
-            picasso = new Picasso.Builder(parent.getContext())
-                    .memoryCache(new LruCache(10 * 1024 * 1024))
-                    .build();
-        }
-
         ImageCardView cardView = new ImageCardView(parent.getContext());
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);

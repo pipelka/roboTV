@@ -1,18 +1,17 @@
 package org.xvdr.timers.fragment;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.widget.GuidanceStylist;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-
-import java.io.IOException;
 
 public class CreateTimerStepFragment extends GuidedStepFragment {
 
@@ -37,32 +36,17 @@ public class CreateTimerStepFragment extends GuidedStepFragment {
             mDrawable = getActivity().getDrawable(R.drawable.recording_unkown);
         }
         else {
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        mDrawable = new BitmapDrawable(getResources(), Picasso.with(getActivity())
-                                                       .load(url)
-                                                       .resize(
-                                                           Utils.dp(R.integer.artwork_background_width, activity),
-                                                           Utils.dp(R.integer.artwork_background_height, activity))
-                                                       .centerCrop()
-                                                       .error(activity.getDrawable(R.drawable.recording_unkown))
-                                                       .placeholder(activity.getDrawable(R.drawable.recording_unkown))
-                                                       .get());
-                    }
-                    catch(IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            t.start();
-
             try {
-                t.join();
+                Bitmap bitmap = Glide.with(getActivity())
+                    .load(url).asBitmap()
+                    .into(
+                        Utils.dp(R.integer.artwork_background_width, activity),
+                        Utils.dp(R.integer.artwork_background_height, activity)).get();
+
+                mDrawable = new BitmapDrawable(getResources(), bitmap);
             }
-            catch(InterruptedException e) {
+            catch(Exception e) {
+                mDrawable = getActivity().getDrawable(R.drawable.recording_unkown);
                 e.printStackTrace();
             }
         }

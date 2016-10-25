@@ -3,7 +3,6 @@ package org.xvdr.recordings.activity;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
@@ -11,10 +10,11 @@ import android.os.Bundle;
 import android.view.Surface;
 import android.view.SurfaceView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.xvdr.player.Player;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
@@ -82,25 +82,14 @@ public class PlayerActivity extends Activity implements Player.Listener {
         String url = movie.getCardImageUrl();
 
         if(url != null && !url.isEmpty()) {
-            Picasso
-            .with(this)
-            .load(url)
-            .resize(Utils.dpToPx(R.integer.artwork_poster_width, this), Utils.dpToPx(R.integer.artwork_poster_height, this))
-            .centerCrop()
-            .into(new Target() {
+            Glide.with(this).load(url).asBitmap()
+            .override(Utils.dpToPx(R.integer.artwork_poster_width, this), Utils.dpToPx(R.integer.artwork_poster_height, this))
+            .centerCrop().into(new SimpleTarget<Bitmap>() {
                 @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap);
+                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, resource);
                     MediaMetadata m = metadataBuilder.build();
                     mSession.setMetadata(m);
-                }
-
-                @Override
-                public void onBitmapFailed(Drawable errorDrawable) {
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
                 }
             });
             return;

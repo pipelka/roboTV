@@ -6,10 +6,9 @@ import android.support.v17.leanback.widget.Presenter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.model.Movie;
-import org.xvdr.recordings.util.PicassoImageCardViewTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
@@ -17,12 +16,10 @@ public class EpgEventPresenter extends Presenter {
 
     static public class ViewHolder extends Presenter.ViewHolder {
         private ImageCardView mCardView;
-        private PicassoImageCardViewTarget mImageCardViewTarget;
 
         public ViewHolder(View view) {
             super(view);
             mCardView = (ImageCardView) view;
-            mImageCardViewTarget = new PicassoImageCardViewTarget(mCardView);
         }
 
         public ImageCardView getCardView() {
@@ -35,15 +32,13 @@ public class EpgEventPresenter extends Presenter {
                 return;
             }
 
-            Picasso.with(context)
+            Glide.with(context)
             .load(link)
-            .resize(
-                Utils.dp(R.integer.artwork_background_width, context),
-                Utils.dp(R.integer.artwork_background_height, context))
+            .override(Utils.dp(R.integer.artwork_background_width, context), Utils.dp(R.integer.artwork_background_height, context))
             .centerCrop()
             .error(context.getDrawable(R.drawable.recording_unkown))
             .placeholder(context.getDrawable(R.drawable.recording_unkown))
-            .into(mImageCardViewTarget);
+            .into(mCardView.getMainImageView());
         }
     }
 
