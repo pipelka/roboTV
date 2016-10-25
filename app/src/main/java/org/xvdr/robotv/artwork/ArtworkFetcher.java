@@ -14,13 +14,13 @@ import java.io.IOException;
 
 public class ArtworkFetcher {
 
-    static final String TAG = "ArtworkFetcher";
+    private static final String TAG = "ArtworkFetcher";
     public final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
-    Connection mConnection;
-    ArtworkProvider mServerCache;
-    ArtworkProvider[] mProviders;
-    String mEpgImageTemplateUrl = "";
+    private Connection mConnection;
+    private ArtworkProvider mServerCache;
+    private ArtworkProvider[] mProviders;
+    private String mEpgImageTemplateUrl = "";
 
     public ArtworkFetcher(Connection connection, String language) {
         mConnection = connection;
@@ -83,7 +83,7 @@ public class ArtworkFetcher {
         return o;
     }
 
-    protected String getEpgImageTemplateUrl() {
+    private String getEpgImageTemplateUrl() {
         return mConnection.getConfig("EpgImageUrl");
     }
 }

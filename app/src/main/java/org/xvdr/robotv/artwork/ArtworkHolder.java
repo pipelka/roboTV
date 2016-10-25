@@ -2,11 +2,9 @@ package org.xvdr.robotv.artwork;
 
 public class ArtworkHolder {
 
-    static final String TAG = "ArtworkHolder";
-
-    protected String mPosterUrl;
-    protected String mBackgroundUrl;
-    protected String mTitle;
+    private String mPosterUrl;
+    private String mBackgroundUrl;
+    private String mTitle;
 
     public ArtworkHolder(String posterUrl, String backgroundUrl) {
         mPosterUrl = posterUrl;

@@ -9,7 +9,7 @@ import org.xvdr.robotv.client.Connection;
 
 public class RoboTvProvider extends SimpleArtworkProvider {
 
-    static final String TAG = "RoboTvProvider";
+    private static final String TAG = "RoboTvProvider";
 
     private Connection mConnection;
 

@@ -31,7 +31,7 @@ public class ArtworkUtils {
         final int eventId = (int) p.getU32();
         long startTime = p.getU32();
         final int duration = (int) p.getU32();
-        int contentId = 0;
+        int contentId;
         List<Integer> list = new ArrayList<>();
 
         while((contentId = (int) p.getU8()) != 0) {
@@ -42,7 +42,7 @@ public class ArtworkUtils {
             contentId = list.get(0);
         }
 
-        int rating = (int) p.getU32();
+        p.getU32(); // rating
         String title = p.getString();
         String shortText = p.getString();
         String description = p.getString();

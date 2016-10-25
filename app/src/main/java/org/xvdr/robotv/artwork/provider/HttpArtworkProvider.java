@@ -2,47 +2,38 @@ package org.xvdr.robotv.artwork.provider;
 
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
-public abstract class HttpArtworkProvider extends ArtworkProvider {
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+abstract class HttpArtworkProvider extends ArtworkProvider {
 
     private final static String TAG = "HttpArtworkProvider";
 
-    private int mTimeoutMs = 2000;
     private int mDelayAfterRequestMs = 0;
+    private OkHttpClient client;
 
-    public void setTimeout(int timeoutMs) {
-        mTimeoutMs = timeoutMs;
+    HttpArtworkProvider() {
+        client = new OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
+                .build();
     }
 
-    public void setDelayAfterRequest(int delayMs) {
+    void setDelayAfterRequest(int delayMs) {
         mDelayAfterRequestMs = delayMs;
     }
 
-    protected boolean checkUrlExists(String urlString) throws IOException {
-        Log.d(TAG, "checking url: " + urlString);
+    boolean checkUrlExists(String url) throws IOException {
+        Log.d(TAG, "checking url: " + url);
 
-        URL url;
+        Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
 
-        try {
-            url = new URL(urlString);
-        }
-        catch(MalformedURLException e) {
-            return false;
-        }
-
-        HttpURLConnection huc = (HttpURLConnection)url.openConnection();
-        huc.setRequestMethod("GET");
-        huc.connect();
-
-        int status = huc.getResponseCode();
+        int status = response.code();
 
         if(status == 200) {
             return true;
@@ -52,20 +43,11 @@ public abstract class HttpArtworkProvider extends ArtworkProvider {
         return false;
     }
 
-    protected String getResponseFromServer(String url) throws IOException {
+    String getResponseFromServer(String url) throws IOException {
         Log.d(TAG, "reading url: " + url);
 
-        BufferedReader inputStream;
-
-        URL jsonUrl = new URL(url);
-        URLConnection dc = jsonUrl.openConnection();
-
-        dc.setConnectTimeout(mTimeoutMs);
-        dc.setReadTimeout(mTimeoutMs);
-
-        inputStream = new BufferedReader(new InputStreamReader(dc.getInputStream()));
-
-        String result = inputStream.readLine();
+        Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
 
         if(mDelayAfterRequestMs > 0) {
             try {
@@ -76,6 +58,6 @@ public abstract class HttpArtworkProvider extends ArtworkProvider {
             }
         }
 
-        return result;
+        return response.body().string();
     }
 }

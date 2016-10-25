@@ -35,7 +35,7 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         return result;
     }
 
-    protected JSONArray filterTitleMatch(String title, String titleTag, JSONArray array) {
+    private JSONArray filterTitleMatch(String title, String titleTag, JSONArray array) {
         if(array == null) {
             return null;
         }
@@ -82,20 +82,23 @@ public class TheMovieDatabase extends HttpArtworkProvider {
                 continue;
             }
 
-            if(background == null || !background.equals("null")) {
+            if(background == null || background.equals("null")) {
                 background = "";
+            }
+
+            if(!background.isEmpty()) {
+                background = IMAGE_BASE_PATH + background;
             }
 
             ArtworkHolder holder = new ArtworkHolder(
                 IMAGE_BASE_PATH + poster,
-                IMAGE_BASE_PATH + background
+                background
             );
 
             holder.setTitle(title);
 
             Log.d(TAG, IMAGE_BASE_PATH + poster);
             result.add(holder);
-
         }
 
         return result;
@@ -206,11 +209,11 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         return IMAGE_BASE_PATH + path;
     }
 
-    public String getPosterUrl(JSONArray o) {
+    private String getPosterUrl(JSONArray o) {
         return getUrl(o, "poster_path");
     }
 
-    public String getBackgroundUrl(JSONArray o) {
+    private String getBackgroundUrl(JSONArray o) {
         return getUrl(o, "backdrop_path");
     }
 
