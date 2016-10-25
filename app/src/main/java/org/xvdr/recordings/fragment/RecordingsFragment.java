@@ -1,9 +1,7 @@
 package org.xvdr.recordings.fragment;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
@@ -18,13 +16,10 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 
 import android.support.v17.leanback.widget.Row;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
@@ -81,7 +76,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         }
 
         mAdapter = new MovieCollectionAdapter(getActivity());
-        mAdapter.addAll(collection);
+        mAdapter.addAllMovies(collection);
 
         setupPreferences(mAdapter);
         mAdapter.cleanup();
@@ -119,8 +114,6 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     }
 
     private void updateBackground(String url) {
-        Log.d(TAG, "updateBackground: '" + url + "'");
-
         if(url == null || url.isEmpty() || !url.endsWith(".jpg")) {
             backgroundManager.setDrawable(null);
             backgroundManager.setColor(color_background);
@@ -138,7 +131,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         }
 
         HeaderItem gridHeader = new HeaderItem(
-            adapter.size(),
+            1000,
             getActivity().getString(R.string.recordings_settings_title));
         ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(new PreferenceCardPresenter());
 
@@ -200,14 +193,9 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
                     ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
                     selectedItem = rowAdapter.indexOf(item);
 
-                    if(movie.isSeriesHeader()) {
-                        mAdapter.setSeriesRow(movie.getTitle());
-                    }
-                    else {
-                        Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                        intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
-                        startActivity(intent);
-                    }
+                    Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                    intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
+                    startActivity(intent);
                 }
                 else if(item instanceof PreferenceCardPresenter.Style) {
                     if(((PreferenceCardPresenter.Style) item).getId() == 1) {

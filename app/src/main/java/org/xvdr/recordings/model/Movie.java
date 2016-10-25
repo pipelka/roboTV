@@ -22,6 +22,7 @@ public class Movie implements Serializable {
     private String channelName;
     private int channelUid;
     private boolean isSeriesHeader = false;
+    private int episodeCount;
 
     public Movie() {
     }
@@ -217,5 +218,13 @@ public class Movie implements Serializable {
 
     public long getStartTime() {
         return timeStamp / 1000;
+    }
+
+    public int getEpisodeCount() {
+        return episodeCount;
+    }
+
+    void setEpisodeCount(int count) {
+        episodeCount = count;
     }
 }

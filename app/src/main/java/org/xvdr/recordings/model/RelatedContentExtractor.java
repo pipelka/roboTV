@@ -14,11 +14,11 @@ public class RelatedContentExtractor {
 
     Collection<Movie> result = new ArrayList<>(50);
 
-    public Collection<Movie> getSeries(String name) {
+    public Collection<Movie> getSeries(String title) {
         Iterator<Movie> i = collection.iterator();
         while(i.hasNext()) {
             Movie m = i.next();
-            if(m.isSeries() && m.getCategory().equals(name)) {
+            if(m.isSeries() && m.getTitle().equals(title)) {
                 result.add(m);
             }
         }

@@ -15,7 +15,6 @@ import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
-import android.support.v17.leanback.widget.OnActionClickedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
@@ -30,6 +29,7 @@ import org.xvdr.recordings.activity.CoverSearchActivity;
 import org.xvdr.recordings.activity.PlayerActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
+import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.recordings.model.SortedArrayObjectAdapter;
 import org.xvdr.recordings.presenter.ActionPresenterSelector;
 import org.xvdr.recordings.presenter.ColorAction;
@@ -41,6 +41,7 @@ import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.DataServiceClient;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 public class VideoDetailsFragment extends DetailsFragment {
@@ -54,8 +55,9 @@ public class VideoDetailsFragment extends DetailsFragment {
     private static final int ACTION_MOVE = 3;
 
     private Movie mSelectedMovie;
+    private Collection<Movie> episodes;
     private BackgroundManager backgroundManager;
-    BackgroundManagerTarget backgroundManagerTarget;
+    private BackgroundManagerTarget backgroundManagerTarget;
 
     private DataServiceClient dataClient;
 
@@ -86,13 +88,18 @@ public class VideoDetailsFragment extends DetailsFragment {
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Object row) {
                 if(item instanceof ColorAction) {
                     ColorAction action = (ColorAction) item;
-                    if(action.getId() == ACTION_EDIT) {
+                    if (action.getId() == ACTION_EDIT) {
                         Intent intent = new Intent(getActivity(), CoverSearchActivity.class);
                         intent.putExtra(EXTRA_MOVIE, mSelectedMovie);
                         startActivity(intent);
                         getActivity().finishAndRemoveTask();
                     }
-                    else if(action.getId() == ACTION_MOVE) {
+                }
+                else if(item instanceof Action) {
+                    Action action = (Action) item;
+                    Movie movie = (Movie) ((DetailsOverviewRow) row).getItem();
+                    if(action.getId() == ACTION_WATCH) {
+                        playbackMovie(movie);
                     }
                 }
                 else if(item instanceof Movie) {
@@ -102,6 +109,10 @@ public class VideoDetailsFragment extends DetailsFragment {
         });
 
         mSelectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
+
+        if(mSelectedMovie.isSeries()) {
+            setTitle(mSelectedMovie.getTitle());
+        }
     }
 
     @Override
@@ -146,20 +157,24 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         // set detail background and style
         dorPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.primary_color));
-        dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
+        /*dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
             @Override
             public void onActionClicked(Action action) {
                 if(action.getId() == ACTION_WATCH) {
                     playbackMovie(mSelectedMovie);
                 }
             }
-        });
+        });*/
 
         ps.addClassPresenter(DetailsOverviewRow.class, dorPresenter);
-        ps.addClassPresenter(ListRow.class,
-                new ListRowPresenter());
+        ps.addClassPresenter(ListRow.class, new ListRowPresenter());
 
-        addDetailRow(adapter, mSelectedMovie);
+        if(mSelectedMovie.isSeries()) {
+            addEpisodeRows(adapter, mSelectedMovie);
+        }
+        else {
+            addDetailRow(adapter, mSelectedMovie);
+        }
 
         setExtraActions(adapter);
         loadRelatedContent(adapter);
@@ -167,8 +182,32 @@ public class VideoDetailsFragment extends DetailsFragment {
         setAdapter(adapter);
     }
 
+    private void addEpisodeRows(ArrayObjectAdapter adapter, Movie movie) {
+        DataService service = dataClient.getService();
+
+        if(service == null) {
+            return;
+        }
+
+        Collection<Movie> collection = service.getMovieCollection();
+        episodes = new RelatedContentExtractor(collection).getSeries(movie.getTitle());
+
+        if(episodes == null) {
+            return;
+        }
+
+        Movie[] movies = episodes.toArray(new Movie[episodes.size()]);
+        Arrays.sort(movies, MovieCollectionAdapter.compareTimestamps);
+
+        for (Movie m : movies) {
+            addDetailRow(adapter, m);
+        }
+    }
+
     private void addDetailRow(ArrayObjectAdapter adapter, Movie movie) {
-        final DetailsOverviewRow row = new DetailsOverviewRow(mSelectedMovie);
+        final DetailsOverviewRow row = new DetailsOverviewRow(movie);
+        row.setItem(movie);
+
         String url = movie.getCardImageUrl();
 
 
@@ -216,6 +255,11 @@ public class VideoDetailsFragment extends DetailsFragment {
     }
 
     private void loadRelatedContent(ArrayObjectAdapter adapter) {
+        // disable related content in series view
+        if(mSelectedMovie.isSeries()) {
+            return;
+        }
+
         DataService service = dataClient.getService();
 
         if(service == null) {
@@ -250,14 +294,18 @@ public class VideoDetailsFragment extends DetailsFragment {
                         getResources().getDrawable(R.drawable.ic_style, null)
                 ).setColor(Utils.getColor(getActivity(), R.color.default_background))
         );
-        actionAdapter.add(
-                new ColorAction(
-                        ACTION_MOVE,
-                        getResources().getString(R.string.move_folder),
-                        "",
-                        getResources().getDrawable(R.drawable.ic_folder, null)
-                ).setColor(Utils.getColor(getActivity(), R.color.default_background))
-        );
+
+        // disable moving to folder for series
+        if(!mSelectedMovie.isSeries()) {
+            actionAdapter.add(
+                    new ColorAction(
+                            ACTION_MOVE,
+                            getResources().getString(R.string.move_folder),
+                            "",
+                            getResources().getDrawable(R.drawable.ic_folder, null)
+                    ).setColor(Utils.getColor(getActivity(), R.color.default_background))
+            );
+        }
 
         ListRow listRow = new ListRow(new HeaderItem(getString(R.string.movie_actions)), actionAdapter);
 

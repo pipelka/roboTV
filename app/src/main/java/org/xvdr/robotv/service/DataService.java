@@ -218,6 +218,20 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     }
 
     public void setMovieArtwork(Movie movie, ArtworkHolder holder) {
+        if(movie.isSeries() || movie.isSeriesHeader()) {
+            Collection<Movie> episodes = new RelatedContentExtractor(movieCollection).getSeries(movie.getTitle());
+            for(Movie m: episodes) {
+                setArtwork(m, holder);
+            }
+        }
+        else {
+            setArtwork(movie, holder);
+        }
+
+        postMovieCollectionUpdated(movieCollection);
+    }
+
+    private void setArtwork(Movie movie, ArtworkHolder holder) {
         // update local movie list
         String id = movie.getId();
         for(Movie m : movieCollection) {
@@ -230,7 +244,6 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
         // update on server
         ArtworkUtils.setMovieArtwork(connection, movie, holder);
-        postMovieCollectionUpdated(movieCollection);
     }
 
     public Collection<Movie> getMovieCollection() {
@@ -289,7 +302,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     public Collection<Movie> getRelatedContent(Movie movie) {
         RelatedContentExtractor contentExtractor = new RelatedContentExtractor(movieCollection);
         if(movie.isSeries()) {
-            return contentExtractor.getSeries(movie.getCategory());
+            return contentExtractor.getSeries(movie.getTitle());
         }
 
         return contentExtractor.getRelatedMovies(movie);

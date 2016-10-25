@@ -1,6 +1,7 @@
 package org.xvdr.recordings.presenter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
@@ -58,9 +59,18 @@ public class MoviePresenter extends Presenter {
         Movie movie = (Movie) item;
         ViewHolder vh = (ViewHolder) viewHolder;
         ImageCardView cardView = vh.getCardView();
-
+        Resources resources = cardView.getResources();
         cardView.setTitleText(movie.getTitle());
-        cardView.setContentText(movie.getOutline());
+
+        if(movie.isSeriesHeader()) {
+            int count = movie.getEpisodeCount();
+            cardView.setContentText(
+                    count + " " + resources.getString(count > 1 ? R.string.episodes : R.string.episode));
+        }
+        else {
+            cardView.setContentText(movie.getOutline());
+        }
+
         cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.primary_color));
         cardView.setMainImageDimensions(266, 400);
 

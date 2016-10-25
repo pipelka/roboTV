@@ -5,9 +5,7 @@ import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
-import android.support.v17.leanback.widget.ObjectAdapter;
 import android.support.v17.leanback.widget.Presenter;
-import android.util.ArrayMap;
 
 import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
@@ -15,13 +13,11 @@ import org.xvdr.robotv.R;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 
-public class MovieCollectionAdapter extends ArrayObjectAdapter {
+public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
 
     private MoviePresenter mCardPresenter;
     private LatestCardPresenter mLatestCardPresenter;
-    private ArrayMap<String, ListRow> mSeriesMap;
     private ArrayObjectAdapter mLatest;
     private ArrayObjectAdapter mTvShows;
     private Context mContext;
@@ -33,9 +29,34 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         }
     };
 
+    private static Comparator<ListRow> compareCategories = new Comparator<ListRow>() {
+        @Override
+        public int compare(ListRow lhs, ListRow rhs) {
+            HeaderItem lhsHeader = lhs.getHeaderItem();
+            HeaderItem rhsHeader = rhs.getHeaderItem();
+
+            if(lhsHeader.getId() == 0) {
+                return -1;
+            }
+            else if(rhsHeader.getId() == 0) {
+                return 1;
+            }
+            else if(lhsHeader.getId() == 1) {
+                return -1;
+            }
+            else if(rhsHeader.getId() == 1) {
+                return 1;
+            }
+            else if(lhsHeader.getId() == 1000) {
+                return 1;
+            }
+
+            return lhsHeader.getName().compareTo(rhsHeader.getName());
+        }
+    };
 
     public MovieCollectionAdapter(Context context) {
-        super(new ListRowPresenter());
+        super(compareCategories, new ListRowPresenter());
         mContext = context;
         mCardPresenter = new MoviePresenter();
         mLatestCardPresenter = new LatestCardPresenter();
@@ -46,8 +67,6 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
     @Override
     public void clear() {
         super.clear();
-
-        mSeriesMap = new ArrayMap<>();
 
         mLatest = getCategory(mContext.getString(R.string.latest_movies), true, mLatestCardPresenter); // 0
         mTvShows = getCategory(mContext.getString(R.string.tv_shows), true, mCardPresenter); // 1
@@ -77,7 +96,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         return getCategory(category, addNew, mCardPresenter);
     }
 
-    public ListRow findRow(String category) {
+    private ListRow findRow(String category) {
         ListRow listrow;
 
         for(int i = 0; i < size(); i++) {
@@ -131,50 +150,6 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         return listRowAdapter;
     }
 
-    public ObjectAdapter getSeries(String title) {
-        return getSeries(title, "", false);
-    }
-
-    private ObjectAdapter getSeries(String title, String url, boolean addNew) {
-        ArrayObjectAdapter row = getCategory(mContext.getString(R.string.tv_shows), true);
-
-        if(row == null) {
-            return null;
-        }
-
-        // get adapter of series
-        ListRow seriesRow = mSeriesMap.get(title);
-
-        if(seriesRow != null) {
-            return seriesRow.getAdapter();
-        }
-
-        if(!addNew) {
-            return null;
-        }
-
-        // create a new one for this series
-        Movie series = new Movie();
-        series.setTitle(title);
-        series.setContent(0x15);
-        series.setCardImageUrl(url);
-        series.setSeriesHeader();
-
-        row.add(series);
-
-        // create a new adapter for this series
-        ArrayObjectAdapter seriesRowAdapter = new SortedArrayObjectAdapter(compareTimestamps, mCardPresenter);
-        ListRow listRow = new ListRow(new HeaderItem(mContext.getString(R.string.tv_show_single) + " " + title), seriesRowAdapter);
-
-        if(mSeriesMap.isEmpty()) {
-            add(2, listRow);
-        }
-
-        mSeriesMap.put(title, listRow);
-
-        return seriesRowAdapter;
-    }
-
     public ArrayObjectAdapter add(Movie movie) {
         // add into "latest" category
         Movie item = movieExists(mLatest, movie);
@@ -193,7 +168,7 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         return addMovie(movie);
     }
 
-    protected ArrayObjectAdapter addMovie(Movie movie) {
+    private ArrayObjectAdapter addMovie(Movie movie) {
         ArrayObjectAdapter row = getCategory(movie.getCategory(), true);
 
         if(row == null) {
@@ -212,23 +187,27 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         return row;
     }
 
-    protected ArrayObjectAdapter addSeriesEpisode(Movie episode) {
-        ArrayObjectAdapter seriesRow = (ArrayObjectAdapter) getSeries(episode.getTitle(), episode.getCardImageUrl(), true);
-
-        if(seriesRow == null) {
-            return null;
+    private ArrayObjectAdapter addSeriesEpisode(Movie episode) {
+        // check if series item already exists
+        for(int i = 0; i < mTvShows.size(); i++) {
+            Movie m = (Movie) mTvShows.get(i);
+            if(m.getTitle().equals(episode.getTitle())) {
+                m.setEpisodeCount(m.getEpisodeCount() + 1);
+                return mTvShows;
+            }
         }
 
-        Movie item = movieExists(seriesRow, episode);
+        // create a new item for this series
+        Movie series = new Movie();
+        series.setTitle(episode.getTitle());
+        series.setContent(0x15);
+        series.setCardImageUrl(episode.getCardImageUrl());
+        series.setBackgroundImageUrl(episode.getBackgroundImageUrl());
+        series.setEpisodeCount(1);
+        series.setSeriesHeader();
 
-        if(item != null) {
-            item.setArtwork(episode);
-        }
-        else {
-            seriesRow.add(episode);
-        }
-
-        return seriesRow;
+        mTvShows.add(series);
+        return mTvShows;
     }
 
     public void remove(Movie movie) {
@@ -241,12 +220,6 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         row.remove(movie);
     }
 
-    public void setSeriesRow(String title) {
-        ListRow row = mSeriesMap.get(title);
-        replace(2, row);
-        notifyArrayItemRangeChanged(2, 1);
-    }
-
     public void cleanup() {
         ListRow tvShowsRow = findRow("TV Shows");
 
@@ -255,10 +228,8 @@ public class MovieCollectionAdapter extends ArrayObjectAdapter {
         }
     }
 
-    public void addAll(Collection<Movie> movieCollection) {
-        Iterator<Movie> i = movieCollection.iterator();
-        while(i.hasNext()) {
-            Movie movie = i.next();
+    public void addAllMovies(Collection<Movie> movieCollection) {
+        for(Movie movie : movieCollection) {
             add(movie);
         }
     }

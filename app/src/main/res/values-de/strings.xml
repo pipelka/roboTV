@@ -79,4 +79,6 @@
     <string name="audiotrack">Tonspur</string>
     <string name="fail_to_load_movielist">Liste der Aufnahmen konnte nicht geladen werden</string>
     <string name="error_open_recording">Fehler beim Wiedergeben der Aufnahme</string>
+    <string name="episode">Folge</string>
+    <string name="episodes">Folgen</string>
 </resources>
