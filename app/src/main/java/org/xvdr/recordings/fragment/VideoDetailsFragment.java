@@ -291,7 +291,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                         ACTION_EDIT,
                         getResources().getString(R.string.change_cover),
                         "",
-                        getResources().getDrawable(R.drawable.ic_style, null)
+                        getResources().getDrawable(R.drawable.ic_style_white_48dp, null)
                 ).setColor(Utils.getColor(getActivity(), R.color.default_background))
         );
 
@@ -302,7 +302,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                             ACTION_MOVE,
                             getResources().getString(R.string.move_folder),
                             "",
-                            getResources().getDrawable(R.drawable.ic_folder, null)
+                            getResources().getDrawable(R.drawable.ic_folder_white_48dp, null)
                     ).setColor(Utils.getColor(getActivity(), R.color.default_background))
             );
         }
