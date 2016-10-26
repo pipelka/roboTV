@@ -151,7 +151,7 @@ public class TimerFragment extends BrowseFragment {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
                 Movie movie = (Movie) item;
-                CreateTimerFragment.startGuidedStep(getActivity(), movie);
+                new CreateTimerFragment().startGuidedStep(getActivity(), movie);
             }
         });
 

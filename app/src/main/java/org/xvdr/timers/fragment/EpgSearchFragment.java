@@ -3,6 +3,7 @@ package org.xvdr.timers.fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v17.leanback.app.ProgressBarManager;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
@@ -14,6 +15,9 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Channels;
@@ -42,7 +46,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
         String query;
 
-        public void setSearchQuery(String query) {
+        void setSearchQuery(String query) {
             this.query = query;
         }
 
@@ -59,8 +63,8 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
     class EpgSearchLoader extends AsyncTask<String, Void, List<ListRow>> {
 
-        protected List<ListRow> mResultRows = new ArrayList<>();
-        protected List<Movie> mMovieList = new ArrayList<>();
+        List<ListRow> mResultRows = new ArrayList<>();
+        EpgEventPresenter eventPresenter = new EpgEventPresenter();
 
         private ListRow findOrCreateChannelRow(String channelName, long channelId) {
             // row already exists ?
@@ -73,7 +77,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             }
 
             // add new row
-            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new EpgEventPresenter());
+            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(eventPresenter);
             HeaderItem header = new HeaderItem(channelId, channelName);
 
             ListRow row = new ListRow(header, listRowAdapter);
@@ -84,6 +88,9 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
         @Override
         protected void onPreExecute() {
+            progress.show();
+            progress.enableProgressBar();
+
             mRowsAdapter.clear();
         }
 
@@ -91,8 +98,6 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
         protected List<ListRow> doInBackground(String... params) {
             final Channels channelList = new Channels();
             channelList.load(mConnection);
-
-            mMovieList.clear();
 
             // search
             Packet req = mConnection.CreatePacket(
@@ -112,6 +117,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             resp.uncompress();
 
             // process result
+            int count = 0;
             while(!resp.eop() && !isCancelled()) {
                 final Event event = ArtworkUtils.packetToEvent(resp);
                 String channelName = resp.getString();
@@ -130,9 +136,21 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 movie.setStartTime(event.getStartTime());
                 movie.setDuration(event.getDuration());
 
-                mMovieList.add(movie);
+                // fetch artwork
+                try {
+                    ArtworkHolder holder = mArtwork.fetchForEvent(movie.getEvent());
+                    movie.setArtwork(holder);
+                }
+                catch(IOException e) {
+                    e.printStackTrace();
+                }
 
                 adapter.add(movie);
+                count++;
+
+                if(count >= 100) {
+                    break;
+                }
             }
 
             Collections.sort(mResultRows, new Comparator<ListRow>() {
@@ -149,46 +167,12 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
         @Override
         protected void onPostExecute(final List<ListRow> result) {
+            progress.disableProgressBar();
+            progress.hide();
+
             for(ListRow row : result) {
                 mRowsAdapter.add(row);
             }
-
-            // start update thread
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for(Movie movie : mMovieList) {
-                        if(isCancelled()) {
-                            return;
-                        }
-
-                        // fetch artwork
-                        try {
-                            ArtworkHolder holder = mArtwork.fetchForEvent(movie.getEvent());
-                            movie.setArtwork(holder);
-                        }
-                        catch(IOException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            for(int i = 0; i < mRowsAdapter.size(); i++) {
-                                ListRow row = (ListRow)mRowsAdapter.get(i);
-                                ArrayObjectAdapter adapter = (ArrayObjectAdapter)row.getAdapter();
-                                adapter.notifyArrayItemRangeChanged(0, adapter.size());
-                            }
-
-                            mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
-                        }
-                    });
-                }
-            });
-
-            thread.start();
         }
     }
 
@@ -198,6 +182,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     private Connection mConnection;
     private ArtworkFetcher mArtwork;
     private Handler mHandler;
+    ProgressBarManager progress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -227,6 +212,15 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
         mLoader = new EpgSearchLoader();
         mDelayedLoader = new DelayedTask();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        progress = new ProgressBarManager();
+        progress.setRootView((ViewGroup) view);
+
+        return view;
     }
 
     @Override

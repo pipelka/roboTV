@@ -1,6 +1,5 @@
 package org.xvdr.timers.fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.widget.GuidanceStylist;
@@ -25,18 +24,6 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
     private GuidedAction mActionFolder;
     private GuidedAction mActionAdd;
     private GuidedAction mActionCancel;
-
-    static public void startGuidedStep(Activity activity, Movie movie) {
-        GuidedStepFragment fragment = new CreateTimerFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(EXTRA_MOVIE, movie);
-        fragment.setArguments(bundle);
-
-        GuidedStepFragment.addAsRoot(
-            activity,
-            fragment,
-            android.R.id.content /*R.id.container*/);
-    }
 
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
@@ -107,18 +94,20 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
+        Movie movie = getMovie();
+
         switch((int)action.getId()) {
             case ACTION_FOLDER:
                 GuidedStepFragment fragment = new CreateTimerFragmentFolder();
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(EXTRA_MOVIE, mMovie);
+                bundle.putSerializable(EXTRA_MOVIE, movie);
                 fragment.setArguments(bundle);
                 GuidedStepFragment.add(getActivity().getFragmentManager(), fragment);
                 break;
 
             case ACTION_ADD:
-                mMovie.setCategory(SetupUtils.getRecordingFolder());
-                createTimer(mMovie);
+                movie.setCategory(SetupUtils.getRecordingFolder());
+                createTimer(movie);
                 finishGuidedStepFragments();
                 break;
 

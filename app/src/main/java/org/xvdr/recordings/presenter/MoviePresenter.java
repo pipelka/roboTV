@@ -28,7 +28,7 @@ public class MoviePresenter extends Presenter {
             return mCardView;
         }
 
-        protected void updateCardViewImage(Context context, String link) {
+        public void updateCardViewImage(Context context, String link) {
             Drawable drawableUnknown = context.getDrawable(R.drawable.recording_unkown);
 
             if(link == null || link.isEmpty()) {

@@ -14,7 +14,6 @@ import java.util.TreeSet;
 
 public class TimerActivity extends Activity {
 
-    private static final String TAG = "TimerActivity";
     private DataServiceClient dataClient;
     TreeSet<String> folderList;
 

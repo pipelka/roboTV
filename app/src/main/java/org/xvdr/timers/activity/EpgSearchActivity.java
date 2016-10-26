@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.SpeechRecognitionCallback;
 
+import org.xvdr.recordings.fragment.MovieStepFragment;
 import org.xvdr.timers.fragment.CreateTimerFragment;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
@@ -31,7 +32,7 @@ public class EpgSearchActivity extends Activity {
     }
 
     public void selectEvent(Movie event) {
-        CreateTimerFragment.startGuidedStep(this, event);
+        new CreateTimerFragment().startGuidedStep(this, event);
     }
 
     @Override
