@@ -50,6 +50,9 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             else if(lhsHeader.getId() == 1000) {
                 return 1;
             }
+            else if(rhsHeader.getId() == 1000) {
+                return -1;
+            }
 
             return lhsHeader.getName().compareTo(rhsHeader.getName());
         }
