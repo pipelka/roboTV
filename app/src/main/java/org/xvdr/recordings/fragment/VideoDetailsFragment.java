@@ -95,12 +95,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                 else if(item instanceof Action) {
                     Action action = (Action) item;
                     Movie movie = (Movie) ((DetailsOverviewRow) row).getItem();
-                    if (action.getId() == ACTION_WATCH) {
-                        playbackMovie(movie);
-                    }
-                    else if (action.getId() == ACTION_DELETE_EPISODE) {
-                        new DeleteMovieFragment().startGuidedStep(getActivity(), movie, dataClient.getService());
-                    }
+                    handleDetailActions(action, movie);
                 }
                 else if(item instanceof Movie) {
                     playbackMovie((Movie) item);
@@ -115,13 +110,29 @@ public class VideoDetailsFragment extends DetailsFragment {
         }
     }
 
+    private void handleDetailActions(Action action, Movie movie) {
+        switch((int)action.getId()) {
+            case ACTION_WATCH:
+                playbackMovie(movie);
+                break;
+
+            case ACTION_DELETE_EPISODE:
+                new DeleteMovieFragment().startGuidedStep(
+                        getActivity(),
+                        movie,
+                        dataClient.getService(),
+                        R.id.details_fragment);
+                break;
+        }
+    }
+
     void handleExtraActions(ColorAction action) {
         switch((int)action.getId()) {
             case ACTION_EDIT:
                 Intent intent = new Intent(getActivity(), CoverSearchActivity.class);
                 intent.putExtra(EXTRA_MOVIE, selectedMovie);
                 startActivityForResult(intent, CoverSearchActivity.REQUEST_COVER);
-                return;
+                break;
 
             case ACTION_DELETE:
                 new DeleteMovieFragment().startGuidedStep(
@@ -129,7 +140,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                         selectedMovie,
                         dataClient.getService(),
                         R.id.details_fragment);
-                return;
+                break;
 
             case ACTION_MOVE:
                 new MovieFolderFragment().startGuidedStep(
@@ -137,6 +148,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                         selectedMovie,
                         dataClient.getService(),
                         R.id.details_fragment);
+                break;
         }
     }
 
