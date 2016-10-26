@@ -469,6 +469,18 @@ public class ChannelSyncAdapter {
             values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endTime * 1000);
             values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(event.getContentId()));
 
+            Event.SeasonEpisodeHolder seasonEpisode = event.getSeasionEpisode();
+            if(seasonEpisode.valid()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    values.put(TvContract.Programs.COLUMN_SEASON_DISPLAY_NUMBER, seasonEpisode.season);
+                    values.put(TvContract.Programs.COLUMN_EPISODE_DISPLAY_NUMBER, seasonEpisode.episode);
+                }
+                else {
+                    values.put(TvContract.Programs.COLUMN_SEASON_NUMBER, seasonEpisode.season);
+                    values.put(TvContract.Programs.COLUMN_EPISODE_NUMBER, seasonEpisode.episode);
+                }
+            }
+
             // content rating
             if(parentalRating >= 4 && parentalRating <= 18) {
                 TvContentRating rating = TvContentRating.createRating("com.android.tv", "DVB", "DVB_" + parentalRating);
