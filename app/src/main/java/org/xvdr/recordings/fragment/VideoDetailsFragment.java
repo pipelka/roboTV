@@ -143,7 +143,7 @@ public class VideoDetailsFragment extends DetailsFragment {
         }
 
         Glide.with(getActivity())
-        .load(url).asBitmap().skipMemoryCache(true)
+        .load(url).asBitmap()
         .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
         .into(backgroundManagerTarget);
     }

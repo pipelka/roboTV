@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.SpeechRecognitionCallback;
 
+import com.bumptech.glide.Glide;
+
 import org.xvdr.robotv.R;
 
 public class SearchActivity extends Activity {
@@ -27,6 +29,12 @@ public class SearchActivity extends Activity {
             }
         });
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Glide.get(this).clearMemory();
     }
 
     @Override

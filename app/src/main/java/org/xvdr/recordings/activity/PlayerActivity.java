@@ -168,6 +168,8 @@ public class PlayerActivity extends Activity implements Player.Listener {
         if(mPlayer != null) {
             mPlayer.release();
         }
+
+        Glide.get(this).clearMemory();
     }
 
     @Override

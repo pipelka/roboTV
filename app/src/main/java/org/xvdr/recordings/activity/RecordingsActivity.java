@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
+
 import org.xvdr.recordings.fragment.RecordingsFragment;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
@@ -31,6 +33,7 @@ public class RecordingsActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         dataClient.unbind();
+        Glide.get(this).clearMemory();
     }
 
     @Override

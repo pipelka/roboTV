@@ -16,7 +16,6 @@ public class BackgroundManagerTarget extends SimpleTarget<Bitmap> {
 
     @Override
     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-        backgroundManager.setDrawable(null);
         backgroundManager.setBitmap(resource);
     }
 }
