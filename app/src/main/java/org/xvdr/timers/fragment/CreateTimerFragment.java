@@ -93,6 +93,7 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
         connection.close();
     }
 
+    @Override
     public void onGuidedActionClicked(GuidedAction action) {
         Movie movie = getMovie();
 

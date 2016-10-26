@@ -1,5 +1,6 @@
 package org.xvdr.recordings.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
@@ -53,8 +54,10 @@ public class VideoDetailsFragment extends DetailsFragment {
     private static final int ACTION_WATCH = 1;
     private static final int ACTION_EDIT = 2;
     private static final int ACTION_MOVE = 3;
+    private static final int ACTION_DELETE_EPISODE = 4;
+    private static final int ACTION_DELETE = 5;
 
-    private Movie mSelectedMovie;
+    private Movie selectedMovie;
     private Collection<Movie> episodes;
     private BackgroundManager backgroundManager;
     private BackgroundManagerTarget backgroundManagerTarget;
@@ -87,19 +90,16 @@ public class VideoDetailsFragment extends DetailsFragment {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Object row) {
                 if(item instanceof ColorAction) {
-                    ColorAction action = (ColorAction) item;
-                    if (action.getId() == ACTION_EDIT) {
-                        Intent intent = new Intent(getActivity(), CoverSearchActivity.class);
-                        intent.putExtra(EXTRA_MOVIE, mSelectedMovie);
-                        startActivity(intent);
-                        getActivity().finishAndRemoveTask();
-                    }
+                    handleExtraActions((ColorAction) item);
                 }
                 else if(item instanceof Action) {
                     Action action = (Action) item;
                     Movie movie = (Movie) ((DetailsOverviewRow) row).getItem();
-                    if(action.getId() == ACTION_WATCH) {
+                    if (action.getId() == ACTION_WATCH) {
                         playbackMovie(movie);
+                    }
+                    else if (action.getId() == ACTION_DELETE_EPISODE) {
+                        new DeleteMovieFragment().startGuidedStep(getActivity(), movie, dataClient.getService());
                     }
                 }
                 else if(item instanceof Movie) {
@@ -108,12 +108,50 @@ public class VideoDetailsFragment extends DetailsFragment {
             }
         });
 
-        mSelectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
+        selectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
 
-        if(mSelectedMovie.isSeries()) {
-            setTitle(mSelectedMovie.getTitle());
+        if(selectedMovie.isSeries()) {
+            setTitle(selectedMovie.getTitle());
         }
     }
+
+    void handleExtraActions(ColorAction action) {
+        switch((int)action.getId()) {
+            case ACTION_EDIT:
+                Intent intent = new Intent(getActivity(), CoverSearchActivity.class);
+                intent.putExtra(EXTRA_MOVIE, selectedMovie);
+                startActivityForResult(intent, CoverSearchActivity.REQUEST_COVER);
+                return;
+
+            case ACTION_DELETE:
+                new DeleteMovieFragment().startGuidedStep(
+                        getActivity(),
+                        selectedMovie,
+                        dataClient.getService(),
+                        R.id.details_fragment);
+                return;
+
+            case ACTION_MOVE:
+                new MovieFolderFragment().startGuidedStep(
+                        getActivity(),
+                        selectedMovie,
+                        dataClient.getService(),
+                        R.id.details_fragment);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode != CoverSearchActivity.REQUEST_COVER) {
+            return;
+        }
+
+        if(resultCode == Activity.RESULT_OK) {
+            selectedMovie = (Movie) data.getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
+            initDetails();
+        }
+    }
+
 
     @Override
     public void onDestroy() {
@@ -132,8 +170,8 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
 
-        if(mSelectedMovie != null && !TextUtils.isEmpty(mSelectedMovie.getBackgroundImageUrl())) {
-            updateBackground(mSelectedMovie.getBackgroundImageUrl());
+        if(selectedMovie != null && !TextUtils.isEmpty(selectedMovie.getBackgroundImageUrl())) {
+            updateBackground(selectedMovie.getBackgroundImageUrl());
         }
     }
 
@@ -157,23 +195,15 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         // set detail background and style
         dorPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.primary_color));
-        /*dorPresenter.setOnActionClickedListener(new OnActionClickedListener() {
-            @Override
-            public void onActionClicked(Action action) {
-                if(action.getId() == ACTION_WATCH) {
-                    playbackMovie(mSelectedMovie);
-                }
-            }
-        });*/
 
         ps.addClassPresenter(DetailsOverviewRow.class, dorPresenter);
         ps.addClassPresenter(ListRow.class, new ListRowPresenter());
 
-        if(mSelectedMovie.isSeries()) {
-            addEpisodeRows(adapter, mSelectedMovie);
+        if(selectedMovie.isSeries()) {
+            addEpisodeRows(adapter, selectedMovie);
         }
         else {
-            addDetailRow(adapter, mSelectedMovie);
+            addDetailRow(adapter, selectedMovie);
         }
 
         setExtraActions(adapter);
@@ -241,6 +271,17 @@ public class VideoDetailsFragment extends DetailsFragment {
                 )
         );
 
+        if(movie.isSeries()) {
+            actions.set(1,
+                    new Action(
+                            ACTION_DELETE_EPISODE,
+                            null,
+                            getResources().getString(R.string.delete),
+                            getResources().getDrawable(R.drawable.ic_delete_white_48dp, null)
+                    )
+            );
+        }
+
         row.setActionsAdapter(actions);
 
         adapter.add(row);
@@ -256,7 +297,7 @@ public class VideoDetailsFragment extends DetailsFragment {
 
     private void loadRelatedContent(ArrayObjectAdapter adapter) {
         // disable related content in series view
-        if(mSelectedMovie.isSeries()) {
+        if(selectedMovie.isSeries()) {
             return;
         }
 
@@ -267,7 +308,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             return;
         }
 
-        Collection<Movie> collection = service.getRelatedContent(mSelectedMovie);
+        Collection<Movie> collection = service.getRelatedContent(selectedMovie);
 
         if(collection == null) {
             return;
@@ -296,13 +337,21 @@ public class VideoDetailsFragment extends DetailsFragment {
         );
 
         // disable moving to folder for series
-        if(!mSelectedMovie.isSeries()) {
+        if(!selectedMovie.isSeries()) {
             actionAdapter.add(
                     new ColorAction(
                             ACTION_MOVE,
                             getResources().getString(R.string.move_folder),
                             "",
                             getResources().getDrawable(R.drawable.ic_folder_white_48dp, null)
+                    ).setColor(Utils.getColor(getActivity(), R.color.default_background))
+            );
+            actionAdapter.add(
+                    new ColorAction(
+                            ACTION_DELETE,
+                            getResources().getString(R.string.delete),
+                            "",
+                            getResources().getDrawable(R.drawable.ic_delete_white_48dp, null)
                     ).setColor(Utils.getColor(getActivity(), R.color.default_background))
             );
         }
@@ -312,4 +361,8 @@ public class VideoDetailsFragment extends DetailsFragment {
         adapter.add(listRow);
     }
 
+    public void updateMovie(Movie movie) {
+        selectedMovie = movie;
+        initDetails();
+    }
 }

@@ -110,4 +110,11 @@
     <string name="movie_actions">Actions</string>
     <string name="episodes">Episodes</string>
     <string name="episode">Episode</string>
+    <string name="delete_episode">Delete Episode</string>
+    <string name="delete_movie">Delete Movie</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="active_recording">Recording active</string>
+    <string name="failed_delete_movie">failed to delete movie</string>
+    <string name="movie_move_to_folder">Move to folder</string>
 </resources>

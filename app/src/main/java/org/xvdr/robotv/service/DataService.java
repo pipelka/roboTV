@@ -269,6 +269,14 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         });
     }
 
+    public int deleteMovie(Movie movie) {
+        return connection.deleteRecording(movie.getId());
+    }
+
+    public int renameMovie(Movie movie, String newName) {
+        return connection.renameRecording(movie.getId(), newName);
+    }
+
     protected void updateFolderList() {
         String seriesFolder = connection.getConfig("SeriesFolder");
 

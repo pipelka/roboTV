@@ -19,6 +19,7 @@ public class CoverSearchActivity extends Activity {
 
     private static final int REQUEST_SPEECH = 1;
     public static final String EXTRA_MOVIE = "extra_movie";
+    public static final int REQUEST_COVER = 101;
 
     SearchFragment mFragment;
     DataService service;
@@ -60,6 +61,8 @@ public class CoverSearchActivity extends Activity {
 
         mMovie = (Movie) getIntent().getSerializableExtra(EXTRA_MOVIE);
         mFragment.setSearchQuery(mMovie.getTitle(), false);
+
+        setResult(RESULT_CANCELED, null);
     }
 
     @Override
@@ -73,7 +76,13 @@ public class CoverSearchActivity extends Activity {
             service.setMovieArtwork(mMovie, holder);
         }
 
-        finishAndRemoveTask();
+        mMovie.setArtwork(holder);
+
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_MOVIE, mMovie);
+
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     @Override

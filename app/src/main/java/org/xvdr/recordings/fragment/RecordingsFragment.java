@@ -16,6 +16,7 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 
 import android.support.v17.leanback.widget.Row;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -86,7 +87,10 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         // update current row
         if(selectedRow >= 0 && selectedRow < mAdapter.size()) {
             try {
-                setSelectedPosition(selectedRow, true, new ListRowPresenter.SelectItemViewHolderTask(selectedItem));
+                ListRowPresenter.SelectItemViewHolderTask task = new ListRowPresenter.SelectItemViewHolderTask(selectedItem);
+                task.setSmoothScroll(false);
+
+                setSelectedPosition(selectedRow, false, task);
             }
             catch(Exception e) {
                 e.printStackTrace();
@@ -114,7 +118,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     }
 
     private void updateBackground(String url) {
-        if(url == null || url.isEmpty() || !url.endsWith(".jpg")) {
+        if(TextUtils.isEmpty(url) || !url.endsWith(".jpg")) {
             backgroundManager.setDrawable(null);
             backgroundManager.setColor(color_background);
             return;
@@ -236,6 +240,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         }
 
         if(collection != null) {
+            backgroundManager.setDrawable(null);
             loadMovies(collection);
         }
     }

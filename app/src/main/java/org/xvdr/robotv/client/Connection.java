@@ -228,4 +228,21 @@ public class Connection extends Session {
 
         return resp.getS64();
     }
+
+    public int deleteRecording(String id) {
+        Packet req = CreatePacket(Connection.XVDR_RECORDINGS_DELETE);
+        req.putString(id);
+
+        Packet resp = transmitMessage(req);
+        return (int)resp.getU32();
+    }
+
+    public int renameRecording(String id, String newName) {
+        Packet req = CreatePacket(Connection.XVDR_RECORDINGS_RENAME);
+        req.putString(id);
+        req.putString(newName);
+
+        Packet resp = transmitMessage(req);
+        return (int)resp.getU32();
+    }
 }

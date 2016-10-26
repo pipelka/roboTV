@@ -62,6 +62,7 @@ public class CreateTimerFragmentFolder extends CreateTimerStepFragment {
 
     }
 
+    @Override
     public void onGuidedActionClicked(GuidedAction action) {
         if(action.getId() != 0) {
             SetupUtils.setRecordingFolder(action.getTitle().toString());

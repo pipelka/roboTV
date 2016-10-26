@@ -81,4 +81,12 @@
     <string name="error_open_recording">Fehler beim Wiedergeben der Aufnahme</string>
     <string name="episode">Folge</string>
     <string name="episodes">Folgen</string>
+    <string name="delete_episode">Folge löschen</string>
+    <string name="delete_movie">Aufnahme löschen</string>
+    <string name="cancel">Abbruch</string>
+    <string name="delete">Löschen</string>
+    <string name="active_recording">Aufnahme läuft</string>
+    <string name="failed_delete_movie">Fehler beim löschen</string>
+    <string name="movie_actions">Aktionen</string>
+    <string name="movie_move_to_folder">In Ordner verschieben</string>
 </resources>

@@ -16,6 +16,7 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.text.TextUtils;
 
 import org.xvdr.recordings.activity.CoverSearchActivity;
+import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.presenter.ArtworkPresenter;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
