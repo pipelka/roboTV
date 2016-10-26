@@ -5,7 +5,20 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.Integer.parseInt;
+
 public class Event {
+
+    static private final String TAG = "Event";
+
+    public class SeasonEpisodeHolder {
+        public int season = 0;
+        public int episode = 0;
+
+        public boolean valid() {
+            return season > 0 && episode > 0;
+        }
+    }
 
     private int mContentId;
     private String mTitle;
@@ -16,8 +29,25 @@ public class Event {
     private int mEventId;
     private long mStartTime;
     private int mChannelUid;
+    private SeasonEpisodeHolder seasonEpisode = new SeasonEpisodeHolder();
 
     private static Pattern mYearPattern = Pattern.compile("\\b(19|20)\\d{2}\\b");
+
+    private static Pattern seasonEpisodePatterns[] = {
+            Pattern.compile("\\b(\\d).+[S|s]taffel.+[F|f]olge\\W+(\\d+)\\b"),
+            Pattern.compile("\\b[S|s]taffel\\W+(\\d).+[F|f]olge\\W+(\\d+)\\b"),
+            Pattern.compile("\\bS(\\d+).+E(\\d+)\\b")
+    };
+
+    private static Pattern episodeSeasonPatterns[] = {
+            Pattern.compile("\\b(\\d).+[F|f]olge.+[S|s]taffel\\W++(\\d+)\\b"),
+            Pattern.compile("\\bE(\\d+).+S(\\d+)\\b")
+    };
+
+    private static Pattern episodeOnlyPatterns[] = {
+            Pattern.compile("\\b[F|f]olge\\W+(\\d+)\\b"),
+            Pattern.compile("\\b(\\d+)\\W+[F|f]olge\\b")
+    };
 
     private static String[] genreFilm = {
         "abenteuerfilm",
@@ -104,6 +134,14 @@ public class Event {
         mPlot = plot;
         mDuration = durationSec;
         mEventId = eventId;
+
+        if (!getSeasonEpisode(plot, seasonEpisode)) {
+            getSeasonEpisode(subTitle, seasonEpisode);
+        }
+
+        if(seasonEpisode.valid() && !isTvShow()) {
+            mContentId = 0x15;
+        }
     }
 
     public int getGenre() {
@@ -146,6 +184,10 @@ public class Event {
         return (getContentId() == 0x15 || getContentId() == 0x23);
     }
 
+    public SeasonEpisodeHolder getSeasionEpisode() {
+        return seasonEpisode;
+    }
+
     static public int guessYearFromDescription(String description) {
         int year = 0;
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -156,7 +198,7 @@ public class Event {
             String word = matches.group();
 
             try {
-                year = Integer.parseInt(word);
+                year = parseInt(word);
             }
             catch(Exception e) {
                 return 0;
@@ -218,6 +260,40 @@ public class Event {
         }
 
         return contentId;
+    }
+
+    static public boolean getSeasonEpisode(String text, SeasonEpisodeHolder holder) {
+        for(Pattern seasonEpisodePattern : seasonEpisodePatterns) {
+            Matcher matches = seasonEpisodePattern.matcher(text);
+
+            if (matches.find()) {
+                holder.season = parseInt(matches.group(1));
+                holder.episode = parseInt(matches.group(2));
+                return true;
+            }
+        }
+
+        for(Pattern seasonEpisodePattern : episodeSeasonPatterns) {
+            Matcher matches = seasonEpisodePattern.matcher(text);
+
+            if (matches.find()) {
+                holder.season = parseInt(matches.group(2));
+                holder.episode = parseInt(matches.group(1));
+                return true;
+            }
+        }
+
+        for(Pattern seasonEpisodePattern : episodeOnlyPatterns) {
+            Matcher matches = seasonEpisodePattern.matcher(text);
+
+            if (matches.find()) {
+                holder.season = 1;
+                holder.episode = parseInt(matches.group(1));
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void setStartTime(long startTime) {
