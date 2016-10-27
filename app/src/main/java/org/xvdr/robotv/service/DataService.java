@@ -287,7 +287,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
                 continue;
             }
 
-            if (category.equals(PacketAdapter.FOLDER_UNSORTED)) {
+            if(category.isEmpty()) {
                 continue;
             }
 

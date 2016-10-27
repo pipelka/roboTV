@@ -6,6 +6,7 @@ import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.Presenter;
+import android.text.TextUtils;
 
 import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
@@ -128,6 +129,10 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     private ArrayObjectAdapter getCategory(String category, boolean addNew, Presenter presenter) {
+        if(TextUtils.isEmpty(category)) {
+            return null;
+        }
+
         ListRow listrow;
 
         for(int i = 0; i < size(); i++) {
@@ -153,7 +158,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         return listRowAdapter;
     }
 
-    public ArrayObjectAdapter add(Movie movie) {
+    public void add(Movie movie) {
         // add into "latest" category
         Movie item = movieExists(mLatest, movie);
 
@@ -165,17 +170,18 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         }
 
         if(movie.isSeries()) {
-            return addSeriesEpisode(movie);
+            addSeriesEpisode(movie);
+            return;
         }
 
-        return addMovie(movie);
+        addMovie(movie);
     }
 
-    private ArrayObjectAdapter addMovie(Movie movie) {
+    private void addMovie(Movie movie) {
         ArrayObjectAdapter row = getCategory(movie.getCategory(), true);
 
         if(row == null) {
-            return null;
+            return;
         }
 
         Movie item = movieExists(row, movie);
@@ -186,17 +192,15 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         else {
             row.add(movie);
         }
-
-        return row;
     }
 
-    private ArrayObjectAdapter addSeriesEpisode(Movie episode) {
+    private void addSeriesEpisode(Movie episode) {
         // check if series item already exists
         for(int i = 0; i < mTvShows.size(); i++) {
             Movie m = (Movie) mTvShows.get(i);
             if(m.getTitle().equals(episode.getTitle())) {
                 m.setEpisodeCount(m.getEpisodeCount() + 1);
-                return mTvShows;
+                return;
             }
         }
 
@@ -210,7 +214,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         series.setSeriesHeader();
 
         mTvShows.add(series);
-        return mTvShows;
+        return;
     }
 
     public void remove(Movie movie) {

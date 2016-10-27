@@ -4,8 +4,6 @@ import org.xvdr.jniwrap.Packet;
 
 public class PacketAdapter {
 
-    public static final String FOLDER_UNSORTED = "Unsorted";
-
     public static Movie toMovie(Packet p) {
         Movie movie = new Movie();
 
@@ -28,10 +26,6 @@ public class PacketAdapter {
 
         // folder
         String folder = p.getString();
-
-        if(folder.isEmpty()) {
-            folder = FOLDER_UNSORTED;
-        }
 
         movie.setCategory(folder); // directory / folder
         movie.setId(p.getString());
