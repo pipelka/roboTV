@@ -72,12 +72,11 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     }
 
     synchronized private void loadMovies(Collection<Movie> collection) {
-        if(collection.size() == 0) {
-            return;
-        }
-
         mAdapter = new MovieCollectionAdapter(getActivity());
-        mAdapter.addAllMovies(collection);
+
+        if(collection.size() != 0) {
+            mAdapter.addAllMovies(collection);
+        }
 
         setupPreferences(mAdapter);
         mAdapter.cleanup();
@@ -203,17 +202,25 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
                 }
                 else if(item instanceof PreferenceCardPresenter.Style) {
                     if(((PreferenceCardPresenter.Style) item).getId() == 1) {
-                        Intent intent = new Intent(getActivity(), org.xvdr.robotv.setup.SetupActivity.class);
-                        startActivity(intent);
+                        startSetupActivity();
                     }
                 }
             }
         };
     }
 
+    private void startSetupActivity() {
+        Intent intent = new Intent(getActivity(), org.xvdr.robotv.setup.SetupActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void onServiceConnected(DataService service) {
         loadMovies(service.getMovieCollection());
+
+        if(service.getConnectionStatus() != DataService.STATUS_Server_Connected) {
+            startSetupActivity();
+        }
     }
 
     @Override

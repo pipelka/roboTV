@@ -31,13 +31,19 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     public static final int STATUS_Collection_Busy = 0;
     public static final int STATUS_Collection_Ready = 1;
 
+    public static final int STATUS_Server_Connected = 0;
+    public static final int STATUS_Server_Failed = 1;
+    public static final int STATUS_Server_Starting = 2;
+
     private final IBinder binder = new Binder();
+
     Connection connection;
     Handler handler;
     NotificationHandler notification;
     ArtworkFetcher artwork;
     Collection<Movie> movieCollection;
     TreeSet<String> folderList;
+    int connectionStatus = STATUS_Server_Starting;
 
     private MovieCollectionLoaderTask loaderTask;
 
@@ -83,6 +89,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         }
 
         public void onDisconnect() {
+            connectionStatus = STATUS_Server_Failed;
         }
 
         public void onReconnect() {
@@ -90,6 +97,8 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
                 @Override
                 public void run() {
                     connection.login();
+                    loadMovieCollection();
+                    connectionStatus = STATUS_Server_Connected;
                 }
             }, 3000);
         }
@@ -161,13 +170,17 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
     private boolean open() {
         if(connection.isOpen()) {
+            connectionStatus = STATUS_Server_Connected;
             return true;
         }
 
         connection.setPriority(1); // low priority for DataService
         if(!connection.open(SetupUtils.getServer(this))) {
+            connectionStatus = STATUS_Server_Failed;
             return false;
         }
+
+        connectionStatus = STATUS_Server_Connected;
 
         // movie collection loader
         loadMovieCollection();
@@ -314,6 +327,10 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         }
 
         return contentExtractor.getRelatedMovies(movie);
+    }
+
+    public int getConnectionStatus() {
+        return connectionStatus;
     }
 
     // MovieCollectionLoaderTask
