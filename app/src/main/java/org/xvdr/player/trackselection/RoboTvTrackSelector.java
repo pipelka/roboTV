@@ -30,8 +30,6 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
     protected TrackSelection[] selectTracks(RendererCapabilities[] rendererCapabilities, TrackGroupArray[] rendererTrackGroupArrays, int[][][] rendererFormatSupports) throws ExoPlaybackException {
         TrackSelection[] trackSelection = super.selectTracks(rendererCapabilities, rendererTrackGroupArrays, rendererFormatSupports);
 
-        int[] trackScore = new int[trackSelection.length];
-
         int bestScore = -1;
         int bestRenderer = -1;
 
@@ -40,12 +38,10 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
 
             // skip non-audio / disabled tracks
             if(rendererCapabilities[i].getTrackType() != C.TRACK_TYPE_AUDIO || trackSelection[i] == null) {
-                trackScore[i] = -1;
                 continue;
             }
 
             int score = getScoreFromFormat(trackSelection[i].getSelectedFormat());
-            trackScore[i] = score;
 
             if(score > bestScore) {
                 bestScore = score;
