@@ -6,18 +6,21 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BackgroundManager;
-import android.support.v17.leanback.app.DetailsFragment;
+import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.Action;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.BaseOnItemViewClickedListener;
 import android.support.v17.leanback.widget.ClassPresenterSelector;
 import android.support.v17.leanback.widget.DetailsOverviewRow;
 import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
+import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
+import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.Presenter;
+import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
+import android.support.v17.leanback.widget.SectionRow;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.text.TextUtils;
 import android.util.Log;
@@ -39,13 +42,15 @@ import org.xvdr.recordings.presenter.LatestCardPresenter;
 import org.xvdr.recordings.util.BackgroundManagerTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.DataServiceClient;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 
-public class VideoDetailsFragment extends DetailsFragment {
+public class VideoDetailsFragment extends BrowseFragment {
 
     public static final String TAG = "VideoDetailsFragment";
     public static final String EXTRA_MOVIE = "extra_movie";
@@ -69,6 +74,7 @@ public class VideoDetailsFragment extends DetailsFragment {
         super.onCreate(savedInstanceState);
 
         initBackground();
+        prepareEntranceTransition();
 
         dataClient = new DataServiceClient(getActivity(), new DataServiceClient.Listener() {
             @Override
@@ -86,9 +92,9 @@ public class VideoDetailsFragment extends DetailsFragment {
         });
         dataClient.bind();
 
-        setOnItemViewClickedListener(new BaseOnItemViewClickedListener() {
+        setOnItemViewClickedListener(new OnItemViewClickedListener() {
             @Override
-            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Object row) {
+            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
                 if(item instanceof ColorAction) {
                     handleExtraActions((ColorAction) item);
                 }
@@ -102,6 +108,9 @@ public class VideoDetailsFragment extends DetailsFragment {
                 }
             }
         });
+
+        int brandColor = Utils.getColor(getActivity(), R.color.episode_header_color);
+        setBrandColor(brandColor);
 
         selectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
 
@@ -215,6 +224,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             addEpisodeRows(adapter, selectedMovie);
         }
         else {
+            setHeadersState(HEADERS_DISABLED);
             addDetailRow(adapter, selectedMovie);
         }
 
@@ -238,39 +248,97 @@ public class VideoDetailsFragment extends DetailsFragment {
             return;
         }
 
+        Comparator<Movie> compareEpisodes = new Comparator<Movie>() {
+            @Override
+            public int compare(Movie lhs, Movie rhs) {
+                Event event1 = lhs.getEvent();
+                Event event2 = rhs.getEvent();
+
+                Event.SeasonEpisodeHolder episode1 = event1.getSeasionEpisode();
+                Event.SeasonEpisodeHolder episode2 = event2.getSeasionEpisode();
+
+                if(episode1.valid() && episode2.valid()) {
+
+                    if(episode1.season == episode2.season) {
+                        return episode1.episode > episode2.episode ? -1 : 1;
+                    }
+
+                    return episode1.season > episode2.season ? -1 : 1;
+                }
+
+                return lhs.getTimeStamp() > rhs.getTimeStamp() ? -1 : 1;
+            }
+        };
+
         Movie[] movies = episodes.toArray(new Movie[episodes.size()]);
-        Arrays.sort(movies, MovieCollectionAdapter.compareTimestamps);
+        Arrays.sort(movies, compareEpisodes);
+
+        int lastSeason = -1;
+        int currentSeason;
 
         for (Movie m : movies) {
-            addDetailRow(adapter, m);
+            currentSeason = m.getEvent().getSeasionEpisode().season;
+
+            if(currentSeason != lastSeason) {
+                lastSeason = currentSeason;
+
+                if(currentSeason == 0) {
+                    adapter.add(new SectionRow(new HeaderItem(getString(R.string.episodes))));
+                }
+                else {
+                    adapter.add(new SectionRow(new HeaderItem(getString(R.string.season_nr, currentSeason))));
+                }
+                addDetailRow(adapter, m);
+            }
+            else {
+                addDetailRow(adapter, m);
+            }
         }
+    }
+
+    private void postStartEntranceTransition() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                startEntranceTransition();
+
+            }
+        });
     }
 
     private void addDetailRow(ArrayObjectAdapter adapter, Movie movie) {
         final DetailsOverviewRow row = new DetailsOverviewRow(movie);
+
+        Event.SeasonEpisodeHolder episode = movie.getEvent().getSeasionEpisode();
+
+        row.setHeaderItem(new HeaderItem(
+                episode.valid() ? getString(R.string.episode_nr, episode.episode) :
+                movie.getOutline()));
         row.setItem(movie);
 
         String url = movie.getCardImageUrl();
 
-
-        if(url == null || url.isEmpty()) {
+        if(TextUtils.isEmpty(url)) {
             row.setImageDrawable(getResources().getDrawable(R.drawable.recording_unkown, null));
+            postStartEntranceTransition();
         }
+        else {
+            SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    row.setImageBitmap(getActivity(), resource);
+                    postStartEntranceTransition();
+                }
+            };
 
-        SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>() {
-            @Override
-            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                row.setImageBitmap(getActivity(), resource);
-            }
-        };
-
-        Glide.with(getActivity())
-                .load(url).asBitmap()
-                .override(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()), Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
-                .error(getResources().getDrawable(R.drawable.recording_unkown, null))
-                .placeholder(getResources().getDrawable(R.drawable.recording_unkown, null))
-                .centerCrop()
-                .into(target);
+            Glide.with(getActivity())
+                    .load(url).asBitmap()
+                    .override(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()), Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
+                    .error(getResources().getDrawable(R.drawable.recording_unkown, null))
+                    .placeholder(getResources().getDrawable(R.drawable.recording_unkown, null))
+                    .centerCrop()
+                    .into(target);
+        }
 
         SparseArrayObjectAdapter actions = new SparseArrayObjectAdapter();
 
@@ -373,8 +441,4 @@ public class VideoDetailsFragment extends DetailsFragment {
         adapter.add(listRow);
     }
 
-    public void updateMovie(Movie movie) {
-        selectedMovie = movie;
-        initDetails();
-    }
 }

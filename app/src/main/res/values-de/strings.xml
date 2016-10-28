@@ -89,4 +89,6 @@
     <string name="failed_delete_movie">Fehler beim löschen</string>
     <string name="movie_actions">Aktionen</string>
     <string name="movie_move_to_folder">In Ordner verschieben</string>
+    <string name="episode_nr">Folge %1$d</string>
+    <string name="season_nr">%1$d. Staffel</string>
 </resources>

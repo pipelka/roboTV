@@ -117,4 +117,6 @@
     <string name="active_recording">Recording active</string>
     <string name="failed_delete_movie">failed to delete movie</string>
     <string name="movie_move_to_folder">Move to folder</string>
+    <string name="season_nr">Season %1$d</string>
+    <string name="episode_nr">Episode %1$d</string>
 </resources>
