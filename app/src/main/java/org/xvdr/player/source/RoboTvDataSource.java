@@ -58,8 +58,8 @@ class RoboTvDataSource implements DataSource {
         response.clear();
 
         // check if we should seek
-        if(streaming && (lastUri != null && uri.equals(lastUri))) {
-            long seekPosition = dataSpec.position;
+        long seekPosition = dataSpec.position;
+        if(streaming && (lastUri != null && uri.equals(lastUri)) && seekPosition != 0) {
             Log.d(TAG, "seek to position: " + seekPosition);
 
             connection.seek(seekPosition);
@@ -203,5 +203,10 @@ class RoboTvDataSource implements DataSource {
     public void close() throws IOException {
         Log.d(TAG, "close");
         response.clear();
+    }
+
+    public void disconnect() throws IOException {
+        streaming = false;
+        close();
     }
 }

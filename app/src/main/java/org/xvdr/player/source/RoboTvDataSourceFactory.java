@@ -39,6 +39,13 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
                 return;
             }
 
+            try {
+                dataSource.disconnect();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -46,6 +53,7 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
                 }
             }, 3000);
         }
+
 
         public void onReconnect() {
             if(connection == null || listener == null) {
