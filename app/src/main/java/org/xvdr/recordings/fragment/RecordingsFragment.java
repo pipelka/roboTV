@@ -51,6 +51,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prepareEntranceTransition();
     }
 
     @Override
@@ -85,16 +86,22 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
 
         // update current row
         if(selectedRow >= 0 && selectedRow < mAdapter.size()) {
-            try {
-                ListRowPresenter.SelectItemViewHolderTask task = new ListRowPresenter.SelectItemViewHolderTask(selectedItem);
-                task.setSmoothScroll(false);
+            if(selectedItem >= 0) {
+                try {
+                    ListRowPresenter.SelectItemViewHolderTask task = new ListRowPresenter.SelectItemViewHolderTask(selectedItem);
+                    task.setSmoothScroll(false);
 
-                setSelectedPosition(selectedRow, false, task);
+                    setSelectedPosition(selectedRow, false, task);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            catch(Exception e) {
-                e.printStackTrace();
+            else {
+                setSelectedPosition(selectedRow);
             }
         }
+
+        startEntranceTransition();
     }
 
     @Override
@@ -216,9 +223,11 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
 
     @Override
     public void onServiceConnected(DataService service) {
-        loadMovies(service.getMovieCollection());
+        if(service.getConnectionStatus() == DataService.STATUS_Server_Connected) {
+            loadMovies(service.getMovieCollection());
+        }
 
-        if(service.getConnectionStatus() != DataService.STATUS_Server_Connected) {
+        if(service.getConnectionStatus() == DataService.STATUS_Server_Failed) {
             startSetupActivity();
         }
     }
