@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 
+import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
 
 import java.util.List;
@@ -69,7 +70,17 @@ public class MovieFolderFragment extends MovieStepFragment {
     }
 
     private void moveMovie(String folder) {
-        String newName = mapName(folder + "~" + getMovie().getTitle());
-        getService().renameMovie(getMovie(), newName);
+        String name = null;
+        Movie movie = getMovie();
+
+        if(movie.isSeries() || folder.equals(getService().getSeriesFolder())) {
+            name = folder + "~" + movie.getTitle() + "~" + movie.getOutline();
+        }
+        else {
+            name = folder + "~" + movie.getTitle();
+        }
+
+        String newName = mapName(name);
+        getService().renameMovie(movie, newName);
     }
 }
