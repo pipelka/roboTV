@@ -12,7 +12,6 @@ import org.xvdr.jniwrap.SessionListener;
 import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionLoaderTask;
-import org.xvdr.recordings.model.PacketAdapter;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
@@ -265,6 +264,10 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
     public TreeSet<String> getFolderList() {
         return folderList;
+    }
+
+    public String getSeriesFolder() {
+        return connection.getConfig("SeriesFolder");
     }
 
     protected void loadMovieCollection() {
