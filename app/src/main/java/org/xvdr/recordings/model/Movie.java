@@ -23,6 +23,7 @@ public class Movie implements Serializable {
     private int channelUid;
     private boolean isSeriesHeader = false;
     private int episodeCount;
+    private Event event = null;
 
     public Movie() {
     }
@@ -171,11 +172,16 @@ public class Movie implements Serializable {
     }
 
     public Event getEvent() {
+        if(event != null) {
+            return event;
+        }
+
         if(content == 0 || (content & 0x50) == 0x50) {
             content = 0x10;
         }
 
-        return new Event(content, title, outline, description, duration);
+        event = new Event(content, title, outline, description, duration);
+        return event;
     }
 
     public void setSeriesHeader() {
