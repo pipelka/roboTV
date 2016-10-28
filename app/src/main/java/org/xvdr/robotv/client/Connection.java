@@ -234,6 +234,11 @@ public class Connection extends Session {
         req.putString(id);
 
         Packet resp = transmitMessage(req);
+
+        if(resp == null) {
+            return -1;
+        }
+
         return (int)resp.getU32();
     }
 
@@ -243,6 +248,7 @@ public class Connection extends Session {
         req.putString(newName);
 
         Packet resp = transmitMessage(req);
+
         if(resp == null) {
             return -1;
         }
