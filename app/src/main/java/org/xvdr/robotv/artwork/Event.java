@@ -1,5 +1,6 @@
 package org.xvdr.robotv.artwork;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.regex.Matcher;
@@ -7,16 +8,24 @@ import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 
-public class Event {
+public class Event implements Serializable {
 
     static private final String TAG = "Event";
 
-    public class SeasonEpisodeHolder {
+    public class SeasonEpisodeHolder implements Serializable {
         public int season = 0;
         public int episode = 0;
 
         public boolean valid() {
             return season > 0 && episode > 0;
+        }
+
+        @Override
+        public String toString() {
+            return "SeasonEpisodeHolder {" +
+                    "season=\'" + season + "\'" +
+                    ", episode=\'" + episode + "\'" +
+                    "}";
         }
     }
 
@@ -307,4 +316,20 @@ public class Event {
     public Timestamp getTimestamp() {
         return new Timestamp(mStartTime * 1000);
     }
+
+    @Override
+    public String toString() {
+        return "Event {" +
+                "mContentId=\'" + mContentId + "\'" +
+                ", mTitle=\'" + mTitle + "\'" +
+                ", mSubTitle=\'" + mSubTitle + "\'" +
+                ", mPlot=\'" + mPlot + "\'" +
+                ", mDuration=\'" + mDuration + "\'" +
+                ", mYear=\'" + mYear + "\'" +
+                ", mEventId=\'" + mYear + "\'" +
+                ", mStartTime=\'" + mYear + "\'" +
+                ", mChannelUid=\'" + mYear + "\'" +
+                "}";
+    }
+
 }
