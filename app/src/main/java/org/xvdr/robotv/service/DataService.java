@@ -95,9 +95,15 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    connection.login();
-                    loadMovieCollection();
-                    connectionStatus = STATUS_Server_Connected;
+                    Log.d(TAG, "server reconnected");
+                    if(connection.login()) {
+                        Log.d(TAG, "logged in");
+                        loadMovieCollection();
+                        connectionStatus = STATUS_Server_Connected;
+                    }
+                    else {
+                        Log.e(TAG, "server login failed");
+                    }
                 }
             }, 3000);
         }
@@ -274,6 +280,8 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         handler.post(new Runnable() {
             @Override
             public void run() {
+
+                Log.i(TAG, "started movie collection update");
 
                 for (int i = 0; i < listeners.size(); i++) {
                     listeners.get(i).onMovieCollectionUpdated(null, STATUS_Collection_Busy);
