@@ -4,7 +4,7 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.TrackSelections;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.Allocator;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 
@@ -21,7 +21,8 @@ class RoboTvLoadControl  implements LoadControl {
     }
 
     @Override
-    public void onTracksSelected(Renderer[] renderers, TrackGroupArray trackGroups, TrackSelections<?> trackSelections) {
+    public void onTracksSelected(Renderer[] renderers, TrackGroupArray trackGroupArray, TrackSelectionArray trackSelectionArray) {
+
     }
 
     @Override

@@ -18,10 +18,6 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
     private String audioTrackId;
     private String audioLanguage;
 
-    public RoboTvTrackSelector(Handler eventHandler) {
-        super(eventHandler);
-    }
-
     private static boolean isSupported(int formatSupport) {
         return (formatSupport & RendererCapabilities.FORMAT_SUPPORT_MASK) == RendererCapabilities.FORMAT_HANDLED;
     }

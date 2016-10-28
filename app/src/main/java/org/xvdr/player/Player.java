@@ -28,8 +28,9 @@ import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelections;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.PriorityHandlerThread;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
@@ -43,7 +44,7 @@ import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-public class Player implements ExoPlayer.EventListener, VideoRendererEventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, RoboTvTrackSelector.EventListener, AudioRendererEventListener {
+public class Player implements ExoPlayer.EventListener, VideoRendererEventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, AudioRendererEventListener {
 
     private static final String TAG = "Player";
 
@@ -193,9 +194,8 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         Renderer[] renderers = {videoRenderer, internalAudioRenderer, exoAudioRenderer};
 
-        trackSelector = new RoboTvTrackSelector(handler);
+        trackSelector = new RoboTvTrackSelector();
         trackSelector.setParameters(new RoboTvTrackSelector.Parameters().withPreferredAudioLanguage(language));
-        trackSelector.addListener(this);
 
         player = ExoPlayerFactory.newInstance(renderers, trackSelector, loadControl);
         player.addListener(this);
@@ -420,13 +420,13 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     @Override
-    public void onTrackSelectionsChanged(TrackSelections trackSelections) {
+    public void onTracksChanged(TrackGroupArray trackGroupArray, TrackSelectionArray trackSelectionArray) {
         if(listener == null) {
             return;
         }
 
-        for(int i = 0; i < trackSelections.length; i++) {
-            TrackSelection selection = trackSelections.get(i);
+        for(int i = 0; i < trackSelectionArray.length; i++) {
+            TrackSelection selection = trackSelectionArray.get(i);
 
             // skip disabled renderers
             if(selection == null) {
