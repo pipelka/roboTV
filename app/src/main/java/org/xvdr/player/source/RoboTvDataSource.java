@@ -55,16 +55,20 @@ class RoboTvDataSource implements DataSource {
 
         Log.d(TAG, "open: " + uri.toString());
 
-        response.clear();
-
         // check if we should seek
         long seekPosition = dataSpec.position;
-        if(streaming && (lastUri != null && uri.equals(lastUri)) && seekPosition != 0) {
-            Log.d(TAG, "seek to position: " + seekPosition);
+        if(streaming && (lastUri != null && uri.equals(lastUri))) {
 
-            connection.seek(seekPosition);
+            if(seekPosition != 0) {
+                Log.d(TAG, "seek to position: " + seekPosition);
+                response.clear();
+                connection.seek(seekPosition);
+            }
+
             return C.LENGTH_UNSET;
         }
+
+        response.clear();
 
         if(!uri.getScheme().equals("robotv")) {
             throw new IOException("unable to open stream: " + getUri().toString() + ", uri must start with robotv://");
