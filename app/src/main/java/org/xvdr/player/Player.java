@@ -40,6 +40,7 @@ import org.xvdr.player.audio.RoboTvAudioRenderer;
 import org.xvdr.player.extractor.RoboTvExtractor;
 import org.xvdr.player.source.RoboTvDataSourceFactory;
 import org.xvdr.player.trackselection.RoboTvTrackSelector;
+import org.xvdr.player.video.VideoRenderer;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
@@ -145,7 +146,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         position = new PositionReference();
 
-        videoRenderer = new MediaCodecVideoRenderer(
+        videoRenderer = new VideoRenderer(
             this.context,
             MediaCodecSelector.DEFAULT,
             MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
