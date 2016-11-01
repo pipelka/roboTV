@@ -33,14 +33,14 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.PriorityHandlerThread;
-import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import org.xvdr.player.audio.RoboTvAudioRenderer;
 import org.xvdr.player.extractor.RoboTvExtractor;
 import org.xvdr.player.source.RoboTvDataSourceFactory;
 import org.xvdr.player.trackselection.RoboTvTrackSelector;
-import org.xvdr.player.video.VideoRenderer;
+import org.xvdr.player.video.ShieldVideoRenderer;
+import org.xvdr.player.video.VideoRendererFactory;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
@@ -146,16 +146,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         position = new PositionReference();
 
-        videoRenderer = new VideoRenderer(
-            this.context,
-            MediaCodecSelector.DEFAULT,
-            MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-            5000, // joining time
-            null,
-            true,
-            handler,
-            this,
-            50);
+        videoRenderer = VideoRendererFactory.create(context, handler, this);
 
         internalAudioRenderer = new RoboTvAudioRenderer(
             handler,
