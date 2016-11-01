@@ -110,6 +110,9 @@ public class RoboTvExtractor implements Extractor {
             int bytesRead = scratch.position();
             Log.d(TAG, "skipping " + bytesRead + " bytes (stream change packet)");
             input.skipFully(bytesRead);
+
+            // reset position reference
+            position.reset();
             return RESULT_CONTINUE;
         }
 

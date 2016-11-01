@@ -19,7 +19,7 @@ public class PositionReference {
         reset();
     }
 
-    void reset() {
+    public void reset() {
         startPosition = System.currentTimeMillis();
         endPosition = C.TIME_UNSET;
         currentPosition = startPosition;
