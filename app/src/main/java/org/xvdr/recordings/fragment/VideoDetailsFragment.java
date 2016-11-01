@@ -372,7 +372,6 @@ public class VideoDetailsFragment extends BrowseFragment {
         intent.putExtra(EXTRA_MOVIE, movie);
         intent.putExtra(EXTRA_SHOULD_AUTO_START, true);
         startActivity(intent);
-        getActivity().finishAndRemoveTask();
     }
 
     private void loadRelatedContent(ArrayObjectAdapter adapter) {
