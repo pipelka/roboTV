@@ -395,7 +395,6 @@ public class ChannelSyncAdapter {
                 return;
             }
 
-            Log.i(TAG, "populated database with " + programs.size() + " entries.");
             ops.clear();
         }
 
@@ -408,8 +407,6 @@ public class ChannelSyncAdapter {
         long end = start + duration;
 
         Uri channelUri = TvContract.buildChannelUri(channelId);
-
-        Log.d(TAG, "feching epg for " + channelUri.toString() + " ...");
 
         long last = getLastProgramEndTimeMillis(resolver, channelUri) / 1000;
 
