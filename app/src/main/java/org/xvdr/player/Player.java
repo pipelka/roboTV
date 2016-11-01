@@ -238,7 +238,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public void stop() {
-        trickPlayController.stop();
+        trickPlayController.reset();
         player.stop();
         trackSelector.clearAudioTrack();
         position.reset();

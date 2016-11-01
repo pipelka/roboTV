@@ -63,13 +63,17 @@ class TrickPlayController {
             return;
         }
 
+        tick();
+        reset();
+
+        player.setPlayWhenReady(true);
+    }
+
+    void reset() {
         handler.removeCallbacks(doTick);
         position.setTrickPlayMode(false);
-
-        tick();
         playbackSpeed = 1;
         started = false;
-        player.setPlayWhenReady(true);
     }
 
     void postTick() {
