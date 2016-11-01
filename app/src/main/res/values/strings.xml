@@ -119,4 +119,8 @@
     <string name="movie_move_to_folder">Move to folder</string>
     <string name="season_nr">Season %1$d</string>
     <string name="episode_nr">Episode %1$d</string>
+    <string name="service_not_connected">roboTV service not connected</string>
+    <string name="timer_created">Timer created</string>
+    <string name="failed_create_timer">Failed to create timer !</string>
+    <string name="error">Error</string>
 </resources>

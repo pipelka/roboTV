@@ -91,4 +91,7 @@
     <string name="movie_move_to_folder">In Ordner verschieben</string>
     <string name="episode_nr">Folge %1$d</string>
     <string name="season_nr">%1$d. Staffel</string>
+    <string name="failed_create_timer">Timer konnte nicht angelegt werden !</string>
+    <string name="service_not_connected">roboTV Dienst nicht verbunden</string>
+    <string name="timer_created">Timer angelegt</string>
 </resources>

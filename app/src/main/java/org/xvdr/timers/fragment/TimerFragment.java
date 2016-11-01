@@ -19,6 +19,7 @@ import android.view.View;
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.recordings.model.Movie;
+import org.xvdr.timers.activity.TimerActivity;
 import org.xvdr.timers.presenter.EpgEventPresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
@@ -31,8 +32,6 @@ import org.xvdr.robotv.setup.SetupUtils;
 import java.io.IOException;
 
 public class TimerFragment extends BrowseFragment {
-
-    private final static String TAG = "TimerFragment";
 
     class EpgSearchLoader extends AsyncTask<Integer, Void, ArrayObjectAdapter> {
 
@@ -151,7 +150,7 @@ public class TimerFragment extends BrowseFragment {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
                 Movie movie = (Movie) item;
-                new CreateTimerFragment().startGuidedStep(getActivity(), movie);
+                ((TimerActivity) getActivity()).selectEvent(movie);
             }
         });
 

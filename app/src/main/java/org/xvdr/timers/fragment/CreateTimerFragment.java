@@ -1,21 +1,19 @@
 package org.xvdr.timers.fragment;
 
 import android.os.Bundle;
-import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.annotation.NonNull;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.Timer;
+import org.xvdr.robotv.service.DataService;
+import org.xvdr.robotv.service.NotificationHandler;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.util.List;
 
 public class CreateTimerFragment extends CreateTimerStepFragment {
-
-    static final String TAG = "CreateTimerFragment";
 
     static final int ACTION_FOLDER = 3;
     static final int ACTION_ADD = 1;
@@ -25,13 +23,14 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
     private GuidedAction mActionAdd;
     private GuidedAction mActionCancel;
 
+    @NonNull
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
         return createGuidance(getString(R.string.schedule_recording));
     }
 
     @Override
-    public void onCreateActions(List actions, Bundle savedInstanceState) {
+    public void onCreateActions(@NonNull List actions, Bundle savedInstanceState) {
         mActionFolder = new GuidedAction.Builder(getActivity())
         .id(ACTION_FOLDER)
         .title(getString(R.string.timer_add_select_folder))
@@ -73,24 +72,20 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
     }
 
     protected void createTimer(Movie movie) {
-        Connection connection = new Connection("roboTV:createTimer");
+        DataService service = getService();
+        NotificationHandler notificationHandler = new NotificationHandler(getActivity());
 
-        if(!connection.open(SetupUtils.getServer(getActivity()))) {
+        if(service == null) {
+            notificationHandler.error(getString(R.string.service_not_connected));
             return;
         }
 
-        Timer timer = new Timer(connection);
-
-        String name = movie.getCategory();
-
-        if(!name.isEmpty()) {
-            name += "~";
+        if(service.createTimer(movie)) {
+            notificationHandler.notify(getString(R.string.timer_created), movie.getTitle(), getDrawable());
+            return;
         }
 
-        name += movie.getTitle();
-
-        timer.create(movie.getChannelUid(), movie.getStartTime(), (int)movie.getDuration(), name);
-        connection.close();
+        notificationHandler.error(getString(R.string.failed_create_timer));
     }
 
     @Override
@@ -99,11 +94,8 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
 
         switch((int)action.getId()) {
             case ACTION_FOLDER:
-                GuidedStepFragment fragment = new CreateTimerFragmentFolder();
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(EXTRA_MOVIE, movie);
-                fragment.setArguments(bundle);
-                GuidedStepFragment.add(getActivity().getFragmentManager(), fragment);
+                CreateTimerFragmentFolder fragment = new CreateTimerFragmentFolder();
+                fragment.startGuidedStep(getActivity(), movie, getService(), getResourceId());
                 break;
 
             case ACTION_ADD:

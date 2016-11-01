@@ -8,35 +8,18 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.DataServiceClient;
-
-import java.util.Collection;
-import java.util.TreeSet;
+import org.xvdr.timers.fragment.CreateTimerFragment;
 
 public class TimerActivity extends Activity {
 
     private DataServiceClient dataClient;
-    TreeSet<String> folderList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // start data service
-        dataClient = new DataServiceClient(this, new DataServiceClient.Listener() {
-            @Override
-            public void onServiceConnected(DataService service) {
-                folderList = service.getFolderList();
-            }
-
-            @Override
-            public void onServiceDisconnected(DataService service) {
-            }
-
-            @Override
-            public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
-            }
-        });
-
+        dataClient = new DataServiceClient(this, null);
         dataClient.bind();
 
         setContentView(R.layout.activity_timer);
@@ -55,7 +38,20 @@ public class TimerActivity extends Activity {
         return true;
     }
 
-    public TreeSet<String> getFolderList() {
-        return folderList;
+    public void selectEvent(Movie event) {
+        DataService service = dataClient.getService();
+
+        if(service == null) {
+            // TODO - handle error case
+            return;
+        }
+
+        new CreateTimerFragment().startGuidedStep(
+                this,
+                event,
+                dataClient.getService(),
+                R.id.timer_fragment
+        );
     }
+
 }

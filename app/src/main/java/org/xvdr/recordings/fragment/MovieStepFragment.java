@@ -25,6 +25,7 @@ public class MovieStepFragment extends GuidedStepFragment {
     private Movie movie;
     private Drawable drawable;
     private DataService service;
+    private int resourceId;
 
     private void getArtwork(Activity activity, String url) {
         try {
@@ -39,7 +40,7 @@ public class MovieStepFragment extends GuidedStepFragment {
         }
         catch(Exception e) {
             e.printStackTrace();
-            drawable =activity.getDrawable(R.drawable.recording_unkown);
+            drawable = activity.getDrawable(R.drawable.recording_unkown);
         }
     }
 
@@ -53,6 +54,7 @@ public class MovieStepFragment extends GuidedStepFragment {
 
     public void startGuidedStep(final Activity activity, final Movie movie, DataService service, final int resourceId) {
         this.service = service;
+        this.resourceId = resourceId;
 
         Bundle bundle = new Bundle();
         bundle.putSerializable(EXTRA_MOVIE, movie);
@@ -113,5 +115,13 @@ public class MovieStepFragment extends GuidedStepFragment {
 
     public DataService getService() {
         return service;
+    }
+
+    public int getResourceId() {
+        return resourceId;
+    }
+
+    protected Drawable getDrawable() {
+        return drawable;
     }
 }

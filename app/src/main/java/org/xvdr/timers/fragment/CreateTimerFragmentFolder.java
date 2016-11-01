@@ -6,15 +6,13 @@ import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.setup.SetupUtils;
-import org.xvdr.timers.activity.TimerActivity;
 
 import java.util.List;
 import java.util.TreeSet;
 
 public class CreateTimerFragmentFolder extends CreateTimerStepFragment {
-
-    protected TreeSet<String> mFolderList;
 
     @NonNull
     @Override
@@ -23,32 +21,36 @@ public class CreateTimerFragmentFolder extends CreateTimerStepFragment {
     }
 
     @Override
-    public void onCreateActions(List actions, Bundle savedInstanceState) {
-        mFolderList = ((TimerActivity) getActivity()).getFolderList();
-
+    public void onCreateActions(@NonNull List actions, Bundle savedInstanceState) {
         String currentFolder = SetupUtils.getRecordingFolder();
         String newFolder = currentFolder.equals("") ? getString(R.string.timer_new_folder) : currentFolder;
 
         GuidedAction emptyFolder = new GuidedAction.Builder(getActivity())
-        .id(0)
-        .title(getString(R.string.timer_add_select_folder_none))
-        .checkSetId(1)
-        .checked(currentFolder.equals(""))
-        .build();
+                .id(0)
+                .title(getString(R.string.timer_add_select_folder_none))
+                .checkSetId(1)
+                .checked(currentFolder.equals(""))
+                .build();
 
         actions.add(emptyFolder);
 
         int i = 1;
 
-        for(String folder : mFolderList) {
-            GuidedAction action = new GuidedAction.Builder(getActivity())
-            .id(i++)
-            .title(folder)
-            .checkSetId(1)
-            .checked(currentFolder.equals(folder))
-            .build();
+        DataService service = getService();
 
-            actions.add(action);
+        if(service != null) {
+            TreeSet<String> folderList = service.getFolderList();
+
+            for(String folder : folderList) {
+                GuidedAction action = new GuidedAction.Builder(getActivity())
+                        .id(i++)
+                        .title(folder)
+                        .checkSetId(1)
+                        .checked(currentFolder.equals(folder))
+                        .build();
+
+                actions.add(action);
+            }
         }
 
         GuidedAction customFolder = new GuidedAction.Builder(getActivity())
