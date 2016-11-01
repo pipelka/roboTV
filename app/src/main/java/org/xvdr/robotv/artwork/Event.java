@@ -47,7 +47,9 @@ public class Event implements Serializable {
     private static Pattern seasonEpisodePatterns[] = {
             Pattern.compile("\\b(\\d).+[S|s]taffel.+[F|f]olge\\W+(\\d+)\\b"),
             Pattern.compile("\\b[S|s]taffel\\W+(\\d).+[F|f]olge\\W+(\\d+)\\b"),
-            Pattern.compile("\\bS(\\d+).+E(\\d+)\\b")
+            Pattern.compile("\\b[S|s]taffel\\W+(\\d).+[E|e]pisode\\W+(\\d+)\\b"),
+            Pattern.compile("\\bS(\\d+).+E(\\d+)\\b"),
+            Pattern.compile("\\bs\\W+(\\d+)\\W+ep\\W+(\\d+)\\b")
     };
 
     private static Pattern episodeSeasonPatterns[] = {
@@ -57,7 +59,8 @@ public class Event implements Serializable {
 
     private static Pattern episodeOnlyPatterns[] = {
             Pattern.compile("\\b[F|f]olge\\W+(\\d+)\\b"),
-            Pattern.compile("\\b(\\d+)\\W+[F|f]olge\\b")
+            Pattern.compile("\\b(\\d+)\\W+[F|f]olge\\b"),
+            Pattern.compile("\\b[E|e]pisode\\W+(\\d)+\\b")
     };
 
     private static String[] genreFilm = {
