@@ -18,6 +18,7 @@ import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.client.Connection;
+import org.xvdr.robotv.client.Timer;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     Collection<Movie> movieCollection;
     TreeSet<String> folderList;
     int connectionStatus = STATUS_Server_Starting;
+    private String seriesFolder = null;
 
     private MovieCollectionLoaderTask loaderTask;
 
@@ -273,7 +275,12 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     }
 
     public String getSeriesFolder() {
-        return connection.getConfig("SeriesFolder");
+        if(seriesFolder != null) {
+            return seriesFolder;
+        }
+
+        seriesFolder = connection.getConfig("SeriesFolder");
+        return seriesFolder;
     }
 
     protected void loadMovieCollection() {
@@ -321,6 +328,28 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         if (!seriesFolder.isEmpty()) {
             folderList.add(seriesFolder);
         }
+    }
+
+    public boolean createTimer(Movie movie) {
+        String name;
+        Timer timer = new Timer(connection);
+
+        String category = movie.getCategory();
+
+        if(category.equals(getSeriesFolder())) {
+            name = getSeriesFolder() + "~" + movie.getTitle() + "~" + movie.getOutline();
+        }
+        else {
+            name = category;
+
+            if (!name.isEmpty()) {
+                name += "~";
+            }
+
+            name += movie.getTitle();
+        }
+
+        return timer.create(movie.getChannelUid(), movie.getStartTime(), (int)movie.getDuration(), name);
     }
 
     public void registerListener(Listener listener) {
