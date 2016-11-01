@@ -170,10 +170,16 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public long onTimeShiftGetCurrentPosition() {
+        long currentPos = System.currentTimeMillis();
+
         if(mPlayer == null) {
-            return System.currentTimeMillis();
+            return currentPos;
         }
 
+        if(mPlayer.getPlaybackState() != ExoPlayer.STATE_READY) {
+            return currentPos;
+
+        }
         return mPlayer.getCurrentPosition();
     }
 
