@@ -274,7 +274,17 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     public long getCurrentPosition() {
         long timeUs = player.getCurrentPosition() * 1000;
-        return Math.max(position.positionFromTimeUs(timeUs), position.getStartPosition());
+        long startPos = position.getStartPosition();
+        long endPos = position.getEndPosition();
+
+        long pos = Math.max(position.positionFromTimeUs(timeUs), startPos);
+
+        // clamp to end position (if we already have a valid endposition)
+        if(endPos > startPos) {
+            return Math.min(pos, endPos);
+        }
+
+        return pos;
     }
 
     public long getBufferedPosition() {
