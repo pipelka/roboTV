@@ -1,5 +1,7 @@
 package org.xvdr.robotv.artwork;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -272,6 +274,10 @@ public class Event implements Serializable {
     }
 
     static public boolean getSeasonEpisode(String text, SeasonEpisodeHolder holder) {
+        if(TextUtils.isEmpty(text)) {
+            return false;
+        }
+
         for(Pattern seasonEpisodePattern : seasonEpisodePatterns) {
             Matcher matches = seasonEpisodePattern.matcher(text);
 
