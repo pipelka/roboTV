@@ -460,8 +460,15 @@ public class ChannelSyncAdapter {
             values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
             values.put(TvContract.Programs.COLUMN_TITLE, event.getTitle());
             values.put(TvContract.Programs.COLUMN_EPISODE_TITLE, plotOutline);
-            values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plot);
-            values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, event.getPlot());
+
+            if(plot.length() <= 256) {
+                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plot);
+            }
+            else {
+                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plot.substring(0, 256));
+                //values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, event.getPlot());
+            }
+
             values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
             values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endTime * 1000);
             values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(event.getContentId()));
