@@ -176,10 +176,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
             return currentPos;
         }
 
-        if(mPlayer.getPlaybackState() != ExoPlayer.STATE_READY) {
-            return currentPos;
-
-        }
         return mPlayer.getCurrentPosition();
     }
 
