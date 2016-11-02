@@ -216,6 +216,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     public void setSurface(Surface surface) {
         this.surface = surface;
+        sendMessage(videoRenderer, C.MSG_SET_SURFACE, surface, true);
     }
 
     public void setStreamVolume(float volume) {
