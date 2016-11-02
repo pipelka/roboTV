@@ -76,9 +76,6 @@ public class ArtworkFetcher {
         if(mConnection.transmitMessage(req) == null) {
             Log.d(TAG, "failed to register artwork for '" + event.getTitle() + "' in cache");
         }
-        else if(!o.getBackgroundUrl().isEmpty()) {
-            Log.d(TAG, "putting artwork for '" + event.getTitle() + "' into cache (0x" + Integer.toHexString(event.getContentId()) + ")");
-        }
 
         return o;
     }

@@ -1,15 +1,11 @@
 package org.xvdr.robotv.artwork.provider;
 
-import android.util.Log;
-
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.client.Connection;
 
 public class RoboTvProvider extends SimpleArtworkProvider {
-
-    private static final String TAG = "RoboTvProvider";
 
     private Connection mConnection;
 
@@ -39,12 +35,6 @@ public class RoboTvProvider extends SimpleArtworkProvider {
             return null;
         }
 
-        ArtworkHolder artwork = new ArtworkHolder(posterUrl, backgroundUrl);
-
-        if(artwork.hasBackground()) {
-            Log.d(TAG, "found artwork for '" + event.getTitle() + "' (0x" + Integer.toHexString(event.getContentId()) + ") in cache");
-        }
-
-        return artwork;
+        return new ArtworkHolder(posterUrl, backgroundUrl);
     }
 }

@@ -28,8 +28,6 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
     }
 
     boolean checkUrlExists(String url) throws IOException {
-        Log.d(TAG, "checking url: " + url);
-
         Request request = new Request.Builder().url(url).build();
         Response response = client.newCall(request).execute();
 
@@ -44,8 +42,6 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
     }
 
     String getResponseFromServer(String url) throws IOException {
-        Log.d(TAG, "reading url: " + url);
-
         Request request = new Request.Builder().url(url).build();
         Response response = client.newCall(request).execute();
 
