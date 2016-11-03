@@ -12,7 +12,6 @@ import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ClassPresenterSelector;
 import android.support.v17.leanback.widget.DetailsOverviewRow;
 import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
@@ -50,7 +49,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 
-public class VideoDetailsFragment extends BrowseFragment {
+public class VideoDetailsFragment extends BrowseFragment implements DataServiceClient.Listener {
 
     public static final String TAG = "VideoDetailsFragment";
     public static final String EXTRA_MOVIE = "extra_movie";
@@ -62,35 +61,15 @@ public class VideoDetailsFragment extends BrowseFragment {
     private static final int ACTION_DELETE_EPISODE = 4;
     private static final int ACTION_DELETE = 5;
 
-    private Movie selectedMovie;
+    private Movie selectedMovie = null;
     private Collection<Movie> episodes;
     private BackgroundManager backgroundManager;
     private BackgroundManagerTarget backgroundManagerTarget;
-
-    private DataServiceClient dataClient;
+    private DataService service;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        initBackground();
-        prepareEntranceTransition();
-
-        dataClient = new DataServiceClient(getActivity(), new DataServiceClient.Listener() {
-            @Override
-            public void onServiceConnected(DataService service) {
-                initDetails();
-            }
-
-            @Override
-            public void onServiceDisconnected(DataService service) {
-            }
-
-            @Override
-            public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
-            }
-        });
-        dataClient.bind();
 
         setOnItemViewClickedListener(new OnItemViewClickedListener() {
             @Override
@@ -108,15 +87,12 @@ public class VideoDetailsFragment extends BrowseFragment {
                 }
             }
         });
+    }
 
-        int brandColor = Utils.getColor(getActivity(), R.color.episode_header_color);
-        setBrandColor(brandColor);
-
-        selectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
-
-        if(selectedMovie.isSeries()) {
-            setTitle(selectedMovie.getTitle());
-        }
+    @Override
+    public void onResume() {
+        super.onResume();
+        prepareEntranceTransition();
     }
 
     private void handleDetailActions(Action action, Movie movie) {
@@ -129,7 +105,7 @@ public class VideoDetailsFragment extends BrowseFragment {
                 new DeleteMovieFragment().startGuidedStep(
                         getActivity(),
                         movie,
-                        dataClient.getService(),
+                        service,
                         R.id.details_fragment);
                 break;
         }
@@ -147,7 +123,7 @@ public class VideoDetailsFragment extends BrowseFragment {
                 new DeleteMovieFragment().startGuidedStep(
                         getActivity(),
                         selectedMovie,
-                        dataClient.getService(),
+                        service,
                         R.id.details_fragment);
                 break;
 
@@ -155,7 +131,7 @@ public class VideoDetailsFragment extends BrowseFragment {
                 new MovieFolderFragment().startGuidedStep(
                         getActivity(),
                         selectedMovie,
-                        dataClient.getService(),
+                        service,
                         R.id.details_fragment);
                 break;
         }
@@ -168,22 +144,11 @@ public class VideoDetailsFragment extends BrowseFragment {
         }
 
         if(resultCode == Activity.RESULT_OK) {
+            Log.d(TAG, "onActivityResult");
             selectedMovie = (Movie) data.getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
-            initDetails();
         }
     }
 
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        dataClient.unbind();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
 
     private void initBackground() {
         backgroundManager = BackgroundManager.getInstance(getActivity());
@@ -235,8 +200,6 @@ public class VideoDetailsFragment extends BrowseFragment {
     }
 
     private void addEpisodeRows(ArrayObjectAdapter adapter, Movie movie) {
-        DataService service = dataClient.getService();
-
         if(service == null) {
             return;
         }
@@ -296,16 +259,6 @@ public class VideoDetailsFragment extends BrowseFragment {
         }
     }
 
-    private void postStartEntranceTransition() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                startEntranceTransition();
-
-            }
-        });
-    }
-
     private void addDetailRow(ArrayObjectAdapter adapter, Movie movie) {
         final DetailsOverviewRow row = new DetailsOverviewRow(movie);
 
@@ -320,14 +273,14 @@ public class VideoDetailsFragment extends BrowseFragment {
 
         if(TextUtils.isEmpty(url)) {
             row.setImageDrawable(getResources().getDrawable(R.drawable.recording_unkown, null));
-            postStartEntranceTransition();
         }
         else {
             SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>() {
                 @Override
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    row.setImageBitmap(getActivity(), resource);
-                    postStartEntranceTransition();
+                    if(resource != null) {
+                        row.setImageBitmap(getActivity(), resource);
+                    }
                 }
             };
 
@@ -379,8 +332,6 @@ public class VideoDetailsFragment extends BrowseFragment {
         if(selectedMovie.isSeries()) {
             return;
         }
-
-        DataService service = dataClient.getService();
 
         if(service == null) {
             Log.d(TAG, "service is null");
@@ -440,4 +391,33 @@ public class VideoDetailsFragment extends BrowseFragment {
         adapter.add(listRow);
     }
 
+    @Override
+    public void onServiceConnected(DataService service) {
+        VideoDetailsFragment.this.service = service;
+
+        int brandColor = Utils.getColor(getActivity(), R.color.episode_header_color);
+        setBrandColor(brandColor);
+
+        if(selectedMovie == null) {
+            selectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
+        }
+
+        if(selectedMovie.isSeries()) {
+            setTitle(selectedMovie.getTitle());
+        }
+
+        initBackground();
+        initDetails();
+
+        startEntranceTransition();
+    }
+
+    @Override
+    public void onServiceDisconnected(DataService service) {
+        VideoDetailsFragment.this.service = null;
+    }
+
+    @Override
+    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
+    }
 }

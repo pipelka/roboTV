@@ -41,7 +41,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     Handler handler;
     NotificationHandler notification;
     ArtworkFetcher artwork;
-    Collection<Movie> movieCollection;
+    Collection<Movie> movieCollection = null;
     TreeSet<String> folderList;
     int connectionStatus = STATUS_Server_Starting;
     private String seriesFolder = null;
@@ -148,6 +148,9 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
             connection.close();
             handler.removeCallbacks(mOpenRunnable);
             handler.post(mOpenRunnable);
+        }
+        else if(movieCollection != null) {
+            postMovieCollectionUpdated(movieCollection);
         }
 
         return START_STICKY;
@@ -350,6 +353,10 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         }
 
         return timer.create(movie.getChannelUid(), movie.getStartTime(), (int)movie.getDuration(), name);
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
     public void registerListener(Listener listener) {

@@ -88,14 +88,6 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         return null;
     }
 
-    public ArrayObjectAdapter getCategory(Movie movie) {
-        return getCategory(movie.getCategory());
-    }
-
-    private ArrayObjectAdapter getCategory(String category) {
-        return getCategory(category, false);
-    }
-
     private ArrayObjectAdapter getCategory(String category, boolean addNew) {
         return getCategory(category, addNew, mCardPresenter);
     }
@@ -107,20 +99,6 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             listrow = (ListRow)get(i);
 
             if(listrow.getHeaderItem().getName().equalsIgnoreCase(category)) {
-                return listrow;
-            }
-        }
-
-        return null;
-    }
-
-    public ListRow findRow(long id) {
-        ListRow listrow;
-
-        for(int i = 0; i < size(); i++) {
-            listrow = (ListRow)get(i);
-
-            if(listrow.getId() == id) {
                 return listrow;
             }
         }
@@ -214,7 +192,6 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         series.setSeriesHeader();
 
         mTvShows.add(series);
-        return;
     }
 
     public void remove(Movie movie) {

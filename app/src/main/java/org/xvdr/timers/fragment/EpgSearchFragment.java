@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Channels;
+import org.xvdr.robotv.service.DataService;
+import org.xvdr.robotv.service.DataServiceClient;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.timers.presenter.EpgEventPresenter;
@@ -34,11 +36,12 @@ import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class EpgSearchFragment extends SearchFragment implements SearchFragment.SearchResultProvider {
+public class EpgSearchFragment extends SearchFragment implements SearchFragment.SearchResultProvider, DataServiceClient.Listener  {
 
     private static final int SEARCH_DELAY_MS = 500;
 
@@ -52,24 +55,24 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
         @Override
         public void run() {
-            if(mLoader != null) {
-                mLoader.cancel(true);
+            if(loader != null) {
+                loader.cancel(true);
             }
 
-            mLoader = new EpgSearchLoader();
-            mLoader.execute(query);
+            loader = new EpgSearchLoader();
+            loader.execute(query);
         }
     }
 
     class EpgSearchLoader extends AsyncTask<String, Void, List<ListRow>> {
 
-        List<ListRow> mResultRows = new ArrayList<>();
+        List<ListRow> resultRows = new ArrayList<>();
         EpgEventPresenter eventPresenter = new EpgEventPresenter();
 
         private ListRow findOrCreateChannelRow(String channelName, long channelId) {
             // row already exists ?
-            for(int i = 0; i < mResultRows.size(); i++) {
-                ListRow row = mResultRows.get(i);
+            for(int i = 0; i < resultRows.size(); i++) {
+                ListRow row = resultRows.get(i);
 
                 if(row.getHeaderItem().getId() == channelId) {
                     return row;
@@ -81,7 +84,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             HeaderItem header = new HeaderItem(channelId, channelName);
 
             ListRow row = new ListRow(header, listRowAdapter);
-            mResultRows.add(row);
+            resultRows.add(row);
 
             return row;
         }
@@ -91,26 +94,26 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             progress.show();
             progress.enableProgressBar();
 
-            mRowsAdapter.clear();
+            rowsAdapter.clear();
         }
 
         @Override
         protected List<ListRow> doInBackground(String... params) {
             final Channels channelList = new Channels();
-            channelList.load(mConnection);
+            channelList.load(connection);
 
             // search
-            Packet req = mConnection.CreatePacket(
+            Packet req = connection.CreatePacket(
                              Connection.XVDR_EPG_SEARCH,
                              Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
 
             req.putString(params[0]);
 
-            Packet resp = mConnection.transmitMessage(req);
+            Packet resp = connection.transmitMessage(req);
 
             if(resp == null || resp.eop()) {
                 findOrCreateChannelRow(getString(R.string.no_search_results, params[0]), 0);
-                return mResultRows;
+                return resultRows;
             }
 
             // uncompress respsonse
@@ -138,7 +141,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
                 // fetch artwork
                 try {
-                    ArtworkHolder holder = mArtwork.fetchForEvent(movie.getEvent());
+                    ArtworkHolder holder = artwork.fetchForEvent(movie.getEvent());
                     movie.setArtwork(holder);
                 }
                 catch(IOException e) {
@@ -153,7 +156,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 }
             }
 
-            Collections.sort(mResultRows, new Comparator<ListRow>() {
+            Collections.sort(resultRows, new Comparator<ListRow>() {
                 @Override
                 public int compare(ListRow a, ListRow b) {
                     Channels.Entry entry1 = channelList.findByUid((int)a.getId());
@@ -162,7 +165,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 }
             });
 
-            return mResultRows;
+            return resultRows;
         }
 
         @Override
@@ -171,31 +174,28 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             progress.hide();
 
             for(ListRow row : result) {
-                mRowsAdapter.add(row);
+                rowsAdapter.add(row);
             }
+
+            rowsAdapter.notifyArrayItemRangeChanged(0, rowsAdapter.size());
         }
     }
 
-    private ArrayObjectAdapter mRowsAdapter;
-    private EpgSearchLoader mLoader;
-    private DelayedTask mDelayedLoader;
-    private Connection mConnection;
-    private ArtworkFetcher mArtwork;
-    private Handler mHandler;
+    private ArrayObjectAdapter rowsAdapter;
+    private EpgSearchLoader loader;
+    private DelayedTask delayedLoader;
+    private Connection connection;
+    private ArtworkFetcher artwork;
+    private Handler handler;
     ProgressBarManager progress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mConnection = new Connection("robotv:epgsearchhandler");
-        mConnection.open(SetupUtils.getServer(getActivity()));
+        handler = new Handler();
 
-        mArtwork = new ArtworkFetcher(mConnection, SetupUtils.getLanguage(getActivity()));
-
-        mHandler = new Handler();
-
-        mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+        rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setTitle(getString(R.string.search_epg));
 
         setSearchResultProvider(this);
@@ -210,8 +210,8 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             }
         });
 
-        mLoader = new EpgSearchLoader();
-        mDelayedLoader = new DelayedTask();
+        loader = new EpgSearchLoader();
+        delayedLoader = new DelayedTask();
     }
 
     @Override
@@ -226,21 +226,20 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mConnection.close();
     }
 
     @Override
     public ObjectAdapter getResultsAdapter() {
-        return mRowsAdapter;
+        return rowsAdapter;
     }
 
     @Override
     public boolean onQueryTextChange(String newQuery) {
         if(!TextUtils.isEmpty(newQuery)) {
-            mRowsAdapter.clear();
-            mDelayedLoader.setSearchQuery(newQuery);
-            mHandler.removeCallbacks(mDelayedLoader);
-            mHandler.postDelayed(mDelayedLoader, SEARCH_DELAY_MS);
+            rowsAdapter.clear();
+            delayedLoader.setSearchQuery(newQuery);
+            handler.removeCallbacks(delayedLoader);
+            handler.postDelayed(delayedLoader, SEARCH_DELAY_MS);
         }
 
         return true;
@@ -249,12 +248,26 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     @Override
     public boolean onQueryTextSubmit(String query) {
         if(!TextUtils.isEmpty(query)) {
-            mRowsAdapter.clear();
-            mDelayedLoader.setSearchQuery(query);
-            mHandler.removeCallbacks(mDelayedLoader);
-            mHandler.postDelayed(mDelayedLoader, SEARCH_DELAY_MS);
+            rowsAdapter.clear();
+            delayedLoader.setSearchQuery(query);
+            handler.removeCallbacks(delayedLoader);
+            handler.postDelayed(delayedLoader, SEARCH_DELAY_MS);
         }
 
         return true;
+    }
+
+    @Override
+    public void onServiceConnected(DataService service) {
+        connection = service.getConnection();
+        artwork = new ArtworkFetcher(connection, SetupUtils.getLanguage(getActivity()));
+    }
+
+    @Override
+    public void onServiceDisconnected(DataService service) {
+    }
+
+    @Override
+    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
     }
 }

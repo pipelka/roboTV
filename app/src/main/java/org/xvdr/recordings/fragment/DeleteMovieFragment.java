@@ -1,6 +1,7 @@
 package org.xvdr.recordings.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 
@@ -19,6 +20,7 @@ public class DeleteMovieFragment extends MovieStepFragment {
     static final int ACTION_DELETE = 0;
     static final int ACTION_CANCEL = 1;
 
+    @NonNull
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
         return createGuidance(getString(R.string.delete_movie));

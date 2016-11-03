@@ -51,20 +51,24 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prepareEntranceTransition();
+        initUI();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        initUI();
         setupEventListeners();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        prepareEntranceTransition();
     }
 
     @Override
@@ -73,6 +77,8 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     }
 
     synchronized private void loadMovies(Collection<Movie> collection) {
+        Log.d(TAG, "loadMovies");
+
         mAdapter = new MovieCollectionAdapter(getActivity());
 
         if(collection.size() != 0) {
@@ -113,9 +119,12 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
                 selectedRow = getSelectedPosition();
                 ListRow listRow = (ListRow) row;
                 ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
-                selectedItem = rowAdapter.indexOf(item);
 
-                if(item instanceof Movie) {
+                if(isShowingHeaders()) {
+                    selectedItem = -1;
+                }
+                else if(item instanceof Movie) {
+                    selectedItem = rowAdapter.indexOf(item);
                     Movie movie = (Movie) item;
                     updateBackground(movie.getBackgroundImageUrl());
                 }
@@ -223,10 +232,6 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
 
     @Override
     public void onServiceConnected(DataService service) {
-        if(service.getConnectionStatus() == DataService.STATUS_Server_Connected) {
-            loadMovies(service.getMovieCollection());
-        }
-
         if(service.getConnectionStatus() == DataService.STATUS_Server_Failed) {
             startSetupActivity();
         }
@@ -256,7 +261,6 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         }
 
         if(collection != null) {
-            backgroundManager.setDrawable(null);
             loadMovies(collection);
         }
     }

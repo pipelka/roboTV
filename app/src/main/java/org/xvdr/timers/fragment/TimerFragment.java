@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
+import android.support.v17.leanback.app.ProgressBarManager;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
@@ -14,9 +15,13 @@ import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.robotv.service.DataService;
+import org.xvdr.robotv.service.DataServiceClient;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.timers.activity.TimerActivity;
@@ -30,31 +35,33 @@ import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
+import java.util.Collection;
 
-public class TimerFragment extends BrowseFragment {
+public class TimerFragment extends BrowseFragment implements DataServiceClient.Listener {
 
-    class EpgSearchLoader extends AsyncTask<Integer, Void, ArrayObjectAdapter> {
+    class EpgSearchLoader extends AsyncTask<Void, Void, ArrayObjectAdapter> {
 
         @Override
-        protected ArrayObjectAdapter doInBackground(Integer... params) {
+        protected ArrayObjectAdapter doInBackground(Void... params) {
             ArrayObjectAdapter rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
 
-            mConnection.open(SetupUtils.getServer(getActivity()));
+            if(connection == null) {
+                return rowsAdapter;
+            }
 
-            Packet req = mConnection.CreatePacket(
+            Packet req = connection.CreatePacket(
                              Connection.XVDR_EPG_GETFORCHANNEL,
                              Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
 
 
-            req.putU32(params[0]);
+            req.putU32(channelUid);
             req.putU32(System.currentTimeMillis() / 1000);
             req.putU32(60 * 60 * 24);
 
-            Packet resp = mConnection.transmitMessage(req);
+            Packet resp = connection.transmitMessage(req);
 
             // check if we got a response
             if(resp == null) {
-                mConnection.close();
                 return rowsAdapter;
             }
 
@@ -63,7 +70,7 @@ public class TimerFragment extends BrowseFragment {
 
             // add new row
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new EpgEventPresenter());
-            HeaderItem header = new HeaderItem(params[0], mChannelName);
+            HeaderItem header = new HeaderItem(channelUid, channelName);
 
             ListRow row = new ListRow(header, listRowAdapter);
             ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) row.getAdapter();
@@ -88,7 +95,7 @@ public class TimerFragment extends BrowseFragment {
                 ArtworkHolder art = null;
 
                 try {
-                    art = mArtwork.fetchForEvent(event);
+                    art = artwork.fetchForEvent(event);
                 }
                 catch(IOException e) {
                     e.printStackTrace();
@@ -98,40 +105,49 @@ public class TimerFragment extends BrowseFragment {
                 movie.setTitle(event.getTitle());
                 movie.setOutline(event.getSubTitle());
                 movie.setTimeStamp(event.getTimestamp().getTime());
-                movie.setChannelName(mChannelName);
+                movie.setChannelName(channelName);
                 movie.setArtwork(art);
                 movie.setTimeStamp(startTime * 1000);
-                movie.setChannelUid(params[0]);
+                movie.setChannelUid(channelUid);
                 movie.setDuration(eventDuration);
 
                 rowAdapter.add(movie);
             }
 
-            mConnection.close();
             return rowsAdapter;
         }
 
         @Override
+        protected void onPreExecute() {
+            progress.show();
+            progress.enableProgressBar();
+        }
+
+        @Override
         protected void onPostExecute(final ArrayObjectAdapter result) {
+            progress.disableProgressBar();
+            progress.hide();
+
             TimerFragment.this.setAdapter(result);
+            startEntranceTransition();
         }
     }
 
-    private Connection mConnection;
-    private ArtworkFetcher mArtwork;
-    private String mChannelName;
-    private int mChannelUid;
-    private EpgSearchLoader mLoader;
+    private Connection connection;
+    private ArtworkFetcher artwork;
+    private String channelName;
+    private int channelUid;
+    private EpgSearchLoader loader;
+    ProgressBarManager progress;
 
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        String language = SetupUtils.getLanguage(getActivity());
-        mConnection = new Connection("roboTV:addtimer", language);
-        mArtwork = new ArtworkFetcher(mConnection, language);
+        prepareEntranceTransition();
 
-        mChannelUid = getActivity().getIntent().getIntExtra("uid", 0);
-        mChannelName = getActivity().getIntent().getStringExtra("name");
+        channelUid = getActivity().getIntent().getIntExtra("uid", 0);
+        channelName = getActivity().getIntent().getStringExtra("name");
 
         int color_background = Utils.getColor(getActivity(), R.color.recordings_background);
         int color_brand = Utils.getColor(getActivity(), R.color.primary_color);
@@ -161,25 +177,51 @@ public class TimerFragment extends BrowseFragment {
                 startActivity(intent);
             }
         });
+    }
 
-        mLoader = new EpgSearchLoader();
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                setHeadersState(HEADERS_DISABLED);
-                loadEpgForChannel(mChannelUid, mChannelName);
-            }
-        });
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        progress = new ProgressBarManager();
+        progress.setRootView((ViewGroup) view);
+
+        return view;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mLoader.cancel(true);
+        loader.cancel(true);
     }
 
-    private void loadEpgForChannel(int uid, String name) {
-        mChannelName = name;
-        mLoader.execute(uid);
+    @Override
+    public void onServiceConnected(DataService service) {
+        connection = service.getConnection();
+
+        String language = SetupUtils.getLanguage(getActivity());
+        artwork = new ArtworkFetcher(connection, language);
+
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                setHeadersState(HEADERS_DISABLED);
+                loadEpgForChannel();
+            }
+        });
+    }
+
+    @Override
+    public void onServiceDisconnected(DataService service) {
+
+    }
+
+    @Override
+    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
+
+    }
+
+    private void loadEpgForChannel() {
+        loader = new EpgSearchLoader();
+        loader.execute();
     }
 }

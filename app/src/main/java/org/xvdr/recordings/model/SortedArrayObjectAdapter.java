@@ -13,18 +13,8 @@ public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {
 
     private TreeSet<Object> mSortedItems;
 
-    public SortedArrayObjectAdapter(Comparator comparator, PresenterSelector presenterSelector) {
-        super(presenterSelector);
-        mSortedItems = new TreeSet<Object>(comparator);
-    }
-
     public SortedArrayObjectAdapter(Comparator comparator, Presenter presenter) {
         super(presenter);
-        mSortedItems = new TreeSet<Object>(comparator);
-    }
-
-    public SortedArrayObjectAdapter(Comparator comparator) {
-        super();
         mSortedItems = new TreeSet<Object>(comparator);
     }
 
@@ -42,10 +32,9 @@ public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {
     }
 
     public void addAll(Collection items) {
-        Iterator i = items.iterator();
 
-        while(i.hasNext()) {
-            add(i.next());
+        for(Object item : items) {
+            add(item);
         }
     }
 

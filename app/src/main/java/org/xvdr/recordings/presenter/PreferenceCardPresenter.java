@@ -15,13 +15,11 @@ import org.xvdr.robotv.R;
 public class PreferenceCardPresenter extends Presenter {
 
     static public class Style {
-        private String text;
         private int iconResource;
         private int id;
 
         public Style(int id, String text, int iconResource) {
             this.id = id;
-            this.text = text;
             this.iconResource = iconResource;
         }
 
@@ -51,8 +49,7 @@ public class PreferenceCardPresenter extends Presenter {
         Style style = (Style) item;
         ImageView view = (ImageView) viewHolder.view;
 
-        view.setImageDrawable(view.getResources().getDrawable(style.iconResource));
-        //view.setTitleText(style.text);
+        view.setImageDrawable(view.getResources().getDrawable(style.iconResource, null));
         view.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
     }
 

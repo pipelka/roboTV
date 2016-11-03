@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection> {
+public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<Movie>> {
 
     public interface Listener {
         void onStart();
@@ -44,7 +44,7 @@ public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Colle
     }
 
     @Override
-    protected Collection doInBackground(Connection... params) {
+    protected Collection<Movie> doInBackground(Connection... params) {
 
         // get movies
         Packet request = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETLIST);
@@ -79,7 +79,7 @@ public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Colle
     }
 
     @Override
-    protected void onPostExecute(Collection result) {
+    protected void onPostExecute(Collection<Movie> result) {
         if(listener != null) {
             listener.onCompleted(result);
         }

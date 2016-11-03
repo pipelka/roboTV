@@ -22,9 +22,7 @@ public class DataServiceClient {
     private DataService service;
     private Context context;
     private Listener listener;
-    private Object lock = new Object();
-
-    Handler handler;
+    private Handler handler;
 
     private DataService.Listener dataServiceListener = new DataService.Listener() {
         @Override
@@ -65,8 +63,6 @@ public class DataServiceClient {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            service.unregisterListener(dataServiceListener);
-
             if(listener != null) {
                 handler.post(new Runnable() {
                     @Override
@@ -77,7 +73,6 @@ public class DataServiceClient {
             }
 
             service = null;
-
         }
     };
 
@@ -99,6 +94,10 @@ public class DataServiceClient {
     }
 
     public void unbind() {
+        if(service != null) {
+            service.unregisterListener(dataServiceListener);
+        }
+
         context.unbindService(connection);
     }
 

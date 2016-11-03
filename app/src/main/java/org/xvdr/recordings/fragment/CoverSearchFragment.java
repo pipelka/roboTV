@@ -16,7 +16,6 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.text.TextUtils;
 
 import org.xvdr.recordings.activity.CoverSearchActivity;
-import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.presenter.ArtworkPresenter;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
@@ -61,7 +60,7 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
             mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
         }
 
-        public void setSearchQuery(String newQuery) {
+        void setSearchQuery(String newQuery) {
             query = newQuery;
         }
     }
@@ -93,11 +92,6 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
         });
 
         mDelayedLoad = new SearchRunnable();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     @Override

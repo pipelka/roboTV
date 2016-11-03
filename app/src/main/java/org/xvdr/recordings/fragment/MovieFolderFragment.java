@@ -23,7 +23,7 @@ public class MovieFolderFragment extends MovieStepFragment {
     }
 
     @Override
-    public void onCreateActions(List actions, Bundle savedInstanceState) {
+    public void onCreateActions(@NonNull List actions, Bundle savedInstanceState) {
         folderList = getService().getFolderList();
 
         actions.add(new GuidedAction.Builder(getActivity())
@@ -71,7 +71,7 @@ public class MovieFolderFragment extends MovieStepFragment {
     }
 
     private void moveMovie(String folder) {
-        String name = null;
+        String name ;
         Movie movie = getMovie();
 
         if(movie.isSeries() || folder.equals(getService().getSeriesFolder())) {

@@ -1,6 +1,5 @@
 package org.xvdr.recordings.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -8,14 +7,9 @@ import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.fragment.RecordingsFragment;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.service.DataService;
-import org.xvdr.robotv.service.DataServiceClient;
+import org.xvdr.ui.DataServiceActivity;
 
-public class RecordingsActivity extends Activity {
-
-    private static final String TAG = "RecordingsActivity";
-
-    private DataServiceClient dataClient;
+public class RecordingsActivity extends DataServiceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,16 +17,12 @@ public class RecordingsActivity extends Activity {
         setContentView(R.layout.activity_recordings);
 
         RecordingsFragment fragment = (RecordingsFragment) getFragmentManager().findFragmentById(R.id.container);
-
-        // start data service
-        dataClient = new DataServiceClient(this, fragment);
-        dataClient.bind();
+        setServiceListener(fragment);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        dataClient.unbind();
         Glide.get(this).clearMemory();
     }
 

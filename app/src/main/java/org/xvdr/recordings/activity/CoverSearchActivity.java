@@ -1,55 +1,29 @@
 package org.xvdr.recordings.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.SpeechRecognitionCallback;
 
-import org.xvdr.recordings.fragment.CoverSearchFragment;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.service.DataService;
-import org.xvdr.robotv.service.DataServiceClient;
+import org.xvdr.ui.DataServiceActivity;
 
-import java.util.Collection;
-
-public class CoverSearchActivity extends Activity {
+public class CoverSearchActivity extends DataServiceActivity {
 
     private static final int REQUEST_SPEECH = 1;
     public static final String EXTRA_MOVIE = "extra_movie";
     public static final int REQUEST_COVER = 101;
 
     SearchFragment mFragment;
-    DataService service;
     Movie mMovie;
-    private DataServiceClient dataClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cover);
-
-        // start data service
-        dataClient = new DataServiceClient(this, new DataServiceClient.Listener() {
-
-            @Override
-            public void onServiceConnected(DataService service) {
-                CoverSearchActivity.this.service = service;
-            }
-
-            @Override
-            public void onServiceDisconnected(DataService service) {
-                CoverSearchActivity.this.service = null;
-            }
-
-            @Override
-            public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
-            }
-        });
-
-        dataClient.bind();
 
         mFragment = (SearchFragment) getFragmentManager().findFragmentById(R.id.search);
         mFragment.setSpeechRecognitionCallback(new SpeechRecognitionCallback() {
@@ -65,13 +39,9 @@ public class CoverSearchActivity extends Activity {
         setResult(RESULT_CANCELED, null);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dataClient.unbind();
-    }
-
     public void setArtwork(ArtworkHolder holder) {
+        DataService service = getService();
+
         if(service != null) {
             service.setMovieArtwork(mMovie, holder);
         }

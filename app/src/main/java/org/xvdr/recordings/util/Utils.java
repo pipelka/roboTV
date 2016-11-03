@@ -3,8 +3,6 @@ package org.xvdr.recordings.util;
 import android.content.Context;
 import android.os.Build;
 
-import org.xvdr.robotv.R;
-
 public class Utils {
 
     private Utils() {

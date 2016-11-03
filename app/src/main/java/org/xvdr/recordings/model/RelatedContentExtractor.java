@@ -12,13 +12,11 @@ public class RelatedContentExtractor {
         this.collection = collection;
     }
 
-    Collection<Movie> result = new ArrayList<>(50);
+    private Collection<Movie> result = new ArrayList<>(50);
 
     public Collection<Movie> getSeries(String title) {
-        Iterator<Movie> i = collection.iterator();
-        while(i.hasNext()) {
-            Movie m = i.next();
-            if(m.isSeries() && m.getTitle().equals(title)) {
+        for(Movie m : collection) {
+            if (m.isSeries() && m.getTitle().equals(title)) {
                 result.add(m);
             }
         }
@@ -31,15 +29,12 @@ public class RelatedContentExtractor {
     }
 
     public Collection<Movie> getRelatedMovies(Movie movie) {
-        Iterator<Movie> i = collection.iterator();
-        while(i.hasNext()) {
-            Movie m = i.next();
-
-            if(m.getId().equals(movie.getId())) {
+        for(Movie m : collection) {
+            if (m.getId().equals(movie.getId())) {
                 continue;
             }
 
-            if(m.getCategory().equals(movie.getCategory()) && m.getContent() == movie.getContent()) {
+            if (m.getCategory().equals(movie.getCategory()) && m.getContent() == movie.getContent()) {
                 result.add(m);
             }
         }

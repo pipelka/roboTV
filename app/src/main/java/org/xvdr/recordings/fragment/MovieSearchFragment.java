@@ -64,7 +64,7 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
             mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
         }
 
-        public void setSearchQuery(String newQuery) {
+        void setSearchQuery(String newQuery) {
             query = newQuery;
         }
     }

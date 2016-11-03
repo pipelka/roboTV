@@ -1,14 +1,13 @@
 package org.xvdr.recordings.util;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.app.BackgroundManager;
 
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 public class BackgroundManagerTarget extends SimpleTarget<Bitmap> {
-    BackgroundManager backgroundManager;
+    private BackgroundManager backgroundManager;
 
     public BackgroundManagerTarget(BackgroundManager backgroundManager) {
         this.backgroundManager = backgroundManager;
