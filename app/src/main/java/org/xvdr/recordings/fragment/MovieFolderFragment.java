@@ -7,6 +7,7 @@ import android.support.v17.leanback.widget.GuidedAction;
 
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
+import org.xvdr.ui.MovieStepFragment;
 
 import java.util.List;
 import java.util.TreeSet;

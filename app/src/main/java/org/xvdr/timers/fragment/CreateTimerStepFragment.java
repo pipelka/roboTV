@@ -2,7 +2,7 @@ package org.xvdr.timers.fragment;
 
 import android.text.TextUtils;
 
-import org.xvdr.recordings.fragment.MovieStepFragment;
+import org.xvdr.ui.MovieStepFragment;
 import org.xvdr.recordings.model.Movie;
 
 import org.xvdr.robotv.R;

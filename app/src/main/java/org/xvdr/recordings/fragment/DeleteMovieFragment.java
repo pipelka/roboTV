@@ -8,6 +8,7 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.service.NotificationHandler;
+import org.xvdr.ui.MovieStepFragment;
 
 import java.util.List;
 

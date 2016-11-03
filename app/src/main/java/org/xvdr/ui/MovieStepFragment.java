@@ -1,4 +1,4 @@
-package org.xvdr.recordings.fragment;
+package org.xvdr.ui;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -20,7 +20,6 @@ import org.xvdr.robotv.service.DataService;
 public class MovieStepFragment extends GuidedStepFragment {
 
     static public final String EXTRA_MOVIE = "extra_movie";
-    private static final String TAG = "MovieStepFragment";
 
     private Movie movie;
     private Drawable drawable;
@@ -42,14 +41,6 @@ public class MovieStepFragment extends GuidedStepFragment {
             e.printStackTrace();
             drawable = activity.getDrawable(R.drawable.recording_unkown);
         }
-    }
-
-    public void startGuidedStep(Activity activity, Movie movie) {
-        startGuidedStep(activity, movie, service);
-    }
-
-    public void startGuidedStep(final Activity activity, final Movie movie, DataService service) {
-        startGuidedStep(activity, movie, service, android.R.id.content);
     }
 
     public void startGuidedStep(final Activity activity, final Movie movie, DataService service, final int resourceId) {
@@ -105,6 +96,14 @@ public class MovieStepFragment extends GuidedStepFragment {
 
     protected GuidanceStylist.Guidance createGuidance(String breadCrumb, String description) {
         movie = (Movie) getArguments().getSerializable(EXTRA_MOVIE);
+
+        if(movie == null) {
+            return new GuidanceStylist.Guidance(
+                    "",
+                    description,
+                    breadCrumb,
+                    drawable);
+        }
 
         return new GuidanceStylist.Guidance(
                 movie.getTitle(),
