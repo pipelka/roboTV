@@ -185,7 +185,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
         ps.addClassPresenter(DetailsOverviewRow.class, dorPresenter);
         ps.addClassPresenter(ListRow.class, new ListRowPresenter());
 
-        if(selectedMovie.isSeries()) {
+        if(selectedMovie.isSeriesHeader()) {
             addEpisodeRows(adapter, selectedMovie);
         }
         else {
