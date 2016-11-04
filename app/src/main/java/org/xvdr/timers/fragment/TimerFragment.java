@@ -131,6 +131,15 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
             TimerFragment.this.setAdapter(result);
             startEntranceTransition();
         }
+
+        @Override
+        protected void onCancelled(ArrayObjectAdapter result) {
+            progress.disableProgressBar();
+            progress.hide();
+
+            TimerFragment.this.setAdapter(result);
+            startEntranceTransition();
+        }
     }
 
     private Connection connection;
@@ -191,7 +200,7 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
     @Override
     public void onDestroy() {
         super.onDestroy();
-        loader.cancel(true);
+        loader = null;
     }
 
     @Override
@@ -212,7 +221,6 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
 
     @Override
     public void onServiceDisconnected(DataService service) {
-
     }
 
     @Override
