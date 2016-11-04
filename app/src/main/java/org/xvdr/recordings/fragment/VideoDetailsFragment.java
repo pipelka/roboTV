@@ -68,8 +68,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
     private DataService service;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         setOnItemViewClickedListener(new OnItemViewClickedListener() {
             @Override
