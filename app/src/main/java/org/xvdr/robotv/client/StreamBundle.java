@@ -69,6 +69,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         TYPE_VIDEO_H264,
         TYPE_VIDEO_H265,
         TYPE_AUDIO_AC3,
+        TYPE_AUDIO_EAC3,
         TYPE_AUDIO_AAC,
         TYPE_AUDIO_MPEG2
     };

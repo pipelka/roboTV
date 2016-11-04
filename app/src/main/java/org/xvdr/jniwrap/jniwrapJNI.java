@@ -106,8 +106,6 @@ public class jniwrapJNI {
 
 static {
 	try {
-		System.loadLibrary("a52");
-		System.loadLibrary("mad");
 		System.loadLibrary("msgexchange");
 		System.loadLibrary("jniwrap");
 	}

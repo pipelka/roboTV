@@ -27,6 +27,7 @@ class StreamManager extends SparseArray<StreamReader> {
             case MimeTypes.VIDEO_H264:
             case MimeTypes.VIDEO_H265:
             case MimeTypes.AUDIO_AC3:
+            case MimeTypes.AUDIO_E_AC3:
             case MimeTypes.AUDIO_MPEG:
                 return true;
         }

@@ -8,8 +8,6 @@ add_library(jniwrap SHARED
 	jniwrap.cpp
 	jniwrap.h
 	decoderjni.cpp
-	sessionlistener.h
-	ac3decoder.cpp
-	mpadecoder.cpp)
+	sessionlistener.h)
 
-target_link_libraries(jniwrap msgexchange a52 mad log)
+target_link_libraries(jniwrap msgexchange log)

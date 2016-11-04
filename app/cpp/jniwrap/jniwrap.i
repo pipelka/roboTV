@@ -98,8 +98,6 @@
 static {
 	try {
                 System.loadLibrary("gnustl_shared");
-		System.loadLibrary("a52");
-		System.loadLibrary("mad");
 		System.loadLibrary("msgexchange");
 		System.loadLibrary("jniwrap");
 	}

@@ -821,6 +821,8 @@ void SwigDirector_SessionListener::swig_connect_director(JNIEnv *jenv, jobject j
   }
 }
 
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

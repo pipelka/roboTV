@@ -27,3 +27,4 @@ app/src/main/gen
 app/src/main/main.iml
 roboTV.iml
 app/.externalNativeBuild
+app/cpp/ffmpeg/libs/x86/pkgconfig
