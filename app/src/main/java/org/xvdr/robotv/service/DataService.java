@@ -105,6 +105,9 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
                     }
                     else {
                         Log.e(TAG, "server login failed");
+                        connection.close();
+                        handler.removeCallbacks(mOpenRunnable);
+                        handler.post(mOpenRunnable);
                     }
                 }
             }, 3000);
