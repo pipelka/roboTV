@@ -152,11 +152,14 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
             handler.removeCallbacks(mOpenRunnable);
             handler.post(mOpenRunnable);
         }
-        else if(movieCollection != null) {
-            postMovieCollectionUpdated(movieCollection);
-        }
 
         return START_STICKY;
+    }
+
+    public void notifyClientConnected() {
+        if(movieCollection != null) {
+            postMovieCollectionUpdated(movieCollection);
+        }
     }
 
     @Override

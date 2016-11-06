@@ -235,6 +235,8 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         if(service.getConnectionStatus() == DataService.STATUS_Server_Failed) {
             startSetupActivity();
         }
+
+        service.notifyClientConnected();
     }
 
     @Override
