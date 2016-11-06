@@ -91,27 +91,27 @@ Java_org_xvdr_player_audio_MpegAudioDecoder_getSampleRate(JNIEnv *env, jobject i
 
 JNIEXPORT jstring JNICALL
 Java_org_xvdr_player_extractor_ExtractorBufferPacket_nativeString(JNIEnv *env, jobject instance,
-                                                           jbyteArray buffer_, jint offset, jint length) {
-    jbyte *buffer = env->GetByteArrayElements(buffer_, NULL);
+                                                           jbyteArray buffer_, jint offset, jint remaining) {
+    const char* resultString = "";
 
-    jstring result = env->NewStringUTF((const char*)&buffer[offset]);
+    if(remaining <= 0) {
+        return env->NewStringUTF(resultString);
+    }
 
+    jbyte *buffer = env->GetByteArrayElements(buffer_, nullptr);
+
+    const char* value = (char*)&buffer[offset];
+    size_t length = strnlen(value, remaining);
+
+    if(remaining == length) {
+        env->ReleaseByteArrayElements(buffer_, buffer, 0);
+        return env->NewStringUTF(resultString);
+    }
+
+    jstring result = env->NewStringUTF(value);
     env->ReleaseByteArrayElements(buffer_, buffer, 0);
 
     return result;
-}
-
-JNIEXPORT jint JNICALL
-Java_org_xvdr_player_extractor_ExtractorBufferPacket_nativeSize(JNIEnv *env, jobject instance,
-                                                         jbyteArray buffer_, jint offset,
-                                                         jint length) {
-    jbyte *buffer = env->GetByteArrayElements(buffer_, NULL);
-
-    int size = strlen((const char*)&buffer[offset]) + 1;
-
-    env->ReleaseByteArrayElements(buffer_, buffer, 0);
-
-    return size;
 }
 
 #ifdef __cplusplus

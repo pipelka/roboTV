@@ -74,9 +74,8 @@ public class ExtractorBufferPacket implements BufferPacket {
 
     public String getString() {
         String string = nativeString(buffer.array(), buffer.position(), buffer.remaining());
-        int size = nativeSize(buffer.array(), buffer.position(), buffer.remaining());
+        buffer.position(buffer.position() + string.length() + 1);
 
-        buffer.position(buffer.position() + size);
         return string;
     }
 
@@ -86,5 +85,5 @@ public class ExtractorBufferPacket implements BufferPacket {
 
     private native String nativeString(byte[] buffer, int offset, int length);
 
-    private native int nativeSize(byte[] buffer, int offset, int length);
+    //private native int nativeSize(byte[] buffer, int offset, int length);
 }
