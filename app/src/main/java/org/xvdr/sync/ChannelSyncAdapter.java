@@ -465,7 +465,7 @@ public class ChannelSyncAdapter {
                 values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plot);
             }
             else {
-                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plot.substring(0, 256));
+                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plot.substring(0, 256) + "...");
                 //values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, event.getPlot());
             }
 
