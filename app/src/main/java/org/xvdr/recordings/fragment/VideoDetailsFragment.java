@@ -44,6 +44,7 @@ import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.DataServiceClient;
+import org.xvdr.ui.MovieStepFragment;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,10 +63,10 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
     private static final int ACTION_DELETE = 5;
 
     private Movie selectedMovie = null;
-    private Collection<Movie> episodes;
-    private BackgroundManager backgroundManager;
     private BackgroundManagerTarget backgroundManagerTarget;
     private DataService service;
+
+    private MovieStepFragment actionFragment;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -102,7 +103,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
                 break;
 
             case ACTION_DELETE_EPISODE:
-                new DeleteMovieFragment().startGuidedStep(
+                actionFragment = new DeleteMovieFragment();
+                actionFragment.startGuidedStep(
                         getActivity(),
                         movie,
                         service,
@@ -120,7 +122,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
                 break;
 
             case ACTION_DELETE:
-                new DeleteMovieFragment().startGuidedStep(
+                actionFragment = new DeleteMovieFragment();
+                actionFragment.startGuidedStep(
                         getActivity(),
                         selectedMovie,
                         service,
@@ -128,7 +131,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
                 break;
 
             case ACTION_MOVE:
-                new MovieFolderFragment().startGuidedStep(
+                actionFragment = new MovieFolderFragment();
+                actionFragment.startGuidedStep(
                         getActivity(),
                         selectedMovie,
                         service,
@@ -144,14 +148,13 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
         }
 
         if(resultCode == Activity.RESULT_OK) {
-            Log.d(TAG, "onActivityResult");
             selectedMovie = (Movie) data.getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
         }
     }
 
 
     private void initBackground() {
-        backgroundManager = BackgroundManager.getInstance(getActivity());
+        BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
 
         backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
@@ -205,7 +208,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
         }
 
         Collection<Movie> collection = service.getMovieCollection();
-        episodes = new RelatedContentExtractor(collection).getSeries(movie.getTitle());
+        Collection<Movie> episodes = new RelatedContentExtractor(collection).getSeries(movie.getTitle());
 
         if(episodes == null) {
             return;
