@@ -147,7 +147,8 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
     private String channelName;
     private int channelUid;
     private EpgSearchLoader loader;
-    ProgressBarManager progress;
+    private ProgressBarManager progress;
+    private Handler handler;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -170,6 +171,8 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
 
         setBrandColor(color_brand);
         setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));
+
+        handler = new Handler();
 
         setOnItemViewClickedListener(new OnItemViewClickedListener() {
             @Override
@@ -210,7 +213,7 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
         String language = SetupUtils.getLanguage(getActivity());
         artwork = new ArtworkFetcher(connection, language);
 
-        new Handler().post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 setHeadersState(HEADERS_DISABLED);
