@@ -9,8 +9,11 @@ import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.fragment.CreateTimerFragment;
 import org.xvdr.timers.fragment.TimerFragment;
 import org.xvdr.ui.DataServiceActivity;
+import org.xvdr.ui.MovieStepFragment;
 
 public class TimerActivity extends DataServiceActivity {
+
+    private MovieStepFragment actionFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,8 @@ public class TimerActivity extends DataServiceActivity {
             return;
         }
 
-        new CreateTimerFragment().startGuidedStep(
+        actionFragment = new CreateTimerFragment();
+        actionFragment.startGuidedStep(
                 this,
                 event,
                 service,
