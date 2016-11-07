@@ -10,11 +10,13 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
 import org.xvdr.timers.fragment.EpgSearchFragment;
 import org.xvdr.ui.DataServiceActivity;
+import org.xvdr.ui.MovieStepFragment;
 
 public class EpgSearchActivity extends DataServiceActivity {
 
     private static final int REQUEST_SPEECH = 1;
     private EpgSearchFragment fragment;
+    private MovieStepFragment actionFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,8 @@ public class EpgSearchActivity extends DataServiceActivity {
             return;
         }
 
-        new CreateTimerFragment().startGuidedStep(
+        actionFragment = new CreateTimerFragment();
+        actionFragment.startGuidedStep(
                 this,
                 event,
                 service,
