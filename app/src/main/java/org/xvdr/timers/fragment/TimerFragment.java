@@ -1,6 +1,7 @@
 package org.xvdr.timers.fragment;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -149,6 +150,7 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
     private EpgSearchLoader loader;
     private ProgressBarManager progress;
     private Handler handler;
+    private BackgroundManager backgroundManager;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -159,15 +161,10 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
         channelUid = getActivity().getIntent().getIntExtra("uid", 0);
         channelName = getActivity().getIntent().getStringExtra("name");
 
-        int color_background = Utils.getColor(getActivity(), R.color.recordings_background);
-        int color_brand = Utils.getColor(getActivity(), R.color.primary_color);
-
-        BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
-        backgroundManager.attach(getActivity().getWindow());
-        backgroundManager.setColor(color_background);
-
         setTitle(getString(R.string.timer_title));
         setHeadersTransitionOnBackEnabled(true);
+
+        int color_brand = Utils.getColor(getActivity(), R.color.primary_color);
 
         setBrandColor(color_brand);
         setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));

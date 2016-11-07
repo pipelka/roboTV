@@ -120,13 +120,13 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
                 ListRow listRow = (ListRow) row;
                 ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
 
-                if(isShowingHeaders()) {
-                    selectedItem = -1;
-                }
-                else if(item instanceof Movie) {
+                if(item instanceof Movie) {
                     selectedItem = rowAdapter.indexOf(item);
                     Movie movie = (Movie) item;
                     updateBackground(movie.getBackgroundImageUrl());
+                }
+                else {
+                    selectedItem = -1;
                 }
             }
         };
