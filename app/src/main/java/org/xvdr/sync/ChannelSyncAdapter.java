@@ -461,7 +461,7 @@ public class ChannelSyncAdapter {
                 values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description);
             }
             else {
-                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, 256));
+                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, 256) + "...");
             }
 
             values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
