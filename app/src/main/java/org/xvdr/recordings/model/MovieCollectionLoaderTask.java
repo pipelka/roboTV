@@ -67,10 +67,7 @@ public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Colle
             // search movies
             String url = movie.getCardImageUrl();
 
-            if(url != null && !url.isEmpty() && !url.equals("x")) {
-                Log.d(TAG, "recording '" + movie.getTitle() + "' has url: '" + movie.getCardImageUrl() + "'");
-            }
-            else {
+            if(!(url != null && !url.isEmpty() && !url.equals("x"))) {
                 updateMovieArtwork(movie);
             }
         }

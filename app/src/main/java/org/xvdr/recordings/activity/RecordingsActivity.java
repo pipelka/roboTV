@@ -12,7 +12,7 @@ import org.xvdr.ui.DataServiceActivity;
 public class RecordingsActivity extends DataServiceActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recordings);
 
@@ -21,7 +21,7 @@ public class RecordingsActivity extends DataServiceActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         Glide.get(this).clearMemory();
     }

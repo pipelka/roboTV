@@ -9,7 +9,6 @@ import android.support.v17.leanback.app.ProgressBarManager;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
@@ -32,6 +31,7 @@ import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.DataServiceClient;
+import org.xvdr.robotv.service.NotificationHandler;
 
 import java.util.Collection;
 
@@ -42,6 +42,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     private MovieCollectionAdapter mAdapter;
     private BackgroundManager backgroundManager;
     private BackgroundManagerTarget backgroundManagerTarget;
+    private NotificationHandler notification;
 
     private int color_background;
     private int color_brand;
@@ -49,31 +50,18 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     private int selectedItem = -1;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initUI();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        notification = new NotificationHandler(getActivity());
+
         setupEventListeners();
+        initUI();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        prepareEntranceTransition();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     synchronized private void loadMovies(Collection<Movie> collection) {
@@ -89,47 +77,6 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         mAdapter.cleanup();
 
         setAdapter(mAdapter);
-
-        // update current row
-        if(selectedRow >= 0 && selectedRow < mAdapter.size()) {
-            if(selectedItem >= 0) {
-                try {
-                    ListRowPresenter.SelectItemViewHolderTask task = new ListRowPresenter.SelectItemViewHolderTask(selectedItem);
-                    task.setSmoothScroll(false);
-
-                    setSelectedPosition(selectedRow, false, task);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            else {
-                setSelectedPosition(selectedRow);
-            }
-        }
-
-        startEntranceTransition();
-    }
-
-    @Override
-    public OnItemViewSelectedListener getOnItemViewSelectedListener() {
-        return new OnItemViewSelectedListener() {
-
-            @Override
-            public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                selectedRow = getSelectedPosition();
-                ListRow listRow = (ListRow) row;
-                ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
-
-                if(item instanceof Movie) {
-                    selectedItem = rowAdapter.indexOf(item);
-                    Movie movie = (Movie) item;
-                    updateBackground(movie.getBackgroundImageUrl());
-                }
-                else {
-                    selectedItem = -1;
-                }
-            }
-        };
     }
 
     private void updateBackground(String url) {
@@ -174,7 +121,6 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
 
     private void initUI() {
         setTitle(getString(R.string.browse_title));
-        setHeadersState(HEADERS_ENABLED);
 
         //Back button goes to the fast lane, rather than home screen
         setHeadersTransitionOnBackEnabled(true);
@@ -188,28 +134,15 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     }
 
     private void setupEventListeners() {
-        setOnItemViewClickedListener(getDefaultItemClickedListener());
-        setOnItemViewSelectedListener(getOnItemViewSelectedListener());
-
-        setOnSearchClickedListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), SearchActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-
-    protected OnItemViewClickedListener getDefaultItemClickedListener() {
-        return new OnItemViewClickedListener() {
+        setOnItemViewClickedListener(new OnItemViewClickedListener() {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
                 if(item instanceof Movie) {
                     Movie movie = (Movie) item;
-
-                    selectedRow = getSelectedPosition();
                     ListRow listRow = (ListRow) row;
                     ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
+
+                    selectedRow = getSelectedPosition();
                     selectedItem = rowAdapter.indexOf(item);
 
                     Intent intent = new Intent(getActivity(), DetailsActivity.class);
@@ -222,7 +155,28 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
                     }
                 }
             }
-        };
+        });
+
+        setOnItemViewSelectedListener(new OnItemViewSelectedListener() {
+            @Override
+            public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
+                ListRow listRow = (ListRow) row;
+                ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
+
+                if(item instanceof Movie) {
+                    Movie movie = (Movie) item;
+                    updateBackground(movie.getBackgroundImageUrl());
+                }
+            }
+        });
+
+        setOnSearchClickedListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void startSetupActivity() {
@@ -236,7 +190,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
             startSetupActivity();
         }
 
-        service.notifyClientConnected();
+        service.loadMovieCollection();
     }
 
     @Override
@@ -252,14 +206,19 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         Log.d(TAG, "onMovieCollectionUpdated status=" + status);
 
         ProgressBarManager manager = getProgressBarManager();
+        manager.setInitialDelay(500);
 
-        if(status == DataService.STATUS_Collection_Busy) {
-            manager.enableProgressBar();
-            manager.show();
-        }
-        else if(status == DataService.STATUS_Collection_Ready) {
-            manager.disableProgressBar();
-            manager.hide();
+        switch(status) {
+            case DataService.STATUS_Collection_Busy:
+                manager.enableProgressBar();
+                manager.show();
+                break;
+            case DataService.STATUS_Collection_Error:
+                notification.error(getString(R.string.fail_to_load_movielist));
+            case DataService.STATUS_Collection_Ready:
+                manager.disableProgressBar();
+                manager.hide();
+                break;
         }
 
         if(collection != null) {

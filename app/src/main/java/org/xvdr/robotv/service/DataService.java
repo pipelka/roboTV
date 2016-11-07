@@ -30,6 +30,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
     public static final int STATUS_Collection_Busy = 0;
     public static final int STATUS_Collection_Ready = 1;
+    public static final int STATUS_Collection_Error = 2;
 
     public static final int STATUS_Server_Connected = 0;
     public static final int STATUS_Server_Failed = 1;
@@ -154,12 +155,6 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         }
 
         return START_STICKY;
-    }
-
-    public void notifyClientConnected() {
-        if(movieCollection != null) {
-            postMovieCollectionUpdated(movieCollection);
-        }
     }
 
     @Override
@@ -292,7 +287,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         return seriesFolder;
     }
 
-    protected void loadMovieCollection() {
+    public void loadMovieCollection() {
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -302,11 +297,11 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
                 for (int i = 0; i < listeners.size(); i++) {
                     listeners.get(i).onMovieCollectionUpdated(null, STATUS_Collection_Busy);
                 }
-
-                loaderTask = new MovieCollectionLoaderTask(connection, SetupUtils.getLanguage(DataService.this));
-                loaderTask.load(DataService.this);
             }
         });
+
+        loaderTask = new MovieCollectionLoaderTask(connection, SetupUtils.getLanguage(DataService.this));
+        loaderTask.load(DataService.this);
     }
 
     public int deleteMovie(Movie movie) {
@@ -396,6 +391,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     @Override
     public void onCompleted(Collection<Movie> list) {
         if(list == null) {
+            movieCollection = null;
             postMovieCollectionUpdated(null);
             return;
         }
@@ -413,7 +409,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
             @Override
             public void run() {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).onMovieCollectionUpdated(list, STATUS_Collection_Ready);
+                listeners.get(i).onMovieCollectionUpdated(list, list == null ? STATUS_Collection_Error : STATUS_Collection_Ready);
             }
             }
         });
