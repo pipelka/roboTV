@@ -43,14 +43,13 @@ import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.service.DataService;
-import org.xvdr.robotv.service.DataServiceClient;
 import org.xvdr.ui.MovieStepFragment;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 
-public class VideoDetailsFragment extends BrowseFragment implements DataServiceClient.Listener {
+public class VideoDetailsFragment extends BrowseFragment implements DataService.Listener {
 
     public static final String TAG = "VideoDetailsFragment";
     public static final String EXTRA_MOVIE = "extra_movie";
@@ -207,7 +206,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
             return;
         }
 
-        Collection<Movie> collection = service.getMovieCollection();
+        Collection<Movie> collection = service.getMovieController().getMovieCollection();
         Collection<Movie> episodes = new RelatedContentExtractor(collection).getSeries(movie.getTitle());
 
         if(episodes == null) {
@@ -341,7 +340,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
             return;
         }
 
-        Collection<Movie> collection = service.getRelatedContent(selectedMovie);
+        Collection<Movie> collection = service.getMovieController().getRelatedContent(selectedMovie);
 
         if(collection == null) {
             return;
@@ -395,7 +394,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
     }
 
     @Override
-    public void onServiceConnected(DataService service) {
+    public void onConnected(DataService service) {
         VideoDetailsFragment.this.service = service;
 
         int brandColor = Utils.getColor(getActivity(), R.color.episode_header_color);
@@ -416,11 +415,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataServiceC
     }
 
     @Override
-    public void onServiceDisconnected(DataService service) {
-        VideoDetailsFragment.this.service = null;
+    public void onMovieUpdate(DataService service) {
     }
 
-    @Override
-    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
-    }
 }

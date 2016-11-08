@@ -14,6 +14,7 @@ public class RecordingsActivity extends DataServiceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_recordings);
 
         RecordingsFragment fragment = (RecordingsFragment) getFragmentManager().findFragmentById(R.id.container);

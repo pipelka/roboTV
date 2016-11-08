@@ -38,7 +38,7 @@ import org.xvdr.robotv.setup.SetupUtils;
 import java.io.IOException;
 import java.util.Collection;
 
-public class TimerFragment extends BrowseFragment implements DataServiceClient.Listener {
+public class TimerFragment extends BrowseFragment implements DataService.Listener {
 
     class EpgSearchLoader extends AsyncTask<Void, Void, ArrayObjectAdapter> {
 
@@ -204,7 +204,7 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
     }
 
     @Override
-    public void onServiceConnected(DataService service) {
+    public void onConnected(DataService service) {
         connection = service.getConnection();
 
         String language = SetupUtils.getLanguage(getActivity());
@@ -220,12 +220,7 @@ public class TimerFragment extends BrowseFragment implements DataServiceClient.L
     }
 
     @Override
-    public void onServiceDisconnected(DataService service) {
-    }
-
-    @Override
-    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
-
+    public void onMovieUpdate(DataService service) {
     }
 
     private void loadEpgForChannel() {

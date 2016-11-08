@@ -3,15 +3,13 @@ package org.xvdr.robotv.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.jniwrap.SessionListener;
-import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.recordings.model.Movie;
-import org.xvdr.recordings.model.MovieCollectionLoaderTask;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
@@ -23,36 +21,31 @@ import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.TreeSet;
 
-public class DataService extends Service implements MovieCollectionLoaderTask.Listener {
-
-    public static final int STATUS_Collection_Busy = 0;
-    public static final int STATUS_Collection_Ready = 1;
-    public static final int STATUS_Collection_Error = 2;
-
-    public static final int STATUS_Server_Connected = 0;
-    public static final int STATUS_Server_Failed = 1;
-    public static final int STATUS_Server_Starting = 2;
-
-    private final IBinder binder = new Binder();
-
-    Connection connection;
-    Handler handler;
-    NotificationHandler notification;
-    ArtworkFetcher artwork;
-    Collection<Movie> movieCollection = null;
-    TreeSet<String> folderList;
-    int connectionStatus = STATUS_Server_Starting;
-    private String seriesFolder = null;
-
-    private MovieCollectionLoaderTask loaderTask;
+public class DataService extends Service {
 
     private static final String TAG = "DataService";
 
+    public static final int STATUS_Server_Connected = 0;
+    public static final int STATUS_Server_NotConnected = 1;
+    public static final int STATUS_Server_Connecting = 1;
+
+    private final IBinder binder = new Binder();
+
+    private Connection connection;
+    private HandlerThread handlerThread;
+    private Handler handler;
+    private Handler listenerHandler;
+    private NotificationHandler notification;
+    private ArtworkFetcher artwork;
+    private MovieController movieController;
+
+    private int connectionStatus = STATUS_Server_NotConnected;
+    private String seriesFolder = null;
+
     public interface Listener {
-        void onMovieCollectionUpdated(Collection<Movie> collection, int status);
+        void onConnected(DataService service);
+        void onMovieUpdate(DataService service);
     }
 
     public class Binder extends android.os.Binder {
@@ -62,6 +55,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     }
 
     SessionListener mSessionListener = new SessionListener() {
+        @Override
         public void onNotification(Packet p) {
             String message;
 
@@ -71,7 +65,6 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
             }
 
             int id = p.getMsgID();
-            Log.d(TAG, "notification id: " + id);
 
             switch(id) {
                 case Connection.XVDR_STATUS_MESSAGE:
@@ -85,15 +78,12 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
                     break;
 
                 case Connection.XVDR_STATUS_RECORDINGSCHANGE:
-                    loadMovieCollection();
+                    postOnMovieUpdate();
                     break;
             }
         }
 
-        public void onDisconnect() {
-            connectionStatus = STATUS_Server_Failed;
-        }
-
+        @Override
         public void onReconnect() {
             handler.postDelayed(new Runnable() {
                 @Override
@@ -101,17 +91,22 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
                     Log.d(TAG, "server reconnected");
                     if(connection.login()) {
                         Log.d(TAG, "logged in");
-                        loadMovieCollection();
+                        postOnConnected();
                         connectionStatus = STATUS_Server_Connected;
                     }
                     else {
                         Log.e(TAG, "server login failed");
+                        connectionStatus = STATUS_Server_NotConnected;
                         connection.close();
-                        handler.removeCallbacks(mOpenRunnable);
-                        handler.post(mOpenRunnable);
+
+                        DataService.this.postOpen();
                     }
                 }
             }, 3000);
+        }
+
+        @Override
+        public void onDisconnect() {
         }
     };
 
@@ -119,7 +114,8 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         @Override
         public void run() {
             if(!open()) {
-                handler.postDelayed(mOpenRunnable, 2 * 1000);
+                notification.error(getResources().getString(R.string.failed_connect));
+                handler.postDelayed(mOpenRunnable, 10 * 1000);
                 return;
             }
 
@@ -130,11 +126,8 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
     private final ArrayList<Listener> listeners = new ArrayList<>();
 
     public DataService() {
-        movieCollection = new ArrayList<>(500);
-        folderList = new TreeSet<>();
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
@@ -147,11 +140,13 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         // check if the server has changed
         String server = SetupUtils.getServer(this);
 
-        if(connection != null && !connection.getHostname().equals(server)) {
+        if(connection != null && connectionStatus == STATUS_Server_NotConnected) {
+            postOpen();
+        }
+        else if(connection != null && !connection.getHostname().equals(server)) {
             Log.i(TAG, "new server: " + server);
             connection.close();
-            handler.removeCallbacks(mOpenRunnable);
-            handler.post(mOpenRunnable);
+            postOpen();
         }
 
         return START_STICKY;
@@ -159,7 +154,11 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
     @Override
     public void onCreate() {
-        handler = new Handler();
+        handlerThread = new HandlerThread("dataservice");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+        listenerHandler = new Handler();
+
         notification = new NotificationHandler(this);
 
         connection = new Connection(
@@ -170,31 +169,31 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         connection.setCallback(mSessionListener);
 
         artwork = new ArtworkFetcher(connection, SetupUtils.getLanguage(this));
-
-        handler.post(mOpenRunnable);
+        movieController = new MovieController(this, connection);
     }
 
     @Override
     public void onDestroy() {
+        connectionStatus = STATUS_Server_NotConnected;
         connection.close();
+        handlerThread.interrupt();
     }
 
     private boolean open() {
-        if(connection.isOpen()) {
-            connectionStatus = STATUS_Server_Connected;
+        if(connectionStatus == STATUS_Server_Connected) {
+            postOnConnected();
             return true;
         }
 
+        connectionStatus = STATUS_Server_Connecting;
         connection.setPriority(1); // low priority for DataService
         if(!connection.open(SetupUtils.getServer(this))) {
-            connectionStatus = STATUS_Server_Failed;
+            connectionStatus = STATUS_Server_NotConnected;
             return false;
         }
 
         connectionStatus = STATUS_Server_Connected;
-
-        // movie collection loader
-        loadMovieCollection();
+        postOnConnected();
 
         return true;
     }
@@ -220,7 +219,7 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
         final Event event = ArtworkUtils.packetToEvent(p);
 
-        handler.post(new Runnable() {
+        listenerHandler.post(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -241,43 +240,6 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
         });
     }
 
-    public void setMovieArtwork(Movie movie, ArtworkHolder holder) {
-        if(movie.isSeries() || movie.isSeriesHeader()) {
-            Collection<Movie> episodes = new RelatedContentExtractor(movieCollection).getSeries(movie.getTitle());
-            for(Movie m: episodes) {
-                setArtwork(m, holder);
-            }
-        }
-        else {
-            setArtwork(movie, holder);
-        }
-
-        postMovieCollectionUpdated(movieCollection);
-    }
-
-    private void setArtwork(Movie movie, ArtworkHolder holder) {
-        // update local movie list
-        String id = movie.getId();
-        for(Movie m : movieCollection) {
-            if (m.getId().equals(id)) {
-                Log.d(TAG, "updating movie entry " + id);
-                m.setArtwork(holder);
-                break;
-            }
-        }
-
-        // update on server
-        ArtworkUtils.setMovieArtwork(connection, movie, holder);
-    }
-
-    public Collection<Movie> getMovieCollection() {
-        return movieCollection;
-    }
-
-    public TreeSet<String> getFolderList() {
-        return folderList;
-    }
-
     public String getSeriesFolder() {
         if(seriesFolder != null) {
             return seriesFolder;
@@ -285,53 +247,6 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
         seriesFolder = connection.getConfig("SeriesFolder");
         return seriesFolder;
-    }
-
-    public void loadMovieCollection() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-
-                Log.i(TAG, "started movie collection update");
-
-                for (int i = 0; i < listeners.size(); i++) {
-                    listeners.get(i).onMovieCollectionUpdated(null, STATUS_Collection_Busy);
-                }
-            }
-        });
-
-        loaderTask = new MovieCollectionLoaderTask(connection, SetupUtils.getLanguage(DataService.this));
-        loaderTask.load(DataService.this);
-    }
-
-    public int deleteMovie(Movie movie) {
-        return connection.deleteRecording(movie.getId());
-    }
-
-    public int renameMovie(Movie movie, String newName) {
-        return connection.renameRecording(movie.getId(), newName);
-    }
-
-    protected void updateFolderList() {
-        String seriesFolder = connection.getConfig("SeriesFolder");
-
-        for(Movie movie : movieCollection) {
-            String category = movie.getCategory();
-
-            if (!seriesFolder.isEmpty() && category.startsWith(seriesFolder + "/")) {
-                continue;
-            }
-
-            if(category.isEmpty()) {
-                continue;
-            }
-
-            folderList.add(movie.getCategory());
-        }
-
-        if (!seriesFolder.isEmpty()) {
-            folderList.add(seriesFolder);
-        }
     }
 
     public boolean createTimer(Movie movie) {
@@ -362,55 +277,64 @@ public class DataService extends Service implements MovieCollectionLoaderTask.Li
 
     public void registerListener(Listener listener) {
         listeners.add(listener);
+
+        if(connectionStatus == STATUS_Server_Connected) {
+            postOnConnected(listener);
+        }
     }
 
     public void unregisterListener(Listener listener) {
         listeners.remove(listener);
     }
 
-    public Collection<Movie> getRelatedContent(Movie movie) {
-        RelatedContentExtractor contentExtractor = new RelatedContentExtractor(movieCollection);
-        if(movie.isSeries()) {
-            return contentExtractor.getSeries(movie.getTitle());
-        }
-
-        return contentExtractor.getRelatedMovies(movie);
-    }
-
     public int getConnectionStatus() {
         return connectionStatus;
     }
 
-    // MovieCollectionLoaderTask
-
-    @Override
-    public void onStart() {
-        Log.d(TAG, "started loading movies");
+    public MovieController getMovieController() {
+        return movieController;
     }
 
-    @Override
-    public void onCompleted(Collection<Movie> list) {
-        if(list == null) {
-            movieCollection = null;
-            postMovieCollectionUpdated(null);
+    // post open request
+
+    private void postOpen() {
+        handler.removeCallbacks(mOpenRunnable);
+        handler.post(mOpenRunnable);
+    }
+
+    // post events
+
+    private void postOnConnected(final Listener listener) {
+        if(listener == null) {
             return;
         }
 
-        Log.d(TAG, "finished loading (" + list.size() + " movies)");
-
-        movieCollection = list;
-        updateFolderList();
-        Log.d(TAG, "loaded " + folderList.size() + " folders");
-        postMovieCollectionUpdated(movieCollection);
-    }
-
-    private void postMovieCollectionUpdated(final Collection<Movie> list) {
-        handler.post(new Runnable() {
+        listenerHandler.post(new Runnable() {
             @Override
             public void run() {
-            for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).onMovieCollectionUpdated(list, list == null ? STATUS_Collection_Error : STATUS_Collection_Ready);
+                listener.onConnected(DataService.this);
             }
+        });
+    }
+
+    private void postOnConnected() {
+        listenerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < listeners.size(); i++) {
+                    listeners.get(i).onConnected(DataService.this);
+                }
+            }
+        });
+    }
+
+    private void postOnMovieUpdate() {
+        listenerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < listeners.size(); i++) {
+                    listeners.get(i).onMovieUpdate(DataService.this);
+                }
             }
         });
     }

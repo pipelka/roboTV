@@ -16,6 +16,7 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
+import org.xvdr.robotv.service.MovieController;
 
 public class MovieStepFragment extends GuidedStepFragment {
 
@@ -115,6 +116,11 @@ public class MovieStepFragment extends GuidedStepFragment {
     public DataService getService() {
         return service;
     }
+
+    public MovieController getMovieController() {
+        return service.getMovieController();
+    }
+
 
     public int getResourceId() {
         return resourceId;

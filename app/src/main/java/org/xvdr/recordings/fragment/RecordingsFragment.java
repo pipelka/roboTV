@@ -30,12 +30,12 @@ import org.xvdr.recordings.util.BackgroundManagerTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
-import org.xvdr.robotv.service.DataServiceClient;
+import org.xvdr.robotv.service.MovieController;
 import org.xvdr.robotv.service.NotificationHandler;
 
 import java.util.Collection;
 
-public class RecordingsFragment extends BrowseFragment implements DataServiceClient.Listener {
+public class RecordingsFragment extends BrowseFragment implements DataService.Listener, MovieController.LoaderCallback {
 
     private final static String TAG = "RecordingsFragment";
 
@@ -45,38 +45,17 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     private NotificationHandler notification;
 
     private int color_background;
-    private int color_brand;
-    private int selectedRow = -1;
-    private int selectedItem = -1;
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         notification = new NotificationHandler(getActivity());
+        mAdapter = new MovieCollectionAdapter(getActivity());
 
         setupEventListeners();
         initUI();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    synchronized private void loadMovies(Collection<Movie> collection) {
-        Log.d(TAG, "loadMovies");
-
-        mAdapter = new MovieCollectionAdapter(getActivity());
-
-        if(collection.size() != 0) {
-            mAdapter.addAllMovies(collection);
-        }
-
-        setupPreferences(mAdapter);
-        mAdapter.cleanup();
-
-        setAdapter(mAdapter);
+        prepareEntranceTransition();
     }
 
     private void updateBackground(String url) {
@@ -126,7 +105,7 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         setHeadersTransitionOnBackEnabled(true);
 
         color_background = Utils.getColor(getActivity(), R.color.recordings_background);
-        color_brand = Utils.getColor(getActivity(), R.color.primary_color);
+        int color_brand = Utils.getColor(getActivity(), R.color.primary_color);
 
         setBrandColor(color_brand);
         setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));
@@ -139,13 +118,9 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
                 if(item instanceof Movie) {
                     Movie movie = (Movie) item;
-                    ListRow listRow = (ListRow) row;
-                    ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
-
-                    selectedRow = getSelectedPosition();
-                    selectedItem = rowAdapter.indexOf(item);
 
                     Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                    //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
                     startActivity(intent);
                 }
@@ -160,9 +135,6 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
         setOnItemViewSelectedListener(new OnItemViewSelectedListener() {
             @Override
             public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                ListRow listRow = (ListRow) row;
-                ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter)listRow.getAdapter();
-
                 if(item instanceof Movie) {
                     Movie movie = (Movie) item;
                     updateBackground(movie.getBackgroundImageUrl());
@@ -185,44 +157,43 @@ public class RecordingsFragment extends BrowseFragment implements DataServiceCli
     }
 
     @Override
-    public void onServiceConnected(DataService service) {
-        if(service.getConnectionStatus() == DataService.STATUS_Server_Failed) {
-            startSetupActivity();
-        }
-
-        service.loadMovieCollection();
-    }
-
-    @Override
-    public void onServiceDisconnected(DataService service) {
-    }
-
-    @Override
-    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
-        if(getActivity() == null) {
-            return;
-        }
-
+    public void onMovieCollectionUpdated(Collection<Movie> collection, int status) {
         Log.d(TAG, "onMovieCollectionUpdated status=" + status);
 
         ProgressBarManager manager = getProgressBarManager();
         manager.setInitialDelay(500);
 
         switch(status) {
-            case DataService.STATUS_Collection_Busy:
+            case MovieController.STATUS_Collection_Busy:
                 manager.enableProgressBar();
                 manager.show();
                 break;
-            case DataService.STATUS_Collection_Error:
+            case MovieController.STATUS_Collection_Error:
                 notification.error(getString(R.string.fail_to_load_movielist));
-            case DataService.STATUS_Collection_Ready:
+            case MovieController.STATUS_Collection_Ready:
                 manager.disableProgressBar();
                 manager.hide();
+
+                mAdapter.load(collection);
+
+                if(getAdapter() == null) {
+                    setupPreferences(mAdapter);
+                    setAdapter(mAdapter);
+                }
+
+                startEntranceTransition();
                 break;
         }
-
-        if(collection != null) {
-            loadMovies(collection);
-        }
     }
+
+    @Override
+    public void onConnected(DataService service) {
+        service.getMovieController().loadMovieCollection(this);
+    }
+
+    @Override
+    public void onMovieUpdate(DataService service) {
+        service.getMovieController().loadMovieCollection(this);
+    }
+
 }

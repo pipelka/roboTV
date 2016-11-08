@@ -43,7 +43,7 @@ public class CoverSearchActivity extends DataServiceActivity {
         DataService service = getService();
 
         if(service != null) {
-            service.setMovieArtwork(mMovie, holder);
+            service.getMovieController().setMovieArtwork(mMovie, holder);
         }
 
         mMovie.setArtwork(holder);

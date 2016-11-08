@@ -18,8 +18,6 @@ import com.bumptech.glide.Glide;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
-import java.io.IOException;
-
 public class NotificationHandler {
 
     private final static String TAG = "NotificationHandler";

@@ -41,7 +41,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class EpgSearchFragment extends SearchFragment implements SearchFragment.SearchResultProvider, DataServiceClient.Listener  {
+public class EpgSearchFragment extends SearchFragment implements SearchFragment.SearchResultProvider, DataService.Listener  {
 
     private static final int SEARCH_DELAY_MS = 500;
 
@@ -258,16 +258,13 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     }
 
     @Override
-    public void onServiceConnected(DataService service) {
+    public void onConnected(DataService service) {
         connection = service.getConnection();
         artwork = new ArtworkFetcher(connection, SetupUtils.getLanguage(getActivity()));
     }
 
     @Override
-    public void onServiceDisconnected(DataService service) {
+    public void onMovieUpdate(DataService service) {
     }
 
-    @Override
-    public void onMovieCollectionUpdated(DataService service, Collection<Movie> collection, int status) {
-    }
 }

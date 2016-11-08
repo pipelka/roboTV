@@ -1,32 +1,40 @@
 package org.xvdr.ui;
 
 import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
 
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.DataServiceClient;
 
 public class DataServiceActivity extends Activity {
 
-    private DataServiceClient dataClient;
-    private DataServiceClient.Listener listener;
+    final private static String TAG = "DataServiceActivity";
 
-    protected void setServiceListener(DataServiceClient.Listener listener) {
+    private DataServiceClient dataClient;
+    private DataService.Listener listener;
+
+    protected void setServiceListener(DataService.Listener listener) {
         this.listener = listener;
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
 
         // start data service
         dataClient = new DataServiceClient(this, listener);
         dataClient.bind();
+
+        Log.d(TAG, "bind");
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         dataClient.unbind();
+
+        Log.d(TAG, "unbind");
     }
 
     protected DataService getService() {

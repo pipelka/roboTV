@@ -39,7 +39,7 @@ public class CreateTimerFragmentFolder extends CreateTimerStepFragment {
         DataService service = getService();
 
         if(service != null) {
-            TreeSet<String> folderList = service.getFolderList();
+            TreeSet<String> folderList = getMovieController().getFolderList();
 
             for(String folder : folderList) {
                 GuidedAction action = new GuidedAction.Builder(getActivity())

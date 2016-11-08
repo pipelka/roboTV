@@ -1,9 +1,11 @@
-package org.xvdr.recordings.model;
+package org.xvdr.robotv.service;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.recordings.model.Movie;
+import org.xvdr.recordings.model.PacketAdapter;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
@@ -13,10 +15,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<Movie>> {
+class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<Movie>> {
 
     public interface Listener {
-        void onStart();
         void onCompleted(Collection<Movie> adapter);
     }
 
@@ -26,7 +27,7 @@ public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Colle
     private Listener listener;
     private ArtworkFetcher fetcher;
 
-    public MovieCollectionLoaderTask(Connection connection, String language) {
+    MovieCollectionLoaderTask(Connection connection, String language) {
         this.connection = connection;
         this.fetcher = new ArtworkFetcher(this.connection, language);
     }
@@ -34,13 +35,6 @@ public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Colle
     public void load(Listener listener) {
         this.listener = listener;
         execute(connection);
-    }
-
-    @Override
-    protected void onPreExecute() {
-        if(listener != null) {
-            listener.onStart();
-        }
     }
 
     @Override
@@ -77,6 +71,13 @@ public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Colle
 
     @Override
     protected void onPostExecute(Collection<Movie> result) {
+        if(listener != null) {
+            listener.onCompleted(result);
+        }
+    }
+
+    @Override
+    protected void onCancelled(Collection<Movie> result) {
         if(listener != null) {
             listener.onCompleted(result);
         }

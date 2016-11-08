@@ -53,7 +53,7 @@ public class DeleteMovieFragment extends MovieStepFragment {
     }
 
     private void deleteMovie(Movie movie) {
-        int status = getService().deleteMovie(movie);
+        int status = getMovieController().deleteMovie(movie);
         if(status == 0) {
             return;
         }

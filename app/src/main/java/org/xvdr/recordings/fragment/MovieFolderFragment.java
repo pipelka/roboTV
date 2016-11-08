@@ -7,6 +7,7 @@ import android.support.v17.leanback.widget.GuidedAction;
 
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.service.MovieController;
 import org.xvdr.ui.MovieStepFragment;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class MovieFolderFragment extends MovieStepFragment {
 
     @Override
     public void onCreateActions(@NonNull List actions, Bundle savedInstanceState) {
-        folderList = getService().getFolderList();
+        folderList = getMovieController().getFolderList();
 
         actions.add(new GuidedAction.Builder(getActivity())
                 .id(0)
@@ -82,6 +83,7 @@ public class MovieFolderFragment extends MovieStepFragment {
         }
 
         String newName = mapName(name);
-        getService().renameMovie(movie, newName);
+        getMovieController().renameMovie(movie, newName);
     }
+
 }

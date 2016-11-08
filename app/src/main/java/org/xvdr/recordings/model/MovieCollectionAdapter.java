@@ -59,6 +59,10 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         }
     };
 
+    private interface MovieIterator {
+        boolean iterate(ArrayObjectAdapter adapter, Movie movie);
+    }
+
     public MovieCollectionAdapter(Context context) {
         super(compareCategories, new ListRowPresenter());
         mContext = context;
@@ -92,20 +96,6 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         return getCategory(category, addNew, mCardPresenter);
     }
 
-    private ListRow findRow(String category) {
-        ListRow listrow;
-
-        for(int i = 0; i < size(); i++) {
-            listrow = (ListRow)get(i);
-
-            if(listrow.getHeaderItem().getName().equalsIgnoreCase(category)) {
-                return listrow;
-            }
-        }
-
-        return null;
-    }
-
     private ArrayObjectAdapter getCategory(String category, boolean addNew, Presenter presenter) {
         if(TextUtils.isEmpty(category)) {
             return null;
@@ -136,43 +126,49 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         return listRowAdapter;
     }
 
-    public void add(Movie movie) {
+    private void add(Movie movie) {
         // add into "latest" category
         Movie item = movieExists(mLatest, movie);
 
         if(item != null) {
             item.setArtwork(movie);
+            item.setEpisodeCount(1);
         }
         else {
+            movie.setEpisodeCount(1);
             mLatest.add(movie);
         }
 
         if(movie.isSeries()) {
-            addSeriesEpisode(movie);
+            addEpisode(movie);
             return;
         }
 
-        addMovie(movie);
+        item = addMovie(movie);
+        if(item != null) {
+            item.setEpisodeCount(1);
+        }
     }
 
-    private void addMovie(Movie movie) {
+    private Movie addMovie(Movie movie) {
         ArrayObjectAdapter row = getCategory(movie.getCategory(), true);
 
         if(row == null) {
-            return;
+            return null;
         }
 
         Movie item = movieExists(row, movie);
 
         if(item != null) {
             item.setArtwork(movie);
+            return item;
         }
-        else {
-            row.add(movie);
-        }
+
+        row.add(movie);
+        return movie;
     }
 
-    private void addSeriesEpisode(Movie episode) {
+    private void addEpisode(Movie episode) {
         // check if series item already exists
         for(int i = 0; i < mTvShows.size(); i++) {
             Movie m = (Movie) mTvShows.get(i);
@@ -194,27 +190,87 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         mTvShows.add(series);
     }
 
-    public void remove(Movie movie) {
-        ArrayObjectAdapter row = getCategory(movie.getCategory(), true);
+    private void iterateAll(MovieIterator iterator) {
+        // all rows
+        for(int row = 0; row < size(); row++) {
+            ListRow listrow = (ListRow)get(row);
+            ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) listrow.getAdapter();
 
-        if(row == null) {
-            return;
+            // all items in the row
+            for(int i = 0; i < rowAdapter.size();) {
+                Object item = rowAdapter.get(i);
+
+                if(item instanceof Movie) {
+                    Movie m = (Movie) item;
+                    if(iterator.iterate(rowAdapter, m)) {
+                        i = 0;
+                        continue;
+                    }
+                }
+
+                i++;
+            }
         }
-
-        row.remove(movie);
     }
 
-    public void cleanup() {
-        ListRow tvShowsRow = findRow("TV Shows");
+    public void remove(final Movie movie) {
+        iterateAll(new MovieIterator() {
+            @Override
+            public boolean iterate(ArrayObjectAdapter adapter, Movie m) {
+                String id = m.getId();
+                if(!TextUtils.isEmpty(id) && id.equals(movie.getId())) {
+                    adapter.remove(m);
+                    return true;
+                }
 
-        if(tvShowsRow != null && tvShowsRow.getAdapter().size() == 0) {
-            remove(tvShowsRow);
-        }
+                return false;
+            }
+        });
     }
 
-    public void addAllMovies(Collection<Movie> movieCollection) {
-        for(Movie movie : movieCollection) {
-            add(movie);
+    synchronized public void load(Collection<Movie> movieCollection) {
+        // reset count
+        iterateAll(new MovieIterator() {
+            @Override
+            public boolean iterate(ArrayObjectAdapter adapter, Movie m) {
+                m.setEpisodeCount(0);
+                return false;
+            }
+        });
+
+        // insert all movies
+        if(movieCollection != null) {
+            for(Movie movie : movieCollection) {
+                add(movie);
+            }
+        }
+
+        // check for removed entries
+        iterateAll(new MovieIterator() {
+            @Override
+            public boolean iterate(ArrayObjectAdapter adapter, Movie m) {
+                if(m.getEpisodeCount() == 0) {
+                    adapter.remove(m);
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        // update all rows
+        for(int i = 0; i < size();) {
+            ListRow listRow = (ListRow)get(i);
+            ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) listRow.getAdapter();
+
+            if(rowAdapter.size() == 0) {
+                super.remove(listRow);
+                i = 0;
+                continue;
+            }
+
+            rowAdapter.notifyArrayItemRangeChanged(0, rowAdapter.size() - 1);
+            i++;
         }
     }
 }
