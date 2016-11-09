@@ -15,15 +15,20 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.ConnectionPool;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
 
     private Context mContext;
     private String mInputId;
     private Connection mConnection;
-    private  ContentResolver mResolver;
+    private ContentResolver mResolver;
+    private OkHttpClient client;
 
     final private byte[] mBuffer = new byte[4096];
 
@@ -32,24 +37,21 @@ public abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
         mInputId = inputId;
         mResolver = context.getContentResolver();
         mContext = context;
+
+        client = new OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
+                .build();
     }
 
-    private void fetchChannelLogo(Uri channelUri, String address) {
-        URL sourceUrl;
-        OutputStream os;
-        InputStream in;
-        URLConnection urlConnection;
+    private void fetchChannelLogo(Uri channelUri, String address) throws IOException {
         Uri channelLogoUri = TvContract.buildChannelLogoUri(channelUri);
 
-        try {
-            os = mResolver.openOutputStream(channelLogoUri);
-            sourceUrl = new URL(address);
-            urlConnection = sourceUrl.openConnection();
-            in = new BufferedInputStream(urlConnection.getInputStream());
-        }
-        catch(Exception e) {
-            return;
-        }
+        Request request = new Request.Builder().url(address).build();
+        Response response = client.newCall(request).execute();
+
+        InputStream in = new BufferedInputStream(response.body().byteStream());
+        OutputStream os = mResolver.openOutputStream(channelLogoUri);
 
         if(os == null) {
             return;
@@ -94,7 +96,12 @@ public abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
                 }
 
                 final Uri uri = TvContract.buildChannelUri(channelId);
-                fetchChannelLogo(uri, entry.iconURL);
+                try {
+                    fetchChannelLogo(uri, entry.iconURL);
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 return true;
             }
