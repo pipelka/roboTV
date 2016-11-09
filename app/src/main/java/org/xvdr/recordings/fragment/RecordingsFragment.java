@@ -161,7 +161,6 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
         Log.d(TAG, "onMovieCollectionUpdated status=" + status);
 
         ProgressBarManager manager = getProgressBarManager();
-        manager.setInitialDelay(500);
 
         switch(status) {
             case MovieController.STATUS_Collection_Busy:
