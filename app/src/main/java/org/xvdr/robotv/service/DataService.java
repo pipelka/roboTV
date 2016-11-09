@@ -219,7 +219,7 @@ public class DataService extends Service {
 
         final Event event = ArtworkUtils.packetToEvent(p);
 
-        listenerHandler.post(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 try {
