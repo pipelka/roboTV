@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.AnyRes;
@@ -339,11 +340,6 @@ public class ChannelSyncAdapter {
 
         mChannelIconsTask = new SyncChannelIconsTask(mConnection, mContext, mInputId) {
             @Override
-            protected Void doInBackground(Void... params) {
-                return super.doInBackground(params);
-            }
-
-            @Override
             protected void onPostExecute(Void result) {
                 mChannelIconsTask = null;
                 Log.i(TAG, "finished syncing channel icons.");
@@ -356,7 +352,7 @@ public class ChannelSyncAdapter {
             }
         };
 
-        mChannelIconsTask.execute(null, null, null);
+        mChannelIconsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
     }
 
     public void syncEPG() {
