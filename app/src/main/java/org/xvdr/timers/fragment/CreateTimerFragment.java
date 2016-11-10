@@ -99,7 +99,7 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
                 break;
 
             case ACTION_ADD:
-                movie.setCategory(SetupUtils.getRecordingFolder());
+                movie.setFolder(SetupUtils.getRecordingFolder());
                 createTimer(movie);
                 finishGuidedStepFragments();
                 break;

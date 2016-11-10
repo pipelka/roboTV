@@ -127,19 +127,15 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 ListRow row = findOrCreateChannelRow(channelName, channelId);
                 ArrayObjectAdapter adapter = (ArrayObjectAdapter) row.getAdapter();
 
-                final Movie movie = new Movie();
-                movie.setTitle(event.getTitle());
-                movie.setOutline(event.getSubTitle());
+                final Movie movie = new Movie(event);
                 movie.setTimeStamp(event.getTimestamp().getTime());
                 movie.setChannelName(channelName);
-                movie.setContent(event.getContentId());
                 movie.setChannelUid(channelId);
                 movie.setStartTime(event.getStartTime());
-                movie.setDuration(event.getDuration());
 
                 // fetch artwork
                 try {
-                    ArtworkHolder holder = artwork.fetchForEvent(movie.getEvent());
+                    ArtworkHolder holder = artwork.fetchForEvent(movie);
                     movie.setArtwork(holder);
                 }
                 catch(IOException e) {

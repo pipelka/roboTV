@@ -10,8 +10,8 @@ import java.util.List;
 public class ArtworkUtils {
 
     public static boolean setMovieArtwork(Connection connection, Movie movie, ArtworkHolder holder) {
-        movie.setCardImageUrl(holder.getPosterUrl());
-        movie.setBackgroundImageUrl(holder.getBackgroundUrl());
+        movie.setPosterUrl(holder.getPosterUrl());
+        movie.setBackgroundUrl(holder.getBackgroundUrl());
 
         return setMovieArtwork(connection, movie);
     }
@@ -19,9 +19,9 @@ public class ArtworkUtils {
     public static boolean setMovieArtwork(Connection connection, Movie movie) {
         Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_SETURLS);
 
-        p.putString(movie.getId());
-        p.putString(movie.getCardImageUrl());
-        p.putString(movie.getBackgroundImageUrl());
+        p.putString(movie.getRecordingId());
+        p.putString(movie.getPosterUrl());
+        p.putString(movie.getBackgroundUrl());
         p.putU32(0);
 
         return (connection.transmitMessage(p) != null);

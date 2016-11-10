@@ -137,7 +137,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
             public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
                 if(item instanceof Movie) {
                     Movie movie = (Movie) item;
-                    updateBackground(movie.getBackgroundImageUrl());
+                    updateBackground(movie.getBackgroundUrl());
                 }
             }
         });

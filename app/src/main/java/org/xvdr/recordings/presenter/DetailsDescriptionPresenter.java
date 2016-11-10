@@ -13,14 +13,14 @@ public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPrese
             return;
         }
 
-        if(movie.isSeries()) {
-            viewHolder.getTitle().setText(movie.getOutline());
+        if(movie.isTvShow()) {
+            viewHolder.getTitle().setText(movie.getShortText());
             viewHolder.getBody().setText(movie.getDescription());
             return;
         }
 
         viewHolder.getTitle().setText(movie.getTitle());
-        viewHolder.getSubtitle().setText(movie.getOutline());
+        viewHolder.getSubtitle().setText(movie.getShortText());
         viewHolder.getBody().setText(movie.getDescription());
     }
 }

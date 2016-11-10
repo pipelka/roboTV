@@ -1,11 +1,9 @@
 package org.xvdr.timers.fragment;
 
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.app.ProgressBarManager;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -100,15 +98,12 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
                     e.printStackTrace();
                 }
 
-                final Movie movie = new Movie();
-                movie.setTitle(event.getTitle());
-                movie.setOutline(event.getSubTitle());
+                final Movie movie = new Movie(event);
                 movie.setTimeStamp(event.getTimestamp().getTime());
                 movie.setChannelName(channelName);
                 movie.setArtwork(art);
                 movie.setTimeStamp(startTime * 1000);
                 movie.setChannelUid(channelUid);
-                movie.setDuration(eventDuration);
 
                 rowAdapter.add(movie);
             }

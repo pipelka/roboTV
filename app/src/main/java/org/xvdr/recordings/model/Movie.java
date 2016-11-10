@@ -3,85 +3,61 @@ package org.xvdr.recordings.model;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Movie implements Serializable {
-    private String title;
-    private String description;
-    private String outline;
-    private String category;
-    private String cardImageUrl;
-    private String backgroundImageUrl;
+public class Movie extends Event {
+
+    private String folder;
+    private String posterUrl;
+    private String backgroundUrl;
     private long timeStamp;
-    private int duration;
-    private String id;
-    private int content;
+    private String recordingId;
     private String channelName;
     private int channelUid;
     private boolean isSeriesHeader = false;
     private int episodeCount;
-    private Event event = null;
+    private int playCount;
 
-    public Movie() {
+    public Movie(int contentId, String title, String subTitle, String plot, int durationSec) {
+        super(contentId, title, subTitle, plot, durationSec);
     }
 
-    public String getTitle() {
-        return title;
+    public Movie(Event event) {
+        super(
+                event.getContentId(),
+                event.getTitle(),
+                event.getShortText(),
+                event.getDescription(),
+                event.getDuration(),
+                event.getEventId(),
+                event.getChannelUid()
+        );
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getFolder() {
+        return folder;
     }
 
-    public String getDescription() {
-        return description;
+    public void setFolder(String category) {
+        this.folder = category;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public String getPosterUrl() {
+        return posterUrl;
     }
 
-    public String getOutline() {
-        return outline;
+    public void setPosterUrl(String cardImageUrl) {
+        this.posterUrl = cardImageUrl;
     }
 
-    public void setOutline(String outline) {
-        String parts[] = outline.split("/");
-
-        if(parts.length == 0) {
-            this.outline = "";
-            return;
-        }
-
-        outline = parts[0];
-        this.outline = outline.trim();
+    public String getBackgroundUrl() {
+        return backgroundUrl;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getCardImageUrl() {
-        return cardImageUrl;
-    }
-
-    public void setCardImageUrl(String cardImageUrl) {
-        this.cardImageUrl = cardImageUrl;
-    }
-
-    public String getBackgroundImageUrl() {
-        return backgroundImageUrl;
-    }
-
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
+    public void setBackgroundUrl(String backgroundImageUrl) {
+        this.backgroundUrl = backgroundImageUrl;
     }
 
     public void setTimeStamp(long timeStamp) {
@@ -92,45 +68,24 @@ public class Movie implements Serializable {
         return timeStamp;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
     public long getDurationMs() {
-        return duration * 1000;
+        return getDuration() * 1000;
     }
 
-    public long getDuration() {
-        return duration;
+    void setRecordingId(String id) {
+        this.recordingId = id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setContent(int content) {
-        this.content = content;
-    }
-
-    public int getContent() {
-        return content;
+    public String getRecordingId() {
+        return recordingId;
     }
 
     public int getGenreType() {
-        return content & 0xF0;
+        return getContentId() & 0xF0;
     }
 
     public int getGenreSubType() {
-        return content & 0x0F;
-    }
-
-    public boolean isSeries() {
-        content = Event.guessGenreFromSubTitle(content, outline, duration);
-        return (content == 0x15);
+        return getContentId() & 0x0F;
     }
 
     public void setChannelName(String channelName) {
@@ -150,41 +105,22 @@ public class Movie implements Serializable {
     }
 
     public String getDate() {
-        try {
-            DateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-            Date netDate = (new Date(timeStamp));
-            return sdf.format(netDate).trim();
-        }
-        catch(Exception e) {
-            return "";
-        }
+        return DateFormat.getDateInstance().format(new Date(timeStamp));
     }
 
     public String getDateTime() {
-        try {
-            DateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-            Date netDate = (new Date(timeStamp));
-            return sdf.format(netDate).trim();
-        }
-        catch(Exception e) {
-            return "";
-        }
+        return DateFormat.getDateTimeInstance().format(new Date(timeStamp));
     }
 
-    public Event getEvent() {
-        if(event != null) {
-            return event;
-        }
-
-        if(content == 0 || (content & 0x50) == 0x50) {
-            content = 0x10;
-        }
-
-        event = new Event(content, title, outline, description, duration);
-        return event;
+    void setPlayCount(int count) {
+        playCount = count;
     }
 
-    public void setSeriesHeader() {
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    void setSeriesHeader() {
         isSeriesHeader = true;
     }
 
@@ -197,24 +133,27 @@ public class Movie implements Serializable {
             return;
         }
 
-        cardImageUrl = artwork.getPosterUrl();
-        backgroundImageUrl = artwork.getBackgroundUrl();
+        posterUrl = artwork.getPosterUrl();
+        backgroundUrl = artwork.getBackgroundUrl();
     }
 
     public void setArtwork(Movie movie) {
-        cardImageUrl = movie.getCardImageUrl();
-        backgroundImageUrl = movie.getBackgroundImageUrl();
+        posterUrl = movie.getPosterUrl();
+        backgroundUrl = movie.getBackgroundUrl();
     }
 
     @Override
     public String toString() {
         return "Movie {" +
-               "title=\'" + title + "\'" +
-               ", description=\'" + description + "\'" +
-               ", outline=\'" + outline + "\'" +
-               ", category=\'" + category + "\'" +
-               ", cardImageUrl=\'" + cardImageUrl + "\'" +
-               ", backgroundImageUrl=\'" + backgroundImageUrl + "\'" +
+               "folder=\'" + folder + "\'" +
+               ", posterUrl=\'" + posterUrl + "\'" +
+               ", backgroundUrl=\'" + backgroundUrl + "\'" +
+               ", episodeCount=\'" + episodeCount + "\'" +
+               ", timeStamp=\'" + timeStamp + "\'" +
+               ", recordingId=\'" + recordingId + "\'" +
+               ", channelUid=\'" + channelUid + "\'" +
+               ", channelName=\'" + channelName + "\'" +
+               ", playCount=\'" + playCount + "\'" +
                "}";
     }
 

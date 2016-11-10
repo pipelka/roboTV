@@ -253,10 +253,10 @@ public class DataService extends Service {
         String name;
         Timer timer = new Timer(connection);
 
-        String category = movie.getCategory();
+        String category = movie.getFolder();
 
         if(category.equals(getSeriesFolder())) {
-            name = getSeriesFolder() + "~" + movie.getTitle() + "~" + movie.getOutline();
+            name = getSeriesFolder() + "~" + movie.getTitle() + "~" + movie.getShortText();
         }
         else {
             name = category;

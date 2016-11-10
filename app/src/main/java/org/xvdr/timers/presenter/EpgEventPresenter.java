@@ -4,10 +4,6 @@ import android.content.Context;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.presenter.MoviePresenter;
@@ -24,7 +20,7 @@ public class EpgEventPresenter extends MoviePresenter {
         Context context = cardView.getContext();
 
         cardView.setTitleText(movie.getTitle());
-        String subText = (movie.getOutline().isEmpty() ? "" : movie.getOutline() + " - ");
+        String subText = (movie.getShortText().isEmpty() ? "" : movie.getShortText() + " - ");
         subText += movie.getDateTime();
 
         cardView.setContentText(subText);
@@ -32,9 +28,9 @@ public class EpgEventPresenter extends MoviePresenter {
         cardView.setMainImageDimensions(266, 400);
         cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.primary_color));
 
-        String url = movie.getCardImageUrl();
+        String url = movie.getPosterUrl();
         if(TextUtils.isEmpty(url)) {
-            url = movie.getBackgroundImageUrl();
+            url = movie.getBackgroundUrl();
         }
 
         vh.updateCardViewImage(context, url);

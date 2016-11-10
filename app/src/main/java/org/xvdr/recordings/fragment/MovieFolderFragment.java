@@ -7,7 +7,6 @@ import android.support.v17.leanback.widget.GuidedAction;
 
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.service.MovieController;
 import org.xvdr.ui.MovieStepFragment;
 
 import java.util.List;
@@ -75,8 +74,8 @@ public class MovieFolderFragment extends MovieStepFragment {
         String name ;
         Movie movie = getMovie();
 
-        if(movie.isSeries() || folder.equals(getService().getSeriesFolder())) {
-            name = folder + "~" + movie.getTitle() + "~" + movie.getOutline();
+        if(movie.isTvShow() || folder.equals(getService().getSeriesFolder())) {
+            name = folder + "~" + movie.getTitle() + "~" + movie.getShortText();
         }
         else {
             name = folder + "~" + movie.getTitle();

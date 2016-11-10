@@ -22,7 +22,7 @@ public class LatestCardPresenter extends MoviePresenter {
         cardView.setContentText(contextText);
         cardView.setMainImageDimensions(266, 400);
         cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.primary_color));
-        vh.updateCardViewImage(context, movie.getCardImageUrl());
+        vh.updateCardViewImage(context, movie.getPosterUrl());
     }
 
 }

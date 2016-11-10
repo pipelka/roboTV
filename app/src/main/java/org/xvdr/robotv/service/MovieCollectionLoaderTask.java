@@ -59,7 +59,7 @@ class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<M
             collection.add(movie);
 
             // search movies
-            String url = movie.getCardImageUrl();
+            String url = movie.getPosterUrl();
 
             if(!(url != null && !url.isEmpty() && !url.equals("x"))) {
                 updateMovieArtwork(movie);
@@ -87,7 +87,7 @@ class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<M
         ArtworkHolder o = null;
 
         try {
-            o = fetcher.fetchForEvent(searchMovie.getEvent());
+            o = fetcher.fetchForEvent(searchMovie);
         }
         catch(IOException e) {
             e.printStackTrace();
@@ -97,8 +97,8 @@ class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<M
             return;
         }
 
-        searchMovie.setCardImageUrl(o.getPosterUrl());
-        searchMovie.setBackgroundImageUrl(o.getBackgroundUrl());
+        searchMovie.setPosterUrl(o.getPosterUrl());
+        searchMovie.setBackgroundUrl(o.getBackgroundUrl());
 
         // send new urls to server
         ArtworkUtils.setMovieArtwork(connection, searchMovie);

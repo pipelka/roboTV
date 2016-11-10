@@ -158,8 +158,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
 
         backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
 
-        if(selectedMovie != null && !TextUtils.isEmpty(selectedMovie.getBackgroundImageUrl())) {
-            updateBackground(selectedMovie.getBackgroundImageUrl());
+        if(selectedMovie != null && !TextUtils.isEmpty(selectedMovie.getBackgroundUrl())) {
+            updateBackground(selectedMovie.getBackgroundUrl());
         }
     }
 
@@ -216,11 +216,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
         Comparator<Movie> compareEpisodes = new Comparator<Movie>() {
             @Override
             public int compare(Movie lhs, Movie rhs) {
-                Event event1 = lhs.getEvent();
-                Event event2 = rhs.getEvent();
-
-                Event.SeasonEpisodeHolder episode1 = event1.getSeasionEpisode();
-                Event.SeasonEpisodeHolder episode2 = event2.getSeasionEpisode();
+                Event.SeasonEpisodeHolder episode1 = lhs.getSeasionEpisode();
+                Event.SeasonEpisodeHolder episode2 = rhs.getSeasionEpisode();
 
                 if(episode1.valid() && episode2.valid()) {
 
@@ -242,7 +239,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
         int currentSeason;
 
         for (Movie m : movies) {
-            currentSeason = m.getEvent().getSeasionEpisode().season;
+            currentSeason = m.getSeasionEpisode().season;
 
             if(currentSeason != lastSeason) {
                 lastSeason = currentSeason;
@@ -264,14 +261,14 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
     private void addDetailRow(ArrayObjectAdapter adapter, Movie movie) {
         final DetailsOverviewRow row = new DetailsOverviewRow(movie);
 
-        Event.SeasonEpisodeHolder episode = movie.getEvent().getSeasionEpisode();
+        Event.SeasonEpisodeHolder episode = movie.getSeasionEpisode();
 
         row.setHeaderItem(new HeaderItem(
                 episode.valid() ? getString(R.string.episode_nr, episode.episode) :
-                movie.getOutline()));
+                movie.getShortText()));
         row.setItem(movie);
 
-        String url = movie.getCardImageUrl();
+        String url = movie.getPosterUrl();
 
         if(TextUtils.isEmpty(url)) {
             row.setImageDrawable(getResources().getDrawable(R.drawable.recording_unkown, null));
@@ -306,7 +303,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
                 )
         );
 
-        if(movie.isSeries()) {
+        if(movie.isTvShow()) {
             actions.set(1,
                     new Action(
                             ACTION_DELETE_EPISODE,
@@ -331,7 +328,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
 
     private void loadRelatedContent(ArrayObjectAdapter adapter) {
         // disable related content in series view
-        if(selectedMovie.isSeries()) {
+        if(selectedMovie.isTvShow()) {
             return;
         }
 
@@ -369,7 +366,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
         );
 
         // disable moving to folder for series
-        if(!selectedMovie.isSeries()) {
+        if(!selectedMovie.isTvShow()) {
             actionAdapter.add(
                     new ColorAction(
                             ACTION_MOVE,
@@ -404,7 +401,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
             selectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
         }
 
-        if(selectedMovie.isSeries()) {
+        if(selectedMovie.isTvShow()) {
             setTitle(selectedMovie.getTitle());
         }
 

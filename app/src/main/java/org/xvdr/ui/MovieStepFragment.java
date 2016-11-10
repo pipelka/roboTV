@@ -55,9 +55,9 @@ public class MovieStepFragment extends GuidedStepFragment {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                String url = movie.getCardImageUrl();
+                String url = movie.getPosterUrl();
                 if(TextUtils.isEmpty(url)) {
-                    url = movie.getBackgroundImageUrl();
+                    url = movie.getBackgroundUrl();
                 }
 
                 getArtwork(activity, url);
@@ -87,7 +87,7 @@ public class MovieStepFragment extends GuidedStepFragment {
     }
 
     protected String onCreateDescription(Movie movie) {
-        return movie.getOutline();
+        return movie.getShortText();
     }
 
     protected GuidanceStylist.Guidance createGuidance(String breadCrumb) {

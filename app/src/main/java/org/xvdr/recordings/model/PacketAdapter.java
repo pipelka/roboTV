@@ -5,36 +5,35 @@ import org.xvdr.jniwrap.Packet;
 public class PacketAdapter {
 
     public static Movie toMovie(Packet p) {
-        Movie movie = new Movie();
 
-        movie.setTimeStamp(p.getU32() * 1000L);
-        movie.setDuration((int)p.getU32());
-        p.getU32(); // Priority
-        p.getU32(); // Lifetime
-        movie.setChannelName(p.getString()); // ChannelName
+        long timeStamp = p.getU32() * 1000L;    // timestamp
+        int duration = (int)p.getU32();         // duration
+        p.getU32();                             // Priority
+        p.getU32();                             // Lifetime
+        String channelName = p.getString();     // channel name
+        String title = p.getString();           // title
+        String outline = p.getString();         // outline
+        String plot = p.getString();            // plot
+        String folder = p.getString();          // folder
+        String recId = p.getString();           // recording id
+        int playCount = (int)p.getU32();        // playcount
+        int content = (int)p.getU32();          // content
+        String posterUrl = p.getString();       // poster url
+        String backgroundUrl = p.getString();   // background url
 
-        String title = p.getString();
-        String outline = p.getString();
+        Movie movie = new Movie(content, title, outline, plot, duration);
 
         if(title.equals(outline) || outline.isEmpty()) {
-            outline = movie.getDate();
+            movie.setShortText(movie.getDate());
         }
 
-        movie.setTitle(title);
-        movie.setOutline(outline); // plot outline
-        movie.setDescription(p.getString());
-
-        // folder
-        String folder = p.getString();
-
-        movie.setCategory(folder); // directory / folder
-        movie.setId(p.getString());
-        p.getU32(); // playcount
-
-        movie.setContent((int)p.getU32()); // content
-
-        movie.setCardImageUrl(p.getString()); // thumbnail url
-        movie.setBackgroundImageUrl(p.getString()); // icon url
+        movie.setTimeStamp(timeStamp);
+        movie.setFolder(folder); // directory / folder
+        movie.setChannelName(channelName);
+        movie.setRecordingId(recId);
+        movie.setPlayCount(playCount);
+        movie.setPosterUrl(posterUrl);
+        movie.setBackgroundUrl(backgroundUrl);
 
         return movie;
     }

@@ -201,7 +201,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         mPrimaryActionAdapter.add(mFastForwardAction);
         mPrimaryActionAdapter.add(mSkipNextAction);
 
-        updateVideoImage(mSelectedMovie.getCardImageUrl());
+        updateVideoImage(mSelectedMovie.getPosterUrl());
     }
 
     private void setAudioTrackActionColor(ColorAction action, long id) {

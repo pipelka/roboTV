@@ -68,13 +68,13 @@ public class MoviePresenter extends Presenter {
                     count + " " + resources.getString(count > 1 ? R.string.episodes : R.string.episode));
         }
         else {
-            cardView.setContentText(movie.getOutline());
+            cardView.setContentText(movie.getShortText());
         }
 
         cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.primary_color));
         cardView.setMainImageDimensions(266, 400);
 
-        vh.updateCardViewImage(cardView.getContext(), movie.getCardImageUrl());
+        vh.updateCardViewImage(cardView.getContext(), movie.getPosterUrl());
     }
 
     @Override

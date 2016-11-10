@@ -12,8 +12,6 @@ import static java.lang.Integer.parseInt;
 
 public class Event implements Serializable {
 
-    static private final String TAG = "Event";
-
     public class SeasonEpisodeHolder implements Serializable {
         public int season = 0;
         public int episode = 0;
@@ -31,18 +29,19 @@ public class Event implements Serializable {
         }
     }
 
-    private int mContentId;
-    private String mTitle;
-    private String mSubTitle;
-    private String mPlot;
-    private int mDuration;
-    private int mYear;
-    private int mEventId;
-    private long mStartTime;
-    private int mChannelUid;
+    private int contentId;
+    private String title;
+    private String shortText;
+    private String description;
+    private int duration;
+    private int year;
+    private int eventId;
+    private long startTime;
+    private int channelUid;
+
     private SeasonEpisodeHolder seasonEpisode = new SeasonEpisodeHolder();
 
-    private static Pattern mYearPattern = Pattern.compile("\\b(19|20)\\d{2}\\b");
+    private static Pattern yearPattern = Pattern.compile("\\b(19|20)\\d{2}\\b");
 
     private static Pattern seasonEpisodePatterns[] = {
             Pattern.compile("\\b(\\d).+[S|s]taffel.+[F|f]olge\\W+(\\d+)\\b"),
@@ -134,64 +133,68 @@ public class Event implements Serializable {
     }
 
     public Event(int contentId, String title, String subTitle, String plot, int durationSec, int eventId, int channelUid) {
-        mContentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
-        mChannelUid = channelUid;
+        this.contentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
+        this.channelUid = channelUid;
 
         // sometimes we can guess the sub genre from the title
         if(getGenre() == 0x40) {
-            mContentId = guessGenreFromSubTitle(contentId, title, durationSec);
+            this.contentId = guessGenreFromSubTitle(contentId, title, durationSec);
         }
 
-        mYear = guessYearFromDescription(subTitle + " " + plot);
-        mTitle = title;
-        mSubTitle = subTitle;
-        mPlot = plot;
-        mDuration = durationSec;
-        mEventId = eventId;
+        year = guessYearFromDescription(subTitle + " " + plot);
+        this.title = title;
+        shortText = subTitle;
+        description = plot;
+        duration = durationSec;
+        this.eventId = eventId;
 
         if (!getSeasonEpisode(plot, seasonEpisode)) {
             getSeasonEpisode(subTitle, seasonEpisode);
         }
 
         if(seasonEpisode.valid() && !isTvShow()) {
-            mContentId = 0x15;
+            this.contentId = 0x15;
         }
     }
 
+    public void setShortText(String outline) {
+        shortText = outline;
+    }
+
     public int getGenre() {
-        return mContentId & 0xF0;
+        return contentId & 0xF0;
     }
 
     public int getContentId() {
-        return mContentId;
+        return contentId;
     }
 
     public int getYear() {
-        return mYear;
+        return year;
     }
 
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
-    public String getSubTitle() {
-        return mSubTitle;
+    public String getShortText() {
+        return shortText;
     }
 
-    public String getPlot() {
-        return mPlot;
+    public String getDescription() {
+        return description;
     }
 
     public int getDuration() {
-        return mDuration;
+        return duration;
     }
 
     public int getEventId() {
-        return mEventId;
+        return eventId;
     }
 
     public int getChannelUid() {
-        return mChannelUid;
+        return channelUid;
     }
 
     public boolean isTvShow() {
@@ -202,11 +205,11 @@ public class Event implements Serializable {
         return seasonEpisode;
     }
 
-    static public int guessYearFromDescription(String description) {
-        int year = 0;
+    private static int guessYearFromDescription(String description) {
+        int year;
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 
-        Matcher matches = mYearPattern.matcher(description);
+        Matcher matches = yearPattern.matcher(description);
 
         while(matches.find()) {
             String word = matches.group();
@@ -227,7 +230,7 @@ public class Event implements Serializable {
         return 0;
     }
 
-    static public int guessGenreFromSubTitle(int contentId, String subtitle, int duration) {
+    private static int guessGenreFromSubTitle(int contentId, String subtitle, int duration) {
         if(subtitle == null) {
             return contentId;
         }
@@ -276,7 +279,7 @@ public class Event implements Serializable {
         return contentId;
     }
 
-    static public boolean getSeasonEpisode(String text, SeasonEpisodeHolder holder) {
+    private static boolean getSeasonEpisode(String text, SeasonEpisodeHolder holder) {
         if(TextUtils.isEmpty(text)) {
             return false;
         }
@@ -315,29 +318,29 @@ public class Event implements Serializable {
     }
 
     void setStartTime(long startTime) {
-        mStartTime = startTime;
+        this.startTime = startTime;
     }
 
     public long getStartTime() {
-        return mStartTime;
+        return startTime;
     }
 
     public Timestamp getTimestamp() {
-        return new Timestamp(mStartTime * 1000);
+        return new Timestamp(startTime * 1000);
     }
 
     @Override
     public String toString() {
         return "Event {" +
-                "mContentId=\'" + mContentId + "\'" +
-                ", mTitle=\'" + mTitle + "\'" +
-                ", mSubTitle=\'" + mSubTitle + "\'" +
-                ", mPlot=\'" + mPlot + "\'" +
-                ", mDuration=\'" + mDuration + "\'" +
-                ", mYear=\'" + mYear + "\'" +
-                ", mEventId=\'" + mYear + "\'" +
-                ", mStartTime=\'" + mYear + "\'" +
-                ", mChannelUid=\'" + mYear + "\'" +
+                "contentId=\'" + contentId + "\'" +
+                ", title=\'" + title + "\'" +
+                ", shortText=\'" + shortText + "\'" +
+                ", description=\'" + description + "\'" +
+                ", duration=\'" + duration + "\'" +
+                ", year=\'" + year + "\'" +
+                ", eventId=\'" + year + "\'" +
+                ", startTime=\'" + year + "\'" +
+                ", channelUid=\'" + year + "\'" +
                 "}";
     }
 

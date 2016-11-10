@@ -15,7 +15,7 @@ public class RelatedContentExtractor {
 
     public Collection<Movie> getSeries(String title) {
         for(Movie m : collection) {
-            if (m.isSeries() && m.getTitle().equals(title)) {
+            if (m.isTvShow() && m.getTitle().equals(title)) {
                 result.add(m);
             }
         }
@@ -29,11 +29,11 @@ public class RelatedContentExtractor {
 
     public Collection<Movie> getRelatedMovies(Movie movie) {
         for(Movie m : collection) {
-            if (m.getId().equals(movie.getId())) {
+            if (m.getRecordingId().equals(movie.getRecordingId())) {
                 continue;
             }
 
-            if (m.getCategory().equals(movie.getCategory()) && m.getContent() == movie.getContent()) {
+            if (m.getFolder().equals(movie.getFolder()) && m.getContentId() == movie.getContentId()) {
                 result.add(m);
             }
         }

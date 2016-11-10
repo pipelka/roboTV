@@ -76,10 +76,10 @@ public class PlayerActivity extends Activity implements Player.Listener {
         metadataBuilder
         .putLong(MediaMetadata.METADATA_KEY_DURATION, mSelectedMovie.getDurationMs() * 1000)
         .putString(MediaMetadata.METADATA_KEY_TITLE, movie.getTitle())
-        .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, movie.getOutline())
+        .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, movie.getShortText())
         .putString(MediaMetadata.METADATA_KEY_DISPLAY_DESCRIPTION, movie.getDescription());
 
-        String url = movie.getCardImageUrl();
+        String url = movie.getPosterUrl();
 
         if(url != null && !url.isEmpty()) {
             Glide.with(this).load(url).asBitmap()
@@ -137,7 +137,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
             return;
         }
 
-        String id = mSelectedMovie.getId();
+        String id = mSelectedMovie.getRecordingId();
 
         mPlayer.open(Player.createRecordingUri(id));
         mControls.togglePlayback(true);

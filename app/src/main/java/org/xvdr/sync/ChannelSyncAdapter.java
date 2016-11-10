@@ -440,8 +440,8 @@ public class ChannelSyncAdapter {
             int eventDuration = (int)(endTime - startTime);
             long parentalRating = mResponse.getU32();
             String title = mResponse.getString();
-            String plotOutline = mResponse.getString();
-            String plot = mResponse.getString();
+            String shortText = mResponse.getString();
+            String description = mResponse.getString();
             String posterUrl = mResponse.getString();
             String backgroundUrl = mResponse.getString();
 
@@ -450,19 +450,18 @@ public class ChannelSyncAdapter {
                 continue;
             }
 
-            Event event = new Event(content, title, plotOutline, plot, eventDuration, eventId, uid);
+            Event event = new Event(content, title, shortText, description, eventDuration, eventId, uid);
 
             ContentValues values = new ContentValues();
             values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
             values.put(TvContract.Programs.COLUMN_TITLE, event.getTitle());
-            values.put(TvContract.Programs.COLUMN_EPISODE_TITLE, plotOutline);
+            values.put(TvContract.Programs.COLUMN_EPISODE_TITLE, shortText);
 
-            if(plot.length() <= 256) {
-                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plot);
+            if(description.length() <= 256) {
+                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description);
             }
             else {
-                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, plot.substring(0, 256));
-                //values.put(TvContract.Programs.COLUMN_LONG_DESCRIPTION, event.getPlot());
+                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, 256));
             }
 
             values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
@@ -470,6 +469,7 @@ public class ChannelSyncAdapter {
             values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(event.getContentId()));
 
             Event.SeasonEpisodeHolder seasonEpisode = event.getSeasionEpisode();
+
             if(seasonEpisode.valid()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     values.put(TvContract.Programs.COLUMN_SEASON_DISPLAY_NUMBER, seasonEpisode.season);

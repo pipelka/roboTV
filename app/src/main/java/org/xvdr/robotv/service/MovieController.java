@@ -40,12 +40,12 @@ public class MovieController {
     }
 
     public int deleteMovie(Movie movie) {
-        return connection.deleteRecording(movie.getId());
+        return connection.deleteRecording(movie.getRecordingId());
     }
 
     public Collection<Movie> getRelatedContent(Movie movie) {
         RelatedContentExtractor contentExtractor = new RelatedContentExtractor(movieCollection);
-        if(movie.isSeries()) {
+        if(movie.isTvShow()) {
             return contentExtractor.getSeries(movie.getTitle());
         }
 
@@ -86,7 +86,7 @@ public class MovieController {
     }
 
     public void setMovieArtwork(Movie movie, ArtworkHolder holder) {
-        if(movie.isSeries() || movie.isSeriesHeader()) {
+        if(movie.isTvShow() || movie.isSeriesHeader()) {
             Collection<Movie> episodes = new RelatedContentExtractor(movieCollection).getSeries(movie.getTitle());
             for(Movie m: episodes) {
                 setArtwork(m, holder);
@@ -99,9 +99,9 @@ public class MovieController {
 
     private void setArtwork(Movie movie, ArtworkHolder holder) {
         // update local movie list
-        String id = movie.getId();
+        String id = movie.getRecordingId();
         for(Movie m : movieCollection) {
-            if (m.getId().equals(id)) {
+            if (m.getRecordingId().equals(id)) {
                 Log.d(TAG, "updating movie entry " + id);
                 m.setArtwork(holder);
                 break;
@@ -113,14 +113,14 @@ public class MovieController {
     }
 
     public int renameMovie(Movie movie, String newName) {
-        return connection.renameRecording(movie.getId(), newName);
+        return connection.renameRecording(movie.getRecordingId(), newName);
     }
 
     private void updateFolderList() {
         String seriesFolder = connection.getConfig("SeriesFolder");
 
         for(Movie movie : movieCollection) {
-            String category = movie.getCategory();
+            String category = movie.getFolder();
 
             if (!seriesFolder.isEmpty() && category.startsWith(seriesFolder + "/")) {
                 continue;
@@ -130,7 +130,7 @@ public class MovieController {
                 continue;
             }
 
-            folderList.add(movie.getCategory());
+            folderList.add(movie.getFolder());
         }
 
         if (!seriesFolder.isEmpty()) {

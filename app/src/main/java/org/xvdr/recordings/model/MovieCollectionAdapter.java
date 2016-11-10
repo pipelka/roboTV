@@ -84,7 +84,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         for(int i = 0; i < adapter.size(); i++) {
             Movie item = (Movie) adapter.get(i);
 
-            if(item.getId().equals(movie.getId())) {
+            if(item.getRecordingId().equals(movie.getRecordingId())) {
                 return item;
             }
         }
@@ -139,7 +139,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             mLatest.add(movie);
         }
 
-        if(movie.isSeries()) {
+        if(movie.isTvShow()) {
             addEpisode(movie);
             return;
         }
@@ -151,7 +151,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     private Movie addMovie(Movie movie) {
-        ArrayObjectAdapter row = getCategory(movie.getCategory(), true);
+        ArrayObjectAdapter row = getCategory(movie.getFolder(), true);
 
         if(row == null) {
             return null;
@@ -179,11 +179,9 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         }
 
         // create a new item for this series
-        Movie series = new Movie();
-        series.setTitle(episode.getTitle());
-        series.setContent(0x15);
-        series.setCardImageUrl(episode.getCardImageUrl());
-        series.setBackgroundImageUrl(episode.getBackgroundImageUrl());
+        Movie series = new Movie(0x15, episode.getTitle(), "", "", 0);
+        series.setPosterUrl(episode.getPosterUrl());
+        series.setBackgroundUrl(episode.getBackgroundUrl());
         series.setEpisodeCount(1);
         series.setSeriesHeader();
 
@@ -217,8 +215,8 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         iterateAll(new MovieIterator() {
             @Override
             public boolean iterate(ArrayObjectAdapter adapter, Movie m) {
-                String id = m.getId();
-                if(!TextUtils.isEmpty(id) && id.equals(movie.getId())) {
+                String id = m.getRecordingId();
+                if(!TextUtils.isEmpty(id) && id.equals(movie.getRecordingId())) {
                     adapter.remove(m);
                     return true;
                 }
