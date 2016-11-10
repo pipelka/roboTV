@@ -15,32 +15,28 @@ import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 public class ShieldVideoRenderer extends MediaCodecVideoRenderer {
 
-    private long startTime = 0;
-    private boolean enabled = true;
+    private long startTime;
+    private boolean enabled;
 
     ShieldVideoRenderer(Context context, MediaCodecSelector mediaCodecSelector, int videoScalingMode, long allowedJoiningTimeMs, DrmSessionManager<FrameworkMediaCrypto> drmSessionManager, boolean playClearSamplesWithoutKeys, Handler eventHandler, VideoRendererEventListener eventListener, int maxDroppedFramesToNotify) {
         super(context, mediaCodecSelector, videoScalingMode, allowedJoiningTimeMs, drmSessionManager, playClearSamplesWithoutKeys, eventHandler, eventListener, maxDroppedFramesToNotify);
     }
 
     @Override
-    protected void onEnabled(boolean joining) throws ExoPlaybackException {
-        startTime = System.currentTimeMillis();
-        super.onEnabled(joining);
-    }
-
-    @Override
     protected void configureCodec(MediaCodec codec, Format format, MediaCrypto crypto) {
         super.configureCodec(codec, format, crypto);
+
         enabled = (format.height == 1080 || format.height == 576);
+        startTime = System.currentTimeMillis();
     }
 
     @Override
     public void render(long positionUs, long elapsedRealtimeUs) throws ExoPlaybackException {
         long currentTime = System.currentTimeMillis();
+        long diffMs = currentTime - startTime;
 
-        if(enabled && currentTime - startTime > 13 * 60 * 1000) {
+        if(enabled && diffMs > 13 * 60 * 1000) {
             releaseCodec();
-            startTime = currentTime;
         }
 
         super.render(positionUs, elapsedRealtimeUs);
