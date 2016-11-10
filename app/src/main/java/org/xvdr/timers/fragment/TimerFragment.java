@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.service.DataService;
-import org.xvdr.robotv.service.DataServiceClient;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.timers.activity.TimerActivity;
@@ -36,7 +35,6 @@ import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
-import java.util.Collection;
 
 public class TimerFragment extends BrowseFragment implements DataService.Listener {
 
@@ -150,7 +148,6 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
     private EpgSearchLoader loader;
     private ProgressBarManager progress;
     private Handler handler;
-    private BackgroundManager backgroundManager;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

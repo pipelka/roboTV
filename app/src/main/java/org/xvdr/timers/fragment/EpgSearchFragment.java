@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Channels;
 import org.xvdr.robotv.service.DataService;
-import org.xvdr.robotv.service.DataServiceClient;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.recordings.model.Movie;
 import org.xvdr.timers.presenter.EpgEventPresenter;
@@ -36,7 +35,6 @@ import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
