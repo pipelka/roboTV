@@ -208,6 +208,10 @@ public class Event implements Serializable {
         return eventId;
     }
 
+    public void setChannelUid(int channelUid) {
+        this.channelUid = channelUid;
+    }
+
     public int getChannelUid() {
         return channelUid;
     }

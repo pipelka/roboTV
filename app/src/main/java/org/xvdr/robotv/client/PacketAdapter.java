@@ -98,12 +98,13 @@ public class PacketAdapter {
         timer.setFlags(flags);
         timer.setPriority(priority);
         timer.setLifeTime(lifeTime);
-        timer.setStartTime(startTime);
+        timer.setTimerStartTime(startTime);
         timer.setTimerEndTime(stopTime);
         timer.setSearchTimerId(searchTimerId);
         timer.setRecordingId(recordingId);
         timer.setLogoUrl(logoUrl);
+        timer.setChannelUid(channelUid);
 
-        return null;
+        return timer;
     }
 }

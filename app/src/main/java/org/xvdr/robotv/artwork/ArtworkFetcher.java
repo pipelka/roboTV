@@ -1,5 +1,6 @@
 package org.xvdr.robotv.artwork;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
@@ -38,7 +39,7 @@ public class ArtworkFetcher {
 
     public ArtworkHolder fetchForEvent(Event event) throws IOException {
         // sanity check
-        if(event.getTitle().isEmpty() || mProviders == null) {
+        if(TextUtils.isEmpty(event.getTitle()) || mProviders == null) {
             return null;
         }
 

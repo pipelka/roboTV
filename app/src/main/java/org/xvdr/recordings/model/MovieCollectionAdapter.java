@@ -6,57 +6,75 @@ import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.Presenter;
+import android.support.v17.leanback.widget.Row;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
+import org.xvdr.recordings.presenter.TimerPresenter;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.model.Movie;
+import org.xvdr.robotv.client.model.Timer;
 
 import java.util.Collection;
 import java.util.Comparator;
 
 public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
 
-    private MoviePresenter mCardPresenter;
-    private LatestCardPresenter mLatestCardPresenter;
-    private ArrayObjectAdapter mLatest;
-    private ArrayObjectAdapter mTvShows;
-    private Context mContext;
-
-    static public Comparator<Movie> compareTimestamps = new Comparator<Movie>() {
+    static public Comparator<Event> compareTimestamps = new Comparator<Event>() {
         @Override
-        public int compare(Movie lhs, Movie rhs) {
+        public int compare(Event lhs, Event rhs) {
             return lhs.getStartTime() > rhs.getStartTime() ? -1 : 1;
         }
     };
 
-    private static Comparator<ListRow> compareCategories = new Comparator<ListRow>() {
+    private static Comparator<Row> compareCategories = new Comparator<Row>() {
         @Override
-        public int compare(ListRow lhs, ListRow rhs) {
+        public int compare(Row lhs, Row rhs) {
             HeaderItem lhsHeader = lhs.getHeaderItem();
             HeaderItem rhsHeader = rhs.getHeaderItem();
+            int r;
 
             if(lhsHeader.getId() == 0) {
-                return -1;
+                r = -1;
             }
             else if(rhsHeader.getId() == 0) {
-                return 1;
+                r = 1;
             }
             else if(lhsHeader.getId() == 1) {
-                return -1;
+                r = -1;
             }
             else if(rhsHeader.getId() == 1) {
-                return 1;
+                r = 1;
             }
-            else if(lhsHeader.getId() == 1000) {
-                return 1;
+            else if(lhsHeader.getId() == 2) {
+                r = -1;
             }
-            else if(rhsHeader.getId() == 1000) {
-                return -1;
+            else if(rhsHeader.getId() == 2) {
+                r = 1;
+            }
+            else if(lhsHeader.getId() >= 900 && rhsHeader.getId() >= 900) {
+                if(lhsHeader.getId() == rhsHeader.getId()) {
+                    r = 0;
+                }
+                else {
+                    r = (lhsHeader.getId() < rhsHeader.getId()) ? -1 : 1;
+                }
+            }
+            else if(lhsHeader.getId() >= 900) {
+                r = 1;
+            }
+            else if(rhsHeader.getId() >= 900) {
+                r = -1;
+            }
+            else {
+                r = lhsHeader.getName().compareTo(rhsHeader.getName());
             }
 
-            return lhsHeader.getName().compareTo(rhsHeader.getName());
+            Log.d("MCA", "lhs: " + lhsHeader.getId() + " rhs: " + rhsHeader.getId() + " : " + r);
+            return r;
         }
     };
 
@@ -64,11 +82,20 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         boolean iterate(ArrayObjectAdapter adapter, Movie movie);
     }
 
+    final private MoviePresenter mCardPresenter;
+    final private LatestCardPresenter mLatestCardPresenter;
+    final private TimerPresenter timerPresenter;
+
+    private ArrayObjectAdapter mLatest;
+    private ArrayObjectAdapter mTvShows;
+    private Context mContext;
+
     public MovieCollectionAdapter(Context context) {
         super(compareCategories, new ListRowPresenter());
         mContext = context;
         mCardPresenter = new MoviePresenter();
         mLatestCardPresenter = new LatestCardPresenter();
+        timerPresenter = new TimerPresenter();
 
         clear();
     }
@@ -98,17 +125,24 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     private ArrayObjectAdapter getCategory(String category, boolean addNew, Presenter presenter) {
+        return getCategory(category, addNew, -1, presenter);
+    }
+
+    private ArrayObjectAdapter getCategory(String category, boolean addNew, int rowId, Presenter presenter) {
         if(TextUtils.isEmpty(category)) {
             return null;
         }
 
-        ListRow listrow;
+        Row listrow;
 
         for(int i = 0; i < size(); i++) {
-            listrow = (ListRow)get(i);
+            listrow = (Row)get(i);
 
             if(listrow.getHeaderItem().getName().equalsIgnoreCase(category)) {
-                return (ArrayObjectAdapter) listrow.getAdapter();
+                if(listrow instanceof ListRow) {
+                    return (ArrayObjectAdapter) ((ListRow)listrow).getAdapter();
+                }
+                return null;
             }
         }
 
@@ -116,11 +150,12 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             return null;
         }
 
-        HeaderItem header = new HeaderItem(size(), category);
+        int id = (rowId == -1) ? size() : rowId;
+        HeaderItem header = new HeaderItem(id, category);
         ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(compareTimestamps, presenter);
 
         listrow = new ListRow(header, listRowAdapter);
-        listrow.setId(size());
+        listrow.setId(id);
 
         add(listrow);
 
@@ -192,8 +227,13 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     private void iterateAll(MovieIterator iterator) {
         // all rows
         for(int row = 0; row < size(); row++) {
-            ListRow listrow = (ListRow)get(row);
-            ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) listrow.getAdapter();
+            Row listrow = (Row)get(row);
+
+            if(!(listrow instanceof ListRow)) {
+                continue;
+            }
+
+            ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) ((ListRow)listrow).getAdapter();
 
             // all items in the row
             for(int i = 0; i < rowAdapter.size();) {
@@ -227,7 +267,40 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         });
     }
 
-    synchronized public void load(Collection<Movie> movieCollection) {
+    public void loadTimers(Collection<Timer> timers) {
+        ArrayObjectAdapter timerAdapter = getTimerCategory();
+
+        if(timerAdapter == null) {
+            return;
+        }
+
+        timerAdapter.clear();
+
+        if(timers == null) {
+            return;
+        }
+
+        // insert all timers
+        for(Timer timer : timers) {
+            timerAdapter.add(timer);
+        }
+    }
+
+    public boolean hasTimerCategory() {
+        return
+            getCategory(mContext.getString(R.string.schedule_timers), false) != null ||
+            getCategory(mContext.getString(R.string.search_timers), false) != null;
+    }
+
+    private ArrayObjectAdapter getTimerCategory() {
+        return getCategory(mContext.getString(R.string.schedule_timers), true, 901, timerPresenter);
+    }
+
+    private ArrayObjectAdapter getSearchTimerCategory() {
+        return getCategory(mContext.getString(R.string.search_timers), true, 901, timerPresenter);
+    }
+
+    public void loadMovies(Collection<Movie> movieCollection) {
         // reset count
         iterateAll(new MovieIterator() {
             @Override
@@ -259,8 +332,14 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
 
         // update all rows
         for(int i = 0; i < size();) {
-            ListRow listRow = (ListRow)get(i);
-            ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) listRow.getAdapter();
+            Row listRow = (Row)get(i);
+
+            if(!(listRow instanceof ListRow)) {
+                i++;
+                continue;
+            }
+
+            ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) ((ListRow)listRow).getAdapter();
 
             if(rowAdapter.size() == 0) {
                 super.remove(listRow);

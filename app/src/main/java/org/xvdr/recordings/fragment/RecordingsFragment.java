@@ -15,6 +15,7 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 
 import android.support.v17.leanback.widget.Row;
+import android.support.v17.leanback.widget.SectionRow;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -23,19 +24,21 @@ import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
+import org.xvdr.robotv.client.TimerController;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
 import org.xvdr.recordings.presenter.PreferenceCardPresenter;
 import org.xvdr.recordings.util.BackgroundManagerTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.client.model.Timer;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.client.MovieController;
 import org.xvdr.robotv.service.NotificationHandler;
 
 import java.util.Collection;
 
-public class RecordingsFragment extends BrowseFragment implements DataService.Listener, MovieController.LoaderCallback {
+public class RecordingsFragment extends BrowseFragment implements DataService.Listener, MovieController.LoaderCallback, TimerController.LoaderCallback {
 
     private final static String TAG = "RecordingsFragment";
 
@@ -70,7 +73,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
             .into(backgroundManagerTarget);
     }
 
-    private void setupPreferences(ArrayObjectAdapter adapter) {
+    private void setupPreferences(MovieCollectionAdapter adapter) {
         if(adapter == null) {
             return;
         }
@@ -139,6 +142,10 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                     Movie movie = (Movie) item;
                     updateBackground(movie.getBackgroundUrl());
                 }
+                else if(item instanceof Timer) {
+                    Timer timer = (Timer) item;
+                    updateBackground(timer.getPosterUrl());
+                }
             }
         });
 
@@ -173,7 +180,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                 manager.disableProgressBar();
                 manager.hide();
 
-                mAdapter.load(collection);
+                mAdapter.loadMovies(collection);
 
                 if(getAdapter() == null) {
                     setupPreferences(mAdapter);
@@ -186,8 +193,14 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     }
 
     @Override
+    public void onTimersUpdated(Collection<Timer> timers) {
+        mAdapter.loadTimers(timers);
+    }
+
+    @Override
     public void onConnected(DataService service) {
         service.getMovieController().loadMovieCollection(this);
+        service.getTimerController().loadTimers(this);
     }
 
     @Override
@@ -197,6 +210,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     @Override
     public void onMovieUpdate(DataService service) {
         service.getMovieController().loadMovieCollection(this);
+        service.getTimerController().loadTimers(this);
     }
 
 }

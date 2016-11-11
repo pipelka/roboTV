@@ -123,4 +123,7 @@
     <string name="timer_created">Timer created</string>
     <string name="failed_create_timer">Failed to create timer !</string>
     <string name="error">Error</string>
+    <string name="schedule_timers">Scheduled</string>
+    <string name="timers">Timers</string>
+    <string name="search_timers">Searchtimers</string>
 </resources>
