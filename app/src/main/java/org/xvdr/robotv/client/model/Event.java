@@ -124,6 +124,21 @@ public class Event implements Serializable {
 
     private static int genreSoapMaxLength = 65 * 60; // 65 min
 
+    public Event(Event event) {
+        this(
+            event.contentId,
+            event.title,
+            event.shortText,
+            event.description,
+            event.duration,
+            event.eventId,
+            event.channelUid
+        );
+
+        year = event.year;
+        startTime = event.startTime;
+    }
+
     public Event(int contentId, String title, String subTitle, String plot, int durationSec) {
         this(contentId, title, subTitle, plot, durationSec, 0);
     }
