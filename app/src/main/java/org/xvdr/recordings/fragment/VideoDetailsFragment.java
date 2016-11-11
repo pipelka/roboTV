@@ -228,7 +228,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
                     return episode1.season > episode2.season ? -1 : 1;
                 }
 
-                return lhs.getTimeStamp() > rhs.getTimeStamp() ? -1 : 1;
+                return lhs.getStartTime() > rhs.getStartTime() ? -1 : 1;
             }
         };
 

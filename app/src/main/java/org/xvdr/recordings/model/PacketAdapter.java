@@ -6,7 +6,7 @@ public class PacketAdapter {
 
     public static Movie toMovie(Packet p) {
 
-        long timeStamp = p.getU32() * 1000L;    // timestamp
+        long startTime = p.getU32();            // start time
         int duration = (int)p.getU32();         // duration
         p.getU32();                             // Priority
         p.getU32();                             // Lifetime
@@ -27,7 +27,7 @@ public class PacketAdapter {
             movie.setShortText(movie.getDate());
         }
 
-        movie.setTimeStamp(timeStamp);
+        movie.setStartTime(startTime);
         movie.setFolder(folder); // directory / folder
         movie.setChannelName(channelName);
         movie.setRecordingId(recId);

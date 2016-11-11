@@ -26,7 +26,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     static public Comparator<Movie> compareTimestamps = new Comparator<Movie>() {
         @Override
         public int compare(Movie lhs, Movie rhs) {
-            return lhs.getTimeStamp() > rhs.getTimeStamp() ? -1 : 1;
+            return lhs.getStartTime() > rhs.getStartTime() ? -1 : 1;
         }
     };
 

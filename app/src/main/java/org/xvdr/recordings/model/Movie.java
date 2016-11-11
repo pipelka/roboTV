@@ -4,7 +4,6 @@ import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.Event;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Movie extends Event {
@@ -12,7 +11,6 @@ public class Movie extends Event {
     private String folder;
     private String posterUrl;
     private String backgroundUrl;
-    private long timeStamp;
     private String recordingId;
     private String channelName;
     private int channelUid;
@@ -34,6 +32,8 @@ public class Movie extends Event {
                 event.getEventId(),
                 event.getChannelUid()
         );
+
+        setStartTime(event.getStartTime());
     }
 
     public String getFolder() {
@@ -58,14 +58,6 @@ public class Movie extends Event {
 
     public void setBackgroundUrl(String backgroundImageUrl) {
         this.backgroundUrl = backgroundImageUrl;
-    }
-
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
-    public long getTimeStamp() {
-        return timeStamp;
     }
 
     public long getDurationMs() {
@@ -105,11 +97,11 @@ public class Movie extends Event {
     }
 
     public String getDate() {
-        return DateFormat.getDateInstance().format(new Date(timeStamp));
+        return DateFormat.getDateInstance().format(new Date(getStartTime() * 1000));
     }
 
     public String getDateTime() {
-        return DateFormat.getDateTimeInstance().format(new Date(timeStamp));
+        return DateFormat.getDateTimeInstance().format(new Date(getStartTime() * 1000));
     }
 
     void setPlayCount(int count) {
@@ -149,20 +141,11 @@ public class Movie extends Event {
                ", posterUrl=\'" + posterUrl + "\'" +
                ", backgroundUrl=\'" + backgroundUrl + "\'" +
                ", episodeCount=\'" + episodeCount + "\'" +
-               ", timeStamp=\'" + timeStamp + "\'" +
                ", recordingId=\'" + recordingId + "\'" +
                ", channelUid=\'" + channelUid + "\'" +
                ", channelName=\'" + channelName + "\'" +
                ", playCount=\'" + playCount + "\'" +
                "}";
-    }
-
-    public void setStartTime(long startTime) {
-        this.timeStamp = startTime * 1000;
-    }
-
-    public long getStartTime() {
-        return timeStamp / 1000;
     }
 
     public int getEpisodeCount() {

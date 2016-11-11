@@ -99,10 +99,8 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
                 }
 
                 final Movie movie = new Movie(event);
-                movie.setTimeStamp(event.getTimestamp().getTime());
                 movie.setChannelName(channelName);
                 movie.setArtwork(art);
-                movie.setTimeStamp(startTime * 1000);
                 movie.setChannelUid(channelUid);
 
                 rowAdapter.add(movie);

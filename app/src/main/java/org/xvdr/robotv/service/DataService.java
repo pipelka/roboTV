@@ -268,7 +268,7 @@ public class DataService extends Service {
             name += movie.getTitle();
         }
 
-        return timer.create(movie.getChannelUid(), movie.getStartTime(), (int)movie.getDuration(), name);
+        return timer.create(movie.getChannelUid(), movie.getStartTime(), movie.getDuration(), name);
     }
 
     public Connection getConnection() {

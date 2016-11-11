@@ -128,10 +128,8 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 ArrayObjectAdapter adapter = (ArrayObjectAdapter) row.getAdapter();
 
                 final Movie movie = new Movie(event);
-                movie.setTimeStamp(event.getTimestamp().getTime());
                 movie.setChannelName(channelName);
                 movie.setChannelUid(channelId);
-                movie.setStartTime(event.getStartTime());
 
                 // fetch artwork
                 try {

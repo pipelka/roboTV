@@ -317,7 +317,7 @@ public class Event implements Serializable {
         return false;
     }
 
-    void setStartTime(long startTime) {
+    public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
 
