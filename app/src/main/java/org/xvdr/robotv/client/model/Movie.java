@@ -10,7 +10,7 @@ public class Movie extends Event {
     private String folder;
     private String posterUrl;
     private String backgroundUrl;
-    private String recordingId;
+    private int recordingId;
     private String channelName;
     private int channelUid;
     private boolean isSeriesHeader = false;
@@ -63,11 +63,11 @@ public class Movie extends Event {
         return getDuration() * 1000;
     }
 
-    public void setRecordingId(String id) {
+    public void setRecordingId(int id) {
         this.recordingId = id;
     }
 
-    public String getRecordingId() {
+    public int getRecordingId() {
         return recordingId;
     }
 
@@ -153,5 +153,9 @@ public class Movie extends Event {
 
     public void setEpisodeCount(int count) {
         episodeCount = count;
+    }
+
+    public String getRecordingIdString() {
+        return Integer.toString(recordingId, 16);
     }
 }

@@ -31,7 +31,7 @@ public class RelatedContentExtractor {
 
     public Collection<Movie> getRelatedMovies(Movie movie) {
         for(Movie m : collection) {
-            if (m.getRecordingId().equals(movie.getRecordingId())) {
+            if (m.getRecordingId() == movie.getRecordingId()) {
                 continue;
             }
 

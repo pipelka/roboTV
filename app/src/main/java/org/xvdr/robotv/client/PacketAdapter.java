@@ -36,7 +36,7 @@ public class PacketAdapter {
         movie.setStartTime(startTime);
         movie.setFolder(folder); // directory / folder
         movie.setChannelName(channelName);
-        movie.setRecordingId(recId);
+        movie.setRecordingId(Integer.parseInt(recId, 16));
         movie.setPlayCount(playCount);
         movie.setPosterUrl(posterUrl);
         movie.setBackgroundUrl(backgroundUrl);

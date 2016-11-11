@@ -97,9 +97,9 @@ public class MovieController {
 
     private void setArtwork(Movie movie, ArtworkHolder holder) {
         // update local movie list
-        String id = movie.getRecordingId();
+        int id = movie.getRecordingId();
         for(Movie m : movieCollection) {
-            if (m.getRecordingId().equals(id)) {
+            if (m.getRecordingId() == id) {
                 Log.d(TAG, "updating movie entry " + id);
                 m.setArtwork(holder);
                 break;

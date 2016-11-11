@@ -119,7 +119,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         for(int i = 0; i < adapter.size(); i++) {
             Movie item = (Movie) adapter.get(i);
 
-            if(item.getRecordingId().equals(movie.getRecordingId())) {
+            if(item.getRecordingId() == movie.getRecordingId()) {
                 return item;
             }
         }
@@ -266,8 +266,8 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         iterateAll(new MovieIterator() {
             @Override
             public boolean iterate(ArrayObjectAdapter adapter, Movie m) {
-                String id = m.getRecordingId();
-                if(!TextUtils.isEmpty(id) && id.equals(movie.getRecordingId())) {
+                int id = m.getRecordingId();
+                if(id == movie.getRecordingId()) {
                     adapter.remove(m);
                     return true;
                 }

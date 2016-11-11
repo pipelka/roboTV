@@ -137,7 +137,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
             return;
         }
 
-        String id = mSelectedMovie.getRecordingId();
+        String id = mSelectedMovie.getRecordingIdString();
 
         mPlayer.open(Player.createRecordingUri(id));
         mControls.togglePlayback(true);
