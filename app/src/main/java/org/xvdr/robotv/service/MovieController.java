@@ -8,7 +8,6 @@ import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
 import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.setup.SetupUtils;
 
 import java.util.Collection;
 import java.util.TreeSet;
@@ -27,13 +26,13 @@ public class MovieController {
 
     final private Connection connection;
     final private Handler handler;
+    final private String language;
 
     private Collection<Movie> movieCollection = null;
-    private DataService service;
     private TreeSet<String> folderList;
 
-    MovieController(DataService service, Connection connection) {
-        this.service = service;
+    MovieController(Connection connection, String language) {
+        this.language = language;
         this.connection = connection;
         this.handler = new Handler();
         this.folderList = new TreeSet<>();
@@ -61,7 +60,7 @@ public class MovieController {
             }
         });
 
-        MovieCollectionLoaderTask loaderTask = new MovieCollectionLoaderTask(connection, SetupUtils.getLanguage(service));
+        MovieCollectionLoaderTask loaderTask = new MovieCollectionLoaderTask(connection, language);
         loaderTask.load(new MovieCollectionLoaderTask.Listener() {
             @Override
             public void onCompleted(Collection<Movie> list) {

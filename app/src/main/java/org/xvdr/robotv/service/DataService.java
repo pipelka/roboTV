@@ -170,7 +170,7 @@ public class DataService extends Service {
         connection.setCallback(mSessionListener);
 
         artwork = new ArtworkFetcher(connection, SetupUtils.getLanguage(this));
-        movieController = new MovieController(this, connection);
+        movieController = new MovieController(connection, SetupUtils.getLanguage(this));
     }
 
     @Override
