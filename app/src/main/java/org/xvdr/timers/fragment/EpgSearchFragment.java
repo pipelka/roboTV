@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Channels;
+import org.xvdr.robotv.client.PacketAdapter;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.robotv.client.model.Movie;
@@ -28,7 +29,6 @@ import org.xvdr.timers.presenter.EpgEventPresenter;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.artwork.ArtworkUtils;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.setup.SetupUtils;
@@ -120,7 +120,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             // process result
             int count = 0;
             while(!resp.eop() && !isCancelled()) {
-                final Event event = ArtworkUtils.packetToEvent(resp);
+                final Event event = PacketAdapter.toEvent(resp);
                 String channelName = resp.getString();
                 int channelId = (int) resp.getU32();
 
