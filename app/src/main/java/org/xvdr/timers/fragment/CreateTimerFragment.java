@@ -80,7 +80,7 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
             return;
         }
 
-        if(service.createTimer(movie)) {
+        if(service.getTimerController().createTimer(movie, service.getSeriesFolder())) {
             notificationHandler.notify(getString(R.string.timer_created), movie.getTitle(), getDrawable());
             return;
         }

@@ -16,7 +16,7 @@ import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
 import org.xvdr.robotv.artwork.Event;
 import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.Timer;
+import org.xvdr.robotv.client.TimerController;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
@@ -39,6 +39,7 @@ public class DataService extends Service {
     private NotificationHandler notification;
     private ArtworkFetcher artwork;
     private MovieController movieController;
+    private TimerController timerController;
 
     private int connectionStatus = STATUS_Server_NotConnected;
     private String seriesFolder = null;
@@ -171,6 +172,7 @@ public class DataService extends Service {
 
         artwork = new ArtworkFetcher(connection, SetupUtils.getLanguage(this));
         movieController = new MovieController(connection, SetupUtils.getLanguage(this));
+        timerController = new TimerController(connection);
     }
 
     @Override
@@ -253,28 +255,6 @@ public class DataService extends Service {
         return seriesFolder;
     }
 
-    public boolean createTimer(Movie movie) {
-        String name;
-        Timer timer = new Timer(connection);
-
-        String category = movie.getFolder();
-
-        if(category.equals(getSeriesFolder())) {
-            name = getSeriesFolder() + "~" + movie.getTitle() + "~" + movie.getShortText();
-        }
-        else {
-            name = category;
-
-            if (!name.isEmpty()) {
-                name += "~";
-            }
-
-            name += movie.getTitle();
-        }
-
-        return timer.create(movie.getChannelUid(), movie.getStartTime(), movie.getDuration(), name);
-    }
-
     public Connection getConnection() {
         return connection;
     }
@@ -293,6 +273,10 @@ public class DataService extends Service {
 
     public MovieController getMovieController() {
         return movieController;
+    }
+
+    public TimerController getTimerController() {
+        return timerController;
     }
 
     // post open request
