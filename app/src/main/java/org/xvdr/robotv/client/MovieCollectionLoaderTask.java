@@ -1,4 +1,4 @@
-package org.xvdr.robotv.service;
+package org.xvdr.robotv.client;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -9,7 +9,6 @@ import org.xvdr.recordings.model.PacketAdapter;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
-import org.xvdr.robotv.client.Connection;
 
 import java.io.IOException;
 import java.util.ArrayList;

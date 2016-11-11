@@ -10,9 +10,9 @@ public class TimerController {
     private static final String TAG = "TimerController";
 
     private Connection connection;
-    private int mPreStartRecording = 2 * 60;
-    private int mPostEndRecording = 5 * 60;
-    private int mPriority = 80;
+    private int preStartRecording = 2 * 60;
+    private int postEndRecording = 5 * 60;
+    private int priority = 80;
 
     public TimerController(Connection connection) {
         this.connection = connection;
@@ -51,11 +51,11 @@ public class TimerController {
         Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_ADD);
         request.putU32(0); // index unused
         request.putU32(1 + 4); // active timer + VPS
-        request.putU32(mPriority); // Priority
+        request.putU32(priority); // Priority
         request.putU32(99); // Lifetime
         request.putU32(channelUid); // channel uid
-        request.putU32(startTime - mPreStartRecording); // start time
-        request.putU32(startTime + duration + mPostEndRecording); // end time
+        request.putU32(startTime - preStartRecording); // start time
+        request.putU32(startTime + duration + postEndRecording); // end time
         request.putU32(0); // day
         request.putU32(0); // weeksdays
         request.putString(mapRecordingName(name)); // recording name

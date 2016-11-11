@@ -16,7 +16,7 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
-import org.xvdr.robotv.service.MovieController;
+import org.xvdr.robotv.client.MovieController;
 
 public class MovieStepFragment extends GuidedStepFragment {
 

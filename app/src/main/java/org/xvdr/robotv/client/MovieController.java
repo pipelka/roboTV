@@ -1,4 +1,4 @@
-package org.xvdr.robotv.service;
+package org.xvdr.robotv.client;
 
 import android.os.Handler;
 import android.util.Log;
@@ -7,7 +7,6 @@ import org.xvdr.recordings.model.Movie;
 import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
-import org.xvdr.robotv.client.Connection;
 
 import java.util.Collection;
 import java.util.TreeSet;
@@ -31,7 +30,7 @@ public class MovieController {
     private Collection<Movie> movieCollection = null;
     private TreeSet<String> folderList;
 
-    MovieController(Connection connection, String language) {
+    public MovieController(Connection connection, String language) {
         this.language = language;
         this.connection = connection;
         this.handler = new Handler();
