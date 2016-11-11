@@ -64,7 +64,7 @@ public class Movie extends Event {
         return getDuration() * 1000;
     }
 
-    void setRecordingId(String id) {
+    public void setRecordingId(String id) {
         this.recordingId = id;
     }
 
@@ -104,7 +104,7 @@ public class Movie extends Event {
         return DateFormat.getDateTimeInstance().format(new Date(getStartTime() * 1000));
     }
 
-    void setPlayCount(int count) {
+    public void setPlayCount(int count) {
         playCount = count;
     }
 

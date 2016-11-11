@@ -5,7 +5,6 @@ import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.recordings.model.Movie;
-import org.xvdr.recordings.model.PacketAdapter;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;

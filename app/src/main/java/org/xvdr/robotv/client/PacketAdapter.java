@@ -1,6 +1,7 @@
-package org.xvdr.recordings.model;
+package org.xvdr.robotv.client;
 
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.recordings.model.Movie;
 
 public class PacketAdapter {
 
