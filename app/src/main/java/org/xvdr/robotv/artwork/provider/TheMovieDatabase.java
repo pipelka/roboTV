@@ -6,7 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.artwork.Event;
+import org.xvdr.robotv.client.model.Event;
 
 import java.io.IOException;
 import java.net.URLEncoder;

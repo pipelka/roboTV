@@ -1,7 +1,6 @@
-package org.xvdr.recordings.model;
+package org.xvdr.robotv.client.model;
 
 import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.artwork.Event;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -112,7 +111,7 @@ public class Movie extends Event {
         return playCount;
     }
 
-    void setSeriesHeader() {
+    public void setSeriesHeader() {
         isSeriesHeader = true;
     }
 
@@ -152,7 +151,7 @@ public class Movie extends Event {
         return episodeCount;
     }
 
-    void setEpisodeCount(int count) {
+    public void setEpisodeCount(int count) {
         episodeCount = count;
     }
 }

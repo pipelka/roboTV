@@ -2,7 +2,7 @@ package org.xvdr.recordings.presenter;
 
 import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
 
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 
 public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPresenter {
     @Override

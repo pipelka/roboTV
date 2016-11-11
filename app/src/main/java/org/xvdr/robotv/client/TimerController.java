@@ -3,7 +3,7 @@ package org.xvdr.robotv.client;
 import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 
 public class TimerController {
 

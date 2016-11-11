@@ -9,6 +9,7 @@ import org.xvdr.robotv.artwork.provider.RoboTvProvider;
 import org.xvdr.robotv.artwork.provider.StockImageProvider;
 import org.xvdr.robotv.artwork.provider.TheMovieDatabase;
 import org.xvdr.robotv.client.Connection;
+import org.xvdr.robotv.client.model.Event;
 
 import java.io.IOException;
 

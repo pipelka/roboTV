@@ -28,7 +28,7 @@ import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.player.Player;
 import org.xvdr.recordings.activity.PlayerActivity;
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.presenter.ActionPresenterSelector;
 import org.xvdr.recordings.presenter.ColorAction;
 import org.xvdr.recordings.presenter.DetailsDescriptionPresenter;

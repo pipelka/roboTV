@@ -1,5 +1,7 @@
 package org.xvdr.recordings.model;
 
+import org.xvdr.robotv.client.model.Movie;
+
 import java.util.ArrayList;
 import java.util.Collection;
 

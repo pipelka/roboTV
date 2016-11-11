@@ -17,7 +17,7 @@ import android.text.TextUtils;
 
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.recordings.activity.DetailsActivity;
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
 import org.xvdr.robotv.client.PacketAdapter;
 import org.xvdr.recordings.model.SortedArrayObjectAdapter;

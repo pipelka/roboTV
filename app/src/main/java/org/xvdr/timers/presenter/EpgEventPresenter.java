@@ -5,7 +5,7 @@ import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.text.TextUtils;
 
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;

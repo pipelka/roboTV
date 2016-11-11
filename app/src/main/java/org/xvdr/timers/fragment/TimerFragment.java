@@ -21,14 +21,14 @@ import android.view.ViewGroup;
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.activity.EpgSearchActivity;
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.timers.activity.TimerActivity;
 import org.xvdr.timers.presenter.EpgEventPresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.artwork.Event;
+import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.setup.SetupUtils;
 

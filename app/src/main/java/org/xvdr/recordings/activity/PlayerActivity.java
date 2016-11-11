@@ -19,7 +19,7 @@ import com.google.android.exoplayer2.Format;
 import org.xvdr.player.Player;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.NotificationHandler;

@@ -23,7 +23,7 @@ import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
 import org.xvdr.recordings.presenter.PreferenceCardPresenter;
 import org.xvdr.recordings.util.BackgroundManagerTarget;

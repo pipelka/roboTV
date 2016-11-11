@@ -1,4 +1,4 @@
-package org.xvdr.robotv.artwork;
+package org.xvdr.robotv.client.model;
 
 import android.text.TextUtils;
 

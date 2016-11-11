@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 

@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.client.model.Movie;
 
 import java.util.Collection;
 import java.util.Comparator;

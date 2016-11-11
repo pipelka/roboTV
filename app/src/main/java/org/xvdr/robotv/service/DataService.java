@@ -13,7 +13,7 @@ import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
-import org.xvdr.robotv.artwork.Event;
+import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.MovieController;
 import org.xvdr.robotv.client.TimerController;

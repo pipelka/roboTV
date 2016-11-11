@@ -3,7 +3,7 @@ package org.xvdr.robotv.client;
 import android.os.Handler;
 import android.util.Log;
 
-import org.xvdr.recordings.model.Movie;
+import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
