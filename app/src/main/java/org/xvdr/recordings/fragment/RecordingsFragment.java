@@ -213,4 +213,9 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
         service.getTimerController().loadTimers(this);
     }
 
+    @Override
+    public void onTimersUpdated(DataService service) {
+        service.getTimerController().loadTimers(this);
+    }
+
 }

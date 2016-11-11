@@ -17,10 +17,12 @@ import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.MovieController;
 import org.xvdr.robotv.client.TimerController;
+import org.xvdr.robotv.client.model.Timer;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class DataService extends Service {
 
@@ -48,6 +50,7 @@ public class DataService extends Service {
         void onConnected(DataService service);
         void onConnectionError(DataService service);
         void onMovieUpdate(DataService service);
+        void onTimersUpdated(DataService service);
     }
 
     public class Binder extends android.os.Binder {
@@ -81,6 +84,10 @@ public class DataService extends Service {
 
                 case Connection.XVDR_STATUS_RECORDINGSCHANGE:
                     postOnMovieUpdate();
+                    break;
+
+                case Connection.XVDR_STATUS_TIMERCHANGE:
+                    postOnTimersUpdate();
                     break;
             }
         }
@@ -334,6 +341,17 @@ public class DataService extends Service {
             public void run() {
                 for (int i = 0; i < listeners.size(); i++) {
                     listeners.get(i).onMovieUpdate(DataService.this);
+                }
+            }
+        });
+    }
+
+    private void postOnTimersUpdate() {
+        listenerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < listeners.size(); i++) {
+                    listeners.get(i).onTimersUpdated(DataService.this);
                 }
             }
         });

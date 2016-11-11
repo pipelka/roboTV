@@ -419,4 +419,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
     public void onMovieUpdate(DataService service) {
     }
 
+    @Override
+    public void onTimersUpdated(DataService service) {
+    }
+
 }

@@ -30,6 +30,13 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         }
     };
 
+    private static Comparator<Event> compareTimestampsReverse = new Comparator<Event>() {
+        @Override
+        public int compare(Event lhs, Event rhs) {
+            return lhs.getStartTime() < rhs.getStartTime() ? -1 : 1;
+        }
+    };
+
     private static Comparator<Row> compareCategories = new Comparator<Row>() {
         @Override
         public int compare(Row lhs, Row rhs) {
@@ -125,10 +132,10 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     private ArrayObjectAdapter getCategory(String category, boolean addNew, Presenter presenter) {
-        return getCategory(category, addNew, -1, presenter);
+        return getCategory(category, addNew, -1, presenter, false);
     }
 
-    private ArrayObjectAdapter getCategory(String category, boolean addNew, int rowId, Presenter presenter) {
+    private ArrayObjectAdapter getCategory(String category, boolean addNew, int rowId, Presenter presenter, boolean reverse) {
         if(TextUtils.isEmpty(category)) {
             return null;
         }
@@ -152,7 +159,10 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
 
         int id = (rowId == -1) ? size() : rowId;
         HeaderItem header = new HeaderItem(id, category);
-        ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(compareTimestamps, presenter);
+
+        ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(
+                reverse ? compareTimestampsReverse : compareTimestamps,
+                presenter);
 
         listrow = new ListRow(header, listRowAdapter);
         listrow.setId(id);
@@ -293,11 +303,11 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     private ArrayObjectAdapter getTimerCategory() {
-        return getCategory(mContext.getString(R.string.schedule_timers), true, 901, timerPresenter);
+        return getCategory(mContext.getString(R.string.schedule_timers), true, 901, timerPresenter, true);
     }
 
     private ArrayObjectAdapter getSearchTimerCategory() {
-        return getCategory(mContext.getString(R.string.search_timers), true, 901, timerPresenter);
+        return getCategory(mContext.getString(R.string.search_timers), true, 901, timerPresenter, true);
     }
 
     public void loadMovies(Collection<Movie> movieCollection) {

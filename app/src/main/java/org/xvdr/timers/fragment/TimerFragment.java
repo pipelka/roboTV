@@ -217,6 +217,10 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
     public void onMovieUpdate(DataService service) {
     }
 
+    @Override
+    public void onTimersUpdated(DataService service) {
+    }
+
     private void loadEpgForChannel() {
         loader = new EpgSearchLoader();
         loader.execute();

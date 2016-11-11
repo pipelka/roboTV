@@ -263,4 +263,8 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     public void onMovieUpdate(DataService service) {
     }
 
+    @Override
+    public void onTimersUpdated(DataService service) {
+    }
+
 }
