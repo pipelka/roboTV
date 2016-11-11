@@ -1,27 +1,40 @@
 package org.xvdr.robotv.client;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.robotv.artwork.ArtworkFetcher;
+import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.model.Movie;
+import org.xvdr.robotv.client.model.Timer;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class TimerController {
 
+    public interface LoaderCallback {
+        void onTimersUpdated(Collection<Timer> timers);
+    }
+
     private static final String TAG = "TimerController";
 
-    private Connection connection;
+    final private Connection connection;
+    final private String language;
+
     private int preStartRecording = 2 * 60;
     private int postEndRecording = 5 * 60;
     private int priority = 80;
 
-    public TimerController(Connection connection) {
+    public TimerController(Connection connection, String language) {
         this.connection = connection;
+        this.language = language;
     }
 
     public boolean createTimer(Movie movie, String seriesFolder) {
         String name;
-        TimerController timer = new TimerController(connection);
-
         String category = movie.getFolder();
 
         if(category.equals(seriesFolder)) {
@@ -37,9 +50,8 @@ public class TimerController {
             name += movie.getTitle();
         }
 
-        return timer.createTimer(movie.getChannelUid(), movie.getStartTime(), movie.getDuration(), name);
+        return createTimer(movie.getChannelUid(), movie.getStartTime(), movie.getDuration(), name);
     }
-
 
     public boolean createTimer(int channelUid, long startTime, int duration, String name) {
         Log.d(TAG, "CREATE TIMER");
@@ -68,6 +80,56 @@ public class TimerController {
         }
 
         return response.getU32() == 0;
+    }
+
+    public void loadTimers(final LoaderCallback listener) {
+        AsyncTask<Void, Void, Collection<Timer>> task = new AsyncTask<Void, Void, Collection<Timer>>() {
+
+            @Override
+            protected Collection<Timer> doInBackground(Void... params) {
+                ArtworkFetcher fetcher = new ArtworkFetcher(connection, language);
+                Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_GETLIST);
+                Packet response = connection.transmitMessage(request);
+
+                if(response == null) {
+                    return null;
+                }
+
+                int count = (int) response.getU32();
+                Collection<Timer> timers = new ArrayList<>(count);
+
+                while(!response.eop()) {
+                    Timer timer = PacketAdapter.toTimer(response);
+
+                    ArtworkHolder o = null;
+
+                    try {
+                        o = fetcher.fetchForEvent(timer);
+                    }
+                    catch(IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(o != null) {
+                        timer.setPosterUrl(o.getBackgroundUrl());
+                    }
+
+                    timers.add(timer);
+                }
+
+                return timers;
+            }
+
+            @Override
+            protected void onPostExecute(Collection<Timer> result) {
+                if(listener != null) {
+                    listener.onTimersUpdated(result);
+                }
+            }
+
+        };
+
+        task.execute();
     }
 
     private String mapRecordingName(String name) {

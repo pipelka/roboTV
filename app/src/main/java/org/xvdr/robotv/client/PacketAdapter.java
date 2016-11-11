@@ -3,6 +3,7 @@ package org.xvdr.robotv.client;
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.model.Movie;
+import org.xvdr.robotv.client.model.Timer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,4 +70,40 @@ public class PacketAdapter {
         return e;
     }
 
+    public static Timer toTimer(Packet response) {
+
+        int id = (int) response.getU32();               // id
+        int flags = (int) response.getU32();            // timer flags
+        int priority = (int) response.getU32();         // timer priority
+        int lifeTime = (int) response.getU32();         // lifetime
+        int channelUid = (int) response.getU32();       // channel uid
+        int startTime = (int) response.getU32();        // timer start timer
+        int stopTime = (int) response.getU32();         // timer stop time
+        int searchTimerId = (int) response.getU32();    // search timer id
+        int recordingId = (int) response.getU32();      // id of recording
+        String logoUrl = response.getString();          // logo url
+
+        boolean hasEvent = (response.getU8() == 1);
+        Event event;
+
+        if(hasEvent) {
+            event = PacketAdapter.toEvent(response);
+        }
+        else {
+            event = new Event(0, "", "", "", stopTime - startTime, 0, channelUid);
+            event.setStartTime(startTime);
+        }
+
+        Timer timer = new Timer(id, event);
+        timer.setFlags(flags);
+        timer.setPriority(priority);
+        timer.setLifeTime(lifeTime);
+        timer.setStartTime(startTime);
+        timer.setTimerEndTime(stopTime);
+        timer.setSearchTimerId(searchTimerId);
+        timer.setRecordingId(recordingId);
+        timer.setLogoUrl(logoUrl);
+
+        return null;
+    }
 }
