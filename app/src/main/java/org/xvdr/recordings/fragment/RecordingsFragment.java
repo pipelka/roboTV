@@ -191,6 +191,10 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     }
 
     @Override
+    public void onConnectionError(DataService service) {
+    }
+
+    @Override
     public void onMovieUpdate(DataService service) {
         service.getMovieController().loadMovieCollection(this);
     }

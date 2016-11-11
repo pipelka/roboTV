@@ -210,6 +210,10 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
     }
 
     @Override
+    public void onConnectionError(DataService service) {
+    }
+
+    @Override
     public void onMovieUpdate(DataService service) {
     }
 

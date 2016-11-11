@@ -45,6 +45,7 @@ public class DataService extends Service {
 
     public interface Listener {
         void onConnected(DataService service);
+        void onConnectionError(DataService service);
         void onMovieUpdate(DataService service);
     }
 
@@ -188,7 +189,10 @@ public class DataService extends Service {
         connectionStatus = STATUS_Server_Connecting;
         connection.setPriority(1); // low priority for DataService
         if(!connection.open(SetupUtils.getServer(this))) {
+            connection.close();
             connectionStatus = STATUS_Server_NotConnected;
+            postOnConnectionError();
+
             return false;
         }
 
@@ -287,10 +291,6 @@ public class DataService extends Service {
         listeners.remove(listener);
     }
 
-    public int getConnectionStatus() {
-        return connectionStatus;
-    }
-
     public MovieController getMovieController() {
         return movieController;
     }
@@ -298,6 +298,7 @@ public class DataService extends Service {
     // post open request
 
     private void postOpen() {
+        Log.d(TAG, "postOpen");
         handler.removeCallbacks(mOpenRunnable);
         handler.post(mOpenRunnable);
     }
@@ -318,11 +319,24 @@ public class DataService extends Service {
     }
 
     private void postOnConnected() {
+        Log.d(TAG, "postOnConnected");
         listenerHandler.post(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < listeners.size(); i++) {
                     listeners.get(i).onConnected(DataService.this);
+                }
+            }
+        });
+    }
+
+    private void postOnConnectionError() {
+        Log.d(TAG, "postOnConnectionError");
+        listenerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < listeners.size(); i++) {
+                    listeners.get(i).onConnectionError(DataService.this);
                 }
             }
         });

@@ -256,6 +256,10 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     }
 
     @Override
+    public void onConnectionError(DataService service) {
+    }
+
+    @Override
     public void onMovieUpdate(DataService service) {
     }
 
