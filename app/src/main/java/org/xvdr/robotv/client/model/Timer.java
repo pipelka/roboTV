@@ -98,4 +98,8 @@ public class Timer extends Event {
     public void setPosterUrl(String posterUrl) {
         this.posterUrl = posterUrl;
     }
+
+    public boolean isRecording() {
+        return (flags & 8) == 8;
+    }
 }

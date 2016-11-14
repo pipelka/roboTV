@@ -132,6 +132,64 @@ public class TimerController {
         task.execute();
     }
 
+    public void loadSearchTimers(final LoaderCallback listener) {
+        AsyncTask<Void, Void, Collection<Timer>> task = new AsyncTask<Void, Void, Collection<Timer>>() {
+
+            @Override
+            protected Collection<Timer> doInBackground(Void... params) {
+                ArtworkFetcher fetcher = new ArtworkFetcher(connection, language);
+                Packet request = connection.CreatePacket(Connection.ROBOTV_SEARCHTIMER_GETLIST);
+                Packet response = connection.transmitMessage(request);
+
+                if(response == null) {
+                    return null;
+                }
+
+                response.uncompress();
+
+                int status = (int) response.getU32();
+
+                if(status != 0) {
+                    Log.e(TAG, "error loading search timers. status: " + status);
+                    return null;
+                }
+
+                Collection<Timer> timers = new ArrayList<>(10);
+
+                while(!response.eop()) {
+                    Timer timer = PacketAdapter.toSearchTimer(response);
+
+                    ArtworkHolder o = null;
+
+                    try {
+                        o = fetcher.fetchForEvent(timer);
+                    }
+                    catch(IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(o != null) {
+                        timer.setPosterUrl(o.getBackgroundUrl());
+                    }
+
+                    timers.add(timer);
+                }
+
+                return timers;
+            }
+
+            @Override
+            protected void onPostExecute(Collection<Timer> result) {
+                if(listener != null) {
+                    listener.onTimersUpdated(result);
+                }
+            }
+
+        };
+
+        task.execute();
+    }
+
     private String mapRecordingName(String name) {
         return name.replace(' ', '_').replace(':', '_');
     }
