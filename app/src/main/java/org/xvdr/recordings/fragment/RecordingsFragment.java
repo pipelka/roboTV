@@ -35,6 +35,7 @@ import org.xvdr.robotv.client.model.Timer;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.client.MovieController;
 import org.xvdr.robotv.service.NotificationHandler;
+import org.xvdr.robotv.setup.SetupUtils;
 
 import java.util.Collection;
 
@@ -180,7 +181,9 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                 manager.disableProgressBar();
                 manager.hide();
 
-                mAdapter.loadMovies(collection);
+                if(status == MovieController.STATUS_Collection_Ready) {
+                    mAdapter.loadMovies(collection);
+                }
 
                 if(getAdapter() == null) {
                     setupPreferences(mAdapter);
@@ -205,6 +208,17 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
 
     @Override
     public void onConnectionError(DataService service) {
+        // no entries, add at least the setup row
+        if(getAdapter() == null) {
+            setupPreferences(mAdapter);
+            setAdapter(mAdapter);
+            startEntranceTransition();
+        }
+
+        // missing setup -> start setup activity
+        if(TextUtils.isEmpty(SetupUtils.getServer(getActivity()))) {
+            startSetupActivity();
+        }
     }
 
     @Override

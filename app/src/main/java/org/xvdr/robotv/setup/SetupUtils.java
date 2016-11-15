@@ -16,7 +16,7 @@ public class SetupUtils {
 
     static public String getServer(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        return prefs.getString("server", "192.168.16.10");
+        return prefs.getString("server", "");
     }
 
     static public void setServer(Context context, String server) {
