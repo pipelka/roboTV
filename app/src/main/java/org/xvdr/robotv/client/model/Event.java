@@ -181,6 +181,10 @@ public class Event implements Serializable {
         shortText = outline;
     }
 
+    protected void setTitle(String title) {
+        this.title = title;
+    }
+
     public int getGenre() {
         return contentId & 0xF0;
     }
