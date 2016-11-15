@@ -8,7 +8,6 @@ import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
@@ -80,7 +79,6 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
                 r = lhsHeader.getName().compareTo(rhsHeader.getName());
             }
 
-            Log.d("MCA", "lhs: " + lhsHeader.getId() + " rhs: " + rhsHeader.getId() + " : " + r);
             return r;
         }
     };
