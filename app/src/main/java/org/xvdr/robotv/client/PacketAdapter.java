@@ -29,10 +29,6 @@ public class PacketAdapter {
 
         Movie movie = new Movie(content, title, outline, plot, duration);
 
-        if(title.equals(outline) || outline.isEmpty()) {
-            movie.setShortText(movie.getDate());
-        }
-
         movie.setStartTime(startTime);
         movie.setFolder(folder); // directory / folder
         movie.setChannelName(channelName);
@@ -40,6 +36,10 @@ public class PacketAdapter {
         movie.setPlayCount(playCount);
         movie.setPosterUrl(posterUrl);
         movie.setBackgroundUrl(backgroundUrl);
+
+        if(title.equals(outline) || outline.isEmpty()) {
+            movie.setShortText(movie.getDate());
+        }
 
         return movie;
     }
