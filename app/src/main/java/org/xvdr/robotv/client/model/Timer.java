@@ -106,4 +106,16 @@ public class Timer extends Event {
     public boolean isRecording() {
         return (flags & 8) == 8;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof Timer)) {
+            return false;
+        }
+
+        Timer timer = (Timer) o;
+        return timer.getStartTime() == getStartTime() &&
+            timer.getTitle().equals(getTitle()) &&
+            timer.getId() == getId();
+    }
 }

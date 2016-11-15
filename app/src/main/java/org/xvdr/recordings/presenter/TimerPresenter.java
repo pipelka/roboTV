@@ -14,6 +14,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import org.xvdr.recordings.model.EpisodeTimer;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.client.model.Movie;
@@ -53,20 +54,23 @@ public class TimerPresenter extends Presenter {
         final ImageCardView cardView = vh.getCardView();
         Resources resources = cardView.getResources();
 
-        if(timer.isTvShow()) {
-            cardView.setTitleText(timer.getTitle());
-        }
-        else {
-            cardView.setTitleText(timer.getTitle());
-        }
+        cardView.setTitleText(timer.getTitle());
 
-        String date = DateFormat
-                .getDateInstance(DateFormat.SHORT)
-                .format(new Date((timer.getStartTime() * 1000)));
-
+        String date = timer.getDate();
         String time = new SimpleDateFormat("HH:mm").format(new Date((timer.getStartTime() * 1000)));
 
-        cardView.setContentText(date + " " + time + " / " + (timer.getDuration() / 60) + " min");
+        if(item instanceof EpisodeTimer) {
+            EpisodeTimer episodeTimer = (EpisodeTimer) item;
+            int count = episodeTimer.getTimerCount();
+
+            cardView.setContentText(
+                date + " " + " / " +
+                count + " " +
+                (count > 1 ? resources.getString(R.string.episodes) : resources.getString(R.string.episode)));
+        }
+        else {
+            cardView.setContentText(date + " " + time + " / " + (timer.getDuration() / 60) + " min");
+        }
 
         cardView.setInfoAreaBackgroundColor(
                 Utils.getColor(cardView.getContext(),

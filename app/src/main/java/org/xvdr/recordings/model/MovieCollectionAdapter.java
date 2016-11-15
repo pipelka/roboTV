@@ -17,7 +17,9 @@ import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.robotv.client.model.Timer;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
@@ -25,6 +27,10 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     static public Comparator<Event> compareTimestamps = new Comparator<Event>() {
         @Override
         public int compare(Event lhs, Event rhs) {
+            if(lhs.getStartTime() == rhs.getStartTime()) {
+                return 0;
+            }
+
             return lhs.getStartTime() > rhs.getStartTime() ? -1 : 1;
         }
     };
@@ -32,6 +38,10 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     private static Comparator<Event> compareTimestampsReverse = new Comparator<Event>() {
         @Override
         public int compare(Event lhs, Event rhs) {
+            if(lhs.getStartTime() == rhs.getStartTime()) {
+                return 0;
+            }
+
             return lhs.getStartTime() < rhs.getStartTime() ? -1 : 1;
         }
     };
@@ -278,26 +288,63 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     public void loadTimers(Collection<Timer> timers) {
         ArrayObjectAdapter timerAdapter = getTimerCategory();
 
-        if(timerAdapter == null) {
+        if(timerAdapter == null || timers == null) {
             return;
         }
 
-        timerAdapter.clear();
+        ArrayList<EpisodeTimer> episodeTimers = new ArrayList<>();
+        ArrayList<Timer> newTimers = new ArrayList<>();
 
-        if(timers == null) {
-            return;
-        }
-
-        // insert all timers
+        // prepare timers (categorize)
         for(Timer timer : timers) {
-            timerAdapter.add(timer);
-        }
-    }
 
-    public boolean hasTimerCategory() {
-        return
-            getCategory(mContext.getString(R.string.schedule_timers), false) != null ||
-            getCategory(mContext.getString(R.string.search_timers), false) != null;
+            if(timer.isSearchTimer()) {
+                boolean added = false;
+
+                for(EpisodeTimer episodeTimer: episodeTimers) {
+                    if(episodeTimer.add(timer)) {
+                        added = true;
+                        break;
+                    }
+                }
+
+                if(!added) {
+                    episodeTimers.add(new EpisodeTimer(timer));
+                }
+            }
+            else {
+                newTimers.add(timer);
+            }
+        }
+
+        // add episode timers
+        for(EpisodeTimer timer: episodeTimers) {
+            newTimers.add(timer);
+        }
+
+        // remove items
+        int diff = timerAdapter.size() - newTimers.size();
+        if(diff > 0) {
+            timerAdapter.removeItems(timerAdapter.size() - diff, diff);
+        }
+
+        Collections.sort(newTimers, compareTimestampsReverse);
+
+        // add or replace timers
+        int index = 0;
+        for(Timer timer: newTimers) {
+            if(index < timerAdapter.size()) {
+                if(!timerAdapter.get(index).equals(timer)) {
+                    timerAdapter.replace(index, timer);
+                }
+            }
+            else {
+                timerAdapter.add(timer);
+            }
+            index++;
+        }
+
+        updateRows();
     }
 
     private ArrayObjectAdapter getTimerCategory() {
@@ -339,6 +386,10 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         });
 
         // update all rows
+        updateRows();
+    }
+
+    private void updateRows() {
         for(int i = 0; i < size();) {
             Row listRow = (Row)get(i);
 
