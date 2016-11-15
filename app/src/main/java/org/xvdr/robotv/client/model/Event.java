@@ -72,20 +72,29 @@ public class Event implements Serializable {
         "actionfilm",
         "animationsfilm",
         "agentenfilm",
+        "fantasy",
+        "fantastisch",
         "fantasyfilm",
+        "fantasy-action",
         "fantasy-film",
         "gangsterfilm",
         "heimatfilm",
         "horrorfilm",
         "historienfilm",
         "jugendfilm",
-        "kömödie",
+        "katastrophenfilm",
+        "komödie",
         "kriegsfilm",
         "kriminalfilm",
+        "liebesdrama",
+        "martial arts",
         "monumentalfilm",
         "mysteryfilm",
+        "politthriller",
+        "roadmovie",
         "spielfilm",
         "thriller",
+        "tragikomödie",
         "zeichentrickfilm"
     };
 
@@ -97,11 +106,16 @@ public class Event implements Serializable {
 
     private static String[] genreSoapOrMovie = {
         "action",
+        "animation",
         "comedy",
+        "crime",
         "drama",
+        "dramedy",
         "krimi",
+        "mystery",
         "science-fiction",
-        "scifi"
+        "scifi",
+        "zeichentrick"
     };
 
     private static String[] genreSportTitle = {
