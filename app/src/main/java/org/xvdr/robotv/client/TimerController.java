@@ -37,7 +37,7 @@ public class TimerController {
         String name;
         String category = movie.getFolder();
 
-        if(category.equals(seriesFolder)) {
+        if(category.equals(seriesFolder) || movie.isTvShow()) {
             name = seriesFolder + "~" + movie.getTitle() + "~" + movie.getShortText();
         }
         else {
