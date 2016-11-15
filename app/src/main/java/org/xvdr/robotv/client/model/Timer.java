@@ -19,7 +19,7 @@ public class Timer extends Event {
         this.timerStartTime = event.getStartTime();
         this.timerEndTime = event.getStartTime() + event.getDuration();
         this.flags = 0;
-        this.searchTimerId = 0;
+        this.searchTimerId = -1;
         this.recordingId = 0;
     }
 
@@ -97,6 +97,10 @@ public class Timer extends Event {
 
     public void setPosterUrl(String posterUrl) {
         this.posterUrl = posterUrl;
+    }
+
+    public boolean isSearchTimer() {
+        return (searchTimerId != -1);
     }
 
     public boolean isRecording() {
