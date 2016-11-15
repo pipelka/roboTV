@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.xvdr.jniwrap.Packet;
@@ -17,12 +18,10 @@ import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.MovieController;
 import org.xvdr.robotv.client.TimerController;
-import org.xvdr.robotv.client.model.Timer;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class DataService extends Service {
 
@@ -261,6 +260,11 @@ public class DataService extends Service {
         }
 
         seriesFolder = connection.getConfig("SeriesFolder");
+
+        if(TextUtils.isEmpty(seriesFolder)) {
+            seriesFolder = "Shows";
+        }
+
         return seriesFolder;
     }
 
