@@ -126,4 +126,5 @@
     <string name="schedule_timers">Scheduled</string>
     <string name="timers">Timers</string>
     <string name="search_timers">Searchtimers</string>
+    <string name="timer_add_episode">Record episode</string>
 </resources>

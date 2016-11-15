@@ -26,7 +26,14 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
     @NonNull
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
-        return createGuidance(getString(R.string.schedule_recording));
+        GuidanceStylist.Guidance guidance = createGuidance(getString(R.string.schedule_recording));
+
+        if(getMovie().isTvShow()) {
+            mActionFolder.setEnabled(false);
+            mActionAdd.setTitle(getString(R.string.timer_add_episode));
+        }
+
+        return guidance;
     }
 
     @Override
@@ -49,9 +56,9 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
         .title(getString(R.string.timer_add_cancel))
         .build();
 
+        actions.add(mActionCancel);
         actions.add(mActionFolder);
         actions.add(mActionAdd);
-        actions.add(mActionCancel);
     }
 
     @Override
