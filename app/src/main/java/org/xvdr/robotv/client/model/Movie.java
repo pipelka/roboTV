@@ -2,9 +2,6 @@ package org.xvdr.robotv.client.model;
 
 import org.xvdr.robotv.artwork.ArtworkHolder;
 
-import java.text.DateFormat;
-import java.util.Date;
-
 public class Movie extends Event {
 
     private String folder;
@@ -18,21 +15,15 @@ public class Movie extends Event {
     private int playCount;
 
     public Movie(int contentId, String title, String subTitle, String plot, int durationSec) {
-        super(contentId, title, subTitle, plot, durationSec);
+        super(contentId, title, subTitle, plot, 0, durationSec);
+    }
+
+    public Movie(int contentId, String title, String subTitle, String plot, long startTime, int durationSec) {
+        super(contentId, title, subTitle, plot, startTime, durationSec);
     }
 
     public Movie(Event event) {
-        super(
-                event.getContentId(),
-                event.getTitle(),
-                event.getShortText(),
-                event.getDescription(),
-                event.getDuration(),
-                event.getEventId(),
-                event.getChannelUid()
-        );
-
-        setStartTime(event.getStartTime());
+        super(event);
     }
 
     public String getFolder() {
@@ -93,14 +84,6 @@ public class Movie extends Event {
 
     public int getChannelUid() {
         return channelUid;
-    }
-
-    public String getDate() {
-        return DateFormat.getDateInstance().format(new Date(getStartTime() * 1000));
-    }
-
-    public String getDateTime() {
-        return DateFormat.getDateTimeInstance().format(new Date(getStartTime() * 1000));
     }
 
     public void setPlayCount(int count) {

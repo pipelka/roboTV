@@ -88,7 +88,7 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
                 String posterUrl = resp.getString();
                 String backgroundUrl = resp.getString();
 
-                Event event = new Event(content, title, plotOutline, plot, eventDuration, eventId);
+                Event event = new Event(content, title, plotOutline, plot, startTime, eventDuration, eventId);
                 ArtworkHolder art = null;
 
                 try {

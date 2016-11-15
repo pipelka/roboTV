@@ -4,7 +4,10 @@ import android.text.TextUtils;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +41,7 @@ public class Event implements Serializable {
     private int eventId;
     private long startTime;
     private int channelUid;
+    private long vps;
 
     private SeasonEpisodeHolder seasonEpisode = new SeasonEpisodeHolder();
 
@@ -130,24 +134,24 @@ public class Event implements Serializable {
             event.title,
             event.shortText,
             event.description,
+            event.startTime,
             event.duration,
             event.eventId,
             event.channelUid
         );
 
         year = event.year;
-        startTime = event.startTime;
     }
 
-    public Event(int contentId, String title, String subTitle, String plot, int durationSec) {
-        this(contentId, title, subTitle, plot, durationSec, 0);
+    public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec) {
+        this(contentId, title, subTitle, plot, startTime, durationSec, 0);
     }
 
-    public Event(int contentId, String title, String subTitle, String plot, int durationSec, int eventId) {
-        this(contentId, title, subTitle, plot, durationSec, eventId, 0);
+    public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec, int eventId) {
+        this(contentId, title, subTitle, plot, startTime, durationSec, eventId, 0);
     }
 
-    public Event(int contentId, String title, String subTitle, String plot, int durationSec, int eventId, int channelUid) {
+    public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec, int eventId, int channelUid) {
         this.contentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
         this.channelUid = channelUid;
 
@@ -158,10 +162,11 @@ public class Event implements Serializable {
 
         year = guessYearFromDescription(subTitle + " " + plot);
         this.title = title;
-        shortText = subTitle;
-        description = plot;
-        duration = durationSec;
+        this.shortText = subTitle;
+        this.description = plot;
+        this.duration = durationSec;
         this.eventId = eventId;
+        this.startTime = startTime;
 
         if (!getSeasonEpisode(plot, seasonEpisode)) {
             getSeasonEpisode(subTitle, seasonEpisode);
@@ -215,6 +220,22 @@ public class Event implements Serializable {
     public int getChannelUid() {
         return channelUid;
     }
+
+    public String getDate() {
+        return DateFormat
+                .getDateInstance(DateFormat.MEDIUM)
+                .format(new Date((getStartTime() * 1000)));
+    }
+
+
+    public String getTime() {
+        return new SimpleDateFormat("HH:mm").format(new Date((getStartTime() * 1000)));
+    }
+
+    public String getDateTime() {
+        return getDate() + " " + getTime();
+    }
+
 
     public boolean isTvShow() {
         return (getContentId() == 0x15 || getContentId() == 0x23);
@@ -346,6 +367,14 @@ public class Event implements Serializable {
 
     public Timestamp getTimestamp() {
         return new Timestamp(startTime * 1000);
+    }
+
+    public long getVps() {
+        return vps;
+    }
+
+    public void setVps(long vps) {
+        this.vps = vps;
     }
 
     @Override

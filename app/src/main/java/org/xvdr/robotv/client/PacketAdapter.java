@@ -64,10 +64,7 @@ public class PacketAdapter {
         String shortText = p.getString();
         String description = p.getString();
 
-        Event e = new Event(contentId, title, shortText, description, duration, eventId);
-        e.setStartTime(startTime);
-
-        return e;
+        return new Event(contentId, title, shortText, description, startTime, duration, eventId);
     }
 
     public static Timer toTimer(Packet response) {
@@ -90,8 +87,7 @@ public class PacketAdapter {
             event = PacketAdapter.toEvent(response);
         }
         else {
-            event = new Event(0, "", "", "", stopTime - startTime, 0, channelUid);
-            event.setStartTime(startTime);
+            event = new Event(0, "", "", "", startTime, stopTime - startTime, 0, channelUid);
         }
 
         Timer timer = new Timer(id, event);
@@ -120,7 +116,7 @@ public class PacketAdapter {
         String definition = response.getString();           // epgsearch timer description
 
         int contentId = seriesRecording ? 0x15 : 0x10;
-        Timer timer = new Timer(id, new Event(contentId, title, "", "", 0));
+        Timer timer = new Timer(id, new Event(contentId, title, "", "", 0, 0));
         timer.setChannelUid(channelUid);
         timer.setSearchTimerId(id);
         timer.setLogoUrl(logoUrl);
