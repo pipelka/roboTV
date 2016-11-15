@@ -57,7 +57,7 @@ public class TimerPresenter extends Presenter {
         cardView.setTitleText(timer.getTitle());
 
         String date = timer.getDate();
-        String time = new SimpleDateFormat("HH:mm").format(new Date((timer.getStartTime() * 1000)));
+        String time = timer.getTime();
 
         if(item instanceof EpisodeTimer) {
             EpisodeTimer episodeTimer = (EpisodeTimer) item;
