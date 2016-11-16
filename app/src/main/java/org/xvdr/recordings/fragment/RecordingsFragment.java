@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
+import org.xvdr.recordings.model.EpisodeTimer;
 import org.xvdr.robotv.client.TimerController;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
@@ -47,6 +48,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     private BackgroundManager backgroundManager;
     private BackgroundManagerTarget backgroundManagerTarget;
     private NotificationHandler notification;
+    private DataService service;
 
     private int color_background;
 
@@ -124,9 +126,19 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                     Movie movie = (Movie) item;
 
                     Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                    //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
                     startActivity(intent);
+                }
+                else if(item instanceof EpisodeTimer) {
+                }
+                else if(item instanceof Timer) {
+                    Timer timer = (Timer) item;
+
+                    new DeleteTimerFragment().startGuidedStep(
+                            getActivity(),
+                            timer,
+                            service,
+                            R.id.container);
                 }
                 else if(item instanceof PreferenceCardPresenter.Style) {
                     if(((PreferenceCardPresenter.Style) item).getId() == 1) {
@@ -202,6 +214,8 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
 
     @Override
     public void onConnected(DataService service) {
+        this.service = service;
+
         service.getMovieController().loadMovieCollection(this);
         service.getTimerController().loadTimers(this);
     }

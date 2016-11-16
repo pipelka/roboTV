@@ -99,4 +99,6 @@
     <string name="timers">Timer</string>
     <string name="search_timers">Suchtimer</string>
     <string name="timer_add_episode">Folge aufnehmen</string>
+    <string name="delete_timer">Timer löschen</string>
+    <string name="failed_delete_timer">Timer konnte nicht gelöscht werden</string>
 </resources>

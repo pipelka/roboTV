@@ -190,6 +190,19 @@ public class TimerController {
         task.execute();
     }
 
+    public boolean deleteTimer(int id) {
+        Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_DELETE);
+        request.putU32(id);
+
+        Packet response = connection.transmitMessage(request);
+
+        if(response == null) {
+            return false;
+        }
+
+        return response.getU32() == Connection.STATUS_SUCCESS;
+    }
+
     private String mapRecordingName(String name) {
         return name.replace(' ', '_').replace(':', '_');
     }
