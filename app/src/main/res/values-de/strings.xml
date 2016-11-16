@@ -95,6 +95,7 @@
     <string name="service_not_connected">roboTV Dienst nicht verbunden</string>
     <string name="timer_created">Timer angelegt</string>
     <string name="schedule_timers">Geplant</string>
+    <string name="error">Fehler</string>
     <string name="timers">Timer</string>
     <string name="search_timers">Suchtimer</string>
     <string name="timer_add_episode">Folge aufnehmen</string>
