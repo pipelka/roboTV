@@ -31,6 +31,10 @@ public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {
         super.add(index, item);
     }
 
+    public void append(Object item) {
+        super.add(item);
+    }
+
     public void addAll(Collection items) {
 
         for(Object item : items) {

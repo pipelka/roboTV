@@ -129,4 +129,5 @@
     <string name="timer_add_episode">Record episode</string>
     <string name="delete_timer">Delete timer</string>
     <string name="failed_delete_timer">Failed to remove timer</string>
+    <string name="add">Add</string>
 </resources>

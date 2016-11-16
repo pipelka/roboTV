@@ -15,6 +15,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.xvdr.recordings.model.EpisodeTimer;
+import org.xvdr.recordings.model.IconAction;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.client.model.Movie;
@@ -49,6 +50,26 @@ public class TimerPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
+        if (item instanceof IconAction) {
+            IconAction action = (IconAction) item;
+            ViewHolder vh = (ViewHolder) viewHolder;
+            ImageCardView cardView = vh.getCardView();
+            Resources resources = cardView.getResources();
+
+            cardView.setTitleText(action.getText());
+
+            if(!TextUtils.isEmpty(action.getText2())) {
+                cardView.setContentText(action.getText2());
+            }
+            cardView.setMainImage(resources.getDrawable(action.getResourceId(), null));
+
+            cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.primary_color));
+            cardView.setMainImageDimensions(391, 220);
+            cardView.getMainImageView().setPadding(135, 50, 135, 50);
+
+            return;
+        }
+
         Timer timer = (Timer) item;
         ViewHolder vh = (ViewHolder) viewHolder;
         final ImageCardView cardView = vh.getCardView();
@@ -77,6 +98,8 @@ public class TimerPresenter extends Presenter {
                 timer.isRecording() ? R.color.recording_active_color : R.color.primary_color));
 
         cardView.setMainImageDimensions(391, 220);
+        cardView.getMainImageView().setPadding(0, 0, 0, 0);
+
         Drawable drawableUnknown = resources.getDrawable(R.drawable.recording_unkown, null);
 
         if(!TextUtils.isEmpty(timer.getLogoUrl())) {

@@ -344,6 +344,12 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             index++;
         }
 
+        ((SortedArrayObjectAdapter)timerAdapter).append(new IconAction(
+                        100,
+                        R.drawable.ic_add_circle_outline_white_48dp,
+                        mContext.getString(R.string.add),
+                        mContext.getString(R.string.schedule_recording)));
+
         updateRows();
     }
 

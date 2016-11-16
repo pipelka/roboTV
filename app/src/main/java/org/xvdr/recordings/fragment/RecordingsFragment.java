@@ -25,6 +25,7 @@ import com.bumptech.glide.Glide;
 import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
 import org.xvdr.recordings.model.EpisodeTimer;
+import org.xvdr.recordings.model.IconAction;
 import org.xvdr.robotv.client.TimerController;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
@@ -140,6 +141,12 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                             service,
                             R.id.container);
                 }
+                else if(item instanceof IconAction) {
+                    IconAction action = (IconAction) item;
+                    if(action.getActionId() == 100) {
+                        startEpgSearchActivity();
+                    }
+                }
                 else if(item instanceof PreferenceCardPresenter.Style) {
                     if(((PreferenceCardPresenter.Style) item).getId() == 1) {
                         startSetupActivity();
@@ -169,6 +176,11 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                 startActivity(intent);
             }
         });
+    }
+
+    private void startEpgSearchActivity() {
+        Intent intent = new Intent(getActivity(), org.xvdr.timers.activity.EpgSearchActivity.class);
+        startActivity(intent);
     }
 
     private void startSetupActivity() {
