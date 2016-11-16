@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
@@ -46,36 +49,25 @@ public class NotificationHandler {
 
 
     public void notify(final String message, final String title, final String imageUrl) {
-        if(imageUrl == null || imageUrl.isEmpty()) {
+        if(TextUtils.isEmpty(imageUrl)) {
             NotificationHandler.this.notify(message, title, R.drawable.ic_info_outline_white_48dp);
             return;
         }
 
-        new Thread(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "loading bitmap with picasso");
-                Bitmap bitmap = null;
-
-                try {
-                    bitmap = Glide.with(mContext)
-                             .load(imageUrl).asBitmap().centerCrop()
-                             .into(Utils.dpToPx(R.integer.artwork_background_width_small, mContext),
-                                     Utils.dpToPx(R.integer.artwork_background_height_small, mContext))
-                             .get();
-                }
-                catch(Exception e) {
-                    e.printStackTrace();
-                }
-
-                if(bitmap != null) {
-                    NotificationHandler.this.notify(message, title, new BitmapDrawable(mContext.getResources(), bitmap));
-                }
-                else {
-                    NotificationHandler.this.notify(message, title, R.drawable.ic_info_outline_white_48dp);
-                }
+                Glide.with(mContext)
+                        .load(imageUrl).asBitmap().centerCrop()
+                        .error(R.drawable.ic_info_outline_white_48dp)
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                NotificationHandler.this.notify(message, title, new BitmapDrawable(mContext.getResources(), resource));
+                            }
+                        });
             }
-        }).start();
+        });
     }
 
     public void notify(final String message, final String title, final Drawable d) {

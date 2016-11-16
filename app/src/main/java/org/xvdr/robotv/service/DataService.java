@@ -18,6 +18,7 @@ import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.MovieController;
 import org.xvdr.robotv.client.TimerController;
+import org.xvdr.robotv.client.model.Timer;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
@@ -86,6 +87,12 @@ public class DataService extends Service {
                     break;
 
                 case Connection.XVDR_STATUS_TIMERCHANGE:
+                    if(!p.eop()) {
+                        Timer timer = PacketAdapter.toTimer(p);
+                        if(timer != null) {
+                            onTimerAdded(timer);
+                        }
+                    }
                     postOnTimersUpdate();
                     break;
             }
@@ -122,7 +129,9 @@ public class DataService extends Service {
         @Override
         public void run() {
             if(!open()) {
-                notification.error(getResources().getString(R.string.failed_connect));
+                if(!TextUtils.isEmpty(SetupUtils.getServer(DataService.this))) {
+                    notification.error(getResources().getString(R.string.failed_connect));
+                }
                 handler.postDelayed(mOpenRunnable, 10 * 1000);
                 return;
             }
@@ -360,4 +369,29 @@ public class DataService extends Service {
             }
         });
     }
+
+    private void onTimerAdded(final Timer timer) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                ArtworkHolder o = null;
+                String url;
+
+                try {
+                    o = artwork.fetchForEvent(timer);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (o == null || TextUtils.isEmpty(o.getPosterUrl())) {
+                    url = timer.getLogoUrl();
+                } else {
+                    url = o.getPosterUrl();
+                }
+
+                notification.notify(getString(R.string.timer_created), timer.getTitle(), url);
+            }
+        });
+    }
+
 }

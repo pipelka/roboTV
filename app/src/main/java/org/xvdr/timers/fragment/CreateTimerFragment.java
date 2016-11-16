@@ -87,12 +87,9 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
             return;
         }
 
-        if(service.getTimerController().createTimer(movie, service.getSeriesFolder())) {
-            notificationHandler.notify(getString(R.string.timer_created), movie.getTitle(), getDrawable());
-            return;
+        if(!service.getTimerController().createTimer(movie, service.getSeriesFolder())) {
+            notificationHandler.error(getString(R.string.failed_create_timer));
         }
-
-        notificationHandler.error(getString(R.string.failed_create_timer));
     }
 
     @Override
