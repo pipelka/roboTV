@@ -312,6 +312,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         mPlaybackControlsRow.setCurrentTime(runTime);
         mPlaybackControlsRow.setBufferedProgress((int) player.getBufferedPosition());
 
+        ((PlayerActivity)getActivity()).updatePlaybackState();
     }
 
     private void notifyChanged(Action action) {

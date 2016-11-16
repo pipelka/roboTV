@@ -7,6 +7,7 @@ import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Surface;
 import android.view.SurfaceView;
 
@@ -74,14 +75,14 @@ public class PlayerActivity extends Activity implements Player.Listener {
         final MediaMetadata.Builder metadataBuilder = new MediaMetadata.Builder();
 
         metadataBuilder
-        .putLong(MediaMetadata.METADATA_KEY_DURATION, mSelectedMovie.getDurationMs() * 1000)
+        .putLong(MediaMetadata.METADATA_KEY_DURATION, mSelectedMovie.getDurationMs())
         .putString(MediaMetadata.METADATA_KEY_TITLE, movie.getTitle())
         .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, movie.getShortText())
         .putString(MediaMetadata.METADATA_KEY_DISPLAY_DESCRIPTION, movie.getDescription());
 
         String url = movie.getPosterUrl();
 
-        if(url != null && !url.isEmpty()) {
+        if(!TextUtils.isEmpty(url)) {
             Glide.with(this).load(url).asBitmap()
             .override(Utils.dpToPx(R.integer.artwork_poster_width, this), Utils.dpToPx(R.integer.artwork_poster_height, this))
             .centerCrop().into(new SimpleTarget<Bitmap>() {
