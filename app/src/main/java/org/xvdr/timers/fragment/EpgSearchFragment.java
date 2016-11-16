@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.Channels;
 import org.xvdr.robotv.client.PacketAdapter;
+import org.xvdr.robotv.client.model.Channel;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.robotv.client.model.Movie;
@@ -151,9 +152,9 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             Collections.sort(resultRows, new Comparator<ListRow>() {
                 @Override
                 public int compare(ListRow a, ListRow b) {
-                    Channels.Entry entry1 = channelList.findByUid((int)a.getId());
-                    Channels.Entry entry2 = channelList.findByUid((int)b.getId());
-                    return  entry1.number < entry2.number ? -1 : 1;
+                    Channel entry1 = channelList.findByUid((int)a.getId());
+                    Channel entry2 = channelList.findByUid((int)b.getId());
+                    return  entry1.getNumber() < entry2.getNumber() ? -1 : 1;
                 }
             });
 

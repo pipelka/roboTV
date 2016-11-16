@@ -23,6 +23,7 @@ import org.xvdr.jniwrap.Packet;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
+import org.xvdr.robotv.client.model.Channel;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.artwork.ArtworkHolder;
@@ -247,37 +248,37 @@ public class ChannelSyncAdapter {
 
         int i = 0;
 
-        for(Channels.Entry entry : list) {
+        for(Channel entry : list) {
 
             // skip obsolete channels
-            if(entry.name.endsWith("OBSOLETE")) {
+            if(entry.getName().endsWith("OBSOLETE")) {
                 continue;
             }
 
             // epg search intent
 
             Intent intent = new Intent(mContext, TimerActivity.class);
-            intent.putExtra("uid", entry.uid);
-            intent.putExtra("name", entry.name);
+            intent.putExtra("uid", entry.getUid());
+            intent.putExtra("name", entry.getName());
 
             String link = "intent:" + intent.toUri(0);
 
             Uri channelUri;
-            Long channelId = existingChannels.get(entry.uid);
+            Long channelId = existingChannels.get(entry.getUid());
 
             // channel entry
             ContentValues values = new ContentValues();
             values.put(TvContract.Channels.COLUMN_INPUT_ID, mInputId);
 
-            values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, Integer.toString(entry.number));
-            values.put(TvContract.Channels.COLUMN_DISPLAY_NAME, entry.name);
+            values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, Integer.toString(entry.getNumber()));
+            values.put(TvContract.Channels.COLUMN_DISPLAY_NAME, entry.getName());
             values.put(TvContract.Channels.COLUMN_SERVICE_ID, 0);
             values.put(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID, 0);
-            values.put(TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID, entry.uid);
-            values.put(TvContract.Channels.COLUMN_SERVICE_TYPE, entry.radio ? TvContract.Channels.SERVICE_TYPE_AUDIO : TvContract.Channels.SERVICE_TYPE_AUDIO_VIDEO);
+            values.put(TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID, entry.getUid());
+            values.put(TvContract.Channels.COLUMN_SERVICE_TYPE, entry.isRadio() ? TvContract.Channels.SERVICE_TYPE_AUDIO : TvContract.Channels.SERVICE_TYPE_AUDIO_VIDEO);
             values.put(TvContract.Channels.COLUMN_TYPE, TvContract.Channels.TYPE_DVB_S2);
             values.put(TvContract.Channels.COLUMN_SEARCHABLE, 1);
-            values.put(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA, Integer.toString(entry.uid));
+            values.put(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA, Integer.toString(entry.getUid()));
 
             // channel link needs Android M
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -298,7 +299,7 @@ public class ChannelSyncAdapter {
 
                 if(channelUri != null) {
                     resolver.update(channelUri, values, null, null);
-                    existingChannels.remove(entry.uid);
+                    existingChannels.remove(entry.getUid());
                 }
             }
 

@@ -1,6 +1,7 @@
 package org.xvdr.robotv.client;
 
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.robotv.client.model.Channel;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.robotv.client.model.Timer;
@@ -122,5 +123,18 @@ public class PacketAdapter {
         timer.setLogoUrl(logoUrl);
 
         return timer;
+    }
+
+    public static Channel toChannel(Packet response) {
+        Channel c = new Channel(
+                (int)response.getU32(),
+                response.getString(),
+                (int) response.getU32(),
+                (int) response.getU32(),
+                response.getString(),
+                response.getString());
+
+        c.setGroupName(response.getString().trim());
+        return c;
     }
 }

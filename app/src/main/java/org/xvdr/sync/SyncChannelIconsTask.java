@@ -9,6 +9,7 @@ import android.util.SparseArray;
 
 import org.xvdr.robotv.client.Channels;
 import org.xvdr.robotv.client.Connection;
+import org.xvdr.robotv.client.model.Channel;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.BufferedInputStream;
@@ -83,8 +84,8 @@ public abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
 
         list.load(mConnection, language, new Channels.Callback() {
             @Override
-            public boolean onChannel(final Channels.Entry entry) {
-                Long channelId = existingChannels.get(entry.uid);
+            public boolean onChannel(final Channel entry) {
+                Long channelId = existingChannels.get(entry.getUid());
 
                 // exit if task is cancelled
                 if(isCancelled()) {
@@ -97,7 +98,7 @@ public abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
 
                 final Uri uri = TvContract.buildChannelUri(channelId);
                 try {
-                    fetchChannelLogo(uri, entry.iconURL);
+                    fetchChannelLogo(uri, entry.getIconURL());
                 }
                 catch (IOException e) {
                     e.printStackTrace();

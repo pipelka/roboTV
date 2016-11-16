@@ -1,24 +1,14 @@
 package org.xvdr.robotv.client;
 
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.robotv.client.model.Channel;
 
 import java.util.ArrayList;
 
-public class Channels extends ArrayList<Channels.Entry> {
+public class Channels extends ArrayList<Channel> {
 
     public interface Callback {
-        boolean onChannel(Entry entry);
-    }
-
-    public class Entry {
-        public int number = 0;
-        public String name;
-        public int uid = 0;
-        public int caid = 0;
-        public String iconURL;
-        public String serviceReference;
-        public String groupName;
-        public boolean radio = false;
+        boolean onChannel(Channel entry);
     }
 
     public void load(Connection connection) {
@@ -37,9 +27,9 @@ public class Channels extends ArrayList<Channels.Entry> {
         loadChannelType(connection, false, language, callback);
     }
 
-    public Entry findByUid(int uid) {
-        for(Entry e : this) {
-            if(e.uid == uid) {
+    public Channel findByUid(int uid) {
+        for(Channel e : this) {
+            if(e.getUid() == uid) {
                 return e;
             }
         }
@@ -61,23 +51,16 @@ public class Channels extends ArrayList<Channels.Entry> {
         }
 
         while(!resp.eop()) {
-            Entry e = new Entry();
-            e.number = (int)resp.getU32();
-            e.name = resp.getString();
-            e.uid = (int) resp.getU32();
-            e.caid = (int) resp.getU32();
-            e.iconURL = resp.getString();
-            e.serviceReference = resp.getString();
-            e.groupName = resp.getString().trim();
-            e.radio = radio;
+            Channel c = PacketAdapter.toChannel(resp);
+            c.setRadio(radio);
 
             if(callback != null) {
-                if(!callback.onChannel(e)) {
+                if(!callback.onChannel(c)) {
                     return false;
                 }
             }
             else {
-                add(e);
+                add(c);
             }
         }
 
