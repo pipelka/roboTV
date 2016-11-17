@@ -120,8 +120,9 @@ class RoboTvDataSource implements DataSource {
 
     private boolean openRecording(Uri uri) throws IOException {
         String recordingId = uri.getPath().substring(1);
+        long position = Long.parseLong(uri.getQueryParameter("position"));
 
-        int status = connection.openRecording(recordingId);
+        int status = connection.openRecording(recordingId, position);
 
         if(status == Connection.STATUS_SUCCESS) {
             Log.d(TAG, "recording opened");

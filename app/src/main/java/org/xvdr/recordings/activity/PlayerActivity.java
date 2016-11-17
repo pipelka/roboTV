@@ -20,6 +20,7 @@ import com.google.android.exoplayer2.Format;
 import org.xvdr.player.Player;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
+import org.xvdr.robotv.client.MovieController;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
@@ -38,6 +39,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
     private Movie mSelectedMovie;
     private MediaSession mSession;
     private NotificationHandler notificationHandler;
+    private MovieController movieController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
             return;
         }
 
+        movieController = new MovieController(mPlayer.getConnection(), SetupUtils.getLanguage(this));
         mControls.setPlayer(mPlayer);
 
         mSession = new MediaSession(this, "roboTV Movie");
@@ -138,16 +141,17 @@ public class PlayerActivity extends Activity implements Player.Listener {
             return;
         }
 
+        long position = movieController.getPlaybackPosition(mSelectedMovie);
         String id = mSelectedMovie.getRecordingIdString();
 
-        mPlayer.open(Player.createRecordingUri(id));
+        mPlayer.open(Player.createRecordingUri(id, position));
         mControls.togglePlayback(true);
 
         mSession.setActive(true);
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
 
         if(!requestVisibleBehind(true)) {
@@ -187,7 +191,9 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
         mControls.stopProgressAutomation();
 
-        //mPlayer.setLastPosition(getCurrentTime()); - TODO
+        long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
+        movieController.setPlaybackPosition(mSelectedMovie, lastPosition);
+
         mPlayer.stop();
         mPlayer.release();
         mPlayer = null;

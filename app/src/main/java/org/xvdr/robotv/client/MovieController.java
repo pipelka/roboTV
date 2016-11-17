@@ -3,11 +3,13 @@ package org.xvdr.robotv.client;
 import android.os.Handler;
 import android.util.Log;
 
+import org.xvdr.jniwrap.Packet;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.ArtworkUtils;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.TreeSet;
 
@@ -138,6 +140,28 @@ public class MovieController {
 
     public TreeSet<String> getFolderList() {
         return folderList;
+    }
+
+    public boolean setPlaybackPosition(Movie movie, long lastPosition) {
+        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_SETPOSITION);
+
+        p.putString(movie.getRecordingIdString());
+        p.putU64(BigInteger.valueOf(lastPosition));
+
+        return (connection.transmitMessage(p) != null);
+    }
+
+    public long getPlaybackPosition(Movie movie) {
+        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETPOSITION);
+        p.putString(movie.getRecordingIdString());
+
+        Packet r = connection.transmitMessage(p);
+
+        if(r == null || r.eop()) {
+            return 0;
+        }
+
+        return r.getU64().longValue();
     }
 
 }

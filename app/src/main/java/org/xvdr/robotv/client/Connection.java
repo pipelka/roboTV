@@ -183,7 +183,7 @@ public class Connection extends Session {
         return (int)resp.getU32();
     }
 
-    public int openRecording(String recordingId) {
+    public int openRecording(String recordingId, long position) {
         Packet req = CreatePacket(Connection.XVDR_RECSTREAM_OPEN, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
         req.putString(recordingId);
 
@@ -198,7 +198,19 @@ public class Connection extends Session {
             return STATUS_NORESPONSE;
         }
 
-        return (int)resp.getU32();
+        int status = (int)resp.getU32();
+
+        if(status != Connection.STATUS_SUCCESS || position == 0) {
+            return status;
+        }
+
+        long seekTime = System.currentTimeMillis() + position;
+
+        if(seek(seekTime) > 0) {
+            return STATUS_SUCCESS;
+        }
+
+        return STATUS_NORESPONSE;
     }
 
     public boolean closeStream() {
@@ -226,7 +238,7 @@ public class Connection extends Session {
         Packet resp = transmitMessage(req);
 
         if(resp == null) {
-            return -1;
+            return STATUS_NORESPONSE;
         }
 
         return resp.getS64();

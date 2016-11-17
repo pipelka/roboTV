@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.MediaCodec;
 import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Handler;
@@ -39,8 +38,8 @@ import org.xvdr.player.audio.RoboTvAudioRenderer;
 import org.xvdr.player.extractor.RoboTvExtractor;
 import org.xvdr.player.source.RoboTvDataSourceFactory;
 import org.xvdr.player.trackselection.RoboTvTrackSelector;
-import org.xvdr.player.video.ShieldVideoRenderer;
 import org.xvdr.player.video.VideoRendererFactory;
+import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
@@ -91,8 +90,6 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     final private PositionReference position;
     final private TrickPlayController trickPlayController;
 
-    private Context context;
-
     private boolean audioPassthrough;
     private int channelConfiguration;
 
@@ -102,6 +99,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     static public Uri createRecordingUri(String recordingId) {
         return Uri.parse("robotv://recording/" + recordingId);
+    }
+
+    static public Uri createRecordingUri(String recordingId, long position) {
+        return Uri.parse("robotv://recording/" + recordingId + "?position=" + position);
     }
 
     public Player(Context context, String server, String language, Listener listener) throws IOException {
@@ -127,7 +128,6 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration, LoadControl loadControl) throws IOException {
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
-        this.context = context;
         this.listener = listener;
         this.audioPassthrough = audioPassthrough;
         this.audioPassthrough = audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3) && audioPassthrough;
@@ -349,6 +349,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         }
 
         return "invalid configuration";
+    }
+
+    public Connection getConnection() {
+        return dataSourceFactory.getConnection();
     }
 
     @Override

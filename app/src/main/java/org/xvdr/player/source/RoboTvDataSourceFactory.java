@@ -112,4 +112,7 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
         connection.close();
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
 }
