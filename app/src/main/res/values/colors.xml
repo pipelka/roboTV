@@ -7,4 +7,5 @@
     <color name="default_background">#3d3d3d</color>
     <color name="dim_background">#C0616161</color>
     <color name="episode_header_color">#de1a237e</color>
+    <color name="iconaction_color">#1A237E</color>
 </resources>

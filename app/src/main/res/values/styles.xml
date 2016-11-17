@@ -8,4 +8,17 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">false</item> -->
     </style>
+
+    <style name="IconActionCardViewStyle" parent="Widget.Leanback.ImageCardViewStyle">
+        <item name="lbImageCardViewType">Title</item>
+        <item name="infoAreaBackground">@color/primary_color</item>
+        <item name="cardBackground">@color/iconaction_color</item>
+    </style>
+
+    <style name="IconActionCardTheme" parent="Theme.Leanback">
+        <item name="imageCardViewStyle">@style/IconActionCardViewStyle</item>
+        <!-- <item name="cardBackground">@color/recording_active_color</item>
+        <item name="imageCardViewInfoAreaStyle">@style/IconActionCardViewColoredInfoArea</item>
+        <item name="imageCardViewTitleStyle">@style/IconActionCardViewColoredTitle</item> -->
+    </style>
 </resources>

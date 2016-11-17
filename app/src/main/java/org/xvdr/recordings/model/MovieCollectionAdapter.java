@@ -2,13 +2,16 @@ package org.xvdr.recordings.model;
 
 import android.content.Context;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import android.support.v17.leanback.widget.ClassPresenterSelector;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.Presenter;
+import android.support.v17.leanback.widget.PresenterSelector;
 import android.support.v17.leanback.widget.Row;
 import android.text.TextUtils;
 
+import org.xvdr.recordings.presenter.IconActionPresenter;
 import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
 import org.xvdr.recordings.presenter.TimerPresenter;
@@ -100,6 +103,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     final private MoviePresenter mCardPresenter;
     final private LatestCardPresenter mLatestCardPresenter;
     final private TimerPresenter timerPresenter;
+    final private IconActionPresenter iconActionPresenter;
 
     private ArrayObjectAdapter mLatest;
     private ArrayObjectAdapter mTvShows;
@@ -111,6 +115,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         mCardPresenter = new MoviePresenter();
         mLatestCardPresenter = new LatestCardPresenter();
         timerPresenter = new TimerPresenter();
+        iconActionPresenter = new IconActionPresenter(250, 220);
 
         clear();
     }
@@ -344,17 +349,35 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             index++;
         }
 
-        ((SortedArrayObjectAdapter)timerAdapter).append(new IconAction(
+        timerAdapter.add(new IconAction(
                         100,
                         R.drawable.ic_add_circle_outline_white_48dp,
-                        mContext.getString(R.string.add),
                         mContext.getString(R.string.schedule_recording)));
 
         updateRows();
     }
 
     private ArrayObjectAdapter getTimerCategory() {
-        return getCategory(mContext.getString(R.string.schedule_timers), true, 901, timerPresenter, true);
+        int id = 900;
+        String category = mContext.getString(R.string.schedule_timers);
+        ArrayObjectAdapter adapter = getCategory(category, false);
+
+        if(adapter != null) {
+            return adapter;
+        }
+
+        ClassPresenterSelector selector = new ClassPresenterSelector();
+        selector.addClassPresenter(Timer.class, timerPresenter);
+        selector.addClassPresenter(IconAction.class, iconActionPresenter);
+
+        HeaderItem header = new HeaderItem(id, category);
+        adapter = new ArrayObjectAdapter(selector);
+
+        ListRow row = new ListRow(header, adapter);
+        row.setId(id);
+
+        add(row);
+        return adapter;
     }
 
     private ArrayObjectAdapter getSearchTimerCategory() {

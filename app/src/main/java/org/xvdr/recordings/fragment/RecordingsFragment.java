@@ -15,7 +15,6 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 
 import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.SectionRow;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -26,10 +25,10 @@ import org.xvdr.recordings.activity.DetailsActivity;
 import org.xvdr.recordings.activity.SearchActivity;
 import org.xvdr.recordings.model.EpisodeTimer;
 import org.xvdr.recordings.model.IconAction;
+import org.xvdr.recordings.presenter.IconActionPresenter;
 import org.xvdr.robotv.client.TimerController;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
-import org.xvdr.recordings.presenter.PreferenceCardPresenter;
 import org.xvdr.recordings.util.BackgroundManagerTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
@@ -82,18 +81,15 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
             return;
         }
 
-        HeaderItem gridHeader = new HeaderItem(
-            1000,
-            getActivity().getString(R.string.recordings_settings_title));
-        ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(new PreferenceCardPresenter());
+        HeaderItem gridHeader = new HeaderItem(1000, getActivity().getString(R.string.recordings_settings_title));
+        ArrayObjectAdapter rowAdapter = new ArrayObjectAdapter(new IconActionPresenter(250, 220));
 
-        gridRowAdapter.add(new PreferenceCardPresenter.Style(
-                               1,
-                               getActivity().getString(R.string.recordings_setup_title),
-                               R.drawable.ic_settings_white_48dp));
+        rowAdapter.add(new IconAction(
+                101,
+                R.drawable.ic_settings_white_48dp,
+                getString(R.string.recordings_setup_title)));
 
-        adapter.add(new ListRow(gridHeader, gridRowAdapter));
-
+        adapter.add(new ListRow(gridHeader, rowAdapter));
     }
 
     private void setBackground() {
@@ -131,6 +127,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                     startActivity(intent);
                 }
                 else if(item instanceof EpisodeTimer) {
+                    // TODO - add search timer handling
                 }
                 else if(item instanceof Timer) {
                     Timer timer = (Timer) item;
@@ -146,9 +143,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                     if(action.getActionId() == 100) {
                         startEpgSearchActivity();
                     }
-                }
-                else if(item instanceof PreferenceCardPresenter.Style) {
-                    if(((PreferenceCardPresenter.Style) item).getId() == 1) {
+                    if(action.getActionId() == 101) {
                         startSetupActivity();
                     }
                 }
