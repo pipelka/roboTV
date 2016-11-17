@@ -22,6 +22,7 @@ public class TheMovieDatabase extends HttpArtworkProvider {
     private String mLanguage;
 
     public TheMovieDatabase(String apiKey, String language) {
+        super(1);
         mApiKey = apiKey;
         mLanguage = language;
 
