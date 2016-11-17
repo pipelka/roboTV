@@ -187,6 +187,10 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     public void onMovieCollectionUpdated(Collection<Movie> collection, int status) {
         Log.d(TAG, "onMovieCollectionUpdated status=" + status);
 
+        if(!isAdded()) {
+            return;
+        }
+
         ProgressBarManager manager = getProgressBarManager();
 
         switch(status) {
