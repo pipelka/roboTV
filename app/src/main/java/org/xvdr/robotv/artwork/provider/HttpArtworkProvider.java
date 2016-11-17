@@ -5,6 +5,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -17,7 +18,12 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
     private OkHttpClient client;
 
     HttpArtworkProvider() {
+        this(5);
+    }
+
+    HttpArtworkProvider(int concurrentConnections) {
         client = new OkHttpClient.Builder()
+                .connectionPool(new ConnectionPool(concurrentConnections, 5, TimeUnit.MINUTES))
                 .connectTimeout(3, TimeUnit.SECONDS)
                 .readTimeout(3, TimeUnit.SECONDS)
                 .build();
