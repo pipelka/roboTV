@@ -87,6 +87,7 @@ public class Event implements Serializable {
         "kriegsfilm",
         "kriminalfilm",
         "liebesdrama",
+        "liebesfilm",
         "martial arts",
         "monumentalfilm",
         "mysteryfilm",
@@ -95,13 +96,27 @@ public class Event implements Serializable {
         "spielfilm",
         "thriller",
         "tragikomödie",
+        "western",
         "zeichentrickfilm"
     };
 
     private static String[] genreSoap = {
+        "comedyserie",
+        "comedy-serie",
+        "crime-serie",
+        "dramedyserie",
         "folge ",
+        "jugendserie",
+        "kinderserie",
+        "kochshow",
+        "krimiserie",
+        "krimi-serie",
+        "krankenhausserie",
         "serie",
-        "sitcom"
+        "sitcom",
+        "thriller-serie",
+        "unterhaltungsserie",
+        "zeichentrickserie"
     };
 
     private static String[] genreSoapOrMovie = {
@@ -168,25 +183,29 @@ public class Event implements Serializable {
     public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec, int eventId, int channelUid) {
         this.contentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
         this.channelUid = channelUid;
+        this.title = title.trim();
+        this.shortText = subTitle.trim();
+        this.description = plot.trim();
+        this.duration = durationSec;
+        this.eventId = eventId;
+        this.startTime = startTime;
 
         // sometimes we can guess the sub genre from the title
         if(getGenre() == 0x40) {
             this.contentId = guessGenreFromSubTitle(contentId, title, durationSec);
         }
 
-        year = guessYearFromDescription(subTitle + " " + plot);
-        this.title = title;
-        this.shortText = subTitle;
-        this.description = plot;
-        this.duration = durationSec;
-        this.eventId = eventId;
-        this.startTime = startTime;
+        this.year = guessYearFromDescription(subTitle + " " + plot);
 
         if (!getSeasonEpisode(plot, seasonEpisode)) {
             getSeasonEpisode(subTitle, seasonEpisode);
         }
 
         if(seasonEpisode.valid() && !isTvShow()) {
+            this.contentId = 0x15;
+        }
+
+        if(!isTvShow() && guessSoapFromDescription(this.description)) {
             this.contentId = 0x15;
         }
     }
@@ -289,7 +308,7 @@ public class Event implements Serializable {
     }
 
     private static int guessGenreFromSubTitle(int contentId, String subtitle, int duration) {
-        if(subtitle == null) {
+        if(TextUtils.isEmpty(subtitle)) {
             return contentId;
         }
 
@@ -335,6 +354,23 @@ public class Event implements Serializable {
         }
 
         return contentId;
+    }
+
+    private static boolean guessSoapFromDescription(String plot) {
+        if(TextUtils.isEmpty(plot)) {
+            return false;
+        }
+
+        plot = plot.toLowerCase();
+
+        // try to guess soap from keywords
+        for(String word : genreSoap) {
+            if(plot.startsWith(word.toLowerCase())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static boolean getSeasonEpisode(String text, SeasonEpisodeHolder holder) {
