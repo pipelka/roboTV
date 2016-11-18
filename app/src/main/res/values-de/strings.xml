@@ -23,7 +23,7 @@
     <string name="recordings">Aufnahmen</string>
     <string name="schedule_recording">Aufnahme planen</string>
     <string name="search_epg">EPG</string>
-    <string name="search_results">Suchergebnisser für \'%1$s\'</string>
+    <string name="search_results">Suchergebnisse für \'%1$s\'</string>
     <string name="service_connected">roboTV Dienst verbunden</string>
     <string name="setup_activity">Einrichtung</string>
     <string name="setup_import_title">Aktualisiere Kanalliste …</string>
