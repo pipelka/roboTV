@@ -166,7 +166,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             return null;
         }
 
-        int id = (rowId == -1) ? size() : rowId;
+        int id = (rowId == -1) ? size() + 10 : rowId;
         HeaderItem header = new HeaderItem(id, category);
 
         ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(
