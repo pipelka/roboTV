@@ -36,8 +36,6 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
 
         @Override
         public void run() {
-            ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(MovieCollectionAdapter.compareTimestamps, new MoviePresenter());
-
             Packet req = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_SEARCH, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
             req.putString(query);
 
@@ -52,16 +50,10 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
             }
 
             // results
-            HeaderItem header = new HeaderItem(getString(R.string.search_results, query));
-            ListRow listRow = new ListRow(header, listRowAdapter);
-
             while(!resp.eop()) {
                 Movie movie = PacketAdapter.toMovie(resp);
-                listRowAdapter.add(movie);
+                mRowsAdapter.add(movie);
             }
-
-            mRowsAdapter.add(listRow);
-            mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
         }
 
         void setSearchQuery(String newQuery) {
@@ -69,7 +61,7 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
         }
     }
 
-    private ArrayObjectAdapter mRowsAdapter;
+    private MovieCollectionAdapter mRowsAdapter;
     private Handler mHandler = new Handler();
     private SearchRunnable mDelayedLoad;
     private Connection mConnection;
@@ -78,7 +70,7 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+        mRowsAdapter = new MovieCollectionAdapter(getActivity());
         setSearchResultProvider(this);
 
         setOnItemViewClickedListener(new OnItemViewClickedListener() {

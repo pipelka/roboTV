@@ -7,7 +7,6 @@ import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.PresenterSelector;
 import android.support.v17.leanback.widget.Row;
 import android.text.TextUtils;
 
@@ -123,9 +122,6 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     @Override
     public void clear() {
         super.clear();
-
-        mLatest = getCategory(mContext.getString(R.string.latest_movies), true, mLatestCardPresenter); // 0
-        mTvShows = getCategory(mContext.getString(R.string.tv_shows), true, mCardPresenter); // 1
     }
 
     private Movie movieExists(ArrayObjectAdapter adapter, Movie movie) {
@@ -185,9 +181,9 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         return listRowAdapter;
     }
 
-    private void add(Movie movie) {
+    public void add(Movie movie) {
         // add into "latest" category
-        Movie item = movieExists(mLatest, movie);
+        Movie item = movieExists(getLatestCategory(), movie);
 
         if(item != null) {
             item.setArtwork(movie);
@@ -228,9 +224,11 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     private void addEpisode(Movie episode) {
+        ArrayObjectAdapter shows = getTvShowCategory();
+
         // check if series item already exists
-        for(int i = 0; i < mTvShows.size(); i++) {
-            Movie m = (Movie) mTvShows.get(i);
+        for(int i = 0; i < shows.size(); i++) {
+            Movie m = (Movie) shows.get(i);
             if(m.getTitle().equals(episode.getTitle())) {
                 m.setEpisodeCount(m.getEpisodeCount() + 1);
                 return;
@@ -244,7 +242,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         series.setEpisodeCount(1);
         series.setSeriesHeader();
 
-        mTvShows.add(series);
+        shows.add(series);
     }
 
     private void iterateAll(MovieIterator iterator) {
@@ -355,6 +353,22 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
                         mContext.getString(R.string.schedule_recording)));
 
         updateRows();
+    }
+
+    private ArrayObjectAdapter getTvShowCategory() {
+        if(mTvShows == null) {
+            mTvShows = getCategory(mContext.getString(R.string.tv_shows), true, 1, mCardPresenter, false);
+        }
+
+        return mTvShows;
+    }
+
+    private ArrayObjectAdapter getLatestCategory() {
+        if(mLatest == null) {
+            mLatest = getCategory(mContext.getString(R.string.latest_movies), true, 0, mLatestCardPresenter, false);
+        }
+
+        return mLatest;
     }
 
     private ArrayObjectAdapter getTimerCategory() {
