@@ -23,14 +23,16 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 * [Android TV](https://www.android.com/tv/) (minimum API Level 22 Android 5.1 Lollipop)
 * [VDR 2.2](http://www.vdr-wiki.de/)
 * [vdr-plugin-robotv](https://github.com/pipelka/vdr-plugin-robotv)
+* [vdr-epgsearch](http://www.vdr-wiki.de/wiki/index.php/Epgsearch-plugin) (recommended)
 
 The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [Shield Android TV](https://shield.nvidia.com/android-tv) are used for development.
 
 ## Building
 
-1. Set the SDK and NDK location in Android Studio (Project Structure) or "local.properties".
-   Please download the Android NDK 11 and set the proper path.
-2. ./gradlew assembleDebug
+1. Download [Android Studio](https://developer.android.com/studio/index.html)
+2. Download the [Android NDK 11](https://developer.android.com/ndk/downloads/index.html) (or higher).
+3. Set the SDK and NDK location in Android Studio (Project Structure) or "local.properties".
+4. ./gradlew assembleDebug
 
 # Current Features
 
@@ -46,12 +48,18 @@ The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [
 - [x] Watch Recordings
 - [x] Timeshift support
 - [x] Schedule Recordings (create timers)
+- [x] Edit timers
+- [x] Delete recordings
+- [x] Move recordings between folders
+- [x] Cover Artwork browsing
+- [x] Timeshift Reverse Play
+- [x] Management of TV shows (Season / Episode)
+- [x] Notifications about timers / recordings
 
 # Planned Features
 
-- [ ] Edit timers
-- [ ] Delete recordings
-- [ ] Move recordings between folders
+- [ ] EAC3 support
+- [ ] enriched EPG information for TV shows
+- [ ] full epgsearch support
 - [ ] Teletext support
-- [ ] Timeshift Reverse Play
 - [ ] H265 (UHD) Support (partly done)
