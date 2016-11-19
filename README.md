@@ -15,7 +15,11 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 <img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-folders.jpg" width="200" />
 <img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-all.jpg" width="200" />
 <img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-details.jpg" width="200" />
+<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-details2.jpg" width="200" />
 <img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-playback.jpg" width="200" />
+<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-series.jpg" width="200" />
+<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-series-detail.jpg" width="200" />
+<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-timers.jpg" width="200" />
 <img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/setup.jpg" width="200" />
 
 ## System requirements
