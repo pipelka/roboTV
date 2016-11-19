@@ -55,22 +55,18 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             HeaderItem rhsHeader = rhs.getHeaderItem();
             int r;
 
-            if(lhsHeader.getId() == 0) {
+            if(lhsHeader.getId() <= 9 && rhsHeader.getId() <= 9) {
+                if(lhsHeader.getId() == rhsHeader.getId()) {
+                    r = 0;
+                }
+                else {
+                    r = (lhsHeader.getId() < rhsHeader.getId()) ? -1 : 1;
+                }
+            }
+            else if(lhsHeader.getId() <= 9) {
                 r = -1;
             }
-            else if(rhsHeader.getId() == 0) {
-                r = 1;
-            }
-            else if(lhsHeader.getId() == 1) {
-                r = -1;
-            }
-            else if(rhsHeader.getId() == 1) {
-                r = 1;
-            }
-            else if(lhsHeader.getId() == 2) {
-                r = -1;
-            }
-            else if(rhsHeader.getId() == 2) {
+            else if(rhsHeader.getId() <= 9) {
                 r = 1;
             }
             else if(lhsHeader.getId() >= 900 && rhsHeader.getId() >= 900) {
