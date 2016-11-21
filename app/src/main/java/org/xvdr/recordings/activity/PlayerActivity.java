@@ -56,8 +56,8 @@ public class PlayerActivity extends Activity implements Player.Listener {
                 SetupUtils.getServer(this),                     // Server
                 SetupUtils.getLanguageISO3(this),               // Language
                 this,                                           // Listener
-                SetupUtils.getPassthrough(this),                // AC3 passthrough
-                SetupUtils.getSpeakerConfiguration(this));      // preferred channel configuration
+                SetupUtils.getPassthrough(this)                 // AC3 passthrough
+            );
         }
         catch(IOException e) {
             e.printStackTrace();

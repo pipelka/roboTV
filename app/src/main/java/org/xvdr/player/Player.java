@@ -48,10 +48,10 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
     private static final String TAG = "Player";
 
-    public final static int CHANNELS_DEFAULT = 0;
-    public final static int CHANNELS_STEREO = 2;
-    public final static int CHANNELS_SURROUND = 4;
-    public final static int CHANNELS_DIGITAL51 = 6;
+    private final static int CHANNELS_DEFAULT = 0;
+    private final static int CHANNELS_STEREO = 2;
+    private final static int CHANNELS_SURROUND = 4;
+    private final static int CHANNELS_DIGITAL51 = 6;
 
     public interface Listener  {
 
@@ -79,7 +79,6 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     private Renderer exoAudioRenderer = null;
 
     private Listener listener;
-    private PriorityHandlerThread handlerThread;
     private Handler handler;
     private Surface surface;
 
@@ -91,7 +90,6 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     final private TrickPlayController trickPlayController;
 
     private boolean audioPassthrough;
-    private int channelConfiguration;
 
     static public Uri createLiveUri(int channelUid) {
         return Uri.parse("robotv://livetv/" + channelUid);
@@ -106,32 +104,27 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public Player(Context context, String server, String language, Listener listener) throws IOException {
-        this(context, server, language, listener, false, CHANNELS_SURROUND);
+        this(context, server, language, listener, false);
     }
 
     public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough) throws IOException {
-        this(context, server, language, listener, audioPassthrough, CHANNELS_SURROUND);
-    }
-
-    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration) throws IOException {
         this(
             context,
             server,
             language,
             listener,
             audioPassthrough,
-            wantedChannelConfiguration,
             new RoboTvLoadControl()
         );
     }
 
-    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, int wantedChannelConfiguration, LoadControl loadControl) throws IOException {
+    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, LoadControl loadControl) throws IOException {
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
         this.listener = listener;
         this.audioPassthrough = audioPassthrough;
         this.audioPassthrough = audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3) && audioPassthrough;
-        this.channelConfiguration = Math.min(audioCapabilities.getMaxChannelCount(), wantedChannelConfiguration);
+        int channelConfiguration = audioCapabilities.getMaxChannelCount();
 
         Log.i(TAG, "audio passthrough: " + (this.audioPassthrough ? "enabled" : "disabled"));
 
@@ -139,7 +132,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
             Log.i(TAG, "audio channel configuration: " + nameOfChannelConfiguration(channelConfiguration));
         }
 
-        handlerThread = new PriorityHandlerThread("roboTV:player", PriorityHandlerThread.NORM_PRIORITY);
+        PriorityHandlerThread handlerThread = new PriorityHandlerThread("roboTV:player", PriorityHandlerThread.NORM_PRIORITY);
         handlerThread.start();
 
         handler = new Handler(handlerThread.getLooper());
@@ -151,8 +144,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         internalAudioRenderer = new RoboTvAudioRenderer(
             handler,
             null,
-            this.audioPassthrough,
-            channelConfiguration);
+            this.audioPassthrough);
 
         // codecSelector disabling MPEG audio (handled by RoboTvAudioDecoder)
         MediaCodecSelector codecSelector = new MediaCodecSelector() {

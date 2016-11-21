@@ -91,8 +91,8 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
                 SetupUtils.getServer(mContext),                 // Server
                 SetupUtils.getLanguageISO3(mContext),           // Language
                 this,                                           // Listener
-                SetupUtils.getPassthrough(mContext),            // AC3 passthrough
-                SetupUtils.getSpeakerConfiguration(mContext));  // preferred channel configuration
+                SetupUtils.getPassthrough(mContext)             // AC3 passthrough
+            );
         }
         catch(IOException e) {
             mNotification.error(getResources().getString(R.string.connect_unable));

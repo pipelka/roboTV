@@ -23,13 +23,11 @@ public class SetupFragment extends GuidedStepFragment {
     static final int ACTION_LANGUAGE = 2;
     static final int ACTION_IMPORT = 4;
     static final int ACTION_PASSTHROUGH = 6;
-    static final int ACTION_SPEAKERCONFIG = 7;
     static final int ACTION_TIMESHIFT = 8;
 
     private GuidedAction mActionServer;
     private GuidedAction mActionLanguage;
     private GuidedAction mActionPassthrough;
-    private GuidedAction mActionSpeakerConfig;
     private GuidedAction mActionTimeshift;
 
     @NonNull
@@ -70,11 +68,6 @@ public class SetupFragment extends GuidedStepFragment {
         .checked(SetupUtils.getPassthrough(getActivity()))
         .build();
 
-        mActionSpeakerConfig = new GuidedAction.Builder(getActivity())
-        .id(ACTION_SPEAKERCONFIG)
-        .title(getString(R.string.setup_root_speakerconfig_title))
-        .build();
-
         mActionTimeshift = new GuidedAction.Builder(getActivity())
         .id(ACTION_TIMESHIFT)
         .title(getString(R.string.setup_root_timeshift_title))
@@ -90,8 +83,6 @@ public class SetupFragment extends GuidedStepFragment {
         if(audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3)) {
             actions.add(mActionPassthrough);
         }
-
-        actions.add(mActionSpeakerConfig);
 
         actions.add(mActionTimeshift);
 
@@ -121,14 +112,6 @@ public class SetupFragment extends GuidedStepFragment {
         boolean passthrough = SetupUtils.getPassthrough(getActivity());
         mActionPassthrough.setChecked(passthrough);
 
-        int speakerConfig = SetupUtils.getSpeakerConfiguration(getActivity());
-        mActionSpeakerConfig.setDescription(
-            (speakerConfig == 6) ? getString(R.string.setup_root_speakerconfig_digital_51) :
-            (speakerConfig == 4) ? getString(R.string.setup_root_speakerconfig_surround) :
-            (speakerConfig == 2) ? getString(R.string.setup_root_speakerconfig_stereo) :
-            "");
-        mActionSpeakerConfig.setEnabled(!passthrough);
-
         boolean timeshift = SetupUtils.getTimeshiftEnabled(getActivity());
         mActionTimeshift.setChecked(timeshift);
     }
@@ -146,13 +129,7 @@ public class SetupFragment extends GuidedStepFragment {
                 break;
 
             case ACTION_PASSTHROUGH:
-                mActionSpeakerConfig.setEnabled(!action.isChecked());
-                notifyActionChanged(findActionPositionById(ACTION_SPEAKERCONFIG));
                 SetupUtils.setPassthrough(getActivity(), action.isChecked());
-                break;
-
-            case ACTION_SPEAKERCONFIG:
-                GuidedStepFragment.add(fm, new SetupFragmentSpeakerConfig());
                 break;
 
             case ACTION_TIMESHIFT:

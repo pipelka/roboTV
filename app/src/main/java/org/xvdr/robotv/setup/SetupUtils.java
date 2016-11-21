@@ -65,18 +65,6 @@ public class SetupUtils {
         e.apply();
     }
 
-    public static int getSpeakerConfiguration(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        return prefs.getInt("speakerconfig", 6);
-    }
-
-    public static void setSpeakerConfiguration(Context context, int speakerConfig) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        SharedPreferences.Editor e = prefs.edit();
-        e.putInt("speakerconfig", speakerConfig);
-        e.apply();
-    }
-
     public static void setRecordingFolder(String folder) {
         mRecordingFolder = folder;
     }
