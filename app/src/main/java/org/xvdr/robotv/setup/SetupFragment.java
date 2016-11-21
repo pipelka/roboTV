@@ -21,7 +21,6 @@ public class SetupFragment extends GuidedStepFragment {
 
     static final int ACTION_SERVER = 1;
     static final int ACTION_LANGUAGE = 2;
-    static final int ACTION_REFRESHRATE = 3;
     static final int ACTION_IMPORT = 4;
     static final int ACTION_PASSTHROUGH = 6;
     static final int ACTION_SPEAKERCONFIG = 7;
@@ -29,7 +28,6 @@ public class SetupFragment extends GuidedStepFragment {
 
     private GuidedAction mActionServer;
     private GuidedAction mActionLanguage;
-    private GuidedAction mActionRefreshRate;
     private GuidedAction mActionPassthrough;
     private GuidedAction mActionSpeakerConfig;
     private GuidedAction mActionTimeshift;
@@ -65,11 +63,6 @@ public class SetupFragment extends GuidedStepFragment {
         .title(getString(R.string.setup_root_language_title))
         .build();
 
-        mActionRefreshRate = new GuidedAction.Builder(getActivity())
-        .id(ACTION_REFRESHRATE)
-        .title(getString(R.string.setup_root_refreshrate_title))
-        .build();
-
         mActionPassthrough = new GuidedAction.Builder(getActivity())
         .id(ACTION_PASSTHROUGH)
         .title(getString(R.string.setup_root_passthrough_title))
@@ -102,10 +95,6 @@ public class SetupFragment extends GuidedStepFragment {
 
         actions.add(mActionTimeshift);
 
-        if(SetupUtils.isRefreshRateChangeSupported()) {
-            actions.add(mActionRefreshRate);
-        }
-
         actions.add(new GuidedAction.Builder(getActivity())
                     .id(ACTION_IMPORT)
                     .title(getString(R.string.setup_root_import_title))
@@ -128,12 +117,6 @@ public class SetupFragment extends GuidedStepFragment {
         }
 
         mActionLanguage.setDescription(langArray[langIndex]);
-
-        // refresh rate
-        String[] refreshRates = getResources().getStringArray(R.array.refresh_rate_name_array);
-        int refreshRateIndex = SetupUtils.getRefreshRateIndex(getActivity());
-
-        mActionRefreshRate.setDescription(refreshRates[refreshRateIndex]);
 
         boolean passthrough = SetupUtils.getPassthrough(getActivity());
         mActionPassthrough.setChecked(passthrough);
@@ -160,10 +143,6 @@ public class SetupFragment extends GuidedStepFragment {
 
             case ACTION_LANGUAGE:
                 GuidedStepFragment.add(fm, new SetupFragmentLanguage());
-                break;
-
-            case ACTION_REFRESHRATE:
-                GuidedStepFragment.add(fm, new SetupFragmentRefreshRate());
                 break;
 
             case ACTION_PASSTHROUGH:
