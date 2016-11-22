@@ -63,7 +63,18 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    connection.login();
+                    // reschedule login if login fails
+                    if(!connection.login()) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                sessionListener.onReconnect();
+                            }
+                        }, 1000);
+                        return;
+                    }
+
+                    // notify about successful reconnect
                     listener.onReconnect();
                 }
             }, 3000);
