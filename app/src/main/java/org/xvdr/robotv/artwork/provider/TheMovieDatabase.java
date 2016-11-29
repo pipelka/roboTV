@@ -1,5 +1,6 @@
 package org.xvdr.robotv.artwork.provider;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -246,9 +247,16 @@ public class TheMovieDatabase extends HttpArtworkProvider {
             return null;
         }
 
+        String posterUrl = getPosterUrl(results);
+        String backgroundUrl = getBackgroundUrl(results);
+
+        if(TextUtils.isEmpty(posterUrl) && TextUtils.isEmpty(backgroundUrl)) {
+            return null;
+        }
+
         return new ArtworkHolder(
-                   getPosterUrl(results),
-                   getBackgroundUrl(results)
+                   posterUrl,
+                   backgroundUrl
                );
     }
 }
