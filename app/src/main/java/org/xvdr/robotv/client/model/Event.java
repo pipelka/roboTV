@@ -185,9 +185,19 @@ public class Event implements Serializable {
     public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec, int eventId, int channelUid) {
         this.contentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
         this.channelUid = channelUid;
-        this.title = title.trim();
-        this.shortText = subTitle.trim();
-        this.description = plot.trim();
+
+        if(!TextUtils.isEmpty(title)) {
+            this.title = title.trim();
+        }
+
+        if(!TextUtils.isEmpty(subTitle)) {
+            this.shortText = subTitle.trim();
+        }
+
+        if(!TextUtils.isEmpty(plot)) {
+            this.description = plot.trim();
+        }
+
         this.duration = durationSec;
         this.eventId = eventId;
         this.startTime = startTime;
