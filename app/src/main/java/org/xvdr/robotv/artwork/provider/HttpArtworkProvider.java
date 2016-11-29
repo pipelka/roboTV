@@ -62,4 +62,9 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
 
         return response.body().string();
     }
+
+    protected OkHttpClient getClient() {
+        return client;
+    }
+
 }
