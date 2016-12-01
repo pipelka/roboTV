@@ -3,6 +3,7 @@ package org.xvdr.recordings.fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.v17.leanback.app.ProgressBarManager;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
@@ -21,6 +22,7 @@ import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.artwork.provider.TheMovieDatabase;
+import org.xvdr.robotv.artwork.provider.TheTvDb;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.util.List;
@@ -28,36 +30,36 @@ import java.util.List;
 public class CoverSearchFragment extends SearchFragment implements SearchFragment.SearchResultProvider {
 
     private static final int SEARCH_DELAY_MS = 300;
+    private TheMovieDatabase mMovieDb;
+    private TheTvDb tvDb;
 
     private class SearchRunnable implements Runnable {
 
         private String query;
-        private TheMovieDatabase mMovieDb = new TheMovieDatabase(ArtworkFetcher.TMDB_APIKEY, SetupUtils.getLanguage(getActivity()));
-
         @Override
         public void run() {
             mRowsAdapter.clear();
 
-            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new ArtworkPresenter());
-            List<ArtworkHolder> list = mMovieDb.searchAll(query);
-            HeaderItem header;
+            final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new ArtworkPresenter());
+            final List<ArtworkHolder> list = mMovieDb.searchAll(query);
 
-            // no results
-            if(list.isEmpty()) {
-                header = new HeaderItem(getString(R.string.no_search_results, query));
-            }
-            else {
-                header = new HeaderItem(getString(R.string.search_results, query));
-            }
+            list.addAll(tvDb.searchAll(query));
 
-            final ListRow listRow = new ListRow(header, listRowAdapter);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String title = list.isEmpty() ?
+                            getString(R.string.no_search_results, query) :
+                            getString(R.string.search_results, query);
 
-            for(ArtworkHolder item : list) {
-                listRowAdapter.add(item);
-            }
+                    HeaderItem header = new HeaderItem(title);
+                    ListRow listRow = new ListRow(header, listRowAdapter);
+                    mRowsAdapter.add(listRow);
 
-            mRowsAdapter.add(listRow);
-            mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
+                    listRowAdapter.addAll(0, list);
+
+                }
+            });
         }
 
         void setSearchQuery(String newQuery) {
@@ -90,6 +92,9 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
                 activity.setArtwork(holder);
             }
         });
+
+        mMovieDb = new TheMovieDatabase(ArtworkFetcher.TMDB_APIKEY, SetupUtils.getLanguage(getActivity()));
+        tvDb = new TheTvDb(SetupUtils.getLanguage(getActivity()));
 
         mDelayedLoad = new SearchRunnable();
     }
