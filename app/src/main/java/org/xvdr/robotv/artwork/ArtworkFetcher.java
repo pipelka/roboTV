@@ -9,6 +9,7 @@ import org.xvdr.robotv.artwork.provider.HttpEpgImageProvider;
 import org.xvdr.robotv.artwork.provider.RoboTvProvider;
 import org.xvdr.robotv.artwork.provider.StockImageProvider;
 import org.xvdr.robotv.artwork.provider.TheMovieDatabase;
+import org.xvdr.robotv.artwork.provider.TheTvDb;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.model.Event;
 
@@ -31,10 +32,11 @@ public class ArtworkFetcher {
         // fetch epg images template url
         mEpgImageTemplateUrl = getEpgImageTemplateUrl();
 
-        mProviders = new ArtworkProvider[3];
+        mProviders = new ArtworkProvider[4];
         mProviders[0] = new HttpEpgImageProvider(mEpgImageTemplateUrl);
         mProviders[1] = new TheMovieDatabase(TMDB_APIKEY, language);
-        mProviders[2] = new StockImageProvider();
+        mProviders[2] = new TheTvDb(language);
+        mProviders[3] = new StockImageProvider();
     }
 
     public ArtworkHolder fetchForEvent(Event event) throws IOException {
