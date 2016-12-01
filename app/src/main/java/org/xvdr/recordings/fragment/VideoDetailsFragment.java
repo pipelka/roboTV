@@ -64,7 +64,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
     private Movie selectedMovie = null;
     private BackgroundManagerTarget backgroundManagerTarget;
     private DataService service;
-
+    private BackgroundManager backgroundManager;
     private MovieStepFragment actionFragment;
 
     @Override
@@ -148,12 +148,13 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
 
         if(resultCode == Activity.RESULT_OK) {
             selectedMovie = (Movie) data.getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
+            updateBackground(selectedMovie.getBackgroundUrl());
         }
     }
 
 
     private void initBackground() {
-        BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
+        backgroundManager = BackgroundManager.getInstance(getActivity());
         backgroundManager.attach(getActivity().getWindow());
 
         backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
@@ -164,7 +165,11 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
     }
 
     protected void updateBackground(String url) {
-        if(url == null || url.isEmpty()) {
+        int color_background = Utils.getColor(getActivity(), R.color.recordings_background);
+
+        if(TextUtils.isEmpty(url) || !url.endsWith(".jpg")) {
+            backgroundManager.setDrawable(null);
+            backgroundManager.setColor(color_background);
             return;
         }
 
