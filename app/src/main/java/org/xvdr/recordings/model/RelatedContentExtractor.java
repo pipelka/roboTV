@@ -16,6 +16,10 @@ public class RelatedContentExtractor {
     private Collection<Movie> result = new ArrayList<>(50);
 
     public Collection<Movie> getSeries(String title) {
+        if(collection == null) {
+            return null;
+        }
+
         for(Movie m : collection) {
             if (m.isTvShow() && m.getTitle().equals(title)) {
                 result.add(m);
