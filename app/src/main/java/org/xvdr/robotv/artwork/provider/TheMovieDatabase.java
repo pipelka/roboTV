@@ -17,7 +17,7 @@ import java.util.List;
 public class TheMovieDatabase extends HttpArtworkProvider {
 
     private final static String TAG = "TheMovieDatabase";
-    private final static String IMAGE_BASE_PATH = "http://image.tmdb.org/t/p/w600";
+    private final static String IMAGE_BASE_PATH = "http://image.tmdb.org/t/p/w1280";
 
     private String mApiKey;
     private String mLanguage;
