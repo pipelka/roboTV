@@ -20,7 +20,7 @@ public class EpgEventPresenter extends MoviePresenter {
         Context context = cardView.getContext();
 
         cardView.setTitleText(movie.getTitle());
-        String subText = movie.getDateTime() + (movie.getShortText().isEmpty() ? "" : " - " + movie.getShortText());
+        String subText = movie.getDateTime() + (TextUtils.isEmpty(movie.getShortText()) ? "" : " - " + movie.getShortText());
 
         cardView.setContentText(subText);
 
