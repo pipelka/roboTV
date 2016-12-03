@@ -194,10 +194,6 @@ public class Connection extends Session {
             return Connection.STATUS_NORESPONSE;
         }
 
-        if(resp == null) {
-            return STATUS_NORESPONSE;
-        }
-
         int status = (int)resp.getU32();
 
         if(status != Connection.STATUS_SUCCESS || position == 0) {
