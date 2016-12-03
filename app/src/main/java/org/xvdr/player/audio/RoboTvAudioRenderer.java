@@ -10,6 +10,7 @@ import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.SimpleDecoderAudioRenderer;
 import com.google.android.exoplayer2.decoder.DecoderInputBuffer;
 import com.google.android.exoplayer2.decoder.SimpleOutputBuffer;
+import com.google.android.exoplayer2.drm.ExoMediaCrypto;
 import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.player.Player;
@@ -61,7 +62,7 @@ public class RoboTvAudioRenderer extends SimpleDecoderAudioRenderer {
     }
 
     @Override
-    protected RoboTvAudioDecoder createDecoder(Format format) throws AudioDecoderException {
+    protected RoboTvAudioDecoder createDecoder(Format format, ExoMediaCrypto crypto) throws AudioDecoderException {
         decoder = null;
 
         if(format.sampleMimeType.equals(MimeTypes.AUDIO_AC3)) {

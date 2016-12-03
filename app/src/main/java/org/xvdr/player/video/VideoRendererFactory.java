@@ -18,7 +18,6 @@ public class VideoRendererFactory {
             return new ShieldVideoRenderer(
                     context,
                     MediaCodecSelector.DEFAULT,
-                    MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
                     5000, // joining time
                     null,
                     true,
@@ -30,7 +29,6 @@ public class VideoRendererFactory {
         return new MediaCodecVideoRenderer(
                 context,
                 MediaCodecSelector.DEFAULT,
-                MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
                 5000, // joining time
                 null,
                 true,

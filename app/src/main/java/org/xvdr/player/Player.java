@@ -181,8 +181,7 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
             true,
             handler,
             null,
-            audioCapabilities,
-            AudioManager.STREAM_MUSIC);
+            audioCapabilities);
 
         Renderer[] renderers = {videoRenderer, internalAudioRenderer, exoAudioRenderer};
 
