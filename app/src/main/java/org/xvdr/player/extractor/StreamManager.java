@@ -62,7 +62,7 @@ class StreamManager extends SparseArray<StreamReader> {
         // fill remaining tracks
         for(int i = index; i < MAX_OUTPUT_TRACKS; i++) {
             Format format = Format.createContainerFormat("", null, null,
-                            MimeTypes.VIDEO_UNKNOWN, Format.NO_VALUE);
+                            MimeTypes.TEXT_VTT, Format.NO_VALUE);
             trackOutput[i].format(format);
         }
     }
