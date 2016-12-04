@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.upstream.DefaultAllocator;
 class RoboTvLoadControl  implements LoadControl {
 
     private final static long MAX_BUFFER_SIZE = 10 * 1024 * 1024; // 10mb
+    private final static long MAX_BUFFER_DURATION = 5000000; // 5 seconds
 
     private final DefaultAllocator allocator;
 
@@ -50,6 +51,6 @@ class RoboTvLoadControl  implements LoadControl {
     @Override
     public boolean shouldContinueLoading(long bufferedDurationUs) {
         long bytesAllocated = allocator.getTotalBytesAllocated();
-        return (bytesAllocated < MAX_BUFFER_SIZE);
+        return (bytesAllocated < MAX_BUFFER_SIZE || bufferedDurationUs < MAX_BUFFER_DURATION);
     }
 }
