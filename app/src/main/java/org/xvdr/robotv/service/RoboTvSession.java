@@ -2,10 +2,8 @@ package org.xvdr.robotv.service;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Point;
 import android.media.PlaybackParams;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
@@ -16,9 +14,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
-import android.view.Display;
 import android.view.Surface;
-import android.view.WindowManager;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
@@ -48,8 +44,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     private Handler mHandler;
     private NotificationHandler mNotification;
 
-    private Point mDisplaySize = new Point();
-
     private class TuneRunnable implements Runnable {
         private Uri mChannelUri;
 
@@ -71,12 +65,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         mContext = context;
         mInputId = inputId;
         mContentResolver =  mContext.getContentResolver();
-
-        // get display width / height
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-
-        display.getSize(mDisplaySize);
 
         mNotification = new NotificationHandler(mContext);
 
@@ -246,10 +234,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         TvTrackInfo info = TrackInfoMapper.findTrackInfo(
                                bundle,
                                StreamBundle.CONTENT_VIDEO,
-                               0,
-                               mDisplaySize.x,
-                               mDisplaySize.y
-                           );
+                               0);
 
         if(info != null) {
             tracks.add(info);

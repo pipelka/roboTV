@@ -6,7 +6,7 @@ import org.xvdr.robotv.client.StreamBundle;
 
 public class TrackInfoMapper {
 
-    static public TvTrackInfo streamToTrackInfo(StreamBundle.Stream stream, int displayWidth, int displayHeight) {
+    static public TvTrackInfo streamToTrackInfo(StreamBundle.Stream stream) {
         if(stream.content == StreamBundle.CONTENT_AUDIO) {
             return new TvTrackInfo.Builder(TvTrackInfo.TYPE_AUDIO, Integer.toString(stream.physicalId))
                    .setAudioChannelCount(stream.channels)
@@ -22,15 +22,9 @@ public class TrackInfoMapper {
             }
 
             double stretchWidth = (double) stream.width * stream.pixelAspectRatio;
-            double factor = 1.0;
 
-            // scale down picture (if larger than display)
-            if(stream.width != 0 && stretchWidth > displayWidth) {
-                factor = displayWidth / stretchWidth;
-            }
-
-            builder.setVideoWidth((int)(stretchWidth * factor));
-            builder.setVideoHeight((int)(stream.height * factor));
+            builder.setVideoWidth((int)stretchWidth);
+            builder.setVideoHeight(stream.height);
 
             return builder.build();
         }
@@ -38,11 +32,7 @@ public class TrackInfoMapper {
         return null;
     }
 
-    static public TvTrackInfo streamToTrackInfo(StreamBundle.Stream stream) {
-        return streamToTrackInfo(stream, 0, 0);
-    }
-
-    static public TvTrackInfo findTrackInfo(StreamBundle bundle, int contentType, int streamIndex, int width, int height) {
+    static public TvTrackInfo findTrackInfo(StreamBundle bundle, int contentType, int streamIndex) {
         if(streamIndex < 0) {
             return null;
         }
@@ -54,7 +44,7 @@ public class TrackInfoMapper {
 
             if(stream.content == contentType) {
                 if(count == streamIndex) {
-                    return streamToTrackInfo(stream, width, height);
+                    return streamToTrackInfo(stream);
                 }
 
                 count++;
@@ -62,9 +52,5 @@ public class TrackInfoMapper {
         }
 
         return null;
-    }
-
-    static public TvTrackInfo findTrackInfo(StreamBundle bundle, int contentType, int streamIndex) {
-        return findTrackInfo(bundle, contentType, streamIndex, 0, 0);
     }
 }
