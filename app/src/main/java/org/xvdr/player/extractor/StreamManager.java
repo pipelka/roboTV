@@ -1,5 +1,6 @@
 package org.xvdr.player.extractor;
 
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.android.exoplayer2.Format;
@@ -56,6 +57,11 @@ class StreamManager extends SparseArray<StreamReader> {
 
             if(isSteamSupported(stream)) {
                 put(pid, new StreamReader(trackOutput[index++], stream));
+            }
+
+            if(index >= MAX_OUTPUT_TRACKS) {
+                Log.e(TAG, "maximum stream count of " + MAX_OUTPUT_TRACKS + " reached. skipping other streams");
+                return;
             }
         }
 
