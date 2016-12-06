@@ -1,10 +1,14 @@
 package org.xvdr.robotv.tv;
 
 import android.media.tv.TvTrackInfo;
+import android.os.Build;
+import android.util.Log;
 
 import org.xvdr.robotv.client.StreamBundle;
 
 public class TrackInfoMapper {
+
+    final private static String TAG = "TrackInfoMapper";
 
     static public TvTrackInfo streamToTrackInfo(StreamBundle.Stream stream) {
         if(stream.content == StreamBundle.CONTENT_AUDIO) {
@@ -21,10 +25,26 @@ public class TrackInfoMapper {
                 builder.setVideoFrameRate(stream.fpsRate / stream.fpsScale);
             }
 
-            double stretchWidth = (double) stream.width * stream.pixelAspectRatio;
+            int stretchWidth = (int)((double) stream.width * stream.pixelAspectRatio);
+            float pixelAspect = (float)stream.pixelAspectRatio;
 
-            builder.setVideoWidth((int)stretchWidth);
-            builder.setVideoHeight(stream.height);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                builder.setVideoWidth(stream.width);
+                builder.setVideoHeight(stream.height);
+                builder.setVideoPixelAspectRatio(pixelAspect);
+            }
+            else {
+                builder.setVideoWidth(stretchWidth);
+                builder.setVideoHeight(stream.height);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                builder.setVideoActiveFormatDescription((byte)8); // full frame image
+            }
+
+            Log.i(TAG, "native size: " + stream.width + "x" + stream.height);
+            Log.i(TAG, "pixel aspect ratio: " + stream.pixelAspectRatio);
+            Log.i(TAG, "video size: " + stretchWidth + "x" + stream.height);
 
             return builder.build();
         }
