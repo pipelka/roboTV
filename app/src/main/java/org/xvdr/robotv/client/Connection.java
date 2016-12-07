@@ -58,7 +58,7 @@ public class Connection extends Session {
 
     /* OPCODE 100 - 119: XVDR network functions for recording access */
     public static final int XVDR_RECORDINGS_DISKSIZE = 100;
-    public static final int XVDR_RECORDINGS_GETCOUNT = 101;
+    public static final int XVDR_RECORDINGS_GETFOLDERS = 101;
     public static final int XVDR_RECORDINGS_GETLIST = 102;
     public static final int XVDR_RECORDINGS_RENAME = 103;
     public static final int XVDR_RECORDINGS_DELETE = 104;

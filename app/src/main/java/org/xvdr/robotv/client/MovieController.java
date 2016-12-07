@@ -30,13 +30,11 @@ public class MovieController {
     final private String language;
 
     private Collection<Movie> movieCollection = null;
-    private TreeSet<String> folderList;
 
     public MovieController(Connection connection, String language) {
         this.language = language;
         this.connection = connection;
         this.handler = new Handler();
-        this.folderList = new TreeSet<>();
     }
 
     public int deleteMovie(Movie movie) {
@@ -74,8 +72,6 @@ public class MovieController {
                 Log.d(TAG, "finished loading (" + list.size() + " movies)");
 
                 movieCollection = list;
-                updateFolderList();
-                Log.d(TAG, "loaded " + folderList.size() + " folders");
                 listener.onMovieCollectionUpdated(movieCollection, STATUS_Collection_Ready);
             }
         });
@@ -116,29 +112,22 @@ public class MovieController {
         return connection.renameRecording(movie.getRecordingId(), newName);
     }
 
-    private void updateFolderList() {
-        String seriesFolder = connection.getConfig("SeriesFolder");
-
-        for(Movie movie : movieCollection) {
-            String category = movie.getFolder();
-
-            if (!seriesFolder.isEmpty() && category.startsWith(seriesFolder + "/")) {
-                continue;
-            }
-
-            if(category.isEmpty()) {
-                continue;
-            }
-
-            folderList.add(movie.getFolder());
-        }
-
-        if (!seriesFolder.isEmpty()) {
-            folderList.add(seriesFolder);
-        }
-    }
-
     public TreeSet<String> getFolderList() {
+        TreeSet<String> folderList = new TreeSet<>();
+
+        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETFOLDERS);
+        Packet r = connection.transmitMessage(p);
+
+        if(r == null) {
+            return folderList;
+        }
+
+        r.uncompress();
+
+        while(!r.eop()) {
+            folderList.add(r.getString());
+        }
+
         return folderList;
     }
 
