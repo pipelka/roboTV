@@ -41,6 +41,7 @@ cd ffmpeg
     --disable-avfilter \
     --disable-symver \
     --enable-avresample \
+    --enable-decoder=aac_latm \
     --enable-decoder=ac3 \
     --enable-decoder=eac3 \
     --enable-decoder=mp3
@@ -79,6 +80,7 @@ make install-libs
     --disable-avfilter \
     --disable-symver \
     --enable-avresample \
+    --enable-decoder=aac_latm \
     --enable-decoder=ac3 \
     --enable-decoder=eac3 \
     --enable-decoder=mp3
