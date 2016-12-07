@@ -30,6 +30,7 @@ class StreamManager extends SparseArray<StreamReader> {
             case MimeTypes.AUDIO_AC3:
             case MimeTypes.AUDIO_E_AC3:
             case MimeTypes.AUDIO_MPEG:
+            case MimeTypes.BASE_TYPE_AUDIO + "/aac_latm":
                 return true;
         }
 

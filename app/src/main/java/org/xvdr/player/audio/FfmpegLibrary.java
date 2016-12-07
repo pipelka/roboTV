@@ -69,6 +69,8 @@ public final class FfmpegLibrary {
     switch (mimeType) {
       case MimeTypes.AUDIO_AAC:
         return "aac";
+      case  MimeTypes.BASE_TYPE_AUDIO + "/aac_latm":
+        return "aac_latm";
       case MimeTypes.AUDIO_MPEG:
       case MimeTypes.AUDIO_MPEG_L1:
       case MimeTypes.AUDIO_MPEG_L2:

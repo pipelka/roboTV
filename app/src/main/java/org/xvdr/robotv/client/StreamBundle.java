@@ -71,6 +71,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         TYPE_AUDIO_AC3,
         TYPE_AUDIO_EAC3,
         TYPE_AUDIO_AAC,
+        TYPE_AUDIO_LATM,
         TYPE_AUDIO_MPEG2
     };
 
@@ -180,6 +181,9 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         }
         else if(type == TYPE_AUDIO_AAC) {
             return MimeTypes.AUDIO_AAC;
+        }
+        else if(type == TYPE_AUDIO_LATM) {
+            return MimeTypes.BASE_TYPE_AUDIO + "/aac_latm";
         }
         else if(type == TYPE_AUDIO_EAC3) {
             return MimeTypes.AUDIO_E_AC3;
