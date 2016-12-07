@@ -157,12 +157,14 @@ public class DataService extends Service {
         // check if the server has changed
         String server = SetupUtils.getServer(this);
 
-        if(connection != null && connectionStatus == STATUS_Server_NotConnected) {
+        if(connectionStatus == STATUS_Server_NotConnected) {
             postOpen();
         }
-        else if(connection != null && !connection.getHostname().equals(server)) {
+        else if(!connection.getHostname().equals(server)) {
             Log.i(TAG, "new server: " + server);
             connection.close();
+            connectionStatus = STATUS_Server_NotConnected;
+
             postOpen();
         }
 
@@ -205,9 +207,13 @@ public class DataService extends Service {
             return true;
         }
 
+        String server = SetupUtils.getServer(this);
         connectionStatus = STATUS_Server_Connecting;
         connection.setPriority(1); // low priority for DataService
-        if(!connection.open(SetupUtils.getServer(this))) {
+
+        Log.i(TAG, "connecting to " + server + "...");
+
+        if(!connection.open(server)) {
             connection.close();
             connectionStatus = STATUS_Server_NotConnected;
             postOnConnectionError();
