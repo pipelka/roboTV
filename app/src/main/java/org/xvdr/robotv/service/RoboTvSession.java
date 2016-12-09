@@ -302,7 +302,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     }
 
     @Override
-    public void onRenderedFirstFrame(Surface surface) {
+    public void onRenderedFirstFrame() {
         notifyVideoAvailable();
     }
 

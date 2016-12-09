@@ -240,7 +240,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     @Override
-    public void onRenderedFirstFrame(Surface surface) {
+    public void onRenderedFirstFrame() {
     }
 
     @Override

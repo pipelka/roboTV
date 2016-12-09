@@ -3,28 +3,20 @@ package org.xvdr.player;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.LoadControl;
-import com.google.android.exoplayer2.Renderer;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
-import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
-import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
-import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
-import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -32,26 +24,18 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.PriorityHandlerThread;
-import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
-import org.xvdr.player.audio.RoboTvAudioRenderer;
 import org.xvdr.player.extractor.RoboTvExtractor;
 import org.xvdr.player.source.RoboTvDataSourceFactory;
 import org.xvdr.player.trackselection.RoboTvTrackSelector;
-import org.xvdr.player.video.VideoRendererFactory;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-public class Player implements ExoPlayer.EventListener, VideoRendererEventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, AudioRendererEventListener {
+public class Player implements ExoPlayer.EventListener, SimpleExoPlayer.VideoListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, AudioRendererEventListener {
 
     private static final String TAG = "Player";
-
-    private final static int CHANNELS_DEFAULT = 0;
-    private final static int CHANNELS_STEREO = 2;
-    private final static int CHANNELS_SURROUND = 4;
-    private final static int CHANNELS_DIGITAL51 = 6;
 
     public interface Listener  {
 
@@ -69,34 +53,24 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         void onVideoTrackChanged(Format format);
 
-        void onRenderedFirstFrame(Surface surface);
+        void onRenderedFirstFrame();
 
         void onStreamError(int status);
     }
-
-    private Renderer videoRenderer = null;
-    private Renderer internalAudioRenderer = null;
-    private Renderer exoAudioRenderer = null;
 
     private Listener listener;
     private Handler handler;
     private Surface surface;
 
-    final private ExoPlayer player;
+    final private SimpleExoPlayer player;
     final private RoboTvTrackSelector trackSelector;
     final private RoboTvDataSourceFactory dataSourceFactory;
     final private RoboTvExtractor.Factory extractorFactory;
     final private PositionReference position;
     final private TrickPlayController trickPlayController;
 
-    private boolean audioPassthrough;
-
     static public Uri createLiveUri(int channelUid) {
         return Uri.parse("robotv://livetv/" + channelUid);
-    }
-
-    static public Uri createRecordingUri(String recordingId) {
-        return Uri.parse("robotv://recording/" + recordingId);
     }
 
     static public Uri createRecordingUri(String recordingId, long position) {
@@ -108,29 +82,12 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough) throws IOException {
-        this(
-            context,
-            server,
-            language,
-            listener,
-            audioPassthrough,
-            new RoboTvLoadControl()
-        );
-    }
-
-    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, LoadControl loadControl) throws IOException {
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
         this.listener = listener;
-        this.audioPassthrough = audioPassthrough;
-        this.audioPassthrough = audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3) && audioPassthrough;
-        int channelConfiguration = audioCapabilities.getMaxChannelCount();
+        boolean passthrough = audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3) && audioPassthrough;
 
-        Log.i(TAG, "audio passthrough: " + (this.audioPassthrough ? "enabled" : "disabled"));
-
-        if(!this.audioPassthrough) {
-            Log.i(TAG, "audio channel configuration: " + nameOfChannelConfiguration(channelConfiguration));
-        }
+        Log.i(TAG, "audio passthrough: " + (passthrough ? "enabled" : "disabled"));
 
         PriorityHandlerThread handlerThread = new PriorityHandlerThread("roboTV:player", PriorityHandlerThread.NORM_PRIORITY);
         handlerThread.start();
@@ -139,49 +96,12 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
 
         position = new PositionReference();
 
-        videoRenderer = VideoRendererFactory.create(context, handler, this);
-
-        internalAudioRenderer = new RoboTvAudioRenderer(
-            handler,
-            null,
-            this.audioPassthrough);
-
-        // codecSelector disabling MPEG audio (handled by RoboTvAudioDecoder)
-        MediaCodecSelector codecSelector = new MediaCodecSelector() {
-            @Override
-            public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder) throws MediaCodecUtil.DecoderQueryException {
-                if(mimeType.equals(MimeTypes.AUDIO_MPEG)) {
-                    return null;
-                }
-
-                if(mimeType.equals(MimeTypes.AUDIO_AC3) && !Player.this.audioPassthrough) {
-                    return null;
-                }
-
-                return MediaCodecUtil.getDecoderInfo(mimeType, requiresSecureDecoder);
-            }
-
-            @Override
-            public MediaCodecInfo getPassthroughDecoderInfo() throws MediaCodecUtil.DecoderQueryException {
-                return MediaCodecUtil.getPassthroughDecoderInfo();
-            }
-        };
-
-        exoAudioRenderer = new MediaCodecAudioRenderer(
-            codecSelector,
-            null,
-            true,
-            handler,
-            null,
-            audioCapabilities);
-
-        Renderer[] renderers = {videoRenderer, internalAudioRenderer, exoAudioRenderer};
-
         trackSelector = new RoboTvTrackSelector();
         trackSelector.setParameters(new RoboTvTrackSelector.Parameters().withPreferredAudioLanguage(language));
 
-        player = ExoPlayerFactory.newInstance(renderers, trackSelector, loadControl);
+        player = new SimpleRoboTvPlayer(context, trackSelector, passthrough);
         player.addListener(this);
+        player.setVideoListener(this);
 
         dataSourceFactory = new RoboTvDataSourceFactory(position, language, this);
         dataSourceFactory.connect(server);
@@ -200,19 +120,15 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         player.release();
 
         dataSourceFactory.release();
-
-        videoRenderer = null;
-        internalAudioRenderer = null;
     }
 
     public void setSurface(Surface surface) {
+        player.setVideoSurface(surface);
         this.surface = surface;
-        sendMessage(videoRenderer, C.MSG_SET_SURFACE, surface, true);
     }
 
     public void setStreamVolume(float volume) {
-        sendMessage(internalAudioRenderer, C.MSG_SET_VOLUME, volume);
-        sendMessage(exoAudioRenderer, C.MSG_SET_VOLUME, volume);
+        player.setVolume(volume);
     }
 
     public void play() {
@@ -247,8 +163,8 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         );
 
         player.prepare(source);
+        player.setVideoSurface(surface);
 
-        sendMessage(videoRenderer, C.MSG_SET_SURFACE, surface, true);
         return true;
     }
 
@@ -309,39 +225,6 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
         trickPlayController.start(params.getSpeed());
     }
 
-    private void sendMessage(ExoPlayer.ExoPlayerComponent target, int messageType, Object message) {
-        sendMessage(target, messageType, message, false);
-    }
-
-    private void sendMessage(ExoPlayer.ExoPlayerComponent target, int messageType, Object message, boolean blocking) {
-        ExoPlayer.ExoPlayerMessage msg = new ExoPlayer.ExoPlayerMessage(target, messageType, message);
-
-        if(blocking) {
-            player.blockingSendMessages(msg);
-        }
-        else {
-            player.sendMessages();
-        }
-    }
-
-    private static String nameOfChannelConfiguration(int channelConfiguration) {
-        switch(channelConfiguration) {
-            case CHANNELS_DEFAULT:
-                return "default (unknown)";
-
-            case CHANNELS_STEREO:
-                return "stereo";
-
-            case CHANNELS_SURROUND:
-                return "surround";
-
-            case CHANNELS_DIGITAL51:
-                return "digital51";
-        }
-
-        return "invalid configuration";
-    }
-
     public Connection getConnection() {
         return dataSourceFactory.getConnection();
     }
@@ -375,36 +258,16 @@ public class Player implements ExoPlayer.EventListener, VideoRendererEventListen
     }
 
     @Override
-    public void onVideoEnabled(DecoderCounters counters) {
-    }
-
-    @Override
-    public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
-    }
-
-    @Override
-    public void onVideoInputFormatChanged(Format format) {
-    }
-
-    @Override
-    public void onDroppedFrames(int count, long elapsed) {
-    }
-
-    @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
     }
 
     @Override
-    public void onRenderedFirstFrame(Surface surface) {
+    public void onRenderedFirstFrame() {
         if(trickPlayController.activated()) {
             trickPlayController.postTick();
         }
 
-        listener.onRenderedFirstFrame(surface);
-    }
-
-    @Override
-    public void onVideoDisabled(DecoderCounters counters) {
+        listener.onRenderedFirstFrame();
     }
 
     @Override
