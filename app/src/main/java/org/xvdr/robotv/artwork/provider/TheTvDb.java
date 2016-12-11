@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -55,7 +56,12 @@ public class TheTvDb extends HttpArtworkProvider {
                 MediaType.parse("application/json"),
                 "{\"apikey\":\"" + apiKey + "\"}");
 
-        Request request = new Request.Builder().url(baseUrl + "/login")
+        HttpUrl httpUrl = HttpUrl.parse(baseUrl + "/login");
+        if(httpUrl == null) {
+            return false;
+        }
+
+        Request request = new Request.Builder().url(httpUrl)
                 .post(requestBody).build();
 
         Response response;

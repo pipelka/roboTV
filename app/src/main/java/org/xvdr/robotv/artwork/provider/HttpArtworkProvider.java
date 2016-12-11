@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.ConnectionPool;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,8 +34,13 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
         mDelayAfterRequestMs = delayMs;
     }
 
-    boolean checkUrlExists(String url) throws IOException {
-        Request request = new Request.Builder().url(url).build();
+    boolean checkUrlExists(String address) throws IOException {
+        HttpUrl httpUrl = HttpUrl.parse(address);
+        if(httpUrl == null) {
+            return false;
+        }
+
+        Request request = new Request.Builder().url(httpUrl).build();
         Response response = client.newCall(request).execute();
 
         int status = response.code();
@@ -47,8 +53,13 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
         return false;
     }
 
-    String getResponseFromServer(String url) throws IOException {
-        Request request = new Request.Builder().url(url).build();
+    String getResponseFromServer(String address) throws IOException {
+        HttpUrl httpUrl = HttpUrl.parse(address);
+        if(httpUrl == null) {
+            return "";
+        }
+
+        Request request = new Request.Builder().url(httpUrl).build();
         Response response = client.newCall(request).execute();
 
         if(mDelayAfterRequestMs > 0) {
