@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
+import android.text.TextUtils;
 
 import com.google.android.exoplayer2.audio.AudioCapabilities;
 
@@ -50,48 +51,52 @@ public class SetupFragment extends GuidedStepFragment {
         String server = SetupUtils.getServer(getActivity());
 
         mActionServer = new GuidedAction.Builder(getActivity())
-        .id(ACTION_SERVER)
-        .title(server)
-        .description(getString(R.string.setup_root_server_desc))
-        .editable(true)
-        .build();
+                .id(ACTION_SERVER)
+                .title(server)
+                .description(getString(R.string.setup_root_server_desc))
+                .editable(true)
+                .build();
 
         mActionLanguage = new GuidedAction.Builder(getActivity())
-        .id(ACTION_LANGUAGE)
-        .title(getString(R.string.setup_root_language_title))
-        .build();
+                .id(ACTION_LANGUAGE)
+                .title(getString(R.string.setup_root_language_title))
+                .build();
 
         mActionPassthrough = new GuidedAction.Builder(getActivity())
-        .id(ACTION_PASSTHROUGH)
-        .title(getString(R.string.setup_root_passthrough_title))
-        .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
-        .checked(SetupUtils.getPassthrough(getActivity()))
-        .build();
+                .id(ACTION_PASSTHROUGH)
+                .title(getString(R.string.setup_root_passthrough_title))
+                .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
+                .checked(SetupUtils.getPassthrough(getActivity()))
+                .build();
 
         mActionTimeshift = new GuidedAction.Builder(getActivity())
-        .id(ACTION_TIMESHIFT)
-        .title(getString(R.string.setup_root_timeshift_title))
-        .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
-        .checked(SetupUtils.getTimeshiftEnabled(getActivity()))
-        .build();
+                .id(ACTION_TIMESHIFT)
+                .title(getString(R.string.setup_root_timeshift_title))
+                .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
+                .checked(SetupUtils.getTimeshiftEnabled(getActivity()))
+                .build();
 
         actions.add(mActionServer);
         actions.add(mActionLanguage);
 
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(getActivity());
 
-        if(audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3)) {
+        if (audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3)) {
             actions.add(mActionPassthrough);
         }
 
         actions.add(mActionTimeshift);
 
-        actions.add(new GuidedAction.Builder(getActivity())
-                    .id(ACTION_IMPORT)
-                    .title(getString(R.string.setup_root_import_title))
-                    .description(getString(R.string.setup_root_import_desc))
-                    .hasNext(true)
-                    .build());
+        SetupActivity activity = (SetupActivity) getActivity();
+
+        if (!TextUtils.isEmpty(activity.getInputId())) {
+            actions.add(new GuidedAction.Builder(getActivity())
+                .id(ACTION_IMPORT)
+                .title(getString(R.string.setup_root_import_title))
+                .description(getString(R.string.setup_root_import_desc))
+                .hasNext(true)
+                .build());
+        }
     }
 
     @Override

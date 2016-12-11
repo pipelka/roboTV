@@ -34,6 +34,10 @@ public class SetupActivity extends Activity {
         GuidedStepFragment.addAsRoot(this, new SetupFragment(), android.R.id.content);
     }
 
+    String getInputId() {
+        return mInputId;
+    }
+
     public boolean registerChannels(final ChannelSyncAdapter.ProgressCallback progress) {
         // reconnect data service
         Intent serviceIntent = new Intent(this, DataService.class);
