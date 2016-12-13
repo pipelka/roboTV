@@ -14,7 +14,6 @@ import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import org.xvdr.player.audio.RoboTvAudioRenderer;
@@ -22,16 +21,14 @@ import org.xvdr.player.video.VideoRendererFactory;
 
 import java.util.ArrayList;
 
-public class SimpleRoboTvPlayer extends SimpleExoPlayer {
+class SimpleRoboTvPlayer extends SimpleExoPlayer {
 
-    private boolean audioPassthrough;
-    private AudioCapabilities audioCapabilities;
-
-    protected SimpleRoboTvPlayer(Context context, TrackSelector trackSelector, boolean audioPassthrough) {
-        super(context, trackSelector, new RoboTvLoadControl(), null, EXTENSION_RENDERER_MODE_OFF, 5000);
-
-        this.audioPassthrough = audioPassthrough;
-        this.audioCapabilities = AudioCapabilities.getCapabilities(context);
+    SimpleRoboTvPlayer(Context context, TrackSelector trackSelector, boolean audioPassthrough) {
+        // this is the ugliest hack on the planet ,...
+        // since we need to set audioPassthrough before super() (which isn't possible)
+        // we pass EXTENSION_RENDERER_MODE_OFF / EXTENSION_RENDERER_MODE_ON for false / true
+        super(context, trackSelector, new RoboTvLoadControl(), null,
+                audioPassthrough ? EXTENSION_RENDERER_MODE_ON : EXTENSION_RENDERER_MODE_OFF, 5000);
     }
 
     protected void buildAudioRenderers(Context context, Handler mainHandler,
@@ -39,24 +36,19 @@ public class SimpleRoboTvPlayer extends SimpleExoPlayer {
                                        int extensionRendererMode, AudioRendererEventListener eventListener,
                                        ArrayList<Renderer> out) {
 
+        final boolean audioPassthrough = (extensionRendererMode == EXTENSION_RENDERER_MODE_ON);
+        AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
+
         // codecSelector disabling MPEG audio (handled by RoboTvAudioDecoder)
         MediaCodecSelector codecSelector = new MediaCodecSelector() {
             @Override
             public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder, boolean requiresTunneling) throws MediaCodecUtil.DecoderQueryException {
-                if (mimeType.equals(MimeTypes.AUDIO_MPEG)) {
-                    return null;
-                }
-
-                if (mimeType.equals(MimeTypes.AUDIO_AC3) && !SimpleRoboTvPlayer.this.audioPassthrough) {
-                    return null;
-                }
-
                 return MediaCodecUtil.getDecoderInfo(mimeType, requiresSecureDecoder, requiresTunneling);
             }
 
             @Override
             public MediaCodecInfo getPassthroughDecoderInfo() throws MediaCodecUtil.DecoderQueryException {
-                return MediaCodecUtil.getPassthroughDecoderInfo();
+                return audioPassthrough ? MediaCodecUtil.getPassthroughDecoderInfo() : null;
             }
         };
 

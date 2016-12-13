@@ -1,7 +1,5 @@
 package org.xvdr.player.trackselection;
 
-import android.os.Handler;
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
@@ -17,10 +15,6 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
 
     private String audioTrackId;
     private String audioLanguage;
-
-    private static boolean isSupported(int formatSupport) {
-        return (formatSupport & RendererCapabilities.FORMAT_SUPPORT_MASK) == RendererCapabilities.FORMAT_HANDLED;
-    }
 
     @Override
     protected TrackSelection[] selectTracks(RendererCapabilities[] rendererCapabilities, TrackGroupArray[] rendererTrackGroupArrays, int[][][] rendererFormatSupports) throws ExoPlaybackException {
@@ -81,7 +75,7 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
 
             for(int trackIndex = 0; trackIndex < trackGroup.length; trackIndex++) {
 
-                if(isSupported(trackFormatSupport[trackIndex])) {
+                if(isSupported(trackFormatSupport[trackIndex], false)) {
                     Format format = trackGroup.getFormat(trackIndex);
                     int trackScore = getScoreFromFormat(format);
 
