@@ -170,8 +170,7 @@ public class RoboTvExtractor implements Extractor {
     }
 
     @Override
-
-    synchronized public void seek(long p) {
+    synchronized public void seek(long p, long timeUs) {
         Log.d(TAG, "seek: " + p);
     }
 
