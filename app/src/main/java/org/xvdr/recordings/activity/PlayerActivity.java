@@ -8,7 +8,6 @@ import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Surface;
 import android.view.SurfaceView;
 
 import com.bumptech.glide.Glide;
@@ -241,6 +240,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     @Override
     public void onRenderedFirstFrame() {
+        mControls.startProgressAutomation();
     }
 
     @Override

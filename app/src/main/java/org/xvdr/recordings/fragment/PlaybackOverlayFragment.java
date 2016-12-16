@@ -261,13 +261,20 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         audioTrackActionAdapter.notifyArrayItemRangeChanged(0, trackCount);
     }
 
-    private void startProgressAutomation() {
+    public void startProgressAutomation() {
         if(mRunnable == null) {
             mRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    mPlaybackControlsRow.setTotalTime((int) player.getDuration());
-                    mPlaybackControlsRow.setCurrentTime((int) player.getDurationSinceStart());
+                    long durationMs = player.getDuration();
+                    if(durationMs > 0) {
+                        mPlaybackControlsRow.setTotalTime((int) durationMs);
+                    }
+
+                    long timeMs = player.getDurationSinceStart();
+                    if(timeMs <= player.getDuration()) {
+                        mPlaybackControlsRow.setCurrentTime((int) timeMs);
+                    }
 
                     mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
 
@@ -287,30 +294,32 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         }
     }
 
+    private void play() {
+        mCurrentPlaybackState = PlaybackState.STATE_PLAYING;
+        setFadingEnabled(true);
+        mPlayPauseAction.setIndex(PlaybackControlsRow.PlayPauseAction.PAUSE);
+        mPlayPauseAction.setIcon(mPlayPauseAction.getDrawable(PlaybackControlsRow.PlayPauseAction.PAUSE));
+        notifyChanged(mPlayPauseAction);
+    }
+
+    private void pause() {
+        mCurrentPlaybackState = PlaybackState.STATE_PAUSED;
+        stopProgressAutomation();
+        setFadingEnabled(false); // if set to false, PlaybackcontrolsRow will always be on the screen
+        mPlayPauseAction.setIndex(PlaybackControlsRow.PlayPauseAction.PLAY);
+        mPlayPauseAction.setIcon(mPlayPauseAction.getDrawable(PlaybackControlsRow.PlayPauseAction.PLAY));
+        notifyChanged(mPlayPauseAction);
+    }
+
     public void playbackStateChanged() {
         mPlaybackControlsRow.setTotalTime((int) player.getDuration());
 
         if(mCurrentPlaybackState != PlaybackState.STATE_PLAYING) {
-            mCurrentPlaybackState = PlaybackState.STATE_PLAYING;
-            startProgressAutomation();
-            setFadingEnabled(true);
-            mPlayPauseAction.setIndex(PlaybackControlsRow.PlayPauseAction.PAUSE);
-            mPlayPauseAction.setIcon(mPlayPauseAction.getDrawable(PlaybackControlsRow.PlayPauseAction.PAUSE));
-            notifyChanged(mPlayPauseAction);
+            play();
         }
         else {
-            mCurrentPlaybackState = PlaybackState.STATE_PAUSED;
-            stopProgressAutomation();
-            setFadingEnabled(false); // if set to false, PlaybackcontrolsRow will always be on the screen
-            mPlayPauseAction.setIndex(PlaybackControlsRow.PlayPauseAction.PLAY);
-            mPlayPauseAction.setIcon(mPlayPauseAction.getDrawable(PlaybackControlsRow.PlayPauseAction.PLAY));
-            notifyChanged(mPlayPauseAction);
+            pause();
         }
-
-        int runTime = (int) player.getDurationSinceStart();
-
-        mPlaybackControlsRow.setCurrentTime(runTime);
-        mPlaybackControlsRow.setBufferedProgress((int) player.getBufferedPosition());
 
         ((PlayerActivity)getActivity()).updatePlaybackState();
     }
@@ -331,16 +340,19 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
     public void fastForward(int timeMs) {
-        player.seek(player.getCurrentPosition() + timeMs);
+        stopProgressAutomation();
+        long position = player.getCurrentPosition() + timeMs;
+        player.seek(position);
     }
 
     public void rewind(int timeMs) {
-        player.seek(player.getCurrentPosition() - timeMs);
+        stopProgressAutomation();
+        long position = Math.max(player.getCurrentPosition() - timeMs, player.getStartPosition());
+        player.seek(position);
     }
 
-
-    public void togglePlayback(boolean playPause) {
-        if(playPause) {
+    public void togglePlayback(boolean play) {
+        if(play) {
             player.play();
         }
         else {
