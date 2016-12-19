@@ -24,6 +24,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.PriorityHandlerThread;
+import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import org.xvdr.player.extractor.RoboTvExtractor;
 import org.xvdr.player.source.RoboTvDataSourceFactory;
@@ -33,7 +34,7 @@ import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-public class Player implements ExoPlayer.EventListener, SimpleExoPlayer.VideoListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, AudioRendererEventListener {
+public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, AudioRendererEventListener, VideoRendererEventListener {
 
     private static final String TAG = "Player";
 
@@ -101,7 +102,7 @@ public class Player implements ExoPlayer.EventListener, SimpleExoPlayer.VideoLis
 
         player = new SimpleRoboTvPlayer(context, trackSelector, passthrough);
         player.addListener(this);
-        player.setVideoListener(this);
+        player.setVideoDebugListener(this);
 
         dataSourceFactory = new RoboTvDataSourceFactory(position, language, this);
         dataSourceFactory.connect(server);
@@ -258,16 +259,38 @@ public class Player implements ExoPlayer.EventListener, SimpleExoPlayer.VideoLis
     }
 
     @Override
+    public void onVideoEnabled(DecoderCounters counters) {
+    }
+
+    @Override
+    public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
+    }
+
+    @Override
+    public void onVideoInputFormatChanged(Format format) {
+
+    }
+
+    @Override
+    public void onDroppedFrames(int count, long elapsedMs) {
+    }
+
+    @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
     }
 
     @Override
-    public void onRenderedFirstFrame() {
+    public void onRenderedFirstFrame(Surface surface) {
         if(trickPlayController.activated()) {
             trickPlayController.postTick();
+            return;
         }
 
         listener.onRenderedFirstFrame();
+    }
+
+    @Override
+    public void onVideoDisabled(DecoderCounters counters) {
     }
 
     @Override
