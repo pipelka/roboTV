@@ -1,7 +1,6 @@
 package org.xvdr.player;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.extractor.TimestampAdjuster;
 
 public class PositionReference {
 
@@ -13,8 +12,6 @@ public class PositionReference {
 
     private boolean trickPlayMode = false;
 
-    final private TimestampAdjuster timestampAdjuster = new TimestampAdjuster(TimestampAdjuster.DO_NOT_OFFSET);
-
     PositionReference() {
         reset();
     }
@@ -23,7 +20,6 @@ public class PositionReference {
         startPosition = System.currentTimeMillis();
         endPosition = C.TIME_UNSET;
         currentPosition = startPosition;
-        timestampAdjuster.reset();
     }
 
     public void set(long timeUs, long wallClockTime) {
@@ -62,10 +58,6 @@ public class PositionReference {
 
     public long timeUsFromPosition(long position) {
         return timeUs + (position - currentPosition) * 1000;
-    }
-
-    public long adjustTimestamp(long ts) {
-        return timestampAdjuster.adjustTsTimestamp(ts);
     }
 
     void setTrickPlayMode(boolean mode) {

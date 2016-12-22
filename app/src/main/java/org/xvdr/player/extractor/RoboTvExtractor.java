@@ -9,6 +9,7 @@ import com.google.android.exoplayer2.extractor.ExtractorOutput;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.extractor.PositionHolder;
 import com.google.android.exoplayer2.extractor.SeekMap;
+import com.google.android.exoplayer2.extractor.TimestampAdjuster;
 
 import org.xvdr.player.BufferPacket;
 import org.xvdr.player.PositionReference;
@@ -66,12 +67,17 @@ public class RoboTvExtractor implements Extractor {
     final private StreamManager streamManager;
     final private Listener listener;
     final private PositionReference position;
+    final private TimestampAdjuster timestampAdjuster;
+
+
+    private boolean seenFirstTimestamp = false;
 
     private RoboTvExtractor(PositionReference position, Listener listener) {
         this.listener = listener;
         this.position = position;
         this.scratch = new ExtractorBufferPacket(new byte[1024]);
         this.streamManager = new StreamManager();
+        this.timestampAdjuster = new TimestampAdjuster(TimestampAdjuster.DO_NOT_OFFSET);
     }
 
     @Override
@@ -111,8 +117,6 @@ public class RoboTvExtractor implements Extractor {
             Log.d(TAG, "skipping " + bytesRead + " bytes (stream change packet)");
             input.skipFully(bytesRead);
 
-            // reset position reference
-            position.reset();
             return RESULT_CONTINUE;
         }
 
@@ -148,8 +152,14 @@ public class RoboTvExtractor implements Extractor {
             return RESULT_CONTINUE;
         }
 
-        // convert TS -> timeUs
-        long timeUs = position.adjustTimestamp(pts);
+        // register first DTS (to compute to offset)
+        if(!seenFirstTimestamp) {
+            timestampAdjuster.adjustTsTimestamp(dts);
+            seenFirstTimestamp = true;
+        }
+
+        // convert PTS -> timeUs
+        long timeUs = timestampAdjuster.adjustTsTimestamp(pts);
 
         // consume stream data
         reader.consume(input, size, timeUs, C.BUFFER_FLAG_KEY_FRAME);
@@ -172,6 +182,8 @@ public class RoboTvExtractor implements Extractor {
     @Override
     synchronized public void seek(long p, long timeUs) {
         Log.d(TAG, "seek: " + p);
+        timestampAdjuster.reset();
+        seenFirstTimestamp = false;
     }
 
     @Override
