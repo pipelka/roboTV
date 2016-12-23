@@ -159,7 +159,7 @@ class RoboTvDataSource implements DataSource {
             }
 
             request.createUid();
-            request.putU8(position.getTrickPlayMode() ? (short)1 : (short)0);
+            request.putU8((short)0);
 
             if(!connection.transmitMessage(request, response)) {
                 throw new IOException("failed to request packet from server");
