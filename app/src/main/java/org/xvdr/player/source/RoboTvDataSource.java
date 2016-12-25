@@ -22,6 +22,7 @@ class RoboTvDataSource implements DataSource {
 
         void onOpenStreamError(int status);
 
+        void onServerTuned(int status);
     }
 
     private String language;
@@ -104,6 +105,10 @@ class RoboTvDataSource implements DataSource {
 
         int status = connection.openStream(channelUid, language, false, 50);
 
+        if(listener != null) {
+            listener.onServerTuned(status);
+        }
+
         if(status == Connection.STATUS_SUCCESS) {
             Log.d(TAG, "live stream opened");
             return true;
@@ -123,6 +128,10 @@ class RoboTvDataSource implements DataSource {
         long position = Long.parseLong(uri.getQueryParameter("position"));
 
         int status = connection.openRecording(recordingId, position);
+
+        if(listener != null) {
+            listener.onServerTuned(status);
+        }
 
         if(status == Connection.STATUS_SUCCESS) {
             Log.d(TAG, "recording opened");

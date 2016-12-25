@@ -5,6 +5,7 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.PlaybackParams;
 import android.net.Uri;
+import android.os.ConditionVariable;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
@@ -69,6 +70,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     final private RoboTvExtractor.Factory extractorFactory;
     final private PositionReference position;
     final private TrickPlayController trickPlayController;
+    private final ConditionVariable openConditionVariable;
 
     static public Uri createLiveUri(int channelUid) {
         return Uri.parse("robotv://livetv/" + channelUid);
@@ -93,6 +95,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
         PriorityHandlerThread handlerThread = new PriorityHandlerThread("roboTV:player", PriorityHandlerThread.NORM_PRIORITY);
         handlerThread.start();
 
+        openConditionVariable = new ConditionVariable();
         handler = new Handler(handlerThread.getLooper());
 
         position = new PositionReference();
@@ -153,20 +156,28 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
         position.reset();
     }
 
-    public boolean open(Uri uri) {
+    public void open(Uri uri) {
         stop();
 
         MediaSource source = new ExtractorMediaSource(
-            uri,
-            dataSourceFactory,
-            extractorFactory,
-            handler, null
+                uri,
+                dataSourceFactory,
+                extractorFactory,
+                handler, null
         );
 
         player.prepare(source);
         player.setVideoSurface(surface);
+    }
 
-        return true;
+    public void openSync(Uri uri) {
+        Log.d(TAG, "open sync: " + uri.toString());
+        openConditionVariable.close();
+
+        open(uri);
+
+        openConditionVariable.block(5000);
+        Log.d(TAG, "open sync - done");
     }
 
     public void selectAudioTrack(String trackId) {
@@ -336,6 +347,11 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
         if(listener != null) {
             listener.onStreamError(status);
         }
+    }
+
+    @Override
+    public void onServerTuned(int status) {
+        openConditionVariable.open();
     }
 
     @Override

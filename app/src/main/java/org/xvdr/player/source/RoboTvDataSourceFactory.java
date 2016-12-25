@@ -25,6 +25,8 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
         void onReconnect();
 
         void onStreamError(int status);
+
+        void onServerTuned(int status);
     }
 
     private SessionListener sessionListener = new SessionListener() {
@@ -92,6 +94,13 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
             public void onOpenStreamError(int status) {
                 if(RoboTvDataSourceFactory.this.listener != null) {
                     RoboTvDataSourceFactory.this.listener.onStreamError(status);
+                }
+            }
+
+            @Override
+            public void onServerTuned(int status) {
+                if(RoboTvDataSourceFactory.this.listener != null) {
+                    RoboTvDataSourceFactory.this.listener.onServerTuned(status);
                 }
             }
         });
