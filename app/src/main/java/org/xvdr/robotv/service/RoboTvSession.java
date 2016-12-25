@@ -357,7 +357,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         Uri uri = Player.createLiveUri(channelUid);
 
-        mPlayer.open(uri);
+        mPlayer.openSync(uri);
         mPlayer.play();
 
         Log.i(TAG, "successfully switched channel");
