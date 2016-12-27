@@ -191,18 +191,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     }
 
     @Override
-    public void onOverlayViewSizeChanged(int width, int height) {
-        if(width == 0 || height == 0) {
-            return;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Log.d(TAG, "layout: " + width + ", " + height);
-            layoutSurface(0, 0, width - 1, height - 1);
-        }
-    }
-
-    @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
