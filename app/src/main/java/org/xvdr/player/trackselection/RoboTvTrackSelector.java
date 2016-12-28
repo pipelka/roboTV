@@ -1,5 +1,7 @@
 package org.xvdr.player.trackselection;
 
+import android.text.TextUtils;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
@@ -31,6 +33,11 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
                 continue;
             }
 
+            // fallback: select first renderer if we do not find the "best" renderer
+            if(bestRenderer == -1) {
+                bestRenderer = i;
+            }
+
             int score = getScoreFromFormat(trackSelection[i].getSelectedFormat());
 
             if(score > bestScore) {
@@ -39,7 +46,7 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
             }
         }
 
-        // we didn't find the best renderer ?
+        // we didn't find the best renderer - no audio tracks ?
         if(bestRenderer == -1)  {
             return trackSelection;
         }
@@ -96,15 +103,16 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
             return -1;
         }
 
-        int trackScore = 1;
+        if(!TextUtils.isEmpty(audioTrackId) && format.id.equals(audioTrackId)) {
+            return 100;
+        }
 
-        if(audioTrackId != null && format.id.equals(audioTrackId)) {
-            trackScore = 5;
-        }
-        else {
-            trackScore += (format.language.equals(audioLanguage) ? 2 : 0);
-            trackScore += (format.sampleMimeType.equals(MimeTypes.AUDIO_AC3) ? 1 : 0);
-        }
+        int trackScore = 0;
+
+        trackScore += (format.language.equals(audioLanguage) ? 20 : 0);
+        trackScore += (format.sampleMimeType.equals(MimeTypes.AUDIO_AC3) ? 1 : 0);
+        trackScore += (format.sampleMimeType.equals(MimeTypes.AUDIO_E_AC3) ? 2 : 0);
+        trackScore += format.channelCount;
 
         return trackScore;
     }
