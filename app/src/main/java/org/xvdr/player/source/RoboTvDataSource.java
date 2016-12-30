@@ -177,7 +177,7 @@ class RoboTvDataSource implements DataSource {
             // empty packet ??
             try {
                 if(response.eop()) {
-                    Thread.sleep(100);
+                    Thread.sleep(20);
                     continue;
                 }
             }
