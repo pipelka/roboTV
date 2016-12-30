@@ -266,4 +266,10 @@ public class Connection extends Session {
 
         return (int)resp.getU32();
     }
+
+    @Override
+    public void delete() {
+        Log.d(TAG, "Connection - delete()");
+        close();
+    }
 }
