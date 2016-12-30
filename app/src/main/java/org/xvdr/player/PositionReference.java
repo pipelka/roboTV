@@ -10,8 +10,6 @@ public class PositionReference {
     private long endPosition;
     private long currentPosition;
 
-    private boolean trickPlayMode = false;
-
     PositionReference() {
         reset();
     }
@@ -60,11 +58,4 @@ public class PositionReference {
         return timeUs + (position - currentPosition) * 1000;
     }
 
-    void setTrickPlayMode(boolean mode) {
-        trickPlayMode = mode;
-    }
-
-    public boolean getTrickPlayMode() {
-        return trickPlayMode;
-    }
 }

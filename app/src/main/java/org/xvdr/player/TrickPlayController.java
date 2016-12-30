@@ -1,6 +1,7 @@
 package org.xvdr.player;
 
 import android.os.Handler;
+import android.util.Log;
 
 import com.google.android.exoplayer2.ExoPlayer;
 
@@ -38,13 +39,12 @@ class TrickPlayController {
         startTime = System.currentTimeMillis();
         startPosition = position.positionFromTimeUs(player.getCurrentPosition() * 1000);
         playbackSpeed = (int) speed;
-        position.setTrickPlayMode(true);
 
         if(!started) {
+            started = true;
             postTick();
         }
 
-        started = true;
     }
 
     private void tick() {
@@ -71,7 +71,6 @@ class TrickPlayController {
 
     void reset() {
         handler.removeCallbacks(doTick);
-        position.setTrickPlayMode(false);
         playbackSpeed = 1;
         started = false;
     }
