@@ -202,11 +202,7 @@ public class Connection extends Session {
 
         long seekTime = System.currentTimeMillis() + position;
 
-        if(seek(seekTime) > 0) {
-            return STATUS_SUCCESS;
-        }
-
-        return STATUS_NORESPONSE;
+        return seek(seekTime) ? STATUS_SUCCESS : STATUS_NORESPONSE;
     }
 
     public boolean closeStream() {
@@ -227,17 +223,18 @@ public class Connection extends Session {
         return response.getString();
     }
 
-    public long seek(long position) {
+    public boolean seek(long position) {
         Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_SEEK, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
         req.putS64(position);
 
         Packet resp = transmitMessage(req);
 
         if(resp == null) {
-            return STATUS_NORESPONSE;
+            return false;
         }
 
-        return resp.getS64();
+        resp.getS64();
+        return true;
     }
 
     public int deleteRecording(int id) {
