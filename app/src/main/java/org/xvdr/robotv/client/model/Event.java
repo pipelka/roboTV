@@ -115,6 +115,7 @@ public class Event implements Serializable {
         "krankenhausserie",
         "mysteryserie",
         "politserie",
+        "polizeiserie",
         "serie",
         "sitcom",
         "thriller-serie",
