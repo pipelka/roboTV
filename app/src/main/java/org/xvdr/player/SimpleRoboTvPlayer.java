@@ -3,6 +3,8 @@ package org.xvdr.player;
 import android.content.Context;
 import android.os.Handler;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
@@ -14,6 +16,7 @@ import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import org.xvdr.player.audio.RoboTvAudioRenderer;
@@ -23,12 +26,27 @@ import java.util.ArrayList;
 
 class SimpleRoboTvPlayer extends SimpleExoPlayer {
 
+    private static final int DEFAULT_MIN_BUFFER_MS = 4000;
+    private static final int DEFAULT_MAX_BUFFER_MS = 6000;
+    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_MS = 1500;
+    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS  = 2000;
+
     SimpleRoboTvPlayer(Context context, TrackSelector trackSelector, boolean audioPassthrough) {
-        // this is the ugliest hack on the planet ,...
-        // since we need to set audioPassthrough before super() (which isn't possible)
-        // we pass EXTENSION_RENDERER_MODE_OFF / EXTENSION_RENDERER_MODE_ON for false / true
-        super(context, trackSelector, new RoboTvLoadControl(), null,
-                audioPassthrough ? EXTENSION_RENDERER_MODE_ON : EXTENSION_RENDERER_MODE_OFF, 5000);
+        super(
+                context,
+                trackSelector,
+                new DefaultLoadControl(
+                        new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE),
+                        DEFAULT_MIN_BUFFER_MS,
+                        DEFAULT_MAX_BUFFER_MS,
+                        DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+                        DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS),
+                null,
+                // this is the ugliest hack on the planet ,...
+                // since we need to set audioPassthrough before super() (which isn't possible)
+                // we pass EXTENSION_RENDERER_MODE_OFF / EXTENSION_RENDERER_MODE_ON for false / true
+                audioPassthrough ? EXTENSION_RENDERER_MODE_ON : EXTENSION_RENDERER_MODE_OFF,
+                5000);
     }
 
     protected void buildAudioRenderers(Context context, Handler mainHandler,
