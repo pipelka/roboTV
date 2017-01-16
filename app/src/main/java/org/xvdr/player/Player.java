@@ -127,7 +127,6 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     }
 
     public void setSurface(Surface surface) {
-        player.setVideoSurface(surface);
         this.surface = surface;
     }
 
@@ -166,8 +165,8 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
                 handler, null
         );
 
-        player.prepare(source);
         player.setVideoSurface(surface);
+        player.prepare(source);
     }
 
     public void openSync(Uri uri) {
