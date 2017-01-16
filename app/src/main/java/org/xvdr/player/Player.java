@@ -62,7 +62,6 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
     private Listener listener;
     private Handler handler;
-    private Surface surface;
 
     final private SimpleExoPlayer player;
     final private RoboTvTrackSelector trackSelector;
@@ -127,7 +126,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     }
 
     public void setSurface(Surface surface) {
-        this.surface = surface;
+        player.setVideoSurface(surface);
     }
 
     public void setStreamVolume(float volume) {
@@ -165,7 +164,6 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
                 handler, null
         );
 
-        player.setVideoSurface(surface);
         player.prepare(source);
     }
 
