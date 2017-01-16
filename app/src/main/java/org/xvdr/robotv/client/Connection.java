@@ -167,6 +167,9 @@ public class Connection extends Session {
      * @return returns the status of the operation
      */
     public int openStream(int channelUid, String language, boolean waitForKeyFrame, int priority) {
+        // set timeout for opening the live stream to 5000ms
+        setTimeout(5000);
+
         Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_OPEN, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
 
         req.putU32(channelUid);
