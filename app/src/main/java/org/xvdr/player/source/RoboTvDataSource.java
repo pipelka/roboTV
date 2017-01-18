@@ -171,7 +171,7 @@ class RoboTvDataSource implements DataSource {
             request.putU8((short)0);
 
             if(!connection.transmitMessage(request, response)) {
-                throw new IOException("failed to request packet from server");
+                return 0;
             }
 
             // empty packet ??
