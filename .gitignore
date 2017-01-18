@@ -28,5 +28,4 @@ app/src/main/main.iml
 roboTV.iml
 app/.externalNativeBuild
 app/cpp/ffmpeg/libs/x86/pkgconfig
-gradle.properties
 captures
