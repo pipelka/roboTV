@@ -40,7 +40,7 @@ import org.xvdr.robotv.setup.SetupUtils;
 
 import java.util.Collection;
 
-public class RecordingsFragment extends BrowseFragment implements DataService.Listener, MovieController.LoaderCallback, TimerController.LoaderCallback {
+public class RecordingsFragment extends BrowseFragment implements DataService.Listener, MovieController.LoaderCallback {
 
     private final static String TAG = "RecordingsFragment";
 
@@ -145,7 +145,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                 else if(item instanceof Timer) {
                     Timer timer = (Timer) item;
 
-                    new DeleteTimerFragment().startGuidedStep(
+                    new EditTimerFragment().startGuidedStep(
                             getActivity(),
                             timer,
                             service,
@@ -238,16 +238,11 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     }
 
     @Override
-    public void onTimersUpdated(Collection<Timer> timers) {
-        mAdapter.loadTimers(timers);
-    }
-
-    @Override
     public void onConnected(DataService service) {
         this.service = service;
 
         service.getMovieController().loadMovieCollection(this);
-        service.getTimerController().loadTimers(this);
+        loadTimers(service);
     }
 
     @Override
@@ -268,12 +263,19 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     @Override
     public void onMovieUpdate(DataService service) {
         service.getMovieController().loadMovieCollection(this);
-        service.getTimerController().loadTimers(this);
     }
 
     @Override
     public void onTimersUpdated(DataService service) {
-        service.getTimerController().loadTimers(this);
+        loadTimers(service);
     }
 
+    protected void loadTimers(DataService service) {
+        service.getTimerController().loadTimers(new TimerController.LoaderCallback() {
+            @Override
+            public void onTimersUpdated(Collection<Timer> timers) {
+                mAdapter.loadTimers(timers);
+            }
+        });
+    }
 }

@@ -14,12 +14,15 @@ import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.NotificationHandler;
 import org.xvdr.ui.MovieStepFragment;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
-public class DeleteTimerFragment extends MovieStepFragment {
+public class EditTimerFragment extends MovieStepFragment {
 
     static final int ACTION_DELETE = 0;
     static final int ACTION_CANCEL = 1;
+    static final int ACTION_FOLDER = 2;
 
     private Timer timer;
 
@@ -48,6 +51,30 @@ public class DeleteTimerFragment extends MovieStepFragment {
 
     @Override
     public void onCreateActions(List actions, Bundle savedInstanceState) {
+        List<GuidedAction> subActions = new ArrayList<>();
+        TreeSet<String> folderList = getMovieController().getFolderList();
+
+        int i = 0;
+        for(String folder : folderList) {
+            GuidedAction action = new GuidedAction.Builder(getActivity())
+                    .id(i++)
+                    .title(folder)
+                    .checkSetId(1)
+                    .checked(timer.getFolder().equals(folder))
+                    .build();
+
+            subActions.add(action);
+        }
+
+        actions.add(new GuidedAction.Builder(getActivity())
+                .id(ACTION_FOLDER)
+                .title(getString(R.string.timer_add_select_folder))
+                .description(TextUtils.isEmpty(
+                        timer.getFolder()) ? getActivity().getString(R.string.empty_folder) :
+                        timer.getFolder())
+                .subActions(subActions)
+                .build());
+
         actions.add(new GuidedAction.Builder(getActivity())
                 .id(ACTION_CANCEL)
                 .title(getString(R.string.cancel))
@@ -69,6 +96,25 @@ public class DeleteTimerFragment extends MovieStepFragment {
             case ACTION_CANCEL:
                 getFragmentManager().popBackStack();
                 break;
+        }
+    }
+
+    public boolean onSubGuidedActionClicked(GuidedAction action) {
+        timer.setFolder(action.getTitle().toString());
+
+        GuidedAction a = findActionById(ACTION_FOLDER);
+        a.setDescription(action.getTitle());
+        notifyActionChanged(findActionPositionById(ACTION_FOLDER));
+
+        updateTimer();
+        return true;
+    }
+
+    private void updateTimer() {
+        NotificationHandler notificationHandler = new NotificationHandler(getActivity());
+
+        if(!getService().getTimerController().updateTimer(timer)) {
+            notificationHandler.error(getString(R.string.failed_update_timer));
         }
     }
 

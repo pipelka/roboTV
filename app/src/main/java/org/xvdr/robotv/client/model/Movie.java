@@ -5,11 +5,8 @@ import org.xvdr.robotv.artwork.ArtworkHolder;
 public class Movie extends Event {
 
     private String folder;
-    private String posterUrl;
-    private String backgroundUrl;
     private int recordingId;
     private String channelName;
-    private int channelUid;
     private boolean isSeriesHeader = false;
     private int episodeCount;
     private int playCount;
@@ -32,22 +29,6 @@ public class Movie extends Event {
 
     public void setFolder(String category) {
         this.folder = category;
-    }
-
-    public String getPosterUrl() {
-        return posterUrl;
-    }
-
-    public void setPosterUrl(String cardImageUrl) {
-        this.posterUrl = cardImageUrl;
-    }
-
-    public String getBackgroundUrl() {
-        return backgroundUrl;
-    }
-
-    public void setBackgroundUrl(String backgroundImageUrl) {
-        this.backgroundUrl = backgroundImageUrl;
     }
 
     public long getDurationMs() {
@@ -78,14 +59,6 @@ public class Movie extends Event {
         return channelName;
     }
 
-    public void setChannelUid(int channelUid) {
-        this.channelUid = channelUid;
-    }
-
-    public int getChannelUid() {
-        return channelUid;
-    }
-
     public void setPlayCount(int count) {
         playCount = count;
     }
@@ -107,24 +80,21 @@ public class Movie extends Event {
             return;
         }
 
-        posterUrl = artwork.getPosterUrl();
-        backgroundUrl = artwork.getBackgroundUrl();
+        setPosterUrl(artwork.getPosterUrl());
+        setBackgroundUrl(artwork.getBackgroundUrl());
     }
 
     public void setArtwork(Movie movie) {
-        posterUrl = movie.getPosterUrl();
-        backgroundUrl = movie.getBackgroundUrl();
+        setPosterUrl(movie.getPosterUrl());
+        setBackgroundUrl(movie.getBackgroundUrl());
     }
 
     @Override
     public String toString() {
         return "Movie {" +
                "folder=\'" + folder + "\'" +
-               ", posterUrl=\'" + posterUrl + "\'" +
-               ", backgroundUrl=\'" + backgroundUrl + "\'" +
                ", episodeCount=\'" + episodeCount + "\'" +
                ", recordingId=\'" + recordingId + "\'" +
-               ", channelUid=\'" + channelUid + "\'" +
                ", channelName=\'" + channelName + "\'" +
                ", playCount=\'" + playCount + "\'" +
                "}";

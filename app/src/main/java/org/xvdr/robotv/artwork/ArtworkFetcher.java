@@ -40,6 +40,10 @@ public class ArtworkFetcher {
     }
 
     public ArtworkHolder fetchForEvent(Event event) throws IOException {
+        if(event.hasArtwork()) {
+            return new ArtworkHolder(event.getPosterUrl(), event.getBackgroundUrl());
+        }
+
         // sanity check
         if(TextUtils.isEmpty(event.getTitle()) || mProviders == null) {
             return null;

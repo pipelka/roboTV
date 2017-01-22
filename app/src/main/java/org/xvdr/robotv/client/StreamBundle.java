@@ -210,7 +210,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
             return MimeTypes.VIDEO_H265;
         }
         else if(type == TYPE_SUBTITLE) {
-            return "text/vnd.dvb.subtitle";
+            return MimeTypes.APPLICATION_DVBSUBS;
         }
         else if(type == TYPE_TELETEXT) {
             return "teletext";

@@ -24,8 +24,6 @@ public class TimerController {
     final private Connection connection;
     final private String language;
 
-    private int preStartRecording = 2 * 60;
-    private int postEndRecording = 10 * 60;
     private int priority = 80;
 
     public TimerController(Connection connection, String language) {
@@ -34,52 +32,29 @@ public class TimerController {
     }
 
     public boolean createTimer(Movie movie, String seriesFolder) {
-        String name;
-        String category = movie.getFolder();
+        Timer timer = new Timer(0, movie);
 
-        if(category.equals(seriesFolder) || movie.isTvShow()) {
-            name = seriesFolder + "~" + movie.getTitle() + "~" + movie.getShortText();
+        if (movie.isTvShow()) {
+            timer.setFolder(seriesFolder);
+        } else {
+            timer.setFolder(movie.getFolder());
         }
-        else {
-            name = category;
-
-            if (!name.isEmpty()) {
-                name += "~";
-            }
-
-            name += movie.getTitle();
-        }
-
-        return createTimer(movie.getChannelUid(), movie.getStartTime(), movie.getDuration(), name);
-    }
-
-    public boolean createTimer(int channelUid, long startTime, int duration, String name) {
-        Log.d(TAG, "CREATE TIMER");
-        Log.d(TAG, "channelUid: " + channelUid);
-        Log.d(TAG, "startTime: " + startTime);
-        Log.d(TAG, "duration: " + duration);
-        Log.d(TAG, "name: " + name);
 
         Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_ADD);
-        request.putU32(0); // index unused
-        request.putU32(1 + 4); // active timer + VPS
-        request.putU32(priority); // Priority
-        request.putU32(99); // Lifetime
-        request.putU32(channelUid); // channel uid
-        request.putU32(startTime - preStartRecording); // start time
-        request.putU32(startTime + duration + postEndRecording); // end time
-        request.putU32(0); // day
-        request.putU32(0); // weeksdays
-        request.putString(mapRecordingName(name)); // recording name
-        request.putString(""); // aux
+        PacketAdapter.toPacket(timer, priority, request);
 
         Packet response = connection.transmitMessage(request);
 
-        if(response == null) {
-            return false;
-        }
+        return response != null && response.getU32() == 0;
+    }
 
-        return response.getU32() == 0;
+    public boolean updateTimer(Timer timer) {
+        Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_UPDATE);
+        PacketAdapter.toPacket(timer, priority, request);
+
+        Packet response = connection.transmitMessage(request);
+
+        return response != null && response.getU32() == 0;
     }
 
     public void loadTimers(final LoaderCallback listener) {
@@ -196,14 +171,6 @@ public class TimerController {
 
         Packet response = connection.transmitMessage(request);
 
-        if(response == null) {
-            return false;
-        }
-
-        return response.getU32() == Connection.STATUS_SUCCESS;
-    }
-
-    private String mapRecordingName(String name) {
-        return name.replace(' ', '_').replace(':', '_');
+        return response != null && response.getU32() == Connection.STATUS_SUCCESS;
     }
 }

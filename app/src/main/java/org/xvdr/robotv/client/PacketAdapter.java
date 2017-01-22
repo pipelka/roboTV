@@ -1,6 +1,9 @@
 package org.xvdr.robotv.client;
 
+import android.text.TextUtils;
+
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.model.Channel;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.model.Movie;
@@ -49,6 +52,8 @@ public class PacketAdapter {
         final int eventId = (int) p.getU32();
         long startTime = p.getU32();
         final int duration = (int) p.getU32();
+        long vpsTime = p.getU32();
+
         int contentId;
         List<Integer> list = new ArrayList<>();
 
@@ -65,7 +70,52 @@ public class PacketAdapter {
         String shortText = p.getString();
         String description = p.getString();
 
-        return new Event(contentId, title, shortText, description, startTime, duration, eventId);
+        Event e = new Event(contentId, title, shortText, description, startTime, duration, eventId);
+        e.setVpsTime(vpsTime);
+
+        return e;
+    }
+
+    public static Event toEpgEvent(Packet p) {
+        // V7 EPG Information
+
+        int eventId = (int)p.getU32();
+        long startTime = p.getU32();
+        long endTime = startTime + p.getU32();
+        int contentId = (int)p.getU32();
+        int duration = (int)(endTime - startTime);
+        long parentalRating = p.getU32();
+        String title = p.getString();
+        String shortText = p.getString();
+        String description = p.getString();
+
+        String posterUrl = p.getString();
+        String backgroundUrl = p.getString();
+
+        // V8 extended EPG information
+
+        long vpsTime = p.getS64();
+
+        p.getU8(); // table id
+        p.getU8(); // version
+        p.getU8(); // has timer
+        p.getU8(); // timer running
+
+        // components
+
+        long count = p.getU32();
+        for(long i = 0; i < count; i++) {
+            p.getString(); // description
+            p.getString(); // language
+            p.getU8(); // type
+            p.getU8(); // stream
+        }
+
+        Event e = new Event(contentId, title, shortText, description, startTime, duration, eventId);
+        e.setVpsTime(vpsTime);
+        e.setParentalRating(parentalRating);
+
+        return e;
     }
 
     public static Timer toTimer(Packet response) {
@@ -80,6 +130,7 @@ public class PacketAdapter {
         int searchTimerId = (int) response.getU32();    // search timer id
         int recordingId = (int) response.getU32();      // id of recording
         String logoUrl = response.getString();          // logo url
+        String folder = response.getString();           // folder
 
         boolean hasEvent = (response.getU8() == 1);
         Event event;
@@ -95,12 +146,11 @@ public class PacketAdapter {
         timer.setFlags(flags);
         timer.setPriority(priority);
         timer.setLifeTime(lifeTime);
-        timer.setTimerStartTime(startTime);
-        timer.setTimerEndTime(stopTime);
         timer.setSearchTimerId(searchTimerId);
         timer.setRecordingId(recordingId);
         timer.setLogoUrl(logoUrl);
         timer.setChannelUid(channelUid);
+        timer.setFolder(folder);
 
         return timer;
     }
@@ -136,5 +186,22 @@ public class PacketAdapter {
 
         c.setGroupName(response.getString().trim());
         return c;
+    }
+
+    public static void toPacket(Timer timer, int priority, Packet p) {
+        int flags = 1; // active
+        flags |= (timer.getVpsTime() > 0) ? 4 : 0; // VPS flag
+
+        p.putU32(timer.getId()); // index unused
+        p.putU32(flags); // active timer + VPS
+        p.putU32(priority); // Priority
+        p.putU32(99); // Lifetime
+        p.putU32(timer.getChannelUid()); // channel uid
+        p.putU32(timer.getTimerStartTime()); // start time
+        p.putU32(timer.getTimerEndTime()); // end time
+        p.putU32(0); // day
+        p.putU32(0); // weeksdays
+        p.putString(timer.getRecordingName()); // recording name
+        p.putString(""); // aux
     }
 }

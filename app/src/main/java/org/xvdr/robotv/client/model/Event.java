@@ -45,7 +45,10 @@ public class Event implements Serializable {
     private int eventId;
     private long startTime;
     private int channelUid;
-    private long vps;
+    private long vpsTime;
+    private long parentalRating;
+    private String posterUrl;
+    private String backgroundUrl;
 
     private SeasonEpisodeHolder seasonEpisode = new SeasonEpisodeHolder();
 
@@ -182,6 +185,7 @@ public class Event implements Serializable {
         );
 
         year = event.year;
+        vpsTime = event.vpsTime;
     }
 
     public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec) {
@@ -193,6 +197,9 @@ public class Event implements Serializable {
     }
 
     public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec, int eventId, int channelUid) {
+        this.posterUrl = "x";
+        this.backgroundUrl = "x";
+
         this.contentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
         this.channelUid = channelUid;
 
@@ -277,6 +284,14 @@ public class Event implements Serializable {
 
     public int getEventId() {
         return eventId;
+    }
+
+    public long getParentalRating() {
+        return parentalRating;
+    }
+
+    public void setParentalRating(long parentalRating) {
+        this.parentalRating = parentalRating;
     }
 
     public void setChannelUid(int channelUid) {
@@ -468,16 +483,40 @@ public class Event implements Serializable {
         return startTime;
     }
 
+    public long getEndTime() {
+        return startTime + duration;
+    }
+
     public Timestamp getTimestamp() {
         return new Timestamp(startTime * 1000);
     }
 
-    public long getVps() {
-        return vps;
+    public long getVpsTime() {
+        return vpsTime;
     }
 
-    public void setVps(long vps) {
-        this.vps = vps;
+    public void setVpsTime(long vpsTime) {
+        this.vpsTime = vpsTime;
+    }
+
+    public String getPosterUrl() {
+        return posterUrl;
+    }
+
+    public void setPosterUrl(String cardImageUrl) {
+        this.posterUrl = cardImageUrl;
+    }
+
+    public String getBackgroundUrl() {
+        return backgroundUrl;
+    }
+
+    public void setBackgroundUrl(String backgroundImageUrl) {
+        this.backgroundUrl = backgroundImageUrl;
+    }
+
+    public boolean hasArtwork() {
+        return !backgroundUrl.equals("x") && !posterUrl.equals("x");
     }
 
     @Override
@@ -489,9 +528,12 @@ public class Event implements Serializable {
                 ", description=\'" + description + "\'" +
                 ", duration=\'" + duration + "\'" +
                 ", year=\'" + year + "\'" +
-                ", eventId=\'" + year + "\'" +
-                ", startTime=\'" + year + "\'" +
-                ", channelUid=\'" + year + "\'" +
+                ", eventId=\'" + eventId + "\'" +
+                ", startTime=\'" + startTime + "\'" +
+                ", channelUid=\'" + channelUid + "\'" +
+                ", vpsTime=\'" + vpsTime + "\'" +
+                ", posterUrl=\'" + posterUrl + "\'" +
+                ", backgroundUrl=\'" + backgroundUrl + "\'" +
                 "}";
     }
 

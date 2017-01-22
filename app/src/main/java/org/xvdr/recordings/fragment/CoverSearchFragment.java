@@ -3,7 +3,6 @@ package org.xvdr.recordings.fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.v17.leanback.app.ProgressBarManager;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
@@ -57,7 +56,6 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
                     mRowsAdapter.add(listRow);
 
                     listRowAdapter.addAll(0, list);
-
                 }
             });
         }

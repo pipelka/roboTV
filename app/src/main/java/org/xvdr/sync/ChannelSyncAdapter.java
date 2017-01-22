@@ -24,6 +24,7 @@ import org.xvdr.jniwrap.Packet;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
+import org.xvdr.robotv.client.PacketAdapter;
 import org.xvdr.robotv.client.model.Channel;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.setup.SetupUtils;
@@ -435,24 +436,13 @@ public class ChannelSyncAdapter {
 
         // add schedule
         while(!mResponse.eop()) {
-            int eventId = (int)mResponse.getU32();
-            long startTime = mResponse.getU32();
-            long endTime = startTime + mResponse.getU32();
-            int content = (int)mResponse.getU32();
-            int eventDuration = (int)(endTime - startTime);
-            long parentalRating = mResponse.getU32();
-            String title = mResponse.getString();
-            String shortText = mResponse.getString();
-            String description = mResponse.getString();
-            String posterUrl = mResponse.getString();
-            String backgroundUrl = mResponse.getString();
+            Event event = PacketAdapter.toEpgEvent(mResponse);
+            event.setChannelUid(uid);
 
             // invalid entry
-            if(endTime <= startTime) {
+            if(event.getDuration() <= 0) {
                 continue;
             }
-
-            Event event = new Event(content, title, shortText, description, startTime, eventDuration, eventId, uid);
 
             ContentValues values = new ContentValues();
             values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
@@ -462,7 +452,7 @@ public class ChannelSyncAdapter {
                 values.put(TvContract.Programs.COLUMN_EPISODE_TITLE, event.getShortText());
             }
 
-            description = event.getDescription();
+            String description = event.getDescription();
             if(!TextUtils.isEmpty(description)) {
                 if(description.length() <= 256) {
                     values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description);
@@ -472,8 +462,8 @@ public class ChannelSyncAdapter {
                 }
             }
 
-            values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
-            values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, endTime * 1000);
+            values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, event.getStartTime() * 1000);
+            values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, event.getEndTime() * 1000);
             values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, mCanonicalGenre.get(event.getContentId()));
 
             Event.SeasonEpisodeHolder seasonEpisode = event.getSeasionEpisode();
@@ -490,35 +480,38 @@ public class ChannelSyncAdapter {
             }
 
             // content rating
+            long parentalRating = event.getParentalRating();
+
             if(parentalRating >= 4 && parentalRating <= 18) {
                 TvContentRating rating = TvContentRating.createRating("com.android.tv", "DVB", "DVB_" + parentalRating);
                 values.put(TvContract.Programs.COLUMN_CONTENT_RATING, rating.flattenToString());
             }
 
-            // store eventId on flags
+            // store eventId in FLAG1
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_FLAG1, eventId);
+                values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_FLAG1, event.getEventId());
+            }
+
+            // store VPS time in FLAG2
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_FLAG2, event.getVpsTime());
             }
 
             // artwork
-            if(posterUrl.equals("x")) {
-                try {
 
-                    backgroundUrl = "";
-                    ArtworkHolder art = mArtwork.fetchForEvent(event);
+            String artworkUrl = null;
 
-                    if(art != null) {
-                        backgroundUrl = art.getBackgroundUrl();
-                    }
-                }
-                catch(IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                ArtworkHolder art = mArtwork.fetchForEvent(event);
+                artworkUrl = art.getBackgroundUrl();
+            }
+            catch(IOException e) {
+                e.printStackTrace();
             }
 
             // add url (if not empty)
-            if(!backgroundUrl.isEmpty()) {
-                values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, backgroundUrl);
+            if(!TextUtils.isEmpty(artworkUrl)) {
+                values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, artworkUrl);
             }
 
             // add event

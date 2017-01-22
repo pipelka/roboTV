@@ -55,6 +55,7 @@ public class Connection extends Session {
     public static final int ROBOTV_TIMER_GETLIST = 82;
     public static final int ROBOTV_TIMER_ADD = 83;
     public static final int ROBOTV_TIMER_DELETE = 84;
+    public static final int ROBOTV_TIMER_UPDATE = 85;
     public static final int ROBOTV_SEARCHTIMER_GETLIST = 86;
 
     /* OPCODE 100 - 119: XVDR network functions for recording access */
@@ -93,7 +94,7 @@ public class Connection extends Session {
     public static final int XVDR_STATUS_CHANNELCHANGE = 4;
     public static final int XVDR_STATUS_RECORDINGSCHANGE = 5;
 
-    public static final int XVDRPROTOCOLVERSION = 7;
+    public static final int XVDRPROTOCOLVERSION = 8;
 
     public Packet CreatePacket(int msgid, int type) {
         return new Packet(msgid, type);

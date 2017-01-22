@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.xvdr.jniwrap.Packet;
+import org.xvdr.robotv.client.PacketAdapter;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.robotv.client.model.Movie;
@@ -76,19 +77,7 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
 
             // process result
             while(!resp.eop() && !isCancelled()) {
-                int eventId = (int) resp.getU32();
-                long startTime = resp.getU32();
-                long endTime = startTime + resp.getU32();
-                int content = (int) resp.getU32();
-                int eventDuration = (int)(endTime - startTime);
-                long parentalRating = resp.getU32();
-                String title = resp.getString();
-                String plotOutline = resp.getString();
-                String plot = resp.getString();
-                String posterUrl = resp.getString();
-                String backgroundUrl = resp.getString();
-
-                Event event = new Event(content, title, plotOutline, plot, startTime, eventDuration, eventId);
+                Event event = PacketAdapter.toEpgEvent(resp);
                 ArtworkHolder art = null;
 
                 try {
