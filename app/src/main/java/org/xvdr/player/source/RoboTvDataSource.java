@@ -27,7 +27,6 @@ class RoboTvDataSource implements DataSource {
 
     private String language;
     private Uri uri;
-    private boolean streaming = false;
 
     final private Connection connection;
     final private Packet request;
@@ -46,31 +45,25 @@ class RoboTvDataSource implements DataSource {
     }
 
     @Override
-
-    synchronized public long open(DataSpec dataSpec) throws IOException {
+    public long open(DataSpec dataSpec) throws IOException {
         // the uri should be something like:
         // robotv://type/channeluid (e.g. robotv://livetv/5475634 )
 
-        Uri lastUri = getUri();
         uri = dataSpec.uri;
 
         Log.d(TAG, "open: " + uri.toString());
 
         // check if we should seek
         long seekPosition = dataSpec.position;
-        if(streaming && (lastUri != null && uri.equals(lastUri))) {
 
-            if(seekPosition != 0) {
-                Log.d(TAG, "seek to position: " + seekPosition);
-                response.clear();
-                connection.seek(seekPosition);
-            }
-
+        if(seekPosition != 0) {
+            Log.d(TAG, "seek to position: " + seekPosition);
+            connection.seek(seekPosition);
+            response.clear();
             return C.LENGTH_UNSET;
         }
 
-        response.clear();
-
+        // open streaming connection
         if(!uri.getScheme().equals("robotv")) {
             throw new IOException("unable to open stream: " + getUri().toString() + ", uri must start with robotv://");
         }
@@ -85,11 +78,11 @@ class RoboTvDataSource implements DataSource {
 
         switch(type) {
             case "livetv":
-                streaming = openLiveTv(uri);
+                openLiveTv(uri);
                 break;
 
             case "recording":
-                streaming = openRecording(uri);
+                openRecording(uri);
                 break;
 
             default:
@@ -147,15 +140,8 @@ class RoboTvDataSource implements DataSource {
         return false;
     }
 
-    public void release() {
-        Log.d(TAG, "release");
-        connection.closeStream();
-        streaming = false;
-        uri = null;
-    }
-
     @Override
-    synchronized public int read(byte[] buffer, int offset, int readLength) throws IOException {
+    public int read(byte[] buffer, int offset, int readLength) throws IOException {
         if(readLength == 0) {
             return 0;
         }
@@ -164,6 +150,7 @@ class RoboTvDataSource implements DataSource {
         while(response.eop()) {
 
             if(Thread.interrupted()) {
+                Log.d(TAG, "interrupted");
                 throw new InterruptedIOException();
             }
 
@@ -171,7 +158,7 @@ class RoboTvDataSource implements DataSource {
             request.putU8((short)0);
 
             if(!connection.transmitMessage(request, response)) {
-                return 0;
+                continue;
             }
 
             // empty packet ??
@@ -182,6 +169,7 @@ class RoboTvDataSource implements DataSource {
                 }
             }
             catch(InterruptedException e) {
+                Log.d(TAG, "interrupted");
                 throw new InterruptedIOException();
             }
 
@@ -210,21 +198,11 @@ class RoboTvDataSource implements DataSource {
 
     @Override
     public Uri getUri() {
-        if(!streaming) {
-            return null;
-        }
-
         return uri;
     }
 
     @Override
     public void close() throws IOException {
         Log.d(TAG, "close");
-        response.clear();
-    }
-
-    public void disconnect() throws IOException {
-        streaming = false;
-        close();
     }
 }

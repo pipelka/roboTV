@@ -13,6 +13,7 @@ public class Connection extends Session {
     public final static int STATUS_SUCCESS = 0;
     public final static int STATUS_RECEIVERS_BUSY = 997;
     public final static int STATUS_BLOCKED_BY_RECORDING = 1;
+    public final static int STATUS_CONNECTION_FAILED = 2;
 
     private String mSessionName = "XVDR Client";
     private short mCompressionLevel = 0;

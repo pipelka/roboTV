@@ -16,7 +16,8 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
     private Connection connection;
 
     final private Listener listener;
-    final private RoboTvDataSource dataSource;
+    final private PositionReference position;
+    final private String language;
 
     public interface Listener {
 
@@ -39,13 +40,6 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
         public void onDisconnect() {
             if(connection == null || listener == null) {
                 return;
-            }
-
-            try {
-                dataSource.disconnect();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
             }
 
             handler.postDelayed(new Runnable() {
@@ -85,11 +79,16 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
 
     public RoboTvDataSourceFactory(PositionReference position, String language, Listener listener) {
         this.listener = listener;
+        this.position = position;
+        this.language = language;
 
         connection = new Connection("roboTV:streaming", language);
         connection.setCallback(sessionListener);
+    }
 
-        dataSource = new RoboTvDataSource(position, connection, language, new RoboTvDataSource.Listener() {
+    @Override
+    public DataSource createDataSource() {
+        return new RoboTvDataSource(position, connection, language, new RoboTvDataSource.Listener() {
             @Override
             public void onOpenStreamError(int status) {
                 if(RoboTvDataSourceFactory.this.listener != null) {
@@ -104,31 +103,27 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
                 }
             }
         });
-
-    }
-
-    @Override
-    public DataSource createDataSource() {
-        return dataSource;
     }
 
     public boolean connect(String server) throws IOException {
         if(connection.isOpen()) {
-            return false;
+            return true;
         }
 
         if(connection.open(server)) {
             return true;
         }
 
-        throw new IOException("unable to connect to server");
+        connection.close();
+
+        if(listener != null) {
+            listener.onStreamError(Connection.STATUS_CONNECTION_FAILED);
+        }
+
+        return false;
     }
 
     public void release() {
-        if(dataSource != null) {
-            dataSource.release();
-        }
-
         connection.close();
     }
 
