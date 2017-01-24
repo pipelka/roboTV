@@ -69,7 +69,8 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     final private RoboTvExtractor.Factory extractorFactory;
     final private PositionReference position;
     final private TrickPlayController trickPlayController;
-    private final ConditionVariable openConditionVariable;
+    final private ConditionVariable openConditionVariable;
+    final private String server;
 
     static public Uri createLiveUri(int channelUid) {
         return Uri.parse("robotv://livetv/" + channelUid);
@@ -87,6 +88,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
         this.listener = listener;
+        this.server = server;
         boolean passthrough = audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3) && audioPassthrough;
 
         Log.i(TAG, "audio passthrough: " + (passthrough ? "enabled" : "disabled"));
@@ -107,10 +109,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
         player.setVideoDebugListener(this);
 
         dataSourceFactory = new RoboTvDataSourceFactory(position, language, this);
-        dataSourceFactory.connect(server);
-
         extractorFactory = new RoboTvExtractor.Factory(position, this);
-
         trickPlayController = new TrickPlayController(handler, position, player);
     }
 
@@ -156,6 +155,18 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
     public void open(Uri uri) {
         stop();
+
+        try {
+            dataSourceFactory.connect(server);
+        }
+        catch (IOException e) {
+            if(listener != null) {
+                listener.onStreamError(Connection.STATUS_NORESPONSE);
+            }
+
+            e.printStackTrace();
+            return;
+        }
 
         MediaSource source = new ExtractorMediaSource(
                 uri,
