@@ -111,6 +111,8 @@ private:
 
 	std::mutex m_mutex;
 
+	std::mutex m_mutexTransmit;
+
 	std::map<uint64_t, MsgResponseCondition*> m_queue;
 };
 

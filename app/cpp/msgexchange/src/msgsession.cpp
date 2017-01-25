@@ -36,6 +36,8 @@ MsgSession::~MsgSession() {
 }
 
 bool MsgSession::Open(const char* hostname, int port) {
+	std::lock_guard<std::mutex> lock(m_mutexTransmit);
+
 	if(!MsgConnection::Open(hostname, port)) {
 		return false;
 	}
@@ -48,6 +50,7 @@ bool MsgSession::Open(const char* hostname, int port) {
 }
 
 bool MsgSession::Close() {
+	std::lock_guard<std::mutex> lock(m_mutexTransmit);
 	Terminate();
 	return true;
 }
@@ -107,6 +110,8 @@ void MsgSession::OnNotification(MsgPacket* notification) {
 }
 
 bool MsgSession::TransmitMessage(MsgPacket* request, MsgPacket* response) {
+	std::lock_guard<std::mutex> lock(m_mutexTransmit);
+
 	if((!IsOpen() || IsAborting()) && !GetConnectionLost()) {
 		return false;
 	}
