@@ -305,6 +305,10 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
                 mNotification.notify(getResources().getString(R.string.blocked_by_recording));
                 break;
 
+            case Connection.STATUS_CONNECTION_FAILED:
+                mNotification.notify(getResources().getString(R.string.failed_connect));
+                break;
+
             default:
                 mNotification.error(getResources().getString(R.string.failed_tune));
                 break;
