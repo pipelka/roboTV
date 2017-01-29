@@ -3,6 +3,7 @@ package org.xvdr.robotv.setup;
 import android.app.FragmentManager;
 import android.graphics.drawable.Drawable;
 import android.media.AudioFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.GuidedStepFragment;
@@ -25,6 +26,7 @@ public class SetupFragment extends GuidedStepFragment {
     static final int ACTION_IMPORT = 4;
     static final int ACTION_PASSTHROUGH = 6;
     static final int ACTION_TIMESHIFT = 8;
+    static final int ACTION_SHIELD_WORKAROUND = 9;
 
     private GuidedAction mActionServer;
     private GuidedAction mActionLanguage;
@@ -87,6 +89,15 @@ public class SetupFragment extends GuidedStepFragment {
 
         actions.add(mActionTimeshift);
 
+        if(Build.MODEL.equals("SHIELD Android TV")) {
+            actions.add(new GuidedAction.Builder(getActivity())
+                    .id(ACTION_SHIELD_WORKAROUND)
+                    .title(getString(R.string.setup_shield_workaround))
+                    .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
+                    .checked(SetupUtils.getShieldWorkaroundEnabled(getActivity()))
+                    .build());
+        }
+
         SetupActivity activity = (SetupActivity) getActivity();
 
         if (!TextUtils.isEmpty(activity.getInputId())) {
@@ -139,6 +150,10 @@ public class SetupFragment extends GuidedStepFragment {
 
             case ACTION_TIMESHIFT:
                 SetupUtils.setTimeshiftEnabled(getActivity(), action.isChecked());
+                break;
+
+            case ACTION_SHIELD_WORKAROUND:
+                SetupUtils.setShieldWorkaroundEnabled(getActivity(), action.isChecked());
                 break;
 
             case ACTION_IMPORT:

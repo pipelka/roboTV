@@ -102,4 +102,5 @@
     <string name="delete_timer">Timer löschen</string>
     <string name="failed_delete_timer">Timer konnte nicht gelöscht werden</string>
     <string name="add">Hinzufügen</string>
+    <string name="setup_shield_workaround">Shield TV Workarounds aktivieren</string>
 </resources>

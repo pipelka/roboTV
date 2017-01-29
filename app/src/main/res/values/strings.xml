@@ -118,4 +118,5 @@
     <string name="delete_timer">Delete timer</string>
     <string name="failed_delete_timer">Failed to remove timer</string>
     <string name="add">Add</string>
+    <string name="setup_shield_workaround">Enable Shield TV Workarounds</string>
 </resources>
