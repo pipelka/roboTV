@@ -1,3 +1,6 @@
+[![Travis](https://img.shields.io/travis/pipelka/roboTV.svg)](https://travis-ci.org/pipelka/roboTV)
+[![GitHub release](https://img.shields.io/github/release/pipelka/roboTV.svg)](https://github.com/pipelka/roboTV/releases)
+
 # roboTV
 
 roboTV is a Android TV based frontend for VDR.
@@ -34,7 +37,7 @@ The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [
 ## Building
 
 1. Download [Android Studio](https://developer.android.com/studio/index.html)
-2. Download the [Android NDK 11](https://developer.android.com/ndk/downloads/index.html) (or higher).
+2. Download the [Android NDK 12](https://developer.android.com/ndk/downloads/index.html) (or higher).
 3. Set the SDK and NDK location in Android Studio (Project Structure) or "local.properties".
 4. ./gradlew assembleDebug
 
@@ -46,6 +49,7 @@ The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [
 - [x] H264 Video support
 - [x] MPEG2 Video support
 - [x] decoding of AC3 streams
+- [x] EAC3 support
 - [x] MPEG Audio support
 - [x] Movie Database integration for EPG
 - [x] AC3 passthrough
@@ -62,7 +66,6 @@ The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [
 
 # Planned Features
 
-- [ ] EAC3 support
 - [ ] enriched EPG information for TV shows
 - [ ] full epgsearch support
 - [ ] Teletext support
