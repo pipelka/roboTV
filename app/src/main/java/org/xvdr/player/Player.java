@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
@@ -103,6 +104,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
         trackSelector = new RoboTvTrackSelector();
         trackSelector.setParameters(new RoboTvTrackSelector.Parameters().withPreferredAudioLanguage(language));
+        trackSelector.setTunnelingAudioSessionId(C.generateAudioSessionIdV21(context));
 
         player = new SimpleRoboTvPlayer(context, trackSelector, passthrough);
         player.addListener(this);
