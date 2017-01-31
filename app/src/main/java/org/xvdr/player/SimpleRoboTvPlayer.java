@@ -60,8 +60,8 @@ class SimpleRoboTvPlayer extends SimpleExoPlayer {
         // codecSelector disabling MPEG audio (handled by RoboTvAudioDecoder)
         MediaCodecSelector codecSelector = new MediaCodecSelector() {
             @Override
-            public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder, boolean requiresTunneling) throws MediaCodecUtil.DecoderQueryException {
-                return MediaCodecUtil.getDecoderInfo(mimeType, requiresSecureDecoder, requiresTunneling);
+            public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder) throws MediaCodecUtil.DecoderQueryException {
+                return MediaCodecUtil.getDecoderInfo(mimeType, requiresSecureDecoder);
             }
 
             @Override
