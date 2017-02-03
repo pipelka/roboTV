@@ -32,6 +32,10 @@ public class Event implements Serializable {
         }
     }
 
+    private class StringHolder {
+        public String string;
+    }
+
     private int contentId;
     private String title;
     private String shortText;
@@ -212,8 +216,15 @@ public class Event implements Serializable {
 
         this.year = guessYearFromDescription(subTitle + " " + plot);
 
-        if (!getSeasonEpisode(plot, seasonEpisode)) {
-            getSeasonEpisode(subTitle, seasonEpisode);
+        StringHolder resultHolder = new StringHolder();
+
+        if (!getSeasonEpisode(this.description, seasonEpisode, resultHolder)) {
+            if(getSeasonEpisode(this.shortText, seasonEpisode, resultHolder))  {
+                this.shortText = resultHolder.string;
+            }
+        }
+        else {
+            this.description = resultHolder.string;
         }
 
         if(seasonEpisode.valid() && !isTvShow()) {
@@ -388,7 +399,12 @@ public class Event implements Serializable {
         return false;
     }
 
-    private static boolean getSeasonEpisode(String text, SeasonEpisodeHolder holder) {
+    private static String matchesCut(Matcher m) {
+        m.reset();
+        return m.replaceFirst("").trim().replaceFirst("^[\\W]+", "");
+    }
+
+    private static boolean getSeasonEpisode(String text, SeasonEpisodeHolder holder, StringHolder resultHolder) {
         if(TextUtils.isEmpty(text)) {
             return false;
         }
@@ -399,6 +415,11 @@ public class Event implements Serializable {
             if (matches.find()) {
                 holder.season = parseInt(matches.group(1));
                 holder.episode = parseInt(matches.group(2));
+
+                if(resultHolder != null) {
+                    resultHolder.string = matchesCut(matches);
+                }
+
                 return true;
             }
         }
@@ -409,6 +430,11 @@ public class Event implements Serializable {
             if (matches.find()) {
                 holder.season = parseInt(matches.group(2));
                 holder.episode = parseInt(matches.group(1));
+
+                if(resultHolder != null) {
+                    resultHolder.string = matchesCut(matches);
+                }
+
                 return true;
             }
         }
@@ -419,6 +445,11 @@ public class Event implements Serializable {
             if (matches.find()) {
                 holder.season = 1;
                 holder.episode = parseInt(matches.group(1));
+
+                if(resultHolder != null) {
+                    resultHolder.string = matchesCut(matches);
+                }
+
                 return true;
             }
         }

@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.AnyRes;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -456,13 +457,19 @@ public class ChannelSyncAdapter {
             ContentValues values = new ContentValues();
             values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
             values.put(TvContract.Programs.COLUMN_TITLE, event.getTitle());
-            values.put(TvContract.Programs.COLUMN_EPISODE_TITLE, shortText);
 
-            if(description.length() <= 256) {
-                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description);
+            if(!TextUtils.isEmpty(event.getShortText())) {
+                values.put(TvContract.Programs.COLUMN_EPISODE_TITLE, event.getShortText());
             }
-            else {
-                values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, 256) + "...");
+
+            description = event.getDescription();
+            if(!TextUtils.isEmpty(description)) {
+                if(description.length() <= 256) {
+                    values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description);
+                }
+                else {
+                    values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, 256) + "...");
+                }
             }
 
             values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, startTime * 1000);
