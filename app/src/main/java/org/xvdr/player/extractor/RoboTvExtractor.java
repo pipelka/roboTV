@@ -70,8 +70,6 @@ public class RoboTvExtractor implements Extractor {
     final private TimestampAdjuster timestampAdjuster;
 
 
-    private boolean seenFirstTimestamp = false;
-
     private RoboTvExtractor(PositionReference position, Listener listener) {
         this.listener = listener;
         this.position = position;
@@ -152,12 +150,6 @@ public class RoboTvExtractor implements Extractor {
             return RESULT_CONTINUE;
         }
 
-        // register first DTS (to compute to offset)
-        if(!seenFirstTimestamp) {
-            timestampAdjuster.adjustTsTimestamp(dts);
-            seenFirstTimestamp = true;
-        }
-
         // convert PTS -> timeUs
         long timeUs = timestampAdjuster.adjustTsTimestamp(pts);
 
@@ -183,7 +175,6 @@ public class RoboTvExtractor implements Extractor {
     synchronized public void seek(long p, long timeUs) {
         Log.d(TAG, "seek: " + p);
         timestampAdjuster.reset();
-        seenFirstTimestamp = false;
     }
 
     @Override
