@@ -16,7 +16,7 @@ public class RoboTvAudioRenderer extends FfmpegAudioRenderer {
     }
 
     @Override
-    public int supportsFormatInternal(Format format) {
+    public int supportsFormat(Format format) {
         if(ac3Passthrough && MimeTypes.isAudio(format.sampleMimeType)) {
             if(format.sampleMimeType.equals(MimeTypes.AUDIO_E_AC3)||
                     format.sampleMimeType.equals(MimeTypes.AUDIO_AC3)) {
@@ -24,6 +24,6 @@ public class RoboTvAudioRenderer extends FfmpegAudioRenderer {
             }
         }
 
-        return super.supportsFormatInternal(format);
+        return super.supportsFormat(format);
     }
 }
