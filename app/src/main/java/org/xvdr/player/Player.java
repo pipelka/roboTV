@@ -24,7 +24,6 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.util.MimeTypes;
-import com.google.android.exoplayer2.util.PriorityHandlerThread;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import org.xvdr.player.extractor.RoboTvExtractor;
@@ -93,11 +92,8 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
         Log.i(TAG, "audio passthrough: " + (passthrough ? "enabled" : "disabled"));
 
-        PriorityHandlerThread handlerThread = new PriorityHandlerThread("roboTV:player", PriorityHandlerThread.NORM_PRIORITY);
-        handlerThread.start();
-
         openConditionVariable = new ConditionVariable();
-        handler = new Handler(handlerThread.getLooper());
+        handler = new Handler();
 
         position = new PositionReference();
 
