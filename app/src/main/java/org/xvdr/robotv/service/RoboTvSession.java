@@ -12,7 +12,6 @@ import android.media.tv.TvTrackInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Surface;
 
@@ -40,7 +39,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     private Player mPlayer;
     private TvInputService mContext;
 
-    private HandlerThread mHandlerThread;
     private Handler mHandler;
     private NotificationHandler mNotification;
 
@@ -68,9 +66,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         mNotification = new NotificationHandler(mContext);
 
-        mHandlerThread = new HandlerThread("robotv:eventhandler", android.os.Process.THREAD_PRIORITY_DEFAULT);
-        mHandlerThread.start();
-        mHandler = new Handler(mHandlerThread.getLooper());
+        mHandler = new Handler();
 
         // player init
         try {
@@ -93,8 +89,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         if(mPlayer != null) {
             mPlayer.release();
         }
-
-        mHandlerThread.interrupt();
     }
 
     @Override
