@@ -34,6 +34,11 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 
 The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [Shield Android TV](https://shield.nvidia.com/android-tv) are used for development.
 
+### Server Deployment
+
+The roboTV server (VDR, plugins, configuration) can be deployed easily with the "robotv-server" docker image:
+https://github.com/pipelka/docker-robotv-server
+
 ## Building
 
 1. Download [Android Studio](https://developer.android.com/studio/index.html)
