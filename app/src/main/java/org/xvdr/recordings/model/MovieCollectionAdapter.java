@@ -178,6 +178,11 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     public void add(Movie movie) {
+        // sanity check
+        if(TextUtils.isEmpty(movie.getTitle())) {
+            return;
+        }
+
         // add into "latest" category
         Movie item = movieExists(getLatestCategory(), movie);
 
@@ -225,6 +230,11 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         // check if series item already exists
         for(int i = 0; i < shows.size(); i++) {
             Movie m = (Movie) shows.get(i);
+
+            if(TextUtils.isEmpty(m.getTitle()) || TextUtils.isEmpty(episode.getTitle())) {
+                continue;
+            }
+
             if(m.getTitle().equals(episode.getTitle())) {
                 m.setEpisodeCount(m.getEpisodeCount() + 1);
                 return;

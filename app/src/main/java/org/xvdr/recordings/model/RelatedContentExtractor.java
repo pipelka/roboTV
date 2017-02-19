@@ -1,5 +1,7 @@
 package org.xvdr.recordings.model;
 
+import android.text.TextUtils;
+
 import org.xvdr.robotv.client.model.Movie;
 
 import java.util.ArrayList;
@@ -16,11 +18,15 @@ public class RelatedContentExtractor {
     private Collection<Movie> result = new ArrayList<>(50);
 
     public Collection<Movie> getSeries(String title) {
-        if(collection == null) {
+        if(collection == null || title == null) {
             return null;
         }
 
         for(Movie m : collection) {
+            if(TextUtils.isEmpty(m.getTitle())) {
+                continue;
+            }
+
             if (m.isTvShow() && m.getTitle().equals(title)) {
                 result.add(m);
             }
