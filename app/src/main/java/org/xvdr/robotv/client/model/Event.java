@@ -105,6 +105,7 @@ public class Event implements Serializable {
     };
 
     private static String[] genreSoap = {
+        "actionserie",
         "comedyserie",
         "comedy-serie",
         "crime-serie",
