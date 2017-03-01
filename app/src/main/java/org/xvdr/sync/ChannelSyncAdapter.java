@@ -452,7 +452,7 @@ public class ChannelSyncAdapter {
                 continue;
             }
 
-            Event event = new Event(content, title, shortText, description, eventDuration, eventId, uid);
+            Event event = new Event(content, title, shortText, description, startTime, eventDuration, eventId, uid);
 
             ContentValues values = new ContentValues();
             values.put(TvContract.Programs.COLUMN_CHANNEL_ID, channelId);
