@@ -77,6 +77,10 @@ public class ArtworkFetcher {
         req.putString(o.getBackgroundUrl());
         req.putU32(0);
 
+        // update EPG entry
+        req.putU32(event.getChannelUid());
+        req.putU32(event.getEventId());
+
         if(mConnection.transmitMessage(req) == null) {
             Log.d(TAG, "failed to register artwork for '" + event.getTitle() + "' in cache");
         }
