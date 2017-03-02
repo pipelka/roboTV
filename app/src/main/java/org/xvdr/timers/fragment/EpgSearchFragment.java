@@ -125,6 +125,11 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 String channelName = resp.getString();
                 int channelId = (int) resp.getU32();
 
+                // remove inconsistent entries
+                if(channelId == 0 || channelList.findByUid(channelId) == null) {
+                    continue;
+                }
+
                 ListRow row = findOrCreateChannelRow(channelName, channelId);
                 ArrayObjectAdapter adapter = (ArrayObjectAdapter) row.getAdapter();
 
@@ -154,6 +159,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 public int compare(ListRow a, ListRow b) {
                     Channel entry1 = channelList.findByUid((int)a.getId());
                     Channel entry2 = channelList.findByUid((int)b.getId());
+
                     return  entry1.getNumber() < entry2.getNumber() ? -1 : 1;
                 }
             });
