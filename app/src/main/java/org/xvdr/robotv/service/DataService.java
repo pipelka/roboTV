@@ -53,7 +53,7 @@ public class DataService extends Service {
         void onTimersUpdated(DataService service);
     }
 
-    public class Binder extends android.os.Binder {
+    class Binder extends android.os.Binder {
         DataService getService() {
             return DataService.this;
         }
@@ -99,29 +99,9 @@ public class DataService extends Service {
         }
 
         @Override
-        public void onReconnect() {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "server reconnected");
-                    if(connection.login()) {
-                        Log.d(TAG, "logged in");
-                        postOnConnected();
-                        connectionStatus = STATUS_Server_Connected;
-                    }
-                    else {
-                        Log.e(TAG, "server login failed");
-                        connectionStatus = STATUS_Server_NotConnected;
-                        connection.close();
-
-                        DataService.this.postOpen();
-                    }
-                }
-            }, 3000);
-        }
-
-        @Override
         public void onDisconnect() {
+            DataService.this.connectionStatus = STATUS_Server_NotConnected;
+            postOpen();
         }
     };
 

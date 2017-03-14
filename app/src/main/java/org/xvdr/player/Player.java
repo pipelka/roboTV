@@ -46,8 +46,6 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
         void onDisconnect();
 
-        void onReconnect();
-
         void onTracksChanged(StreamBundle bundle);
 
         void onAudioTrackChanged(Format format);
@@ -311,11 +309,6 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     @Override
     public void onDisconnect() {
         listener.onDisconnect();
-    }
-
-    @Override
-    public void onReconnect() {
-        listener.onReconnect();
     }
 
     @Override

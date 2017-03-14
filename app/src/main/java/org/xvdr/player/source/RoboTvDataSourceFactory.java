@@ -23,8 +23,6 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
 
         void onDisconnect();
 
-        void onReconnect();
-
         void onStreamError(int status);
 
         void onServerTuned(int status);
@@ -46,32 +44,6 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
                 @Override
                 public void run() {
                     listener.onDisconnect();
-                }
-            }, 3000);
-        }
-
-
-        public void onReconnect() {
-            if(connection == null || listener == null) {
-                return;
-            }
-
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // reschedule login if login fails
-                    if(!connection.login()) {
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                sessionListener.onReconnect();
-                            }
-                        }, 1000);
-                        return;
-                    }
-
-                    // notify about successful reconnect
-                    listener.onReconnect();
                 }
             }, 3000);
         }

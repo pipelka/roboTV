@@ -56,6 +56,8 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     }
 
     private TuneRunnable mTune = new TuneRunnable();
+
+
     private ContentResolver mContentResolver;
 
     RoboTvSession(TvInputService context, String inputId) {
@@ -116,19 +118,24 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public boolean onTune(final Uri channelUri) {
+        postTune(channelUri, 0);
+        return true;
+    }
 
+    private void postTune(final Uri channelUri, long delayMillis) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
             notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
         }
 
         // remove pending tune request
         mHandler.removeCallbacks(mTune);
-        mTune.setChannelUri(channelUri);
+
+        if(channelUri != null) {
+            mTune.setChannelUri(channelUri);
+        }
 
         // post new tune request
-        mHandler.post(mTune);
-
-        return true;
+        mHandler.postDelayed(mTune, delayMillis);
     }
 
     @Override
@@ -212,12 +219,8 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL);
         mNotification.error(getResources().getString(R.string.connection_lost));
-    }
 
-    @Override
-    public void onReconnect() {
-        mNotification.notify(getResources().getString(R.string.connection_restored));
-        onTune(mCurrentChannelUri);
+        postTune(null, 10 * 1000);
     }
 
     @Override
@@ -301,6 +304,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
             case Connection.STATUS_CONNECTION_FAILED:
                 mNotification.notify(getResources().getString(R.string.failed_connect));
+                postTune(null, 10 * 1000);
                 break;
 
             default:

@@ -210,11 +210,6 @@ public class PlayerActivity extends Activity implements Player.Listener {
     }
 
     @Override
-    public void onReconnect() {
-        mPlayer.play();
-    }
-
-    @Override
     public void onTracksChanged(final StreamBundle bundle) {
         runOnUiThread(new Runnable() {
             @Override
