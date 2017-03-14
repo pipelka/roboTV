@@ -62,7 +62,6 @@
 //
 
 %ignore MsgConnection::pollfd;
-%ignore MsgConnection::Reconnect;
 %ignore MsgConnection::GetConnectionLost;
 %ignore MsgConnection::SetConnectionLost;
 %ignore MsgConnection::m_socket;

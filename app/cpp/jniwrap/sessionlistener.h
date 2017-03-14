@@ -12,8 +12,6 @@ public:
 
     virtual void onDisconnect() = 0;
 
-    virtual void onReconnect()  = 0;
-
 };
 
 #endif SESSIONLISTENER_H

@@ -29,12 +29,6 @@ protected:
         }
     }
 
-    void OnReconnect() {
-        if(m_callback) {
-            m_callback->onReconnect();
-        }
-    }
-
 private:
 
     SessionListener* m_callback = nullptr;

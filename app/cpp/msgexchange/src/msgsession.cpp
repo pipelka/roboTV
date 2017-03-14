@@ -71,7 +71,7 @@ void MsgSession::Run() {
 
 		// connection lost ?
 		if(GetConnectionLost()) {
-			usleep(50 * 1000);
+			break;
 		}
 
 		// no message

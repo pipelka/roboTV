@@ -153,20 +153,6 @@ protected:
 	virtual void OnDisconnect();
 
 	/**
-	Connection restored handler.
-	This virtual member is called if the connection to the server has been restored.
-	*/
-	virtual void OnReconnect();
-
-	/**
-	Reestablish a lost connection.
-	Tries to reconnect to the server
-
-	@return true on success
-	*/
-	bool Reconnect();
-
-	/**
 	Mark a connection as "lost".
 	*/
 	void SetConnectionLost();

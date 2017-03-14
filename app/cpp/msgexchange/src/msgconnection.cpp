@@ -149,24 +149,6 @@ bool MsgConnection::GetConnectionLost() const {
 	return m_connectionlost;
 }
 
-bool MsgConnection::Reconnect() {
-	syslog(LOG_INFO, "reconnecting ...");
-
-	if(!Open(m_hostname.c_str(), m_port)) {
-		return false;
-	}
-
-	syslog(LOG_INFO, "connection restored.");
-	m_connectionlost = false;
-	OnReconnect();
-
-	return true;
-}
-
-void MsgConnection::OnReconnect() {
-	syslog(LOG_INFO, "=== CONNECTION RESTORED ===");
-}
-
 void MsgConnection::OnDisconnect() {
 	syslog(LOG_INFO, "=== CONNECTION LOST ===");
 }
@@ -181,7 +163,7 @@ bool MsgConnection::SendRequest(MsgPacket* request) {
 	}
 
 	// restore connection if needed
-	if(GetConnectionLost() && !Reconnect()) {
+	if(GetConnectionLost()) {
 		return false;
 	}
 
@@ -199,7 +181,7 @@ bool MsgConnection::ReadResponse(MsgPacket* p) {
 	}
 
 	// restore connection if needed
-	if(GetConnectionLost() && !Reconnect()) {
+	if(GetConnectionLost()) {
 		return false;
 	}
 
