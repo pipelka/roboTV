@@ -8,6 +8,7 @@ import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
+import com.google.android.exoplayer2.audio.AudioProcessor;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
@@ -49,19 +50,19 @@ class SimpleRoboTvPlayer extends SimpleExoPlayer {
                 5000);
     }
 
+    @Override
     protected void buildAudioRenderers(Context context, Handler mainHandler,
                                        DrmSessionManager<FrameworkMediaCrypto> drmSessionManager,
-                                       int extensionRendererMode, AudioRendererEventListener eventListener,
-                                       ArrayList<Renderer> out) {
-
+                                       @ExtensionRendererMode int extensionRendererMode, AudioRendererEventListener eventListener,
+                                       AudioProcessor[] audioProcessors, ArrayList<Renderer> out) {
         final boolean audioPassthrough = (extensionRendererMode == EXTENSION_RENDERER_MODE_ON);
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
         // codecSelector disabling MPEG audio (handled by RoboTvAudioDecoder)
         MediaCodecSelector codecSelector = new MediaCodecSelector() {
             @Override
-            public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder, boolean requiresTunneling) throws MediaCodecUtil.DecoderQueryException {
-                return MediaCodecUtil.getDecoderInfo(mimeType, requiresSecureDecoder, requiresTunneling);
+            public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder) throws MediaCodecUtil.DecoderQueryException {
+                return MediaCodecUtil.getDecoderInfo(mimeType, requiresSecureDecoder);
             }
 
             @Override
@@ -73,7 +74,8 @@ class SimpleRoboTvPlayer extends SimpleExoPlayer {
         out.add(new RoboTvAudioRenderer(
                 mainHandler,
                 null,
-                audioPassthrough)
+                audioPassthrough,
+                audioProcessors)
         );
 
         out.add(new MediaCodecAudioRenderer(
@@ -82,10 +84,12 @@ class SimpleRoboTvPlayer extends SimpleExoPlayer {
                 true,
                 mainHandler,
                 null,
-                audioCapabilities)
+                audioCapabilities,
+                audioProcessors)
         );
     }
 
+    @Override
     protected void buildVideoRenderers(Context context, Handler mainHandler,
                                        DrmSessionManager<FrameworkMediaCrypto> drmSessionManager,
                                        int extensionRendererMode, VideoRendererEventListener eventListener,

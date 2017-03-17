@@ -3,6 +3,7 @@ package org.xvdr.player.extractor;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.extractor.ExtractorOutput;
 import com.google.android.exoplayer2.extractor.TrackOutput;
@@ -17,6 +18,8 @@ class StreamManager extends SparseArray<StreamReader> {
     private static final int MAX_OUTPUT_TRACKS = 8;
 
     private final TrackOutput[] trackOutput;
+
+    private static final String MIMETYPE_UNKNOWN = "unknown/unknown";
 
     StreamManager() {
         trackOutput = new TrackOutput[MAX_OUTPUT_TRACKS];
@@ -40,7 +43,7 @@ class StreamManager extends SparseArray<StreamReader> {
     void createStreams(ExtractorOutput output, StreamBundle bundle) {
         // pre-create output tracks
         for(int i = 0; i < MAX_OUTPUT_TRACKS; i++) {
-            trackOutput[i] = output.track(i);
+            trackOutput[i] = output.track(i, C.TRACK_TYPE_DEFAULT);
         }
 
         updateStreams(bundle);
@@ -68,8 +71,8 @@ class StreamManager extends SparseArray<StreamReader> {
 
         // fill remaining tracks
         for(int i = index; i < MAX_OUTPUT_TRACKS; i++) {
-            Format format = Format.createContainerFormat("", null, null,
-                            MimeTypes.TEXT_VTT, Format.NO_VALUE);
+            Format format = Format.createContainerFormat(null, MIMETYPE_UNKNOWN, MIMETYPE_UNKNOWN,
+                            null, Format.NO_VALUE, 0, null);
             trackOutput[i].format(format);
         }
     }
