@@ -45,7 +45,7 @@
                 android:textStyle="bold|italic"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:textColor="@color/abc_primary_text_material_dark" />
+                android:textColor="@color/lb_tv_white" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -56,7 +56,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:layout_marginTop="2dp"
-                android:textColor="@color/abc_primary_text_material_dark" />
+                android:textColor="@color/lb_tv_white" />
         </LinearLayout>
 
     </LinearLayout>
