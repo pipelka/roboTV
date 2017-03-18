@@ -51,6 +51,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     private DataService service;
 
     private int color_background;
+    private String backgroundUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,8 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
             backgroundManager.setColor(color_background);
             return;
         }
+
+        backgroundUrl = url;
 
         Glide.with(this).load(url).asBitmap()
             .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
@@ -93,12 +96,22 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     }
 
     private void setBackground() {
-        backgroundManager = BackgroundManager.getInstance(getActivity());
-        backgroundManager.attach(getActivity().getWindow());
-        backgroundManager.setColor(color_background);
-        backgroundManager.setDimLayer(new ColorDrawable(Utils.getColor(getActivity(), R.color.dim_background)));
+        if(backgroundManager == null) {
+            backgroundManager = BackgroundManager.getInstance(getActivity());
+        }
 
-        backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
+        if(!backgroundManager.isAttached()) {
+            backgroundManager.attach(getActivity().getWindow());
+
+            backgroundManager.setColor(color_background);
+            backgroundManager.setDimLayer(new ColorDrawable(Utils.getColor(getActivity(), R.color.dim_background)));
+        }
+
+        if(backgroundManagerTarget == null) {
+            backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
+        }
+
+        updateBackground(backgroundUrl);
     }
 
     private void initUI() {
@@ -181,6 +194,12 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     private void startSetupActivity() {
         Intent intent = new Intent(getActivity(), org.xvdr.robotv.setup.SetupActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateBackground(backgroundUrl);
     }
 
     @Override

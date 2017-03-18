@@ -154,8 +154,13 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
 
 
     private void initBackground() {
-        backgroundManager = BackgroundManager.getInstance(getActivity());
-        backgroundManager.attach(getActivity().getWindow());
+        if(backgroundManager == null) {
+            backgroundManager = BackgroundManager.getInstance(getActivity());
+        }
+
+        if(!backgroundManager.isAttached()) {
+            backgroundManager.attach(getActivity().getWindow());
+        }
 
         backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
 
