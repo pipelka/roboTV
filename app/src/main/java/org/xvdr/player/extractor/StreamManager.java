@@ -17,12 +17,9 @@ class StreamManager extends SparseArray<StreamReader> {
 
     private static final int MAX_OUTPUT_TRACKS = 8;
 
-    private final TrackOutput[] trackOutput;
-
     private static final String MIMETYPE_UNKNOWN = "unknown/unknown";
 
     StreamManager() {
-        trackOutput = new TrackOutput[MAX_OUTPUT_TRACKS];
     }
 
     private boolean isSteamSupported(StreamBundle.Stream stream) {
@@ -43,15 +40,15 @@ class StreamManager extends SparseArray<StreamReader> {
     void createStreams(ExtractorOutput output, StreamBundle bundle) {
         // pre-create output tracks
         for(int i = 0; i < MAX_OUTPUT_TRACKS; i++) {
-            trackOutput[i] = output.track(i, C.TRACK_TYPE_DEFAULT);
+            output.track(i, C.TRACK_TYPE_DEFAULT);
         }
 
-        updateStreams(bundle);
+        updateStreams(output, bundle);
 
         output.endTracks();
     }
 
-    void updateStreams(StreamBundle bundle) {
+    void updateStreams(ExtractorOutput output, StreamBundle bundle) {
         int index = 0;
         clear();
 
@@ -60,7 +57,8 @@ class StreamManager extends SparseArray<StreamReader> {
             int pid = stream.physicalId;
 
             if(isSteamSupported(stream)) {
-                put(pid, new StreamReader(trackOutput[index++], stream));
+                TrackOutput track = output.track(index++, C.TRACK_TYPE_DEFAULT);
+                put(pid, new StreamReader(track, stream));
             }
 
             if(index >= MAX_OUTPUT_TRACKS) {
@@ -71,9 +69,10 @@ class StreamManager extends SparseArray<StreamReader> {
 
         // fill remaining tracks
         for(int i = index; i < MAX_OUTPUT_TRACKS; i++) {
+            TrackOutput track = output.track(i, C.TRACK_TYPE_DEFAULT);
             Format format = Format.createContainerFormat(null, MIMETYPE_UNKNOWN, MIMETYPE_UNKNOWN,
                             null, Format.NO_VALUE, 0, null);
-            trackOutput[i].format(format);
+            track.format(format);
         }
     }
 }

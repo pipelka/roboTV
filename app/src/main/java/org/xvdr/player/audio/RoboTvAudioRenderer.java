@@ -5,6 +5,7 @@ import android.os.Handler;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.audio.AudioProcessor;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
+import com.google.android.exoplayer2.ext.ffmpeg.FfmpegAudioRenderer;
 import com.google.android.exoplayer2.util.MimeTypes;
 
 public class RoboTvAudioRenderer extends FfmpegAudioRenderer {

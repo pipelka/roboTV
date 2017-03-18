@@ -38,21 +38,21 @@ extern "C" {
 #define DECODER_FUNC(RETURN_TYPE, NAME, ...) \
   extern "C" { \
   JNIEXPORT RETURN_TYPE \
-    Java_org_xvdr_player_audio_FfmpegDecoder_ ## NAME \
+    Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegDecoder_ ## NAME \
       (JNIEnv* env, jobject thiz, ##__VA_ARGS__);\
   } \
   JNIEXPORT RETURN_TYPE \
-    Java_org_xvdr_player_audio_FfmpegDecoder_ ## NAME \
+    Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegDecoder_ ## NAME \
       (JNIEnv* env, jobject thiz, ##__VA_ARGS__)\
 
 #define LIBRARY_FUNC(RETURN_TYPE, NAME, ...) \
   extern "C" { \
   JNIEXPORT RETURN_TYPE \
-    Java_org_xvdr_player_audio_FfmpegLibrary_ ## NAME \
+    Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegLibrary_ ## NAME \
       (JNIEnv* env, jobject thiz, ##__VA_ARGS__);\
   } \
   JNIEXPORT RETURN_TYPE \
-    Java_org_xvdr_player_audio_FfmpegLibrary_ ## NAME \
+    Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegLibrary_ ## NAME \
       (JNIEnv* env, jobject thiz, ##__VA_ARGS__)\
 
 #define ERROR_STRING_BUFFER_LENGTH 256

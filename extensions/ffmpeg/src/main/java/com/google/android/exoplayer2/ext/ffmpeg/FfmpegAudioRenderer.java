@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.xvdr.player.audio;
+package com.google.android.exoplayer2.ext.ffmpeg;
 
 import android.os.Handler;
 import com.google.android.exoplayer2.C;

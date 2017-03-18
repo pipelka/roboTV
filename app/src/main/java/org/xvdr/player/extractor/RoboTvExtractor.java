@@ -200,7 +200,7 @@ public class RoboTvExtractor implements Extractor {
         }
         else {
             Log.d(TAG, "update streams");
-            streamManager.updateStreams(bundle);
+            streamManager.updateStreams(output, bundle);
         }
 
         if(listener != null) {

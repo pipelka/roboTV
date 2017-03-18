@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.6)
+ 
 if( "${CMAKE_ANDROID_ARCH_ABI}" STREQUAL "x86" )
     set(FFMPEG_LIBDIR "${CMAKE_SOURCE_DIR}/ffmpeg/libs/x86")
 else()

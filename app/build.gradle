@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId "org.xvdr.robotv"
-        minSdkVersion 22
+        minSdkVersion project.ext.minSdkVersion
         targetSdkVersion project.ext.targetSdkVersion
         versionCode 1
         versionName "0.6.3.${gitAbbreviatedId}"
@@ -40,11 +40,6 @@ android {
         }
     }
 
-    sourceSets.main {
-        jniLibs.srcDir 'cpp/ffmpeg/libs'
-        jni.srcDirs = [] // Disable the automatic ndk-build call by Android Studio.
-    }
-
     buildTypes {
         release {
             signingConfig signingConfigs.release
@@ -65,4 +60,5 @@ dependencies {
     compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'com.google.android.exoplayer:exoplayer:r2.3.0'
+    compile project(path: ':extension-ffmpeg')
 }
