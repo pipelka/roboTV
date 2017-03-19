@@ -53,7 +53,7 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
 
             req.putU32(channelUid);
             req.putU32(System.currentTimeMillis() / 1000);
-            req.putU32(60 * 60 * 24);
+            req.putU32(60 * 60 * 24 * 2);
 
             Packet resp = connection.transmitMessage(req);
 
