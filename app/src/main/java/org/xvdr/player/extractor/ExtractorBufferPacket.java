@@ -7,6 +7,7 @@ import org.xvdr.player.BufferPacket;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 public class ExtractorBufferPacket implements BufferPacket {
 
@@ -73,17 +74,23 @@ public class ExtractorBufferPacket implements BufferPacket {
     }
 
     public String getString() {
-        String string = nativeString(buffer.array(), buffer.position(), buffer.remaining());
-        buffer.position(buffer.position() + string.length() + 1);
+        Charset charset = Charset.forName("UTF-8");
+        int i = 0;
+        int p = buffer.position();
 
-        return string;
+        while (i < buffer.remaining() && buffer.get(p) != 0) {
+            i++;
+            p++;
+        }
+
+        String str = new String(buffer.array(), buffer.position(), i, charset);
+        buffer.position(buffer.position() + i + 1);
+
+        return str;
     }
 
     public void readBuffer(byte[] buffer, int offset, int length) {
         this.buffer.get(buffer, offset, length);
     }
 
-    private native String nativeString(byte[] buffer, int offset, int length);
-
-    //private native int nativeSize(byte[] buffer, int offset, int length);
 }
