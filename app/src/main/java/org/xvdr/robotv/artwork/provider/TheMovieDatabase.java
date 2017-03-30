@@ -108,7 +108,7 @@ public class TheMovieDatabase extends HttpArtworkProvider {
 
     public List<ArtworkHolder> searchAll(String title) {
         List<ArtworkHolder> result = new ArrayList<>();
-        JSONArray array;
+        JSONArray array = null;
 
         // movie search
         try {
@@ -116,10 +116,11 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         }
         catch(Exception e) {
             e.printStackTrace();
-            return result;
         }
 
-        result.addAll(getArtworkList(array));
+        if(array != null) {
+            result.addAll(getArtworkList(array));
+        }
 
         // tv search
         try {
@@ -127,10 +128,12 @@ public class TheMovieDatabase extends HttpArtworkProvider {
         }
         catch(Exception e) {
             e.printStackTrace();
-            return result;
+            array = null;
         }
 
-        result.addAll(getArtworkList(array));
+        if(array != null) {
+            result.addAll(getArtworkList(array));
+        }
 
         return result;
     }
@@ -149,6 +152,10 @@ public class TheMovieDatabase extends HttpArtworkProvider {
                                 title,
                                 section.equals("tv") ? "name" : "title",
                                 o.optJSONArray("results"));
+
+        if(results == null) {
+            return null;
+        }
 
         // filter entries (search for year)
         if(year > 0 && !dateProperty.isEmpty()) {
@@ -230,6 +237,10 @@ public class TheMovieDatabase extends HttpArtworkProvider {
             return null;
         }
 
+        if(results == null) {
+            return null;
+        }
+
         return new ArtworkHolder(
                    getPosterUrl(results),
                    getBackgroundUrl(results)
@@ -244,6 +255,10 @@ public class TheMovieDatabase extends HttpArtworkProvider {
             results = search("tv", event.getTitle(), event.getYear(), "first_air_date");
         }
         catch(JSONException e) {
+            return null;
+        }
+
+        if(results == null) {
             return null;
         }
 
