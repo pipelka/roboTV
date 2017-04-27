@@ -69,7 +69,7 @@ public class RoboTvTrackSelector extends DefaultTrackSelector {
     }
 
     @Override
-    protected TrackSelection selectAudioTrack(TrackGroupArray groups, int[][] formatSupport, String preferredAudioLanguage, boolean exceedRendererCapabilitiesIfNecessary) {
+    protected TrackSelection selectAudioTrack(TrackGroupArray groups, int[][] formatSupport, String preferredAudioLanguage, boolean exceedRendererCapabilitiesIfNecessary, boolean allowMixedMimeAdaptiveness, TrackSelection.Factory adaptiveTrackSelectionFactory) {
         TrackGroup selectedGroup = null;
         audioLanguage = preferredAudioLanguage;
 

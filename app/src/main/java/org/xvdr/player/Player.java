@@ -11,9 +11,12 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
@@ -100,7 +103,12 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
         trackSelector.setParameters(new RoboTvTrackSelector.Parameters().withPreferredAudioLanguage(language));
         trackSelector.setTunnelingAudioSessionId(C.generateAudioSessionIdV21(context));
 
-        player = new SimpleRoboTvPlayer(context, trackSelector, passthrough);
+        player = ExoPlayerFactory.newSimpleInstance(
+                new RoboTvRenderersFactory(context, audioPassthrough),
+                trackSelector,
+                new DefaultLoadControl()
+        );
+
         player.addListener(this);
         player.setVideoDebugListener(this);
 
@@ -271,6 +279,10 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
     @Override
     public void onPositionDiscontinuity() {
+    }
+
+    @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
     }
 
     @Override
