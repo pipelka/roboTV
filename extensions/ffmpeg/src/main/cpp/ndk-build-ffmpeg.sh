@@ -12,7 +12,7 @@ rm -Rf include
 
 # checkout ffmpeg
 
-[ -d ffmpeg ] || git clone git://source.ffmpeg.org/ffmpeg ffmpeg
+[ -d ffmpeg ] || ( git clone git://source.ffmpeg.org/ffmpeg ffmpeg && cd ffmpeg && git checkout b96a6e2 && cd .. )
 
 # armeabi-v7a
 
@@ -41,6 +41,7 @@ cd ffmpeg
     --disable-avfilter \
     --disable-symver \
     --enable-avresample \
+    --enable-decoder=h264 \
     --enable-decoder=aac_latm \
     --enable-decoder=ac3 \
     --enable-decoder=eac3 \
@@ -80,6 +81,7 @@ make install-libs
     --disable-avfilter \
     --disable-symver \
     --enable-avresample \
+    --enable-decoder=h264 \
     --enable-decoder=aac_latm \
     --enable-decoder=ac3 \
     --enable-decoder=eac3 \

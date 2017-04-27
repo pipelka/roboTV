@@ -21,6 +21,6 @@ add_library(avresample SHARED IMPORTED)
 set_property(TARGET avresample PROPERTY IMPORTED_LOCATION ${FFMPEG_LIBDIR}/libavresample.so)
 
 
-add_library(ffmpeg SHARED ffmpeg_jni.cc)
+add_library(ffmpeg SHARED ffmpeg_jni.cc ffmpeg_video_jni.cc)
 target_include_directories(ffmpeg PRIVATE ./include)
 target_link_libraries(ffmpeg avcodec avresample avutil swresample log)

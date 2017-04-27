@@ -1,6 +1,5 @@
 package org.xvdr.recordings.activity;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadata;
@@ -19,17 +18,18 @@ import com.google.android.exoplayer2.Format;
 import org.xvdr.player.Player;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
-import org.xvdr.robotv.client.MovieController;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.NotificationHandler;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.client.StreamBundle;
+import org.xvdr.ui.DataServiceActivity;
 
 import java.io.IOException;
 
-public class PlayerActivity extends Activity implements Player.Listener {
+public class PlayerActivity extends DataServiceActivity implements Player.Listener, DataService.Listener {
 
     public static final String TAG = "PlayerActivity";
 
@@ -38,7 +38,6 @@ public class PlayerActivity extends Activity implements Player.Listener {
     private Movie mSelectedMovie;
     private MediaSession mSession;
     private NotificationHandler notificationHandler;
-    private MovieController movieController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,14 +62,13 @@ public class PlayerActivity extends Activity implements Player.Listener {
             return;
         }
 
-        movieController = new MovieController(mPlayer.getConnection(), SetupUtils.getLanguage(this));
         mControls.setPlayer(mPlayer);
 
         mSession = new MediaSession(this, "roboTV Movie");
         mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         initViews();
-        startPlayback();
+        setServiceListener(this);
     }
 
     private void updateMetadata(Movie movie) {
@@ -123,6 +121,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
         stateBuilder.setState(state, position, 1.0f);
 
         mSession.setPlaybackState(stateBuilder.build());
+        updatePlaybackPosition();
     }
 
     private void initViews() {
@@ -140,7 +139,13 @@ public class PlayerActivity extends Activity implements Player.Listener {
             return;
         }
 
-        long position = movieController.getPlaybackPosition(mSelectedMovie);
+        DataService service = getService();
+        long position = 0;
+
+        if(service != null) {
+            position = service.getMovieController().getPlaybackPosition(mSelectedMovie);
+        }
+
         String id = mSelectedMovie.getRecordingIdString();
 
         mPlayer.open(Player.createRecordingUri(id, position));
@@ -169,6 +174,8 @@ public class PlayerActivity extends Activity implements Player.Listener {
     protected void onDestroy() {
         super.onDestroy();
 
+        stopPlayback();
+
         if(mPlayer != null) {
             mPlayer.release();
         }
@@ -180,6 +187,15 @@ public class PlayerActivity extends Activity implements Player.Listener {
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
     }
 
+    void updatePlaybackPosition() {
+        DataService service = getService();
+        long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
+
+        if(service != null) {
+            service.getMovieController().setPlaybackPosition(mSelectedMovie, lastPosition);
+        }
+    }
+
     protected void stopPlayback() {
         mSession.setActive(false);
         mSession.release();
@@ -189,9 +205,6 @@ public class PlayerActivity extends Activity implements Player.Listener {
         }
 
         mControls.stopProgressAutomation();
-
-        long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
-        movieController.setPlaybackPosition(mSelectedMovie, lastPosition);
 
         mPlayer.stop();
         mPlayer.release();
@@ -243,4 +256,21 @@ public class PlayerActivity extends Activity implements Player.Listener {
         notificationHandler.error(getString(R.string.error_open_recording));
     }
 
+    @Override
+    public void onConnected(DataService service) {
+        startPlayback();
+    }
+
+    @Override
+    public void onConnectionError(DataService service) {
+
+    }
+
+    @Override
+    public void onMovieUpdate(DataService service) {
+    }
+
+    @Override
+    public void onTimersUpdated(DataService service) {
+    }
 }

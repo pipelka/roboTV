@@ -38,6 +38,10 @@ public class DataServiceActivity extends Activity {
     }
 
     protected DataService getService() {
+        if(dataClient == null) {
+            return null;
+        }
+
         return dataClient.getService();
     }
 }
