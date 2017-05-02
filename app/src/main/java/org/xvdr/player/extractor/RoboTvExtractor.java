@@ -62,6 +62,7 @@ public class RoboTvExtractor implements Extractor {
     }
 
     private ExtractorOutput output;
+    private boolean seenFirstDts;
 
     final private ExtractorBufferPacket scratch;
     final private StreamManager streamManager;
@@ -76,6 +77,7 @@ public class RoboTvExtractor implements Extractor {
         this.scratch = new ExtractorBufferPacket(new byte[1024]);
         this.streamManager = new StreamManager();
         this.timestampAdjuster = new TimestampAdjuster(TimestampAdjuster.DO_NOT_OFFSET);
+        this.seenFirstDts = false;
     }
 
     @Override
@@ -150,11 +152,39 @@ public class RoboTvExtractor implements Extractor {
             return RESULT_CONTINUE;
         }
 
+        if(!seenFirstDts) {
+            timestampAdjuster.adjustTsTimestamp(dts);
+            seenFirstDts = true;
+        }
+
+        long lastTimeUs = timestampAdjuster.getLastAdjustedTimestampUs();
+
         // convert PTS -> timeUs
         long timeUs = timestampAdjuster.adjustTsTimestamp(pts);
 
+        // sanity check
+        if(lastTimeUs != C.TIME_UNSET) {
+            if(Math.abs(timeUs - lastTimeUs) / 1000000 >= 5) {
+                Log.e(TAG, "timestamps differ more than 5 seconds - resetting");
+                timestampAdjuster.reset();
+                timestampAdjuster.setFirstSampleTimestampUs(lastTimeUs);
+                input.skipFully(size);
+                input.skipFully(8);
+                return RESULT_CONTINUE;
+            }
+        }
+
+        // audio track timestamp synchronization (64ms)
+        // from somewhere we get this timestamp difference
+        // by now we adjust this empirically
+        if(reader.isAudio()) {
+            timeUs += 64000;
+        }
+
         // consume stream data
-        reader.consume(input, size, timeUs, C.BUFFER_FLAG_KEY_FRAME);
+        if(timeUs >= 0) {
+            reader.consume(input, size, timeUs, C.BUFFER_FLAG_KEY_FRAME);
+        }
 
         // get current position
         // position   uint64  8 bytes
@@ -164,7 +194,7 @@ public class RoboTvExtractor implements Extractor {
         long pos = scratch.getU64();
 
         // sanity check if position is within the range
-        if(position.getStartPosition() < pos && pos < position.getEndPosition()) {
+        if(position.getStartPosition() < pos && pos < position.getEndPosition() && timeUs >= 0) {
             position.set(timeUs, pos);
         }
 
@@ -179,6 +209,7 @@ public class RoboTvExtractor implements Extractor {
 
     @Override
     public void release() {
+        this.seenFirstDts = false;
     }
 
     private void updateStreamReaders(BufferPacket p) {
@@ -198,4 +229,5 @@ public class RoboTvExtractor implements Extractor {
             listener.onTracksChanged(bundle);
         }
     }
+
 }
