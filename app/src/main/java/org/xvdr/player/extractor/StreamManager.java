@@ -5,8 +5,8 @@ import android.util.SparseArray;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer2.extractor.ExtractorOutput;
-import com.google.android.exoplayer2.extractor.TrackOutput;
 import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.robotv.client.StreamBundle;
@@ -57,7 +57,8 @@ class StreamManager extends SparseArray<StreamReader> {
             int pid = stream.physicalId;
 
             if(isSteamSupported(stream)) {
-                TrackOutput track = output.track(index++, C.TRACK_TYPE_DEFAULT);
+                DefaultTrackOutput track = (DefaultTrackOutput) output.track(index++, C.TRACK_TYPE_DEFAULT);
+                track.reset(true);
                 put(pid, new StreamReader(track, stream));
             }
 
@@ -67,12 +68,12 @@ class StreamManager extends SparseArray<StreamReader> {
             }
         }
 
-        // fill remaining tracks
+        // disable remaining tracks
         for(int i = index; i < MAX_OUTPUT_TRACKS; i++) {
-            TrackOutput track = output.track(i, C.TRACK_TYPE_DEFAULT);
-            Format format = Format.createContainerFormat(null, MIMETYPE_UNKNOWN, MIMETYPE_UNKNOWN,
-                            null, Format.NO_VALUE, 0, null);
+            DefaultTrackOutput track = (DefaultTrackOutput) output.track(i, C.TRACK_TYPE_DEFAULT);
+            Format format = Format.createSampleFormat(null, MIMETYPE_UNKNOWN, null, Format.NO_VALUE, null);
             track.format(format);
+            track.reset(false);
         }
     }
 }
