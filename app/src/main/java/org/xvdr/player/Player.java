@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
@@ -106,7 +107,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
         player = ExoPlayerFactory.newSimpleInstance(
                 new RoboTvRenderersFactory(context, audioPassthrough),
                 trackSelector,
-                new DefaultLoadControl()
+                new RoboTvLoadControl()
         );
 
         player.addListener(this);
