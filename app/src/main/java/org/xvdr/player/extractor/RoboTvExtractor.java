@@ -167,18 +167,17 @@ public class RoboTvExtractor implements Extractor {
             if(Math.abs(timeUs - lastTimeUs) / 1000000 >= 5) {
                 Log.e(TAG, "timestamps differ more than 5 seconds - resetting");
                 timestampAdjuster.reset();
-                timestampAdjuster.setFirstSampleTimestampUs(lastTimeUs);
                 input.skipFully(size);
                 input.skipFully(8);
                 return RESULT_CONTINUE;
             }
         }
 
-        // audio track timestamp synchronization (64ms)
+        // audio track timestamp synchronization (32ms)
         // from somewhere we get this timestamp difference
         // by now we adjust this empirically
         if(reader.isAudio()) {
-            timeUs += 64000;
+            timeUs += 32000;
         }
 
         // consume stream data
@@ -224,6 +223,8 @@ public class RoboTvExtractor implements Extractor {
             Log.d(TAG, "update streams");
             streamManager.updateStreams(output, bundle);
         }
+
+        timestampAdjuster.reset();
 
         if(listener != null) {
             listener.onTracksChanged(bundle);
