@@ -58,7 +58,6 @@ class StreamManager extends SparseArray<StreamReader> {
 
             if(isSteamSupported(stream)) {
                 DefaultTrackOutput track = (DefaultTrackOutput) output.track(index++, C.TRACK_TYPE_DEFAULT);
-                track.reset(true);
                 put(pid, new StreamReader(track, stream));
             }
 
@@ -73,7 +72,6 @@ class StreamManager extends SparseArray<StreamReader> {
             DefaultTrackOutput track = (DefaultTrackOutput) output.track(i, C.TRACK_TYPE_DEFAULT);
             Format format = Format.createSampleFormat(null, MIMETYPE_UNKNOWN, null, Format.NO_VALUE, null);
             track.format(format);
-            track.reset(false);
         }
     }
 }
