@@ -224,8 +224,6 @@ public class RoboTvExtractor implements Extractor {
             streamManager.updateStreams(output, bundle);
         }
 
-        timestampAdjuster.reset();
-
         if(listener != null) {
             listener.onTracksChanged(bundle);
         }
