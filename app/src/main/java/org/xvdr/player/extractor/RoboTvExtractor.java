@@ -3,12 +3,14 @@ package org.xvdr.player.extractor;
 import android.util.Log;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.extractor.Extractor;
 import com.google.android.exoplayer2.extractor.ExtractorInput;
 import com.google.android.exoplayer2.extractor.ExtractorOutput;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.extractor.PositionHolder;
 import com.google.android.exoplayer2.extractor.SeekMap;
+import com.google.android.exoplayer2.extractor.TrackOutput;
 import com.google.android.exoplayer2.util.TimestampAdjuster;
 
 import org.xvdr.player.BufferPacket;
@@ -27,16 +29,22 @@ public class RoboTvExtractor implements Extractor {
         private RoboTvExtractor extractor = null;
         final private Listener listener;
         final private PositionReference position;
+        final private String audioLanguage;
 
-        public Factory(PositionReference position, Listener listener) {
+        public Factory(PositionReference position, Listener listener, String audioLanguage) {
             this.listener = listener;
             this.position = position;
+            this.audioLanguage = audioLanguage;
         }
 
         @Override
         public Extractor[] createExtractors() {
-            extractor = new RoboTvExtractor(position, listener);
+            extractor = new RoboTvExtractor(position, listener, audioLanguage);
             return new Extractor[] { extractor };
+        }
+
+        public void selectAudioTrack(String trackId) {
+            extractor.selectAudioTrack(trackId);
         }
     }
 
@@ -59,25 +67,29 @@ public class RoboTvExtractor implements Extractor {
 
     public interface Listener {
         void onTracksChanged(StreamBundle bundle);
+        void onAudioTrackChanged(Format format);
     }
 
     private ExtractorOutput output;
     private boolean seenFirstDts;
+    private StreamManager streamManager;
+    private String audioLanguage;
+    private int nextAudioPid;
 
     final private ExtractorBufferPacket scratch;
-    final private StreamManager streamManager;
     final private Listener listener;
     final private PositionReference position;
     final private TimestampAdjuster timestampAdjuster;
 
 
-    private RoboTvExtractor(PositionReference position, Listener listener) {
+    private RoboTvExtractor(PositionReference position, Listener listener, String audioLanguage) {
         this.listener = listener;
         this.position = position;
         this.scratch = new ExtractorBufferPacket(new byte[1024]);
-        this.streamManager = new StreamManager();
         this.timestampAdjuster = new TimestampAdjuster(TimestampAdjuster.DO_NOT_OFFSET);
         this.seenFirstDts = false;
+        this.audioLanguage = audioLanguage;
+        this.nextAudioPid = -1;
     }
 
     @Override
@@ -96,6 +108,17 @@ public class RoboTvExtractor implements Extractor {
 
     @Override
     synchronized public int read(ExtractorInput input, PositionHolder seekPosition) throws IOException, InterruptedException {
+
+        // check for audio track switch
+        if(nextAudioPid != -1) {
+            Format format = streamManager.selectAudioTrack(nextAudioPid);
+            if(listener != null && format != null) {
+                listener.onAudioTrackChanged(format);
+            }
+            nextAudioPid = -1;
+            return RESULT_CONTINUE;
+        }
+
         // read packet header
 
         // messageId  uint16  2 bytes
@@ -105,7 +128,7 @@ public class RoboTvExtractor implements Extractor {
         scratch.read(input, 4);
 
         int messageId = scratch.getU16();
-        int frameType = scratch.getU16();
+        /*int frameType =*/ scratch.getU16();
 
         // check for format packet
         if(messageId == Connection.XVDR_STREAM_CHANGE) {
@@ -143,10 +166,17 @@ public class RoboTvExtractor implements Extractor {
 
         int size = (int) scratch.getU32(); // size of encapsulated stream data
 
-        StreamReader reader = streamManager.get(pid);
+        if(streamManager == null) {
+            input.skipFully(size);
+            input.skipFully(8);
+            return RESULT_CONTINUE;
+        }
+
+        StreamBundle.Stream stream = streamManager.getStream(pid);
+        TrackOutput output = streamManager.getOutput(stream);
 
         // unknown stream ?
-        if(reader == null) {
+        if(output == null) {
             input.skipFully(size);
             input.skipFully(8);
             return RESULT_CONTINUE;
@@ -176,13 +206,19 @@ public class RoboTvExtractor implements Extractor {
         // audio track timestamp synchronization (32ms)
         // from somewhere we get this timestamp difference
         // by now we adjust this empirically
-        if(reader.isAudio()) {
+        if(stream.isAudio()) {
             timeUs += 32000;
         }
 
         // consume stream data
         if(timeUs >= 0) {
-            reader.consume(input, size, timeUs, C.BUFFER_FLAG_KEY_FRAME);
+            int length = size;
+
+            while(length > 0) {
+                length -= output.sampleData(input, length, false);
+            }
+
+            output.sampleMetadata(timeUs, C.BUFFER_FLAG_KEY_FRAME, size, 0, null);
         }
 
         // get current position
@@ -211,21 +247,30 @@ public class RoboTvExtractor implements Extractor {
         this.seenFirstDts = false;
     }
 
+    private void selectAudioTrack(String trackId) {
+        int pid = 0;
+
+        try {
+            pid = Integer.parseInt(trackId);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        nextAudioPid = pid;
+    }
+
     private void updateStreamReaders(BufferPacket p) {
         final StreamBundle bundle = new StreamBundle();
         bundle.updateFromPacket(p);
 
-        if(streamManager.size() == 0) {
-            Log.d(TAG, "create streams");
-            streamManager.createStreams(output, bundle);
-        }
-        else {
-            Log.d(TAG, "update streams");
-            streamManager.updateStreams(output, bundle);
-        }
+        Log.d(TAG, "create streams");
+        this.streamManager = new StreamManager(bundle);
+        streamManager.createStreams(output, audioLanguage);
 
         if(listener != null) {
             listener.onTracksChanged(bundle);
+            listener.onAudioTrackChanged(streamManager.getAudioFormat());
         }
     }
 

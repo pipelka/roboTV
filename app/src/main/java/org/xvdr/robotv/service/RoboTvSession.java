@@ -253,6 +253,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public void onAudioTrackChanged(Format format) {
+        Log.d(TAG, "onAudioTrackChanged: " + format.id);
         notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, format.id);
     }
 

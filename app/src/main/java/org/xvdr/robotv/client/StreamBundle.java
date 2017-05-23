@@ -11,7 +11,7 @@ import org.xvdr.player.BufferPacket;
 import java.util.ArrayList;
 
 public class StreamBundle extends ArrayList<StreamBundle.Stream> {
-    static final String TAG = "StreamBundle";
+    private static final String TAG = "StreamBundle";
 
     static private final SparseArray<String> typeMapping = new SparseArray<String>() {
         {
@@ -121,6 +121,14 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 
             return 0;
         }
+
+        public boolean isVideo() {
+            return content == CONTENT_VIDEO;
+        }
+
+        public boolean isAudio() {
+            return content == CONTENT_AUDIO;
+        }
     }
 
     public StreamBundle() {
@@ -146,7 +154,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         return true;
     }
 
-    public boolean isTypeSupported(int type) {
+    private boolean isTypeSupported(int type) {
         for(int supportedType : supportedTypes) {
             if(supportedType == type) {
                 return true;

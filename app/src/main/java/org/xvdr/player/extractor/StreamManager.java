@@ -1,25 +1,45 @@
 package org.xvdr.player.extractor;
 
+import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer2.extractor.ExtractorOutput;
+import com.google.android.exoplayer2.extractor.TrackOutput;
 import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.robotv.client.StreamBundle;
 
-class StreamManager extends SparseArray<StreamReader> {
+import java.util.List;
+
+class StreamManager {
 
     private static final String TAG = "StreamManager";
+    private StreamBundle bundle;
+    private ExtractorOutput output;
+    private int audioPid;
+    private int videoPid;
 
-    private static final int MAX_OUTPUT_TRACKS = 8;
+    StreamManager(StreamBundle bundle) {
+        this.bundle = bundle;
+    }
 
-    private static final String MIMETYPE_UNKNOWN = "unknown/unknown";
+    StreamBundle.Stream getStream(int pid) {
+        return bundle.getStreamOfPid(pid);
+    }
 
-    StreamManager() {
+    TrackOutput getOutput(StreamBundle.Stream stream) {
+        if(stream.physicalId == videoPid) {
+            return output.track(0, C.TRACK_TYPE_VIDEO);
+        }
+
+        if(stream.physicalId == audioPid) {
+            return output.track(1, C.TRACK_TYPE_AUDIO);
+        }
+
+        return null;
     }
 
     private boolean isSteamSupported(StreamBundle.Stream stream) {
@@ -37,41 +57,149 @@ class StreamManager extends SparseArray<StreamReader> {
         return false;
     }
 
-    void createStreams(ExtractorOutput output, StreamBundle bundle) {
-        // pre-create output tracks
-        for(int i = 0; i < MAX_OUTPUT_TRACKS; i++) {
-            output.track(i, C.TRACK_TYPE_DEFAULT);
+    private static int getScoreFromFormat(Format format, String audioLanguage) {
+        if(format == null) {
+            return -1;
         }
 
-        updateStreams(output, bundle);
+        int trackScore = 0;
+
+        if(!TextUtils.isEmpty(audioLanguage)) {
+            trackScore += (format.language.equals(audioLanguage) ? 20 : 0);
+        }
+        trackScore += (format.sampleMimeType.equals(MimeTypes.AUDIO_AC3) ? 1 : 0);
+        trackScore += (format.sampleMimeType.equals(MimeTypes.AUDIO_E_AC3) ? 2 : 0);
+        trackScore += format.channelCount;
+
+        return trackScore;
+    }
+
+    private StreamBundle.Stream findVideoStream() {
+        for(StreamBundle.Stream stream : bundle) {
+            if (!isSteamSupported(stream)) {
+                continue;
+            }
+
+            if (stream.isVideo()) {
+                return stream;
+            }
+        }
+
+        return null;
+    }
+
+    private StreamBundle.Stream findAudioStream(String audioLanguage) {
+        StreamBundle.Stream bestStream = null;
+        int bestScore = -1;
+
+        for(StreamBundle.Stream stream : bundle) {
+            if(!stream.isAudio()) {
+                continue;
+            }
+
+            Format format = createFormat(stream, null);
+            int score = getScoreFromFormat(format, audioLanguage);
+
+            if(score > bestScore) {
+                bestStream = stream;
+                bestScore = score;
+            }
+        }
+
+        return bestStream;
+    }
+
+    private static Format createFormat(StreamBundle.Stream stream, List<byte[]> initializationData) {
+        String mimeType = stream.getMimeType();
+
+        if(stream.isAudio()) {
+            return Format.createAudioSampleFormat(
+                    Integer.toString(stream.physicalId),
+                    mimeType,
+                    null,
+                    Format.NO_VALUE,
+                    Format.NO_VALUE,
+                    stream.channels,
+                    stream.sampleRate,
+                    C.ENCODING_PCM_16BIT,
+                    null, null,
+                    0,
+                    stream.language);
+        }
+
+        if(stream.isVideo()) {
+            return Format.createVideoSampleFormat(
+                    Integer.toString(stream.physicalId), // << trackId
+                    mimeType,
+                    null,
+                    Format.NO_VALUE,
+                    Format.NO_VALUE,
+                    stream.width,
+                    stream.height,
+                    stream.getFrameRate(),
+                    initializationData,
+                    0,
+                    (float)stream.pixelAspectRatio,
+                    null);
+        }
+
+        return null;
+    }
+
+    Format getAudioFormat() {
+        StreamBundle.Stream stream = getStream(audioPid);
+
+        if(stream == null) {
+            return null;
+        }
+
+        return createFormat(stream, null);
+    }
+
+    void createStreams(ExtractorOutput output, String audioLanguage) {
+        this.output = output;
+        TrackOutput track;
+
+        // add video stream
+        StreamBundle.Stream stream = findVideoStream();
+
+        if(stream != null) {
+            Log.i(TAG, "video track pid: " + stream.physicalId);
+            videoPid = stream.physicalId;
+            track = output.track(0, C.TRACK_TYPE_VIDEO);
+            track.format(createFormat(stream, null));
+        }
+
+        // add audio stream
+        stream = findAudioStream(audioLanguage);
+
+        if(stream != null) {
+            Log.i(TAG, "audio track pid: " + stream.physicalId);
+            audioPid = stream.physicalId;
+            track = output.track(1, C.TRACK_TYPE_AUDIO);
+            track.format(createFormat(stream, null));
+        }
 
         output.endTracks();
     }
 
-    void updateStreams(ExtractorOutput output, StreamBundle bundle) {
-        int index = 0;
-        clear();
+    Format selectAudioTrack(int pid) {
+        Log.d(TAG, "selectAudioTrack: " + pid);
 
-        // create stream readers
-        for(StreamBundle.Stream stream : bundle) {
-            int pid = stream.physicalId;
+        StreamBundle.Stream stream = bundle.getStreamOfPid(pid);
 
-            if(isSteamSupported(stream)) {
-                DefaultTrackOutput track = (DefaultTrackOutput) output.track(index++, C.TRACK_TYPE_DEFAULT);
-                put(pid, new StreamReader(track, stream));
-            }
-
-            if(index >= MAX_OUTPUT_TRACKS) {
-                Log.e(TAG, "maximum stream count of " + MAX_OUTPUT_TRACKS + " reached. skipping other streams");
-                return;
-            }
+        if(stream == null || !stream.isAudio()) {
+            Log.d(TAG, "not an audio stream !");
+            return null;
         }
 
-        // disable remaining tracks
-        for(int i = index; i < MAX_OUTPUT_TRACKS; i++) {
-            DefaultTrackOutput track = (DefaultTrackOutput) output.track(i, C.TRACK_TYPE_DEFAULT);
-            Format format = Format.createSampleFormat(null, MIMETYPE_UNKNOWN, null, Format.NO_VALUE, null);
-            track.format(format);
-        }
+        DefaultTrackOutput track = (DefaultTrackOutput) output.track(1, C.TRACK_TYPE_AUDIO);
+        Format format = createFormat(stream, null);
+        track.reset(false);
+        track.reset(true);
+        track.format(format);
+
+        audioPid = stream.physicalId;
+        return format;
     }
 }

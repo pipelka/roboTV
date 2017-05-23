@@ -27,6 +27,7 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
@@ -41,6 +42,11 @@ import java.io.IOException;
 public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, AudioRendererEventListener, VideoRendererEventListener {
 
     private static final String TAG = "Player";
+
+    private static final int DEFAULT_MIN_BUFFER_MS = 3000;
+    private static final int DEFAULT_MAX_BUFFER_MS = 10000;
+    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_MS = 1000;
+    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 3000;
 
     public interface Listener  {
 
@@ -65,7 +71,6 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     private Handler handler;
 
     final private SimpleExoPlayer player;
-    final private RoboTvTrackSelector trackSelector;
     final private RoboTvDataSourceFactory dataSourceFactory;
     final private RoboTvExtractor.Factory extractorFactory;
     final private PositionReference position;
@@ -99,21 +104,27 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
         position = new PositionReference();
 
-        trackSelector = new RoboTvTrackSelector();
+        RoboTvTrackSelector trackSelector = new RoboTvTrackSelector();
         trackSelector.setParameters(new RoboTvTrackSelector.Parameters().withPreferredAudioLanguage(language));
         trackSelector.setTunnelingAudioSessionId(C.generateAudioSessionIdV21(context));
 
         player = ExoPlayerFactory.newSimpleInstance(
                 new RoboTvRenderersFactory(context, audioPassthrough),
                 trackSelector,
-                new DefaultLoadControl()
+                new DefaultLoadControl(
+                        new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE),
+                        DEFAULT_MIN_BUFFER_MS,
+                        DEFAULT_MAX_BUFFER_MS,
+                        DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+                        DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+                )
         );
 
         player.addListener(this);
         player.setVideoDebugListener(this);
 
         dataSourceFactory = new RoboTvDataSourceFactory(position, language, this);
-        extractorFactory = new RoboTvExtractor.Factory(position, this);
+        extractorFactory = new RoboTvExtractor.Factory(position, this, language);
         trickPlayController = new TrickPlayController(handler, position, player);
     }
 
@@ -153,7 +164,6 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     public void stop() {
         trickPlayController.reset();
         player.stop();
-        trackSelector.clearAudioTrack();
         position.reset();
     }
 
@@ -193,7 +203,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     }
 
     public void selectAudioTrack(String trackId) {
-        trackSelector.selectAudioTrack(trackId);
+        extractorFactory.selectAudioTrack(trackId);
     }
 
     public long getStartPosition() {
@@ -275,6 +285,11 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     @Override
     public void onTracksChanged(StreamBundle bundle) {
         listener.onTracksChanged(bundle);
+    }
+
+    @Override
+    public void onAudioTrackChanged(Format format) {
+        listener.onAudioTrackChanged(format);
     }
 
     @Override
@@ -379,7 +394,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
     @Override
     public void onAudioInputFormatChanged(Format format) {
-        listener.onAudioTrackChanged(format);
+        //listener.onAudioTrackChanged(format);
     }
 
     @Override

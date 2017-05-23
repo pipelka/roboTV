@@ -3,13 +3,11 @@ package org.xvdr.player;
 import android.content.Context;
 import android.os.Handler;
 
-import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
-import com.google.android.exoplayer2.audio.SonicAudioProcessor;
 import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
@@ -22,7 +20,7 @@ import org.xvdr.player.video.VideoRendererFactory;
 
 import java.util.ArrayList;
 
-public class RoboTvRenderersFactory implements RenderersFactory {
+class RoboTvRenderersFactory implements RenderersFactory {
 
     private final boolean audioPassthrough;
     private final Context context;
@@ -42,7 +40,7 @@ public class RoboTvRenderersFactory implements RenderersFactory {
         MediaCodecSelector codecSelector = new MediaCodecSelector() {
             @Override
             public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder) throws MediaCodecUtil.DecoderQueryException {
-                return MediaCodecUtil.getDecoderInfo(mimeType, requiresSecureDecoder);
+                return null;
             }
 
             @Override
@@ -51,21 +49,19 @@ public class RoboTvRenderersFactory implements RenderersFactory {
             }
         };
 
-        out.add(new RoboTvAudioRenderer(
-                eventHandler,
-                null,
-                audioPassthrough,
-                new SonicAudioProcessor())
-        );
-
         out.add(new MediaCodecAudioRenderer(
                 codecSelector,
                 null,
                 true,
                 eventHandler,
                 null,
-                audioCapabilities,
-                new SonicAudioProcessor())
+                audioCapabilities)
+        );
+
+        out.add(new RoboTvAudioRenderer(
+                eventHandler,
+                null,
+                audioPassthrough)
         );
 
         out.add(VideoRendererFactory.create(context, eventHandler, videoRendererEventListener));
