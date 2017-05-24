@@ -44,12 +44,11 @@ class RoboTvRenderersFactory implements RenderersFactory {
                     audioCapabilities)
             );
         }
-        else {
-            out.add(new FfmpegAudioRenderer(
-                    eventHandler,
-                    null)
-            );
-        }
+
+        out.add(new FfmpegAudioRenderer(
+                eventHandler,
+                null)
+        );
 
         out.add(VideoRendererFactory.create(context, eventHandler, videoRendererEventListener));
 

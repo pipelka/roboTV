@@ -14,6 +14,7 @@ import org.xvdr.robotv.client.StreamBundle;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 class StreamManager {
@@ -162,9 +163,29 @@ class StreamManager {
         return createFormat(stream, null);
     }
 
-    void createStreams(ExtractorOutput output, final String audioLanguage) {
+    void createStreams(ExtractorOutput output, final String audioLanguage, boolean audioPassthrough) {
         this.output = output;
         TrackOutput track;
+        boolean havePassthroughStreams = false;
+
+        // check if we have passthrough audio tracks
+        for(StreamBundle.Stream stream: bundle) {
+            if(bundle.isPassthrough(stream.type)) {
+                havePassthroughStreams = true;
+                break;
+            }
+        }
+
+        // remove non-passthrough streams
+        if(havePassthroughStreams && audioPassthrough) {
+            Iterator<StreamBundle.Stream> it = bundle.iterator();
+            while (it.hasNext()) {
+                StreamBundle.Stream stream = it.next();
+                if(stream.isAudio() && !bundle.isPassthrough(stream.type)) {
+                    it.remove();
+                }
+            }
+        }
 
         // sort streams
         Collections.sort(bundle, new Comparator<StreamBundle.Stream>() {

@@ -265,11 +265,11 @@ public class RoboTvExtractor implements Extractor {
 
     private void updateStreams(BufferPacket p) {
         final StreamBundle bundle = new StreamBundle();
-        bundle.updateFromPacket(p, audioPassthrough);
+        bundle.updateFromPacket(p);
 
         Log.d(TAG, "create streams");
         this.streamManager = new StreamManager(bundle);
-        streamManager.createStreams(output, audioLanguage);
+        streamManager.createStreams(output, audioLanguage, audioPassthrough);
 
         if(listener != null) {
             listener.onTracksChanged(bundle);
