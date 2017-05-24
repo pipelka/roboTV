@@ -148,7 +148,8 @@ public class RoboTvExtractor implements Extractor {
 
         // exit if we didn't receive a stream packet
         if(messageId != Connection.XVDR_STREAM_MUXPKT) {
-            Log.d(TAG, "unknown message id: " + messageId);
+            Log.e(TAG, "unknown message id: " + messageId + " - skipping packet");
+            input.skip(1024*1024);
             return RESULT_CONTINUE;
         }
 
