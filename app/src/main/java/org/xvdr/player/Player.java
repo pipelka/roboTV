@@ -45,7 +45,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
     private static final int DEFAULT_MIN_BUFFER_MS = 3000;
     private static final int DEFAULT_MAX_BUFFER_MS = 5000;
-    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_MS = 500;
+    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_MS = 1000;
     private static final int DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 2000;
 
     public interface Listener  {
