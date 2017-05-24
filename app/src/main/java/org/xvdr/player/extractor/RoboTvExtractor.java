@@ -97,10 +97,7 @@ public class RoboTvExtractor implements Extractor {
 
     @Override
     public boolean sniff(ExtractorInput input) throws IOException, InterruptedException {
-        scratch.peek(input, 2);
-        int packetType = scratch.getU16();
-
-        return (packetType == Connection.XVDR_STREAM_CHANGE || packetType == Connection.XVDR_STREAM_MUXPKT);
+        return true;
     }
 
     @Override
