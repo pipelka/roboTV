@@ -128,7 +128,7 @@ public class RoboTvExtractor implements Extractor {
         scratch.read(input, 4);
 
         int messageId = scratch.getU16();
-        /*int frameType =*/ scratch.getU16();
+        boolean keyFrame = (scratch.getU16() == Connection.IFRAME);
 
         // check for format packet
         if(messageId == Connection.XVDR_STREAM_CHANGE) {
@@ -211,6 +211,10 @@ public class RoboTvExtractor implements Extractor {
             timeUs += 32000;
         }
 
+        int flags =
+                stream.isVideo() ? (keyFrame ? C.BUFFER_FLAG_KEY_FRAME : 0) :
+                stream.isAudio() ? C.BUFFER_FLAG_KEY_FRAME : 0;
+
         // consume stream data
         if(timeUs >= 0) {
             int length = size;
@@ -219,7 +223,7 @@ public class RoboTvExtractor implements Extractor {
                 length -= output.sampleData(input, length, false);
             }
 
-            output.sampleMetadata(timeUs, C.BUFFER_FLAG_KEY_FRAME, size, 0, null);
+            output.sampleMetadata(timeUs, flags, size, 0, null);
         }
 
         // get current position
