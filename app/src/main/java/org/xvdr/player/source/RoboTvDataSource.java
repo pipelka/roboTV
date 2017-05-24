@@ -1,6 +1,7 @@
 package org.xvdr.player.source;
 
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.exoplayer2.C;
@@ -49,9 +50,36 @@ class RoboTvDataSource implements DataSource {
         // the uri should be something like:
         // robotv://type/channeluid (e.g. robotv://livetv/5475634 )
 
-        uri = dataSpec.uri;
+        String type = dataSpec.uri.getHost();
 
-        Log.d(TAG, "open: " + uri.toString());
+        Log.d(TAG, "open: " + dataSpec.uri.toString());
+
+        // open streaming connection
+        if(!dataSpec.uri.getScheme().equals("robotv")) {
+            throw new IOException("unable to open stream: " + getUri().toString() + ", uri must start with robotv://");
+        }
+
+        if(!connection.isOpen()) {
+            throw new IOException();
+        }
+
+        Log.d(TAG, "start streaming: " + dataSpec.uri.toString());
+
+        if(!dataSpec.uri.equals(uri)) {
+            switch (type) {
+                case "livetv":
+                    openLiveTv(dataSpec.uri);
+                    break;
+
+                case "recording":
+                    openRecording(dataSpec.uri);
+                    break;
+
+                default:
+                    throw new IOException("unsupported stream type: " + type + ")");
+            }
+            uri = dataSpec.uri;
+        }
 
         // check if we should seek
         long seekPosition = dataSpec.position;
@@ -60,33 +88,6 @@ class RoboTvDataSource implements DataSource {
             Log.d(TAG, "seek to position: " + seekPosition);
             connection.seek(seekPosition);
             response.clear();
-            return C.LENGTH_UNSET;
-        }
-
-        // open streaming connection
-        if(!uri.getScheme().equals("robotv")) {
-            throw new IOException("unable to open stream: " + getUri().toString() + ", uri must start with robotv://");
-        }
-
-        if(!connection.isOpen()) {
-            throw new IOException();
-        }
-
-        Log.d(TAG, "start streaming: " + uri.toString());
-
-        String type = uri.getHost();
-
-        switch(type) {
-            case "livetv":
-                openLiveTv(uri);
-                break;
-
-            case "recording":
-                openRecording(uri);
-                break;
-
-            default:
-                throw new IOException("unsupported stream type: " + type + ")");
         }
 
         return C.LENGTH_UNSET;
