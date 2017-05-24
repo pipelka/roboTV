@@ -36,33 +36,23 @@ class RoboTvRenderersFactory implements RenderersFactory {
 
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
-        // codecSelector disabling MPEG audio (handled by RoboTvAudioDecoder)
-        MediaCodecSelector codecSelector = new MediaCodecSelector() {
-            @Override
-            public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder) throws MediaCodecUtil.DecoderQueryException {
-                return null;
-            }
-
-            @Override
-            public MediaCodecInfo getPassthroughDecoderInfo() throws MediaCodecUtil.DecoderQueryException {
-                return audioPassthrough ? MediaCodecUtil.getPassthroughDecoderInfo() : null;
-            }
-        };
-
-        out.add(new MediaCodecAudioRenderer(
-                codecSelector,
-                null,
-                true,
-                eventHandler,
-                null,
-                audioCapabilities)
-        );
-
-        out.add(new RoboTvAudioRenderer(
-                eventHandler,
-                null,
-                audioPassthrough)
-        );
+        if(audioPassthrough) {
+            out.add(new MediaCodecAudioRenderer(
+                    MediaCodecSelector.DEFAULT,
+                    null,
+                    true,
+                    eventHandler,
+                    null,
+                    audioCapabilities)
+            );
+        }
+        else {
+            out.add(new RoboTvAudioRenderer(
+                    eventHandler,
+                    null,
+                    audioPassthrough)
+            );
+        }
 
         out.add(VideoRendererFactory.create(context, eventHandler, videoRendererEventListener));
 

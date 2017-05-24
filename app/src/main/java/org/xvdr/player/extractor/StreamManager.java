@@ -12,6 +12,8 @@ import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.robotv.client.StreamBundle;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 class StreamManager {
@@ -31,6 +33,10 @@ class StreamManager {
     }
 
     TrackOutput getOutput(StreamBundle.Stream stream) {
+        if(stream == null) {
+            return null;
+        }
+
         if(stream.physicalId == videoPid) {
             return output.track(0, C.TRACK_TYPE_VIDEO);
         }
@@ -64,7 +70,7 @@ class StreamManager {
 
         int trackScore = 0;
 
-        if(!TextUtils.isEmpty(audioLanguage)) {
+        if(!TextUtils.isEmpty(audioLanguage) && !TextUtils.isEmpty(format.language)) {
             trackScore += (format.language.equals(audioLanguage) ? 20 : 0);
         }
         trackScore += (format.sampleMimeType.equals(MimeTypes.AUDIO_AC3) ? 1 : 0);
@@ -156,9 +162,19 @@ class StreamManager {
         return createFormat(stream, null);
     }
 
-    void createStreams(ExtractorOutput output, String audioLanguage) {
+    void createStreams(ExtractorOutput output, final String audioLanguage) {
         this.output = output;
         TrackOutput track;
+
+        // sort streams
+        Collections.sort(bundle, new Comparator<StreamBundle.Stream>() {
+            @Override
+            public int compare(StreamBundle.Stream o1, StreamBundle.Stream o2) {
+                return
+                        getScoreFromFormat(createFormat(o2, null), audioLanguage) -
+                        getScoreFromFormat(createFormat(o1, null), audioLanguage);
+            }
+        });
 
         // add video stream
         StreamBundle.Stream stream = findVideoStream();

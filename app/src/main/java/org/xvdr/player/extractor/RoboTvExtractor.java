@@ -19,6 +19,8 @@ import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class RoboTvExtractor implements Extractor {
 
@@ -30,16 +32,18 @@ public class RoboTvExtractor implements Extractor {
         final private Listener listener;
         final private PositionReference position;
         final private String audioLanguage;
+        final private boolean audioPassthrough;
 
-        public Factory(PositionReference position, Listener listener, String audioLanguage) {
+        public Factory(PositionReference position, Listener listener, String audioLanguage, boolean audioPassthrough) {
             this.listener = listener;
             this.position = position;
             this.audioLanguage = audioLanguage;
+            this.audioPassthrough = audioPassthrough;
         }
 
         @Override
         public Extractor[] createExtractors() {
-            extractor = new RoboTvExtractor(position, listener, audioLanguage);
+            extractor = new RoboTvExtractor(position, listener, audioLanguage, audioPassthrough);
             return new Extractor[] { extractor };
         }
 
@@ -73,22 +77,23 @@ public class RoboTvExtractor implements Extractor {
     private ExtractorOutput output;
     private boolean seenFirstDts;
     private StreamManager streamManager;
-    private String audioLanguage;
     private int nextAudioPid;
 
     final private ExtractorBufferPacket scratch;
     final private Listener listener;
     final private PositionReference position;
     final private TimestampAdjuster timestampAdjuster;
+    final private String audioLanguage;
+    final private boolean audioPassthrough;
 
-
-    private RoboTvExtractor(PositionReference position, Listener listener, String audioLanguage) {
+    private RoboTvExtractor(PositionReference position, Listener listener, String audioLanguage, boolean audioPassthrough) {
         this.listener = listener;
         this.position = position;
         this.scratch = new ExtractorBufferPacket(new byte[1024]);
         this.timestampAdjuster = new TimestampAdjuster(TimestampAdjuster.DO_NOT_OFFSET);
         this.seenFirstDts = false;
         this.audioLanguage = audioLanguage;
+        this.audioPassthrough = audioPassthrough;
         this.nextAudioPid = -1;
     }
 
@@ -134,7 +139,7 @@ public class RoboTvExtractor implements Extractor {
         if(messageId == Connection.XVDR_STREAM_CHANGE) {
             Log.d(TAG, "stream change packet received");
             scratch.peek(input, 512);
-            updateStreamReaders(scratch);
+            updateStreams(scratch);
 
             int bytesRead = scratch.position();
             Log.d(TAG, "skipping " + bytesRead + " bytes (stream change packet)");
@@ -260,9 +265,9 @@ public class RoboTvExtractor implements Extractor {
         nextAudioPid = pid;
     }
 
-    private void updateStreamReaders(BufferPacket p) {
+    private void updateStreams(BufferPacket p) {
         final StreamBundle bundle = new StreamBundle();
-        bundle.updateFromPacket(p);
+        bundle.updateFromPacket(p, audioPassthrough);
 
         Log.d(TAG, "create streams");
         this.streamManager = new StreamManager(bundle);

@@ -164,6 +164,10 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         return false;
     }
 
+    private boolean isPassthrough(int type) {
+        return type == TYPE_AUDIO_AC3 || type == TYPE_AUDIO_EAC3;
+    }
+
     private int getTypeFromName(String typeName) {
         if(typeName == null) {
             return -1;
@@ -216,7 +220,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         }
     }
 
-    public synchronized void updateFromPacket(BufferPacket p) {
+    public synchronized void updateFromPacket(BufferPacket p, boolean audioPassthrough) {
         clear();
 
         int streamCount = p.getU8();
@@ -291,6 +295,10 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
 
             // skip unsupported stream types
             if(!isTypeSupported(stream.type)) {
+                continue;
+            }
+
+            if(audioPassthrough && stream.isAudio() && !isPassthrough(stream.type)) {
                 continue;
             }
 

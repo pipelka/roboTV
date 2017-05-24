@@ -124,7 +124,7 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
         player.setVideoDebugListener(this);
 
         dataSourceFactory = new RoboTvDataSourceFactory(position, language, this);
-        extractorFactory = new RoboTvExtractor.Factory(position, this, language);
+        extractorFactory = new RoboTvExtractor.Factory(position, this, language, passthrough);
         trickPlayController = new TrickPlayController(handler, position, player);
     }
 
