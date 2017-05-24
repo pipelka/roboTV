@@ -8,14 +8,12 @@ import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
-import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
+import com.google.android.exoplayer2.ext.ffmpeg.FfmpegAudioRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
-import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.metadata.MetadataRenderer;
 import com.google.android.exoplayer2.text.TextRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
-import org.xvdr.player.audio.RoboTvAudioRenderer;
 import org.xvdr.player.video.VideoRendererFactory;
 
 import java.util.ArrayList;
@@ -47,10 +45,9 @@ class RoboTvRenderersFactory implements RenderersFactory {
             );
         }
         else {
-            out.add(new RoboTvAudioRenderer(
+            out.add(new FfmpegAudioRenderer(
                     eventHandler,
-                    null,
-                    audioPassthrough)
+                    null)
             );
         }
 

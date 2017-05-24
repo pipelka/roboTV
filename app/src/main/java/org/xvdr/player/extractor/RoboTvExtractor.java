@@ -19,8 +19,6 @@ import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class RoboTvExtractor implements Extractor {
 

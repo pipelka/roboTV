@@ -25,6 +25,7 @@ import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
@@ -33,7 +34,6 @@ import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import org.xvdr.player.extractor.RoboTvExtractor;
 import org.xvdr.player.source.RoboTvDataSourceFactory;
-import org.xvdr.player.trackselection.RoboTvTrackSelector;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 
@@ -44,9 +44,9 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     private static final String TAG = "Player";
 
     private static final int DEFAULT_MIN_BUFFER_MS = 3000;
-    private static final int DEFAULT_MAX_BUFFER_MS = 10000;
-    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_MS = 1000;
-    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 3000;
+    private static final int DEFAULT_MAX_BUFFER_MS = 5000;
+    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_MS = 500;
+    private static final int DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 2000;
 
     public interface Listener  {
 
@@ -104,8 +104,8 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
         position = new PositionReference();
 
-        RoboTvTrackSelector trackSelector = new RoboTvTrackSelector();
-        trackSelector.setParameters(new RoboTvTrackSelector.Parameters().withPreferredAudioLanguage(language));
+        DefaultTrackSelector trackSelector = new DefaultTrackSelector();
+        trackSelector.setParameters(new DefaultTrackSelector.Parameters().withPreferredAudioLanguage(language));
         trackSelector.setTunnelingAudioSessionId(C.generateAudioSessionIdV21(context));
 
         player = ExoPlayerFactory.newSimpleInstance(
