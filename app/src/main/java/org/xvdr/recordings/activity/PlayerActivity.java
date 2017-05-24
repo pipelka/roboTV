@@ -38,6 +38,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     private Movie mSelectedMovie;
     private MediaSession mSession;
     private NotificationHandler notificationHandler;
+    private long lastUpdateTimeStamp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         setContentView(R.layout.activity_player);
 
         notificationHandler = new NotificationHandler(this);
+        lastUpdateTimeStamp = 0;
 
         mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
 
@@ -188,12 +190,20 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     }
 
     void updatePlaybackPosition() {
+        long now = System.currentTimeMillis();
+
+        if(now - lastUpdateTimeStamp < 5000) {
+            return;
+        }
+
         DataService service = getService();
         long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
 
         if(service != null) {
             service.getMovieController().setPlaybackPosition(mSelectedMovie, lastPosition);
         }
+
+        lastUpdateTimeStamp = now;
     }
 
     protected void stopPlayback() {
