@@ -110,7 +110,7 @@ public class RoboTvExtractor implements Extractor {
     synchronized public int read(ExtractorInput input, PositionHolder seekPosition) throws IOException, InterruptedException {
 
         // check for audio track switch
-        if(nextAudioPid != -1) {
+        if(nextAudioPid != -1 && streamManager != null) {
             Format format = streamManager.selectAudioTrack(nextAudioPid);
             if(listener != null && format != null) {
                 listener.onAudioTrackChanged(format);
