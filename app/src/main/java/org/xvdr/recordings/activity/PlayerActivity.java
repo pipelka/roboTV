@@ -268,6 +268,11 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
     @Override
     public void onConnected(DataService service) {
+        // check if thats a service reconnect
+        if(mPlayer != null && mPlayer.getPlaybackState() > ExoPlayer.STATE_IDLE) {
+            return;
+        }
+
         startPlayback();
     }
 
