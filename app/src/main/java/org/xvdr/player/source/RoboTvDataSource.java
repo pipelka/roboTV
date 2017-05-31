@@ -159,7 +159,8 @@ class RoboTvDataSource implements DataSource {
             request.putU8((short)0);
 
             if(!connection.transmitMessage(request, response)) {
-                continue;
+                Log.d(TAG, "timeout receiving packet");
+                throw new InterruptedIOException();
             }
 
             // empty packet ??
