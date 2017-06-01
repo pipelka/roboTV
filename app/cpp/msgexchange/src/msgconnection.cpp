@@ -20,6 +20,8 @@ MsgConnection::~MsgConnection() {
 }
 
 bool MsgConnection::Open(const char* hostname, int port) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	if(m_socket != -1) {
 		return false;
 	}
@@ -111,6 +113,8 @@ void MsgConnection::Abort() {
 }
 
 bool MsgConnection::Close() {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	if(!IsOpen()) {
 		return false;
 	}
@@ -209,6 +213,8 @@ MsgPacket* MsgConnection::ReadResponse() {
 }
 
 MsgPacket* MsgConnection::TransmitMessage(MsgPacket* message) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	if(!SendRequest(message)) {
 		return NULL;
 	}
@@ -217,6 +223,8 @@ MsgPacket* MsgConnection::TransmitMessage(MsgPacket* message) {
 }
 
 bool MsgConnection::TransmitMessage(MsgPacket* request, MsgPacket* response) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	if(!SendRequest(request)) {
 		return false;
 	}

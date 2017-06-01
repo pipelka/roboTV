@@ -14,6 +14,7 @@
 
 #include <string>
 #include <atomic>
+#include <mutex>
 
 class MsgPacket;
 
@@ -178,6 +179,8 @@ private:
     int m_priority = 7;
 
 	std::atomic<bool> m_aborting;
+
+	std::mutex m_mutex;
 };
 
 /*
