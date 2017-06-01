@@ -13,8 +13,7 @@ import java.io.IOException;
 
 public class RoboTvDataSourceFactory implements DataSource.Factory {
 
-    private Connection connection;
-
+    final private Connection connection;
     final private Listener listener;
     final private PositionReference position;
     final private String language;
@@ -36,7 +35,7 @@ public class RoboTvDataSourceFactory implements DataSource.Factory {
         }
 
         public void onDisconnect() {
-            if(connection == null || listener == null) {
+            if(listener == null) {
                 return;
             }
 
