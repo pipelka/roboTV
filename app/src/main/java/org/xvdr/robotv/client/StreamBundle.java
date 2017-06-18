@@ -220,7 +220,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
         }
     }
 
-    public synchronized void updateFromPacket(BufferPacket p) {
+    public synchronized boolean updateFromPacket(BufferPacket p) {
         clear();
 
         int streamCount = p.getU8();
@@ -234,6 +234,12 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
             String typeName = p.getString();
             Log.d(TAG, "type: " + typeName);
             stream.type = getTypeFromName(typeName);
+
+            if(stream.type == -1) {
+                Log.e(TAG, "invalid streamchange packet !!!");
+                return false;
+            }
+
             stream.content = contentMapping.get(stream.type);
 
             if(stream.content == CONTENT_AUDIO) {
@@ -302,6 +308,7 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
             add(stream);
         }
 
+        return true;
     }
 
     public int getStreamCount(int contentType) {

@@ -267,7 +267,10 @@ public class RoboTvExtractor implements Extractor {
 
     private void updateStreams(BufferPacket p) {
         final StreamBundle bundle = new StreamBundle();
-        bundle.updateFromPacket(p);
+
+        if(!bundle.updateFromPacket(p)) {
+            return;
+        }
 
         Log.d(TAG, "create streams");
         this.streamManager = new StreamManager(bundle);
