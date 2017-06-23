@@ -25,7 +25,7 @@ public class TimerController {
     final private String language;
 
     private int preStartRecording = 2 * 60;
-    private int postEndRecording = 5 * 60;
+    private int postEndRecording = 10 * 60;
     private int priority = 80;
 
     public TimerController(Connection connection, String language) {
