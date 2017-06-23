@@ -10,19 +10,24 @@ public class PositionReference {
     private long endPosition;
     private long currentPosition;
 
+    static private long saneWindowMs = 3 * 60 * 60 * 1000;
+
     PositionReference() {
         reset();
     }
 
     public void reset() {
         startPosition = System.currentTimeMillis();
-        endPosition = C.TIME_UNSET;
+        endPosition = startPosition;
         currentPosition = startPosition;
     }
 
     public void set(long timeUs, long wallClockTime) {
         this.timeUs = timeUs;
-        this.currentPosition = wallClockTime;
+
+        if(isPositionSane(wallClockTime)) {
+            this.currentPosition = wallClockTime;
+        }
     }
 
     public long getStartPosition() {
@@ -30,14 +35,14 @@ public class PositionReference {
     }
 
     public void setStartPosition(long pos) {
+        if(!isPositionSane(pos)) {
+            return;
+        }
+
         startPosition = pos;
     }
 
     long getDuration() {
-        if(endPosition == C.TIME_UNSET) {
-            return C.TIME_UNSET;
-        }
-
         return endPosition - startPosition;
     }
 
@@ -46,6 +51,10 @@ public class PositionReference {
     }
 
     public void setEndPosition(long pos) {
+        if(!isPositionSane(pos)) {
+            return;
+        }
+
         endPosition = pos;
     }
 
@@ -54,7 +63,11 @@ public class PositionReference {
         return currentPosition + diffMs;
     }
 
-    public long timeUsFromPosition(long position) {
+    private boolean isPositionSane(long pos) {
+        return (Math.abs(currentPosition - pos) <= saneWindowMs);
+    }
+
+    long timeUsFromPosition(long position) {
         return timeUs + (position - currentPosition) * 1000;
     }
 
