@@ -232,7 +232,7 @@ class StreamManager {
 
         DefaultTrackOutput track = (DefaultTrackOutput) output.track(1, C.TRACK_TYPE_AUDIO);
         Format format = createFormat(stream, null);
-        track.reset(false);
+        track.disable();
         track.reset(true);
         track.format(format);
 
