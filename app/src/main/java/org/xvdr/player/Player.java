@@ -248,8 +248,6 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
     public void seek(long position) {
         long p = this.position.timeUsFromPosition(Math.max(position, this.position.getStartPosition()));
-
-        Log.d(TAG, "seek position   : " + (position / 1000) + " sec");
         player.seekTo(p / 1000);
     }
 
