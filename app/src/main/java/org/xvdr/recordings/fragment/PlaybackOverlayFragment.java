@@ -109,20 +109,21 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                     togglePlayback(mPlayPauseAction.getIndex() == PlaybackControlsRow.PlayPauseAction.PLAY);
                 }
                 else if(action.getId() == mFastForwardAction.getId()) {
-                    fastForward(60 * 1000);
+                    fastForward(30 * 1000);
                 }
                 else if(action.getId() == mRewindAction.getId()) {
-                    rewind(60 * 1000);
+                    rewind(30 * 1000);
                 }
                 else if(action.getId() == mSkipNextAction.getId()) {
-                    fastForward(10 * 60 * 1000);
+                    fastForward(5 * 60 * 1000);
                 }
                 else if(action.getId() == mSkipPreviousAction.getId()) {
-                    rewind(10 * 60 * 1000);
+                    rewind(5 * 60 * 1000);
                 }
+
                 // audio track selection
-                else if(action.getId() >= 100000) {
-                    String trackId = Long.toString(action.getId() - 100000);
+                if(action instanceof ColorAction) {
+                    String trackId = Long.toString(action.getId());
                     player.selectAudioTrack(trackId);
                 }
 
