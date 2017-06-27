@@ -95,7 +95,7 @@ public class RoboTvExtractor implements Extractor {
         this.seenFirstDts = false;
         this.audioLanguage = audioLanguage;
         this.audioPassthrough = audioPassthrough;
-        this.nextAudioPid = -1;
+        this.nextAudioPid = 0;
     }
 
     @Override
@@ -113,12 +113,12 @@ public class RoboTvExtractor implements Extractor {
     synchronized public int read(ExtractorInput input, PositionHolder seekPosition) throws IOException, InterruptedException {
 
         // check for audio track switch
-        if(nextAudioPid != -1 && streamManager != null) {
+        if(nextAudioPid != 0 && streamManager != null) {
             Format format = streamManager.selectAudioTrack(nextAudioPid);
             if(listener != null && format != null) {
                 listener.onAudioTrackChanged(format);
             }
-            nextAudioPid = -1;
+            nextAudioPid = 0;
             return RESULT_CONTINUE;
         }
 
