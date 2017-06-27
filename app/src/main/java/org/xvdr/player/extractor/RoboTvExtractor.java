@@ -77,6 +77,9 @@ public class RoboTvExtractor implements Extractor {
     private StreamManager streamManager;
     private int nextAudioPid;
 
+    private long seekTimeUs = 0;
+    private long seekOffsetUs = 0;
+
     final private ExtractorBufferPacket scratch;
     final private Listener listener;
     final private PositionReference position;
@@ -188,21 +191,17 @@ public class RoboTvExtractor implements Extractor {
             seenFirstDts = true;
         }
 
-        long lastTimeUs = timestampAdjuster.getLastAdjustedTimestampUs();
-
         // convert PTS -> timeUs
         long timeUs = timestampAdjuster.adjustTsTimestamp(pts);
 
-        // sanity check
-        if(lastTimeUs != C.TIME_UNSET) {
-            if(Math.abs(timeUs - lastTimeUs) / 1000000 >= 5) {
-                Log.e(TAG, "timestamps differ more than 5 seconds - resetting");
-                timestampAdjuster.reset();
-                input.skipFully(size);
-                input.skipFully(8);
-                return RESULT_CONTINUE;
-            }
+        // compute the time gap caused by seek
+        if(seekTimeUs != 0) {
+            seekOffsetUs = timeUs - seekTimeUs;
+            seekTimeUs = 0;
+            Log.d(TAG, "seek offset: " + (seekOffsetUs / 1000) + " ms");
         }
+
+        timeUs -= seekOffsetUs;
 
         // audio track timestamp synchronization (32ms)
         // from somewhere we get this timestamp difference
@@ -244,6 +243,7 @@ public class RoboTvExtractor implements Extractor {
     @Override
     synchronized public void seek(long p, long timeUs) {
         Log.d(TAG, "seek: " + p);
+        seekTimeUs = timeUs;
         timestampAdjuster.reset();
     }
 
