@@ -221,9 +221,14 @@ public class StreamBundle extends ArrayList<StreamBundle.Stream> {
     }
 
     public synchronized boolean updateFromPacket(BufferPacket p) {
-        clear();
-
         int streamCount = p.getU8();
+
+        if(streamCount == 0) {
+            Log.d(TAG, "empty stream change packet - ignoring");
+            return false;
+        }
+
+        clear();
         Log.d(TAG, "new streamchange: " + streamCount + " entries");
 
         for(int i = 0; i < streamCount; i++) {
