@@ -244,6 +244,10 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
     @Override
     public void onAudioTrackChanged(final Format format) {
+        if(format == null) {
+            return;
+        }
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

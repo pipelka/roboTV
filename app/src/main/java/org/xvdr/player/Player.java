@@ -287,6 +287,9 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
 
     @Override
     public void onAudioTrackChanged(Format format) {
+        if(format == null) {
+            return;
+        }
         listener.onAudioTrackChanged(format);
     }
 
