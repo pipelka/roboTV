@@ -27,7 +27,7 @@ before_install:
   - sudo apt-get install libstdc++6
   - git clone https://github.com/urho3d/android-ndk.git $HOME/android-ndk-root
   - export ANDROID_NDK_HOME=$HOME/android-ndk-root
-  - yes | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.3155560"
+  - yes | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
   - rm -f gradle.properties
   - openssl aes-256-cbc -K $encrypted_f1b12e79c807_key -iv $encrypted_f1b12e79c807_iv -in gradle.properties.enc -out gradle.properties -d
 
