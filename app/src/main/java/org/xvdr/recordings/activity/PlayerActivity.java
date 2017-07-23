@@ -187,6 +187,9 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if(playWhenReady && (playbackState == ExoPlayer.STATE_READY)) {
+            mControls.startProgressAutomation();
+        }
     }
 
     void updatePlaybackPosition() {
@@ -262,7 +265,6 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
     @Override
     public void onRenderedFirstFrame() {
-        mControls.startProgressAutomation();
     }
 
     @Override
