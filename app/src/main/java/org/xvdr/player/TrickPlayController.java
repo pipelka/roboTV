@@ -76,7 +76,7 @@ class TrickPlayController {
     }
 
     void postTick() {
-        handler.postDelayed(doTick, 250);
+        handler.postDelayed(doTick, 100);
     }
 
     boolean activated() {
