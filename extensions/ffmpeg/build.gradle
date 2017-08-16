@@ -49,6 +49,6 @@ android {
 }
 
 dependencies {
-    compile 'com.google.android.exoplayer:exoplayer-core:r2.4.4'
+    compile "com.android.support:support-core-utils:25.4.0"
+    compile 'com.google.android.exoplayer:exoplayer-core:r2.5.1'
 }
-

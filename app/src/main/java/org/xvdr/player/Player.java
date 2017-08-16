@@ -13,7 +13,6 @@ import android.view.Surface;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -39,7 +38,7 @@ import org.xvdr.robotv.client.StreamBundle;
 
 import java.io.IOException;
 
-public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, AudioRendererEventListener, VideoRendererEventListener {
+public class Player implements com.google.android.exoplayer2.Player.EventListener, RoboTvExtractor.Listener, RoboTvDataSourceFactory.Listener, AudioRendererEventListener, VideoRendererEventListener {
 
     private static final String TAG = "Player";
 
@@ -269,6 +268,10 @@ public class Player implements ExoPlayer.EventListener, RoboTvExtractor.Listener
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         Log.i(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
         listener.onPlayerStateChanged(playWhenReady, playbackState);
+    }
+
+    @Override
+    public void onRepeatModeChanged(int repeatMode) {
     }
 
     @Override

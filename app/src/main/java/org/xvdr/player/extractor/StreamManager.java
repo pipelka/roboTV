@@ -5,9 +5,9 @@ import android.util.Log;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.extractor.DefaultTrackOutput;
 import com.google.android.exoplayer2.extractor.ExtractorOutput;
 import com.google.android.exoplayer2.extractor.TrackOutput;
+import com.google.android.exoplayer2.source.SampleQueue;
 import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.xvdr.robotv.client.StreamBundle;
@@ -230,9 +230,8 @@ class StreamManager {
             return null;
         }
 
-        DefaultTrackOutput track = (DefaultTrackOutput) output.track(1, C.TRACK_TYPE_AUDIO);
+        SampleQueue track = (SampleQueue) output.track(1, C.TRACK_TYPE_AUDIO);
         Format format = createFormat(stream, null);
-        track.disable();
         track.reset(true);
         track.format(format);
 
