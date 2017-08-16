@@ -9,12 +9,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-public class ExtractorBufferPacket implements BufferPacket {
+class ExtractorBufferPacket implements BufferPacket {
 
 
-    final ByteBuffer buffer;
+    private final ByteBuffer buffer;
 
-    public ExtractorBufferPacket(byte[] data) {
+    ExtractorBufferPacket(byte[] data) {
         buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.BIG_ENDIAN);
     }
@@ -36,7 +36,7 @@ public class ExtractorBufferPacket implements BufferPacket {
         rewind();
     }
 
-    public void peek(ExtractorInput input, int length) throws IOException, InterruptedException {
+    void peek(ExtractorInput input, int length) throws IOException, InterruptedException {
         input.peekFully(data(), 0, length);
         rewind();
     }
