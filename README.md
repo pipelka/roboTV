@@ -7,23 +7,14 @@ roboTV is a Android TV based frontend for VDR.
 Now you can use your Android TV Box (or your TV running Android) to stream LiveTV channels from your VDR backend (robotv-plugin must be installed).
 
 ## Screenshots
-
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv-shortcuts.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv-timeshift.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg-genre.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/multiaudio.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/homescreen.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-folders.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-all.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-details.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-details2.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-playback.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-series.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-series-detail.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-timers.jpg" width="200" />
-<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/setup.jpg" width="200" />
+|   |   |   |
+|---|---|---|
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv-shortcuts.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv-timeshift.jpg" width="200" />
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg-genre.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/multiaudio.jpg" width="200" />
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/homescreen.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-folders.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-all.jpg" width="200" />
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-details.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-details2.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-playback.jpg" width="200" />
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-series.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-series-detail.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-timers.jpg" width="200" />
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/setup.jpg" width="200" />| | |
 
 ## System requirements
 
@@ -68,10 +59,10 @@ https://github.com/pipelka/docker-robotv-server
 - [x] Timeshift Reverse Play
 - [x] Management of TV shows (Season / Episode)
 - [x] Notifications about timers / recordings
+- [ ] H265 (UHD) Support (VDR 2.3.x)
 
 # Planned Features
 
 - [ ] enriched EPG information for TV shows
 - [ ] full epgsearch support
 - [ ] Teletext support
-- [ ] H265 (UHD) Support (partly done)
