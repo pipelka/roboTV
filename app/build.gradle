@@ -59,6 +59,6 @@ dependencies {
     compile 'com.github.bumptech.glide:okhttp3-integration:1.5.0@aar'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile "com.android.support:support-core-utils:25.4.0"
-    compile 'com.google.android.exoplayer:exoplayer-core:r2.5.1'
+    compile 'com.google.android.exoplayer:exoplayer-core:r2.5.2'
     compile project(path: ':extension-ffmpeg')
 }
