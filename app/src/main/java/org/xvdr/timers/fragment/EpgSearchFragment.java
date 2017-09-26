@@ -98,8 +98,6 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
         @Override
         protected List<ListRow> doInBackground(String... params) {
-            final Channels channelList = new Channels();
-            channelList.load(connection);
 
             // search
             Packet req = connection.CreatePacket(
@@ -119,18 +117,13 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             resp.uncompress();
 
             // process result
-            int count = 0;
             while(!resp.eop() && !isCancelled()) {
                 final Event event = PacketAdapter.toEvent(resp);
                 String channelName = resp.getString();
                 int channelId = (int) resp.getU32();
+                int channelNumber = (int) resp.getU32();
 
-                // remove inconsistent entries
-                if(channelId == 0 || channelList.findByUid(channelId) == null) {
-                    continue;
-                }
-
-                ListRow row = findOrCreateChannelRow(channelName, channelId);
+                ListRow row = findOrCreateChannelRow(channelName, channelNumber);
                 ArrayObjectAdapter adapter = (ArrayObjectAdapter) row.getAdapter();
 
                 final Movie movie = new Movie(event);
@@ -147,20 +140,12 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 }
 
                 adapter.add(movie);
-                count++;
-
-                if(count >= 100) {
-                    break;
-                }
             }
 
             Collections.sort(resultRows, new Comparator<ListRow>() {
                 @Override
                 public int compare(ListRow a, ListRow b) {
-                    Channel entry1 = channelList.findByUid((int)a.getId());
-                    Channel entry2 = channelList.findByUid((int)b.getId());
-
-                    return  entry1.getNumber() < entry2.getNumber() ? -1 : 1;
+                    return  a.getId() < b.getId() ? -1 : 1;
                 }
             });
 
