@@ -23,11 +23,9 @@ class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<M
 
     private Connection connection;
     private Listener listener;
-    private ArtworkFetcher fetcher;
 
     MovieCollectionLoaderTask(Connection connection, String language) {
         this.connection = connection;
-        this.fetcher = new ArtworkFetcher(this.connection, language);
     }
 
     public void load(Listener listener) {
@@ -55,13 +53,6 @@ class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<M
         while(!response.eop()) {
             final Movie movie = PacketAdapter.toMovie(response);
             collection.add(movie);
-
-            // search movies
-            String url = movie.getPosterUrl();
-
-            if(!(url != null && !url.isEmpty() && !url.equals("x"))) {
-                updateMovieArtwork(movie);
-            }
         }
 
         return collection;
@@ -81,24 +72,4 @@ class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<M
         }
     }
 
-    private void updateMovieArtwork(final Movie searchMovie) {
-        ArtworkHolder o = null;
-
-        try {
-            o = fetcher.fetchForEvent(searchMovie);
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
-
-        if(o == null) {
-            return;
-        }
-
-        searchMovie.setPosterUrl(o.getPosterUrl());
-        searchMovie.setBackgroundUrl(o.getBackgroundUrl());
-
-        // send new urls to server
-        ArtworkUtils.setMovieArtwork(connection, searchMovie);
-    }
 }
