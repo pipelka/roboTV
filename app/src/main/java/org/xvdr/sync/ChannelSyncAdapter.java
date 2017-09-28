@@ -502,16 +502,13 @@ public class ChannelSyncAdapter {
             String artworkUrl = null;
 
             try {
-                ArtworkHolder art = mArtwork.fetchForEvent(event);
-                artworkUrl = art.getBackgroundUrl();
+                if(mArtwork.fetchForEvent(event)) {
+                    String url = event.getBackgroundUrl();
+                    values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, (!TextUtils.isEmpty(url) && !url.equals("x")) ? url : "");
+                }
             }
             catch(IOException e) {
                 e.printStackTrace();
-            }
-
-            // add url (if not empty)
-            if(!TextUtils.isEmpty(artworkUrl)) {
-                values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, artworkUrl);
             }
 
             // add event
