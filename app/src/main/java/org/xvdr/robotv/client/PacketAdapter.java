@@ -112,6 +112,8 @@ public class PacketAdapter {
         }
 
         Event e = new Event(contentId, title, shortText, description, startTime, duration, eventId);
+        e.setPosterUrl(posterUrl);
+        e.setBackgroundUrl(backgroundUrl);
         e.setVpsTime(vpsTime);
         e.setParentalRating(parentalRating);
 
