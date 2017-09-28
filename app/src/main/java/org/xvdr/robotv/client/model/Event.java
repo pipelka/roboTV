@@ -186,6 +186,8 @@ public class Event implements Serializable {
 
         year = event.year;
         vpsTime = event.vpsTime;
+        posterUrl = event.posterUrl;
+        backgroundUrl = event.backgroundUrl;
     }
 
     public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec) {
@@ -516,7 +518,7 @@ public class Event implements Serializable {
     }
 
     public boolean hasArtwork() {
-        return !backgroundUrl.equals("x") && !posterUrl.equals("x");
+        return !backgroundUrl.equals("x") || !posterUrl.equals("x");
     }
 
     @Override
