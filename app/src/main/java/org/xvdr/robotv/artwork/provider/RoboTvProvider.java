@@ -22,6 +22,10 @@ public class RoboTvProvider extends SimpleArtworkProvider {
         req.putString(event.getTitle());
         req.putU32(event.getContentId());
 
+        // update EPG entry
+        req.putU32(event.getChannelUid());
+        req.putU32(event.getEventId());
+
         Packet resp = mConnection.transmitMessage(req);
 
         if(resp == null) {
