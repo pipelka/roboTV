@@ -27,54 +27,56 @@ public class ArtworkFetcher {
 
     public ArtworkFetcher(Connection connection, String language) {
         mConnection = connection;
-        mServerCache = new RoboTvProvider(connection);
 
         // fetch epg images template url
         mEpgImageTemplateUrl = getEpgImageTemplateUrl();
 
-        mProviders = new ArtworkProvider[4];
-        mProviders[0] = new HttpEpgImageProvider(mEpgImageTemplateUrl);
-        mProviders[1] = new TheMovieDatabase(TMDB_APIKEY, language);
-        mProviders[2] = new TheTvDb(language);
-        mProviders[3] = new StockImageProvider();
+        mProviders = new ArtworkProvider[5];
+        mProviders[0] = new RoboTvProvider(connection);
+        mProviders[1] = new HttpEpgImageProvider(mEpgImageTemplateUrl);
+        mProviders[2] = new TheMovieDatabase(TMDB_APIKEY, language);
+        mProviders[3] = new TheTvDb(language);
+        mProviders[4] = new StockImageProvider();
     }
 
-    public ArtworkHolder fetchForEvent(Event event) throws IOException {
+    public boolean fetchForEvent(Event event) throws IOException {
+        if(event.hasArtwork()) {
+            return true;
+        }
+
         // sanity check
         if(TextUtils.isEmpty(event.getTitle()) || mProviders == null) {
-            return null;
+            return false;
         }
 
         if(mEpgImageTemplateUrl.isEmpty()) {
             mEpgImageTemplateUrl = getEpgImageTemplateUrl();
-            mProviders[0] = new HttpEpgImageProvider(mEpgImageTemplateUrl);
+            mProviders[1] = new HttpEpgImageProvider(mEpgImageTemplateUrl);
         }
 
-        // check server cache first
-        ArtworkHolder o;
-
-        if((o = mServerCache.search(event)) != null) {
-            return o;
-        }
+        ArtworkHolder o = null;
 
         // try all providers
-        for(ArtworkProvider provider : mProviders) {
-            if((o = provider.search(event)) != null) {
+        for (ArtworkProvider provider : mProviders) {
+            Log.d(TAG, "search artwork: " + event.getTitle() + " - " + event.getPosterUrl());
+            if ((o = provider.search(event)) != null) {
+                Log.d(TAG, "found: " + provider.getClass().getName());
                 break;
             }
         }
 
         // didn't get any result
         if(o == null) {
-            return null;
+            Log.d(TAG, "NOT found");
+            return false;
         }
 
         // register artwork on server
         Packet req = mConnection.CreatePacket(Connection.XVDR_ARTWORK_SET);
         req.putString(event.getTitle());
         req.putU32(event.getContentId());
-        req.putString(o.getPosterUrl());
-        req.putString(o.getBackgroundUrl());
+        req.putString(o.getPosterUrl().equals("x") ? "" : o.getPosterUrl());
+        req.putString(o.getBackgroundUrl().equals("x") ? "" : o.getBackgroundUrl());
         req.putU32(0);
 
         // update EPG entry
@@ -85,7 +87,10 @@ public class ArtworkFetcher {
             Log.d(TAG, "failed to register artwork for '" + event.getTitle() + "' in cache");
         }
 
-        return o;
+        event.setPosterUrl(o.getPosterUrl());
+        event.setBackgroundUrl(o.getBackgroundUrl());
+
+        return event.hasArtwork();
     }
 
     private String getEpgImageTemplateUrl() {
