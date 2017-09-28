@@ -21,7 +21,6 @@ public class ArtworkFetcher {
     public final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
     private Connection mConnection;
-    private ArtworkProvider mServerCache;
     private ArtworkProvider[] mProviders;
     private String mEpgImageTemplateUrl = "";
 
@@ -58,16 +57,13 @@ public class ArtworkFetcher {
 
         // try all providers
         for (ArtworkProvider provider : mProviders) {
-            Log.d(TAG, "search artwork: " + event.getTitle() + " - " + event.getPosterUrl());
             if ((o = provider.search(event)) != null) {
-                Log.d(TAG, "found: " + provider.getClass().getName());
                 break;
             }
         }
 
         // didn't get any result
         if(o == null) {
-            Log.d(TAG, "NOT found");
             return false;
         }
 
