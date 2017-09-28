@@ -27,17 +27,12 @@ import org.xvdr.timers.activity.TimerActivity;
 import org.xvdr.timers.presenter.EpgEventPresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.setup.SetupUtils;
-
-import java.io.IOException;
 
 public class TimerFragment extends BrowseFragment implements DataService.Listener {
 
-    class EpgSearchLoader extends AsyncTask<Void, Void, ArrayObjectAdapter> {
+    private class EpgSearchLoader extends AsyncTask<Void, Void, ArrayObjectAdapter> {
 
         @Override
         protected ArrayObjectAdapter doInBackground(Void... params) {
@@ -67,7 +62,7 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
             resp.uncompress();
 
             // add new row
-            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new EpgEventPresenter());
+            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new EpgEventPresenter(connection));
             HeaderItem header = new HeaderItem(channelUid, channelName);
 
             ListRow row = new ListRow(header, listRowAdapter);
@@ -78,19 +73,10 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
             // process result
             while(!resp.eop() && !isCancelled()) {
                 Event event = PacketAdapter.toEpgEvent(resp);
-                ArtworkHolder art = null;
-
-                try {
-                    art = artwork.fetchForEvent(event);
-                }
-                catch(IOException e) {
-                    e.printStackTrace();
-                }
+                event.setChannelUid(channelUid);
 
                 final Movie movie = new Movie(event);
                 movie.setChannelName(channelName);
-                movie.setArtwork(art);
-                movie.setChannelUid(channelUid);
 
                 rowAdapter.add(movie);
             }
@@ -124,7 +110,6 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
     }
 
     private Connection connection;
-    private ArtworkFetcher artwork;
     private String channelName;
     private int channelUid;
     private EpgSearchLoader loader;
@@ -185,9 +170,6 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
     @Override
     public void onConnected(DataService service) {
         connection = service.getConnection();
-
-        String language = SetupUtils.getLanguage(getActivity());
-        artwork = new ArtworkFetcher(connection, language);
 
         handler.post(new Runnable() {
             @Override

@@ -355,7 +355,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
 
         SortedArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(
                 MovieCollectionAdapter.compareTimestamps,
-                new LatestCardPresenter());
+                new LatestCardPresenter(service.getConnection()));
 
         listRowAdapter.addAll(collection);
 

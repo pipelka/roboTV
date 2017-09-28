@@ -58,7 +58,6 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
         super.onCreate(savedInstanceState);
 
         notification = new NotificationHandler(getActivity());
-        mAdapter = new MovieCollectionAdapter(getActivity());
 
         setupEventListeners();
         initUI();
@@ -241,6 +240,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     public void onConnected(DataService service) {
         this.service = service;
 
+        mAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
         service.getMovieController().loadMovieCollection(this);
         loadTimers(service);
     }

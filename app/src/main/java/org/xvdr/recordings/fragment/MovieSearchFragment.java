@@ -67,7 +67,7 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRowsAdapter = new MovieCollectionAdapter(getActivity());
+        mRowsAdapter = new MovieCollectionAdapter(getActivity(), mConnection);
         setSearchResultProvider(this);
 
         setOnItemViewClickedListener(new OnItemViewClickedListener() {

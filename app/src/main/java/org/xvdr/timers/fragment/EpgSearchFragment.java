@@ -20,21 +20,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.xvdr.jniwrap.Packet;
-import org.xvdr.robotv.client.Channels;
 import org.xvdr.robotv.client.PacketAdapter;
-import org.xvdr.robotv.client.model.Channel;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.activity.EpgSearchActivity;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.timers.presenter.EpgEventPresenter;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.setup.SetupUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,7 +38,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
     private static final int SEARCH_DELAY_MS = 500;
 
-    class DelayedTask implements Runnable {
+    private class DelayedTask implements Runnable {
 
         String query;
 
@@ -63,10 +57,10 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
         }
     }
 
-    class EpgSearchLoader extends AsyncTask<String, Void, List<ListRow>> {
+    private class EpgSearchLoader extends AsyncTask<String, Void, List<ListRow>> {
 
         List<ListRow> resultRows = new ArrayList<>();
-        EpgEventPresenter eventPresenter = new EpgEventPresenter();
+        EpgEventPresenter eventPresenter = new EpgEventPresenter(connection);
 
         private ListRow findOrCreateChannelRow(String channelName, long channelId) {
             // row already exists ?
@@ -120,7 +114,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             while(!resp.eop() && !isCancelled()) {
                 final Event event = PacketAdapter.toEvent(resp);
                 String channelName = resp.getString();
-                int channelId = (int) resp.getU32();
+                int channelUid = (int) resp.getU32();
                 int channelNumber = (int) resp.getU32();
 
                 ListRow row = findOrCreateChannelRow(channelName, channelNumber);
@@ -128,16 +122,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
                 final Movie movie = new Movie(event);
                 movie.setChannelName(channelName);
-                movie.setChannelUid(channelId);
-
-                // fetch artwork
-                try {
-                    ArtworkHolder holder = artwork.fetchForEvent(movie);
-                    movie.setArtwork(holder);
-                }
-                catch(IOException e) {
-                    e.printStackTrace();
-                }
+                movie.setChannelUid(channelUid);
 
                 adapter.add(movie);
             }
@@ -145,7 +130,7 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
             Collections.sort(resultRows, new Comparator<ListRow>() {
                 @Override
                 public int compare(ListRow a, ListRow b) {
-                    return  a.getId() < b.getId() ? -1 : 1;
+                    return a.getId() < b.getId() ? -1 : 1;
                 }
             });
 
@@ -169,7 +154,6 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     private EpgSearchLoader loader;
     private DelayedTask delayedLoader;
     private Connection connection;
-    private ArtworkFetcher artwork;
     private Handler handler;
     ProgressBarManager progress;
 
@@ -244,7 +228,6 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     @Override
     public void onConnected(DataService service) {
         connection = service.getConnection();
-        artwork = new ArtworkFetcher(connection, SetupUtils.getLanguage(getActivity()));
     }
 
     @Override
