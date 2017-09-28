@@ -19,9 +19,8 @@ import org.xvdr.robotv.client.Connection;
 class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = "SyncAdapter";
 
-    public static final String BUNDLE_KEY_INPUT_ID = "bundle_key_input_id";
-    public static final long SYNC_FREQUENCY_SEC = 60 * 60 * 6;  // 6 hours
-    private static final int SYNC_WINDOW_SEC = 60 * 60 * 12;  // 12 hours
+    static final String BUNDLE_KEY_INPUT_ID = "bundle_key_input_id";
+    static final long SYNC_FREQUENCY_SEC = 60 * 60;  // 1 hour
 
     private final Context mContext;
 
