@@ -4,15 +4,21 @@ import android.content.Context;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 
+import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 
 public class LatestCardPresenter extends MoviePresenter {
+
+    public LatestCardPresenter(Connection connection) {
+        super(connection);
+    }
+
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
         Movie movie = (Movie) item;
-        ViewHolder vh = (ViewHolder) viewHolder;
+        MoviePresenter.ViewHolder vh = (ViewHolder) viewHolder;
         ImageCardView cardView = vh.getCardView();
         Context context = cardView.getContext();
 
@@ -22,7 +28,8 @@ public class LatestCardPresenter extends MoviePresenter {
         cardView.setContentText(contextText);
         cardView.setMainImageDimensions(266, 400);
         cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.primary_color));
-        vh.updateCardViewImage(context, movie.getPosterUrl());
+
+        vh.update(movie, connection, context);
     }
 
 }

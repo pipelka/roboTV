@@ -3,6 +3,8 @@ package org.xvdr.recordings.presenter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.text.TextUtils;
@@ -15,17 +17,22 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.xvdr.recordings.model.EpisodeTimer;
-import org.xvdr.recordings.model.IconAction;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.model.Movie;
+import org.xvdr.robotv.artwork.ArtworkFetcher;
+import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.model.Timer;
+import org.xvdr.robotv.setup.SetupUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
 
 public class TimerPresenter extends Presenter {
+
+    private Connection connection;
+
+    public TimerPresenter(@NonNull Connection connection) {
+        this.connection = connection;
+    }
 
     static public class ViewHolder extends Presenter.ViewHolder {
         private ImageCardView cardView;
@@ -35,7 +42,7 @@ public class TimerPresenter extends Presenter {
             cardView = (ImageCardView) view;
         }
 
-        public ImageCardView getCardView() {
+        ImageCardView getCardView() {
             return cardView;
         }
     }
@@ -50,9 +57,10 @@ public class TimerPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
-        Timer timer = (Timer) item;
-        ViewHolder vh = (ViewHolder) viewHolder;
+        final Timer timer = (Timer) item;
+        final ViewHolder vh = (ViewHolder) viewHolder;
         final ImageCardView cardView = vh.getCardView();
+        final Context context = cardView.getContext();
         Resources resources = cardView.getResources();
 
         cardView.setTitleText(timer.getTitle());
@@ -80,32 +88,59 @@ public class TimerPresenter extends Presenter {
         cardView.setMainImageDimensions(391, 220);
         cardView.getMainImageView().setPadding(0, 0, 0, 0);
 
-        Drawable drawableUnknown = resources.getDrawable(R.drawable.recording_unkown, null);
+        final Drawable drawableUnknown = resources.getDrawable(R.drawable.recording_unkown, null);
 
-        if(!TextUtils.isEmpty(timer.getLogoUrl())) {
-            Glide.with(cardView.getContext())
-                    .load(timer.getLogoUrl())
-                    .error(drawableUnknown)
-                    .placeholder(drawableUnknown)
-                    .into(new SimpleTarget<GlideDrawable>() {
-                        @Override
-                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                            cardView.setBadgeImage(resource);
-                        }
-                    });
-        }
+        String language = SetupUtils.getLanguage(context);
+        final ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
 
-        Glide.with(cardView.getContext())
-                .load(TextUtils.isEmpty(timer.getPosterUrl()) ? timer.getLogoUrl() : timer.getPosterUrl())
-                .centerCrop()
-                .error(drawableUnknown)
-                .placeholder(drawableUnknown)
-                .into(new SimpleTarget<GlideDrawable>() {
-                    @Override
-                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                        cardView.setMainImage(resource);
+        //
+        AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String url = null;
+
+                try {
+                    artwork.fetchForEvent(timer);
+                    url = timer.getPosterUrl();
+                    if(TextUtils.isEmpty(url)) {
+                        url = timer.getBackgroundUrl();
                     }
-                });
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return url;
+            }
+
+            protected void onPostExecute(String url) {
+                if(!TextUtils.isEmpty(timer.getLogoUrl())) {
+                    Glide.with(cardView.getContext())
+                            .load(timer.getLogoUrl())
+                            .error(drawableUnknown)
+                            .placeholder(drawableUnknown)
+                            .into(new SimpleTarget<GlideDrawable>() {
+                                @Override
+                                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                                    cardView.setBadgeImage(resource);
+                                }
+                            });
+                }
+
+                Glide.with(cardView.getContext())
+                        .load(TextUtils.isEmpty(timer.getPosterUrl()) ? timer.getLogoUrl() : timer.getPosterUrl())
+                        .centerCrop()
+                        .error(drawableUnknown)
+                        .placeholder(drawableUnknown)
+                        .into(new SimpleTarget<GlideDrawable>() {
+                            @Override
+                            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                                cardView.setMainImage(resource);
+                            }
+                        });
+            }
+        };
+
+        task.execute();
     }
 
     @Override
