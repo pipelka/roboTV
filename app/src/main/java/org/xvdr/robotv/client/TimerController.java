@@ -79,14 +79,12 @@ public class TimerController {
                     ArtworkHolder o = null;
 
                     try {
-                        o = fetcher.fetchForEvent(timer);
+                        if(fetcher.fetchForEvent(timer)) {
+                            timer.setPosterUrl(timer.getBackgroundUrl());
+                        }
                     }
                     catch(IOException e) {
                         e.printStackTrace();
-                    }
-
-                    if(o != null) {
-                        timer.setPosterUrl(o.getBackgroundUrl());
                     }
 
                     timers.add(timer);
@@ -137,16 +135,13 @@ public class TimerController {
                     ArtworkHolder o = null;
 
                     try {
-                        o = fetcher.fetchForEvent(timer);
+                        fetcher.fetchForEvent(timer);
                     }
                     catch(IOException e) {
                         e.printStackTrace();
                     }
 
-                    if(o != null) {
-                        timer.setPosterUrl(o.getBackgroundUrl());
-                    }
-
+                    timer.setPosterUrl(timer.getBackgroundUrl());
                     timers.add(timer);
                 }
 
