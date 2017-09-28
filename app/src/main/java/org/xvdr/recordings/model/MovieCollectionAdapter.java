@@ -15,6 +15,7 @@ import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
 import org.xvdr.recordings.presenter.TimerPresenter;
 import org.xvdr.robotv.R;
+import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.robotv.client.model.Timer;
@@ -104,12 +105,12 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     private ArrayObjectAdapter mTvShows;
     private Context mContext;
 
-    public MovieCollectionAdapter(Context context) {
+    public MovieCollectionAdapter(Context context, Connection connection) {
         super(compareCategories, new ListRowPresenter());
         mContext = context;
-        mCardPresenter = new MoviePresenter();
-        mLatestCardPresenter = new LatestCardPresenter();
-        timerPresenter = new TimerPresenter();
+        mCardPresenter = new MoviePresenter(connection);
+        mLatestCardPresenter = new LatestCardPresenter(connection);
+        timerPresenter = new TimerPresenter(connection);
         iconActionPresenter = new IconActionPresenter(250, 220);
 
         clear();
