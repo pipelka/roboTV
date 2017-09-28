@@ -232,10 +232,8 @@ public class DataService extends Service {
             @Override
             public void run() {
                 try {
-                    ArtworkHolder holder = artwork.fetchForEvent(event);
-
-                    if(holder != null) {
-                        notification.notify(message, event.getTitle(), holder.getBackgroundUrl());
+                    if(artwork.fetchForEvent(event)) {
+                        notification.notify(message, event.getTitle(), event.getBackgroundUrl());
                     }
                     else {
                         notification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
@@ -361,18 +359,15 @@ public class DataService extends Service {
             @Override
             public void run() {
                 ArtworkHolder o = null;
-                String url;
+                String url = timer.getLogoUrl();
+
 
                 try {
-                    o = artwork.fetchForEvent(timer);
+                    if(artwork.fetchForEvent(timer)) {
+                        url = timer.getPosterUrl();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
-
-                if (o == null || TextUtils.isEmpty(o.getPosterUrl())) {
-                    url = timer.getLogoUrl();
-                } else {
-                    url = o.getPosterUrl();
                 }
 
                 notification.notify(getString(R.string.timer_created), timer.getTitle(), url);
