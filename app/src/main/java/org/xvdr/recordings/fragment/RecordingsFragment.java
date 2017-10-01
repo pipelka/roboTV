@@ -222,14 +222,16 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                 manager.disableProgressBar();
                 manager.hide();
 
+                if(getAdapter() == null) {
+                    mAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
+                    setupPreferences(mAdapter);
+                }
+
                 if(status == MovieController.STATUS_Collection_Ready) {
                     mAdapter.loadMovies(collection);
                 }
 
-                if(getAdapter() == null) {
-                    setupPreferences(mAdapter);
-                    setAdapter(mAdapter);
-                }
+                setAdapter(mAdapter);
 
                 startEntranceTransition();
                 break;
@@ -249,6 +251,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     public void onConnectionError(DataService service) {
         // no entries, add at least the setup row
         if(getAdapter() == null) {
+            mAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
             setupPreferences(mAdapter);
             setAdapter(mAdapter);
             startEntranceTransition();
