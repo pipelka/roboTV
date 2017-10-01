@@ -18,7 +18,7 @@ android {
         minSdkVersion project.ext.minSdkVersion
         targetSdkVersion project.ext.targetSdkVersion
         versionCode 1
-        versionName "0.7.1.${gitAbbreviatedId}"
+        versionName "0.7.2.${gitAbbreviatedId}"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
 
         ndk {
