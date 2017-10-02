@@ -67,7 +67,6 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRowsAdapter = new MovieCollectionAdapter(getActivity(), mConnection);
         setSearchResultProvider(this);
 
         setOnItemViewClickedListener(new OnItemViewClickedListener() {
@@ -85,6 +84,7 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
         mConnection = new Connection("roboTV search movies");
 
         mConnection.open(SetupUtils.getServer(getActivity()));
+        mRowsAdapter = new MovieCollectionAdapter(getActivity(), mConnection);
     }
 
     @Override
