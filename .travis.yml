@@ -43,6 +43,7 @@ deploy:
   api_key:
     secure: mXLa+lcBUNaqKeshGn6zd5M3HQrSc6Qu0gpdGqdpH0CaytBtIzXxscpfkVxJ6EIVe+HLhYv0oJ0kCVilNOe7filqG0/ThlwmNJoBUWlMnydbiCFTEl9QcxzgtagsyishPp4gBMieL/QJ8dz2s3K59aUDqmxksIIV+kr2c3MY7aiRnY5qLBrCA3Dz++eG2grFDx3IzbmcPwHOpGJPDktsA2y36hciGeEasBBlxePph2EUNWAh2hWqG+0j6HRMS/uKZutk6dJuVTdnke6L09ADPqwiJP+h+RH3iwYg8WRTIslJd/6wCICdD+0bgLTL+XNA+AtdQt77fhTONxaDwP1JlOMY0cz/yElYYkCvlHwbhDvZbxBGumG4xDbciR0pIAvYj2UvXc+X9dPi5J8l8VOyluVy74EiEHpswLBZLfAxWOGRp+RgJ01z5GOgbl4CbwlAmOaacZi5qd65vgpeK/vDUip/29vrNidxRI2NI8dxtDzFKyEhnqullk0BuGmQAwSckKacc2knJW/UHXAQuXv3YlgKEjkMkxZPNji1KD3Pg11avYctkCgpxjTbZvx712aYX/f5jN9GDSlHY2WdNVRO//XtgUXfAJxly/QV1lNYRk25myCsWSQZV3l9YQNqgIOc7Mwh2j2qh4pennJ8Le2YiNUt94IbRKk7DtDFgiFir54=
   file: robotv-${TRAVIS_TAG}.apk
+  skip_cleanup: true
   on:
     tags: true
 
