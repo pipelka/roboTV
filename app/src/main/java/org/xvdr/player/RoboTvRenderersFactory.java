@@ -9,7 +9,9 @@ import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.ext.ffmpeg.FfmpegAudioRenderer;
+import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
+import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.metadata.MetadataRenderer;
 import com.google.android.exoplayer2.text.TextRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
@@ -36,7 +38,17 @@ class RoboTvRenderersFactory implements RenderersFactory {
 
         if(audioPassthrough) {
             out.add(new MediaCodecAudioRenderer(
-                    MediaCodecSelector.DEFAULT,
+                    new MediaCodecSelector() {
+                        @Override
+                        public MediaCodecInfo getDecoderInfo(String mimeType, boolean requiresSecureDecoder) throws MediaCodecUtil.DecoderQueryException {
+                            return null;
+                        }
+
+                        @Override
+                        public MediaCodecInfo getPassthroughDecoderInfo() throws MediaCodecUtil.DecoderQueryException {
+                            return MediaCodecUtil.getPassthroughDecoderInfo();
+                        }
+                    },
                     null,
                     true,
                     eventHandler,
