@@ -354,7 +354,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         // sync EPG of this channel after 5 seconds
         mHandler.removeCallbacks(mUpdateEPG);
-        mHandler.postDelayed(mUpdateEPG, 1000);
+        mHandler.postDelayed(mUpdateEPG, 3000);
 
         Log.i(TAG, "successfully switched channel");
         return true;
