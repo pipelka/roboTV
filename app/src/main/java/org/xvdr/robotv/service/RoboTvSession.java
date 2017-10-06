@@ -3,7 +3,6 @@ package org.xvdr.robotv.service;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.media.PlaybackParams;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
@@ -15,7 +14,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
 
 import org.xvdr.player.Player;
@@ -24,6 +22,8 @@ import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.tv.TrackInfoMapper;
+import org.xvdr.sync.SyncChannelEPGTask;
+import org.xvdr.sync.SyncUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,6 +57,16 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     private TuneRunnable mTune = new TuneRunnable();
 
+    private Runnable mUpdateEPG = new Runnable() {
+        @Override
+        public void run() {
+            Connection connection = new Connection("Channel EPG update", "", false);
+            if(connection.open(SetupUtils.getServer(mContext))) {
+                SyncChannelEPGTask task = new SyncChannelEPGTask(connection, mContext, true);
+                task.execute(mCurrentChannelUri);
+            }
+        }
+    };
 
     private ContentResolver mContentResolver;
 
@@ -118,6 +128,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public boolean onTune(final Uri channelUri) {
+        Log.d(TAG, "postTune: " + channelUri.toString());
         postTune(channelUri, 0);
         return true;
     }
@@ -193,11 +204,11 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if(playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
+        if(playWhenReady && playbackState == com.google.android.exoplayer2.Player.STATE_BUFFERING) {
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
         }
 
-        if(playWhenReady && playbackState == ExoPlayer.STATE_READY) {
+        if(playWhenReady && playbackState == com.google.android.exoplayer2.Player.STATE_READY) {
             notifyVideoAvailable();
         }
     }
@@ -316,40 +327,34 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     private boolean tune(Uri channelUri) {
         if(mPlayer == null) {
+            Log.d(TAG, "tune: mPlayer == null ?");
             return false;
         }
 
         Log.i(TAG, "onTune: " + channelUri);
 
-        notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
-        String[] projection = {TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID};
-        int channelUid = 0;
+        // create chennl placeholder
+        SyncUtils.ChannelHolder holder = new SyncUtils.ChannelHolder();
 
-        Cursor cursor = null;
-
-        try {
-            cursor = mContentResolver.query(channelUri, projection, null, null, null);
-
-            if(cursor == null || cursor.getCount() == 0) {
-                mNotification.error(getResources().getString(R.string.channel_not_found));
-                return false;
-            }
-
-            cursor.moveToNext();
-            channelUid = cursor.getInt(0);
-        }
-        finally {
-            if(cursor != null) {
-                cursor.close();
-            }
+        // get information (id's) of the channel
+        if(!SyncUtils.getChannelInfo(mContentResolver, channelUri, holder)) {
+            mNotification.error(getResources().getString(R.string.channel_not_found));
+            return false;
         }
 
+        // set current channel uri
         mCurrentChannelUri = channelUri;
 
-        Uri uri = Player.createLiveUri(channelUid);
+        // create roboTV live channel uri
+        Uri uri = Player.createLiveUri(holder.channelUid);
 
+        // start playback
         mPlayer.openSync(uri);
         mPlayer.play();
+
+        // sync EPG of this channel after 5 seconds
+        mHandler.removeCallbacks(mUpdateEPG);
+        mHandler.postDelayed(mUpdateEPG, 1000);
 
         Log.i(TAG, "successfully switched channel");
         return true;
