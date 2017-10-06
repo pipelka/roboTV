@@ -41,6 +41,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(TAG, "onPerformSync(" + account + ", " + authority + ", " + extras + ")");
         String inputId = extras.getString(SyncAdapter.BUNDLE_KEY_INPUT_ID);
+        boolean skipChannels = extras.getBoolean("skip_channels");
 
         if(inputId == null) {
             return;
@@ -56,7 +57,9 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         ChannelSyncAdapter adapter = new ChannelSyncAdapter(connection, getContext(), inputId);
         adapter.syncChannelIcons();
-        adapter.syncChannels(false);
+        if(!skipChannels) {
+            adapter.syncChannels();
+        }
         adapter.syncEPG();
     }
 }

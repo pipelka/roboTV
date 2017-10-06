@@ -47,8 +47,6 @@ public class SetupActivity extends Activity {
         channelSync = new ChannelSyncAdapter(mConnection, this, mInputId);
         String server = SetupUtils.getServer(SetupActivity.this);
 
-        mConnection.close();
-
         if(!mConnection.open(server)) {
             Toast.makeText(this, getString(R.string.connect_unable), Toast.LENGTH_SHORT).show();
             finish();
@@ -59,11 +57,11 @@ public class SetupActivity extends Activity {
             @Override
             public void run() {
                 channelSync.setProgressCallback(progress);
-                channelSync.syncChannels(true);
+                channelSync.syncChannels();
                 mConnection.close();
 
                 SyncUtils.setUpPeriodicSync(SetupActivity.this, mInputId);
-                SyncUtils.requestSync(mInputId);
+                SyncUtils.requestSync(mInputId, true);
             }
         }).start();
 
