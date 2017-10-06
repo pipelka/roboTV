@@ -44,7 +44,7 @@ public class SetupActivity extends Activity {
         startService(serviceIntent);
 
         // sync channels
-        channelSync = new ChannelSyncAdapter(this, mInputId, mConnection);
+        channelSync = new ChannelSyncAdapter(mConnection, this, mInputId);
         String server = SetupUtils.getServer(SetupActivity.this);
 
         mConnection.close();
