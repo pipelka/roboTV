@@ -1,15 +1,18 @@
 package org.xvdr.sync;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.RemoteException;
 import android.support.annotation.AnyRes;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -22,6 +25,7 @@ import org.xvdr.robotv.client.Channels;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.timers.activity.TimerActivity;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -85,6 +89,7 @@ public class ChannelSyncAdapter {
 
         Channels list = new Channels();
         String language = SetupUtils.getLanguageISO3(context);
+        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
         list.load(connection, language);
 
@@ -135,19 +140,30 @@ public class ChannelSyncAdapter {
             // insert new channel
             if(channelUri == null) {
                 Log.d(TAG, String.format("adding new channel %d - %s", entry.getNumber(), entry.getName()));
-                resolver.insert(TvContract.Channels.CONTENT_URI, values);
+                ops.add(ContentProviderOperation.newInsert(TvContract.Programs.CONTENT_URI).withValues(values).build());
             }
             // update existing channel
             else {
                 Log.d(TAG, String.format("updating channel %d - %s", entry.getNumber(), entry.getName()));
-                resolver.update(channelUri, values, null, null);
+                ops.add(ContentProviderOperation.newUpdate(channelUri).withValues(values).build());
                 existingChannels.remove(entry.getNumber());
             }
 
-            if(progressCallback != null) {
-                progressCallback.onProgress(++i, list.size());
+            if((i % 100) == 0) {
+                Log.d(TAG, "batch commiting changes");
+
+                try {
+                    context.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
+                } catch (RemoteException | OperationApplicationException e) {
+                    Log.e(TAG, "batch operation failed !");
+                }
+
+                ops.clear();
             }
 
+            if (progressCallback != null) {
+                progressCallback.onProgress(++i, list.size());
+            }
         }
 
         // remove orphaned channels
@@ -155,10 +171,18 @@ public class ChannelSyncAdapter {
         Log.d(TAG, String.format("removing %d orphaned channels", existingChannels.size()));
 
         for(LinkedHashMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
-            resolver.delete(pair.getValue(), null, null);
+            ops.add(ContentProviderOperation.newDelete(pair.getValue()).build());
         }
 
-        getExistingChannels(resolver, inputId, existingChannels);
+        // push pending operations
+
+        Log.d(TAG, "batch commiting final changes");
+        try {
+            context.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
+        }
+        catch(RemoteException | OperationApplicationException e) {
+            Log.e(TAG, "Failed to update EPG for channel !", e);
+        }
 
         if(progressCallback != null) {
             progressCallback.onDone();
@@ -204,8 +228,6 @@ public class ChannelSyncAdapter {
             SyncChannelEPGTask task = new SyncChannelEPGTask(connection, context, true);
             task.executeOnExecutor(poolExecutorEPG, pair.getValue());
         }
-
-        //Log.i(TAG, "synced schedule for " + existingChannels.size() + " channels");
     }
 
     static void getExistingChannels(ContentResolver resolver, String inputId, LinkedHashMap<Integer, Uri> existingChannels) {
