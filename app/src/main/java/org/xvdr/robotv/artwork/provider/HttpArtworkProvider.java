@@ -15,6 +15,8 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
 
     private final static String TAG = "HttpArtworkProvider";
 
+    private final static Object lock = new Object();
+
     private int mDelayAfterRequestMs = 0;
     private OkHttpClient client;
 
@@ -54,21 +56,43 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
     }
 
     String getResponseFromServer(String address) throws IOException {
+        long startTime = 0;
+
+        if(mDelayAfterRequestMs > 0) {
+        }
+
         HttpUrl httpUrl = HttpUrl.parse(address);
         if(httpUrl == null) {
             return "";
         }
 
-        Request request = new Request.Builder().url(httpUrl).build();
-        Response response = client.newCall(request).execute();
+        Request request;
+        Response response;
 
         if(mDelayAfterRequestMs > 0) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(mDelayAfterRequestMs);
+            synchronized (lock) {
+                startTime = System.currentTimeMillis();
+
+                request = new Request.Builder().url(httpUrl).build();
+                response = client.newCall(request).execute();
+
+                long timeSpent = System.currentTimeMillis() - startTime;
+                long delay = mDelayAfterRequestMs - timeSpent;
+
+                if(delay > 0) {
+                    Log.d(TAG, String.format("wait for %d ms", delay));
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(delay);
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-            catch(InterruptedException e) {
-                e.printStackTrace();
-            }
+        }
+        else {
+            request = new Request.Builder().url(httpUrl).build();
+            response = client.newCall(request).execute();
         }
 
         return response.body().string();
