@@ -54,11 +54,9 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
             return;
         }
 
-        ChannelSyncAdapter adapter = new ChannelSyncAdapter(getContext(), inputId, connection);
+        ChannelSyncAdapter adapter = new ChannelSyncAdapter(connection, getContext(), inputId);
         adapter.syncChannelIcons();
         adapter.syncChannels(false);
         adapter.syncEPG();
-
-        connection.close();
     }
 }
