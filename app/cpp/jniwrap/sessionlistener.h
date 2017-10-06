@@ -14,4 +14,4 @@ public:
 
 };
 
-#endif SESSIONLISTENER_H
+#endif // SESSIONLISTENER_H
