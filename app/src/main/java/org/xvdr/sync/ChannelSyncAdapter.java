@@ -162,8 +162,10 @@ public class ChannelSyncAdapter {
             }
 
             if (progressCallback != null) {
-                progressCallback.onProgress(++i, list.size());
+                progressCallback.onProgress(i, list.size());
             }
+
+            i++;
         }
 
         // remove orphaned channels
