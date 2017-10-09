@@ -22,7 +22,6 @@ import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.StreamBundle;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.tv.TrackInfoMapper;
-import org.xvdr.sync.SyncChannelEPGTask;
 import org.xvdr.sync.SyncUtils;
 
 import java.io.IOException;
@@ -56,17 +55,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     }
 
     private TuneRunnable mTune = new TuneRunnable();
-
-    private Runnable mUpdateEPG = new Runnable() {
-        @Override
-        public void run() {
-            Connection connection = new Connection("Channel EPG update", "", false);
-            if(connection.open(SetupUtils.getServer(mContext))) {
-                SyncChannelEPGTask task = new SyncChannelEPGTask(connection, mContext, true);
-                task.execute(mCurrentChannelUri);
-            }
-        }
-    };
 
     private ContentResolver mContentResolver;
 
@@ -351,10 +339,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         // start playback
         mPlayer.openSync(uri);
         mPlayer.play();
-
-        // sync EPG of this channel after 5 seconds
-        mHandler.removeCallbacks(mUpdateEPG);
-        mHandler.postDelayed(mUpdateEPG, 3000);
 
         Log.i(TAG, "successfully switched channel");
         return true;
