@@ -24,7 +24,13 @@ public class ArtworkFetcher {
     private ArtworkProvider[] providers;
     private String mEpgImageTemplateUrl = "";
 
+    static private TheMovieDatabase tmdb = null;
+
     public ArtworkFetcher(Connection connection, String language) {
+        if(tmdb == null) {
+            tmdb =  new TheMovieDatabase(TMDB_APIKEY, language);
+        }
+
         mConnection = connection;
 
         // fetch epg images template url
@@ -33,7 +39,7 @@ public class ArtworkFetcher {
         providers = new ArtworkProvider[5];
         providers[0] = new RoboTvProvider(connection);
         providers[1] = new HttpEpgImageProvider(mEpgImageTemplateUrl);
-        providers[2] = new TheMovieDatabase(TMDB_APIKEY, language);
+        providers[2] = tmdb;
         providers[3] = new TheTvDb(language);
         providers[4] = new StockImageProvider();
     }
