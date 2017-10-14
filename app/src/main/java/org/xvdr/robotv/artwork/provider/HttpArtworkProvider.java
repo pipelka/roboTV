@@ -56,10 +56,7 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
     }
 
     String getResponseFromServer(String address) throws IOException {
-        long startTime = 0;
-
-        if(mDelayAfterRequestMs > 0) {
-        }
+        long startTime;
 
         HttpUrl httpUrl = HttpUrl.parse(address);
         if(httpUrl == null) {
