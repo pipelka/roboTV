@@ -198,13 +198,13 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     @Override
     public void onStart() {
         super.onStart();
-        updateBackground(backgroundUrl);
+        if(!TextUtils.isEmpty(backgroundUrl)) {
+            updateBackground(backgroundUrl);
+        }
     }
 
     @Override
     public void onMovieCollectionUpdated(Collection<Movie> collection, int status) {
-        Log.d(TAG, "onMovieCollectionUpdated status=" + status);
-
         if(!isAdded()) {
             return;
         }
@@ -222,7 +222,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                 manager.disableProgressBar();
                 manager.hide();
 
-                if(getAdapter() == null) {
+                if(mAdapter == null) {
                     mAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
                     setupPreferences(mAdapter);
                 }
@@ -231,7 +231,9 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                     mAdapter.loadMovies(collection);
                 }
 
-                setAdapter(mAdapter);
+                if(getAdapter() != mAdapter) {
+                    setAdapter(mAdapter);
+                }
 
                 startEntranceTransition();
                 break;
@@ -242,7 +244,6 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     public void onConnected(DataService service) {
         this.service = service;
 
-        mAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
         service.getMovieController().loadMovieCollection(this);
         loadTimers(service);
     }
@@ -265,6 +266,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
 
     @Override
     public void onMovieUpdate(DataService service) {
+        Log.d(TAG, "onMovieUpdate()");
         service.getMovieController().loadMovieCollection(this);
     }
 
