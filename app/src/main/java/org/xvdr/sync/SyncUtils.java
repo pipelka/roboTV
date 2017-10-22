@@ -188,6 +188,10 @@ public class SyncUtils {
     }
 
     static public boolean getChannelInfo(ContentResolver resolver, Uri channelUri, ChannelHolder holder) {
+        if(channelUri == null) {
+            return false;
+        }
+
         String[] projection = {
                 TvContract.Channels._ID,
                 TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID,
