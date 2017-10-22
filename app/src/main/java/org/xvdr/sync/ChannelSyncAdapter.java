@@ -26,7 +26,8 @@ import org.xvdr.robotv.client.Connection;
 import org.xvdr.timers.activity.TimerActivity;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -82,7 +83,7 @@ public class ChannelSyncAdapter {
         Log.i(TAG, "syncing channel list ...");
 
         // fetch existing channel list
-        LinkedHashMap<Integer, Uri> existingChannels = new LinkedHashMap<>();
+        SortedMap<Integer, Uri> existingChannels = new TreeMap<>();
         getExistingChannels(resolver, this.inputId, existingChannels);
 
         // update or insert channels
@@ -172,7 +173,7 @@ public class ChannelSyncAdapter {
 
         Log.d(TAG, String.format("removing %d orphaned channels", existingChannels.size()));
 
-        for(LinkedHashMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
+        for(SortedMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
             ops.add(ContentProviderOperation.newDelete(pair.getValue()).build());
         }
 
@@ -219,20 +220,20 @@ public class ChannelSyncAdapter {
     }
 
     public void syncEPG() {
-        LinkedHashMap<Integer, Uri> existingChannels = new LinkedHashMap<>();
+        SortedMap<Integer, Uri> existingChannels = new TreeMap<>();
         getExistingChannels(resolver, this.inputId, existingChannels);
 
         Log.i(TAG, String.format("syncing epg for %d channels...", existingChannels.size()));
 
         // fetch epg entries for each channel
-        for(LinkedHashMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
+        for(SortedMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
             Log.d(TAG, String.format("importing EPG of channel %d", pair.getKey()));
             SyncChannelEPGTask task = new SyncChannelEPGTask(connection, context, true);
             task.executeOnExecutor(poolExecutorEPG, pair.getValue());
         }
     }
 
-    static void getExistingChannels(ContentResolver resolver, String inputId, LinkedHashMap<Integer, Uri> existingChannels) {
+    static void getExistingChannels(ContentResolver resolver, String inputId, SortedMap<Integer, Uri> existingChannels) {
         // Create a map from original network ID to channel row ID for existing channels.
         existingChannels.clear();
 
@@ -246,7 +247,7 @@ public class ChannelSyncAdapter {
 
             while(cursor != null && cursor.moveToNext()) {
                 long channelId = cursor.getLong(0);
-                int number = cursor.getInt(1);
+                int number = Integer.parseInt(cursor.getString(1));
                 existingChannels.put(number, TvContract.buildChannelUri(channelId));
             }
         }
