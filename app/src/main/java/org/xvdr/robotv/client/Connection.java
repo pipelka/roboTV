@@ -57,6 +57,8 @@ public class Connection extends Session {
     public static final int ROBOTV_TIMER_DELETE = 84;
     public static final int ROBOTV_TIMER_UPDATE = 85;
     public static final int ROBOTV_SEARCHTIMER_GETLIST = 86;
+    public static final int ROBOTV_SEARCHTIMER_ADD = 87;
+    public static final int ROBOTV_SEARCHTIMER_DELETE = 88;
 
     /* OPCODE 100 - 119: XVDR network functions for recording access */
     public static final int XVDR_RECORDINGS_DISKSIZE = 100;
