@@ -57,6 +57,24 @@ public class TimerController {
         return response != null && response.getU32() == 0;
     }
 
+    public boolean createSearchTimer(Movie movie) {
+        Packet request = connection.CreatePacket(Connection.ROBOTV_SEARCHTIMER_ADD);
+        request.putU32(movie.getChannelUid());
+        request.putString(movie.getTitle());
+
+        Packet response = connection.transmitMessage(request);
+
+        if(response == null) {
+            return false;
+        }
+
+        long status = response.getU32();
+
+        Log.d(TAG, "createSearchTimer: status = " + status);
+
+        return (status == 0);
+    }
+
     public void loadTimers(final LoaderCallback listener) {
         AsyncTask<Void, Void, Collection<Timer>> task = new AsyncTask<Void, Void, Collection<Timer>>() {
 
