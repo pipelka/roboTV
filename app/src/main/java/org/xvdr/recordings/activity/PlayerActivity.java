@@ -7,6 +7,7 @@ import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.SurfaceView;
 
 import com.bumptech.glide.Glide;
@@ -224,6 +225,17 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         mPlayer = null;
 
         finishAndRemoveTask();
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(mPlayer == null || keyCode != KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
+            return super.onKeyDown(keyCode, event);
+        }
+
+        mControls.togglePlayback(mControls.isPlaying());
+        return true;
     }
 
     @Override

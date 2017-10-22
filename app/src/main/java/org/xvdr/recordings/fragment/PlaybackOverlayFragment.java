@@ -362,4 +362,8 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
         playbackStateChanged();
     }
+
+    public boolean isPlaying() {
+        return (mCurrentPlaybackState != PlaybackState.STATE_PLAYING);
+    }
 }
