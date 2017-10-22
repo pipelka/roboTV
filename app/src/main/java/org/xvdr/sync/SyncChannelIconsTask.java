@@ -5,6 +5,8 @@ import android.content.Context;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.TextUtils;
+import android.util.Log;
 
 import org.xvdr.robotv.client.Channels;
 import org.xvdr.robotv.client.Connection;
@@ -15,7 +17,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedHashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.HttpUrl;
@@ -32,6 +35,7 @@ abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
     private OkHttpClient client;
 
     final private byte[] mBuffer = new byte[4096];
+    final private static String TAG = SyncChannelIconsTask.class.getName();
 
     SyncChannelIconsTask(Connection connection, Context context, String inputId) {
         mConnection = connection;
@@ -46,10 +50,24 @@ abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
     }
 
     private void fetchChannelLogo(Uri channelUri, String address) throws IOException {
+        if(TextUtils.isEmpty(address)) {
+            return;
+        }
+
+        SyncUtils.ChannelHolder holder = new SyncUtils.ChannelHolder();
+
+        if(!SyncUtils.getChannelInfo(mResolver, channelUri, holder)) {
+            Log.e(TAG, String.format("unknown channel uri: '%s'", channelUri.toString()));
+            return;
+        }
+
         Uri channelLogoUri = TvContract.buildChannelLogoUri(channelUri);
+
+        Log.d(TAG, String.format("fetching logo for channel %d: %s", holder.displayNumber, address));
 
         HttpUrl httpUrl = HttpUrl.parse(address);
         if(httpUrl == null) {
+            Log.e(TAG, String.format("unable parse uri: %s", address));
             return;
         }
 
@@ -60,6 +78,7 @@ abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
         OutputStream os = mResolver.openOutputStream(channelLogoUri);
 
         if(os == null) {
+            Log.e(TAG, String.format("error creating logo: %s", channelLogoUri.toString()));
             return;
         }
 
@@ -80,7 +99,7 @@ abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        final LinkedHashMap<Integer, Uri> existingChannels = new LinkedHashMap<>();
+        final SortedMap<Integer, Uri> existingChannels = new TreeMap<>();
 
         ChannelSyncAdapter.getExistingChannels(mResolver, mInputId, existingChannels);
         String language = SetupUtils.getLanguageISO3(mContext);
@@ -91,12 +110,14 @@ abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
                 final Uri uri = existingChannels.get(entry.getNumber());
 
                 // exit if task is cancelled
-                if(isCancelled() || uri == null) {
+                if(isCancelled()) {
                     return false;
                 }
 
                 try {
-                    fetchChannelLogo(uri, entry.getIconURL());
+                    if(uri != null) {
+                        fetchChannelLogo(uri, entry.getIconURL());
+                    }
                 }
                 catch (IOException e) {
                     e.printStackTrace();
