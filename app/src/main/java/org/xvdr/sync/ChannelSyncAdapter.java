@@ -140,7 +140,7 @@ public class ChannelSyncAdapter {
             // insert new channel
             if(channelUri == null) {
                 Log.d(TAG, String.format("adding new channel %d - %s", entry.getNumber(), entry.getName()));
-                ops.add(ContentProviderOperation.newInsert(TvContract.Programs.CONTENT_URI).withValues(values).build());
+                resolver.insert(TvContract.Channels.CONTENT_URI, values);
             }
             // update existing channel
             else {
@@ -149,7 +149,7 @@ public class ChannelSyncAdapter {
                 existingChannels.remove(entry.getNumber());
             }
 
-            if((i % 100) == 0) {
+            if(ops.size() == 100) {
                 Log.d(TAG, "batch commiting changes");
 
                 try {
