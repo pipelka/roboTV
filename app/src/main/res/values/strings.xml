@@ -120,4 +120,6 @@
     <string name="add">Add</string>
     <string name="setup_shield_workaround">Enable Shield TV Workarounds</string>
     <string name="failed_update_timer">Failed to update timer</string>
+    <string name="timer_add_all_episodes">Record all episodes</string>
+    <string name="record_all_episodes">Scheduling all episodes</string>
 </resources>

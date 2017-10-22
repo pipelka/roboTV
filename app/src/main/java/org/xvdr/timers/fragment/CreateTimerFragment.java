@@ -17,11 +17,13 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
 
     static final int ACTION_FOLDER = 3;
     static final int ACTION_ADD = 1;
+    static final int ACTION_ADD_SEARCH = 4;
     static final int ACTION_CANCEL = 2;
 
     private GuidedAction mActionFolder;
     private GuidedAction mActionAdd;
     private GuidedAction mActionCancel;
+    private GuidedAction mActionSearch;
 
     @NonNull
     @Override
@@ -32,6 +34,9 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
             mActionFolder.setEnabled(false);
             mActionAdd.setTitle(getString(R.string.timer_add_episode));
         }
+        else {
+            mActionSearch.setEnabled(false);
+        }
 
         return guidance;
     }
@@ -39,26 +44,33 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
     @Override
     public void onCreateActions(@NonNull List actions, Bundle savedInstanceState) {
         mActionFolder = new GuidedAction.Builder(getActivity())
-        .id(ACTION_FOLDER)
-        .title(getString(R.string.timer_add_select_folder))
-        .build();
+                .id(ACTION_FOLDER)
+                .title(getString(R.string.timer_add_select_folder))
+                .build();
 
         updateFolder();
 
         mActionAdd = new GuidedAction.Builder(getActivity())
-        .id(ACTION_ADD)
-        .title(getString(R.string.timer_add_create))
-        .hasNext(true)
-        .build();
+                .id(ACTION_ADD)
+                .title(getString(R.string.timer_add_create))
+                .hasNext(true)
+                .build();
+
+        mActionSearch = new GuidedAction.Builder(getActivity())
+                .id(ACTION_ADD_SEARCH)
+                .title(getString(R.string.timer_add_all_episodes))
+                .hasNext(true)
+                .build();
 
         mActionCancel = new GuidedAction.Builder(getActivity())
-        .id(ACTION_CANCEL)
-        .title(getString(R.string.timer_add_cancel))
-        .build();
+                .id(ACTION_CANCEL)
+                .title(getString(R.string.timer_add_cancel))
+                .build();
 
         actions.add(mActionCancel);
         actions.add(mActionFolder);
         actions.add(mActionAdd);
+        actions.add(mActionSearch);
     }
 
     @Override
@@ -78,12 +90,22 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
         }
     }
 
-    protected void createTimer(Movie movie) {
+    protected void createTimer(Movie movie, boolean searchTimer) {
         DataService service = getService();
         NotificationHandler notificationHandler = new NotificationHandler(getActivity());
 
         if(service == null) {
             notificationHandler.error(getString(R.string.service_not_connected));
+            return;
+        }
+
+        if(searchTimer) {
+            if(!service.getTimerController().createSearchTimer(movie)) {
+                notificationHandler.error(getString(R.string.failed_create_timer));
+                return;
+            }
+
+            notificationHandler.notify(movie.getTitle(), getString(R.string.record_all_episodes), movie.getPosterUrl());
             return;
         }
 
@@ -104,7 +126,12 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
 
             case ACTION_ADD:
                 movie.setFolder(SetupUtils.getRecordingFolder());
-                createTimer(movie);
+                createTimer(movie, false);
+                finishGuidedStepFragments();
+                break;
+
+            case ACTION_ADD_SEARCH:
+                createTimer(movie, true);
                 finishGuidedStepFragments();
                 break;
 

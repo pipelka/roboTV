@@ -104,4 +104,6 @@
     <string name="add">Hinzufügen</string>
     <string name="setup_shield_workaround">Shield TV Workarounds aktivieren</string>
     <string name="failed_update_timer">Timer konnte nicht aktualisiert werden</string>
+    <string name="timer_add_all_episodes">Alle Folgen aufnehmen</string>
+    <string name="record_all_episodes">Alle Folgen werden aufgenommen</string>
 </resources>
