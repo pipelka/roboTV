@@ -1,7 +1,10 @@
 package org.xvdr.recordings.presenter;
 
+import android.content.Context;
 import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
 
+import org.xvdr.robotv.R;
+import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.model.Movie;
 
 public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPresenter {
@@ -15,7 +18,15 @@ public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPrese
 
         if(movie.isTvShow()) {
             viewHolder.getTitle().setText(movie.getShortText());
-            viewHolder.getBody().setText(movie.getDescription());
+
+            String desc = movie.getDescription();
+            Event.SeasonEpisodeHolder episode = movie.getSeasionEpisode();
+            if(episode.valid()) {
+                Context context = viewHolder.view.getContext();
+                desc += "\n";
+                desc += context.getString(R.string.season_episode, episode.season, episode.episode);
+            }
+            viewHolder.getBody().setText(desc);
             return;
         }
 

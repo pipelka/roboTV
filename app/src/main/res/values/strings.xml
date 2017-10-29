@@ -122,4 +122,5 @@
     <string name="failed_update_timer">Failed to update timer</string>
     <string name="timer_add_all_episodes">Record all episodes</string>
     <string name="record_all_episodes">Scheduling all episodes</string>
+    <string name="season_episode">Season %d, Episode %d</string>
 </resources>
