@@ -26,13 +26,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
+class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
 
-    private Context mContext;
     private String mInputId;
     private Connection mConnection;
     private ContentResolver mResolver;
     private OkHttpClient client;
+    private String language;
 
     final private byte[] mBuffer = new byte[4096];
     final private static String TAG = SyncChannelIconsTask.class.getName();
@@ -41,7 +41,7 @@ abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
         mConnection = connection;
         mInputId = inputId;
         mResolver = context.getContentResolver();
-        mContext = context;
+        language = SetupUtils.getLanguageISO3(context);
 
         client = new OkHttpClient.Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
@@ -102,7 +102,6 @@ abstract class SyncChannelIconsTask extends AsyncTask<Void, Void, Void> {
         final SortedMap<Integer, Uri> existingChannels = new TreeMap<>();
 
         ChannelSyncAdapter.getExistingChannels(mResolver, mInputId, existingChannels);
-        String language = SetupUtils.getLanguageISO3(mContext);
 
         new Channels().load(mConnection, language, new Channels.Callback() {
             @Override

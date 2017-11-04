@@ -9,7 +9,7 @@ import android.os.IBinder;
  */
 public class SyncService extends Service {
     private static final Object sSyncAdapterLock = new Object();
-    private static SyncAdapter sSyncAdapter = null;
+    private SyncAdapter sSyncAdapter = null;
 
     @Override
     public void onCreate() {

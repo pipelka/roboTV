@@ -1,8 +1,8 @@
 package org.xvdr.sync;
 
 import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.OperationApplicationException;
 import android.media.tv.TvContract;
 import android.net.Uri;
@@ -20,19 +20,21 @@ public class SyncChannelEPGTask extends AsyncTask<Uri, Void, Void> {
     static private final String TAG = SyncChannelEPGTask.class.getName();
 
     private final Connection connection;
-    private final Context context;
+    private final ContentResolver resolver;
     private final boolean append;
+    private final String language;
 
-    public SyncChannelEPGTask(Connection connection, Context context, boolean append) {
+    SyncChannelEPGTask(Connection connection, String language, ContentResolver resolver, boolean append) {
         this.connection = connection;
-        this.context = context;
+        this.resolver = resolver;
         this.append = append;
+        this.language = language;
     }
 
     private void syncChannelEPG(Uri channelUri) {
         List<ContentValues> programs = new ArrayList<>();
 
-        if(!SyncUtils.fetchEPGForChannel(connection, context, channelUri, programs, append)) {
+        if(!SyncUtils.fetchEPGForChannel(connection, language, resolver, channelUri, programs, append)) {
             return;
         }
 
@@ -54,7 +56,7 @@ public class SyncChannelEPGTask extends AsyncTask<Uri, Void, Void> {
         }
 
         try {
-            context.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
+            resolver.applyBatch(TvContract.AUTHORITY, ops);
         }
         catch(RemoteException | OperationApplicationException e) {
             Log.e(TAG, "Failed to update EPG for channel !", e);

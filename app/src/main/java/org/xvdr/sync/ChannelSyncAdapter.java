@@ -51,12 +51,11 @@ public class ChannelSyncAdapter {
     private ContentResolver resolver;
 
     private ProgressCallback progressCallback = null;
-    private SyncChannelIconsTask channelIconsTask = null;
 
     private final ThreadPoolExecutor poolExecutorEPG;
 
-    private static final int CORE_POOL_SIZE = 6;
-    private static final int MAXIMUM_POOL_SIZE = 10;
+    private static final int CORE_POOL_SIZE = 2;
+    private static final int MAXIMUM_POOL_SIZE = 4;
     private static final int KEEP_ALIVE_SECONDS = 30;
 
     public ChannelSyncAdapter(Connection connection, Context context, String inputId) {
@@ -195,27 +194,8 @@ public class ChannelSyncAdapter {
     }
 
     public void syncChannelIcons() {
-        // task already running
-        if(channelIconsTask != null) {
-            return;
-        }
 
-        Log.i(TAG, "syncing of channel icons started.");
-
-        channelIconsTask = new SyncChannelIconsTask(connection, context, inputId) {
-            @Override
-            protected void onPostExecute(Void result) {
-                channelIconsTask = null;
-                Log.i(TAG, "finished syncing channel icons.");
-            }
-
-            @Override
-            protected void onCancelled(Void result) {
-                channelIconsTask = null;
-                Log.i(TAG, "syncing of channel icons cancelled.");
-            }
-        };
-
+        SyncChannelIconsTask channelIconsTask = new SyncChannelIconsTask(connection, context, inputId);
         channelIconsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -228,7 +208,13 @@ public class ChannelSyncAdapter {
         // fetch epg entries for each channel
         for(SortedMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
             Log.d(TAG, String.format("importing EPG of channel %d", pair.getKey()));
-            SyncChannelEPGTask task = new SyncChannelEPGTask(connection, context, true);
+
+            SyncChannelEPGTask task = new SyncChannelEPGTask(
+                    connection,
+                    SetupUtils.getLanguage(context),
+                    context.getContentResolver(),
+                    true);
+
             task.executeOnExecutor(poolExecutorEPG, pair.getValue());
         }
     }

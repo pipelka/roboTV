@@ -2,7 +2,6 @@ package org.xvdr.sync;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
@@ -17,7 +16,6 @@ import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.PacketAdapter;
 import org.xvdr.robotv.client.model.Event;
-import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -253,7 +251,7 @@ public class SyncUtils {
         return 0;
     }
 
-    static boolean fetchEPGForChannel(Connection connection, Context context, Uri channelUri, List<ContentValues> programs, boolean appendEntries) {
+    static boolean fetchEPGForChannel(Connection connection, String language, ContentResolver resolver, Uri channelUri, List<ContentValues> programs, boolean appendEntries) {
         if(connection == null || !connection.isOpen()) {
             return false;
         }
@@ -263,7 +261,6 @@ public class SyncUtils {
         long end = start + duration;
 
         ChannelHolder holder = new ChannelHolder();
-        ContentResolver resolver = context.getContentResolver();
 
         if(!SyncUtils.getChannelInfo(resolver, channelUri, holder)) {
             return false;
@@ -365,7 +362,7 @@ public class SyncUtils {
             }
 
             // artwork
-            ArtworkFetcher artwork = new ArtworkFetcher(connection, SetupUtils.getLanguage(context));
+            ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
 
             try {
                 if(artwork.fetchForEvent(event)) {
