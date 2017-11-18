@@ -27,7 +27,6 @@ import org.xvdr.timers.activity.TimerActivity;
 import org.xvdr.timers.presenter.EpgEventPresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
 
 public class TimerFragment extends BrowseFragment implements DataService.Listener {
@@ -72,10 +71,9 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
 
             // process result
             while(!resp.eop() && !isCancelled()) {
-                Event event = PacketAdapter.toEpgEvent(resp);
-                event.setChannelUid(channelUid);
+                final Movie movie = new Movie(PacketAdapter.toEpgEvent(resp));
 
-                final Movie movie = new Movie(event);
+                movie.setChannelUid(channelUid);
                 movie.setChannelName(channelName);
 
                 rowAdapter.add(movie);
