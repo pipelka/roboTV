@@ -275,12 +275,20 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
     }
 
     @Override
+    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+    }
+
+    @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
     }
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         listener.onPlayerError(error);
+    }
+
+    @Override
+    public void onPositionDiscontinuity(int reason) {
     }
 
     @Override
@@ -297,11 +305,12 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
     }
 
     @Override
-    public void onPositionDiscontinuity() {
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
     }
 
     @Override
-    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+    public void onSeekProcessed() {
+
     }
 
     @Override
@@ -402,7 +411,8 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
     }
 
     @Override
-    public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+    public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+
     }
 
     @Override

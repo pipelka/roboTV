@@ -46,10 +46,10 @@ android {
         }
     }
 
-    buildToolsVersion '26.0.2'
+    buildToolsVersion "${project.ext.buildToolsVersion}"
 }
 
 dependencies {
-    compile "com.android.support:support-core-utils:25.4.0"
-    compile 'com.google.android.exoplayer:exoplayer-core:r2.5.4'
+    compile "com.android.support:support-core-utils:${project.ext.supportVersion}"
+    compile "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
 }
