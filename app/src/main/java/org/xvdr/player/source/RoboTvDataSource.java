@@ -1,7 +1,6 @@
 package org.xvdr.player.source;
 
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.exoplayer2.C;
@@ -10,7 +9,7 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 
 import org.robotv.msgexchange.Packet;
 import org.xvdr.player.PositionReference;
-import org.xvdr.robotv.client.Connection;
+import org.robotv.client.Connection;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;

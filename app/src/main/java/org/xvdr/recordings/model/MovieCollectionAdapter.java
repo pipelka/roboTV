@@ -15,10 +15,10 @@ import org.xvdr.recordings.presenter.MoviePresenter;
 import org.xvdr.recordings.presenter.LatestCardPresenter;
 import org.xvdr.recordings.presenter.TimerPresenter;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.model.Event;
-import org.xvdr.robotv.client.model.Movie;
-import org.xvdr.robotv.client.model.Timer;
+import org.robotv.client.Connection;
+import org.robotv.client.model.Event;
+import org.robotv.client.model.Movie;
+import org.robotv.client.model.Timer;
 
 import java.util.ArrayList;
 import java.util.Collection;

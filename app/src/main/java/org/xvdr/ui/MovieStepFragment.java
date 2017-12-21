@@ -12,11 +12,11 @@ import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
 
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
-import org.xvdr.robotv.client.MovieController;
+import org.robotv.client.MovieController;
 
 public class MovieStepFragment extends GuidedStepFragment {
 

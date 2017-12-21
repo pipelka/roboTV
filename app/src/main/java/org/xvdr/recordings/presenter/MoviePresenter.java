@@ -13,9 +13,9 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 
-import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.artwork.ArtworkFetcher;
+import org.robotv.client.Connection;
+import org.robotv.client.model.Movie;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.setup.SetupUtils;

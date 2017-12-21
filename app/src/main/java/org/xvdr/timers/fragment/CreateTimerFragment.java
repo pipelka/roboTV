@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.NotificationHandler;

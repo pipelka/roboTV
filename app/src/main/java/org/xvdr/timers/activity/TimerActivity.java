@@ -3,7 +3,7 @@ package org.xvdr.timers.activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.fragment.CreateTimerFragment;

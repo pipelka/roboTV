@@ -19,15 +19,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.robotv.msgexchange.Packet;
-import org.xvdr.robotv.client.PacketAdapter;
+import org.robotv.client.PacketAdapter;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.activity.EpgSearchActivity;
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.timers.activity.TimerActivity;
 import org.xvdr.timers.presenter.EpgEventPresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.Connection;
+import org.robotv.client.Connection;
 
 public class TimerFragment extends BrowseFragment implements DataService.Listener {
 

@@ -18,10 +18,10 @@ import android.text.TextUtils;
 import org.xvdr.recordings.activity.CoverSearchActivity;
 import org.xvdr.recordings.presenter.ArtworkPresenter;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.artwork.provider.TheMovieDatabase;
-import org.xvdr.robotv.artwork.provider.TheTvDb;
+import org.robotv.client.artwork.ArtworkFetcher;
+import org.robotv.client.artwork.ArtworkHolder;
+import org.robotv.client.artwork.provider.TheMovieDatabase;
+import org.robotv.client.artwork.provider.TheTvDb;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.util.List;

@@ -8,8 +8,8 @@ import android.support.v17.leanback.widget.GuidedAction;
 import android.text.TextUtils;
 
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.model.Movie;
-import org.xvdr.robotv.client.model.Timer;
+import org.robotv.client.model.Movie;
+import org.robotv.client.model.Timer;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.NotificationHandler;
 import org.xvdr.ui.MovieStepFragment;

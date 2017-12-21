@@ -16,11 +16,11 @@ import android.text.TextUtils;
 
 import org.robotv.msgexchange.Packet;
 import org.xvdr.recordings.activity.DetailsActivity;
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
-import org.xvdr.robotv.client.PacketAdapter;
+import org.robotv.client.PacketAdapter;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.Connection;
+import org.robotv.client.Connection;
 import org.xvdr.robotv.setup.SetupUtils;
 
 public class MovieSearchFragment extends SearchFragment implements SearchFragment.SearchResultProvider {

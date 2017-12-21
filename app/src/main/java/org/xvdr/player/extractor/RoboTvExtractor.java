@@ -15,8 +15,8 @@ import com.google.android.exoplayer2.util.TimestampAdjuster;
 
 import org.xvdr.player.BufferPacket;
 import org.xvdr.player.PositionReference;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.StreamBundle;
+import org.robotv.client.Connection;
+import org.xvdr.player.StreamBundle;
 
 import java.io.IOException;
 

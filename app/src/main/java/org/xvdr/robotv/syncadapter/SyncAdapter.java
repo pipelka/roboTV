@@ -11,7 +11,7 @@ import android.util.Log;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import org.xvdr.sync.ChannelSyncAdapter;
-import org.xvdr.robotv.client.Connection;
+import org.robotv.client.Connection;
 
 /**
  * A SyncAdapter implementation which updates program info periodically.

@@ -19,10 +19,10 @@ import android.util.Log;
 
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.model.Channel;
+import org.robotv.client.model.Channel;
 import org.xvdr.robotv.setup.SetupUtils;
-import org.xvdr.robotv.client.Channels;
-import org.xvdr.robotv.client.Connection;
+import org.robotv.client.Channels;
+import org.robotv.client.Connection;
 import org.xvdr.timers.activity.TimerActivity;
 
 import java.util.ArrayList;

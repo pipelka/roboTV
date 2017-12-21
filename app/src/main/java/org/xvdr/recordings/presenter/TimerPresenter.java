@@ -19,9 +19,9 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import org.xvdr.recordings.model.EpisodeTimer;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.model.Timer;
+import org.robotv.client.artwork.ArtworkFetcher;
+import org.robotv.client.Connection;
+import org.robotv.client.model.Timer;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.IOException;
@@ -29,6 +29,66 @@ import java.io.IOException;
 public class TimerPresenter extends Presenter {
 
     private Connection connection;
+
+
+    private static class TimerArtworkTask extends AsyncTask<Void, Void, String> {
+
+        ArtworkFetcher artwork;
+        Timer timer;
+        ImageCardView cardView;
+        Drawable drawableUnknown;
+
+        TimerArtworkTask(ArtworkFetcher artwork, Timer timer, ImageCardView cardView) {
+            this.artwork = artwork;
+            this.timer = timer;
+            this.cardView = cardView;
+            this.drawableUnknown = cardView.getResources().getDrawable(R.drawable.recording_unkown, null);
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            String url = null;
+
+            try {
+                artwork.fetchForEvent(timer);
+                url = timer.getPosterUrl();
+                if(TextUtils.isEmpty(url)) {
+                    url = timer.getBackgroundUrl();
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            return url;
+        }
+
+        @Override
+        protected void onPostExecute(String url) {
+            if(!TextUtils.isEmpty(timer.getLogoUrl())) {
+                Glide.with(cardView.getContext())
+                        .load(timer.getLogoUrl())
+                        .error(drawableUnknown)
+                        .placeholder(drawableUnknown)
+                        .into(new SimpleTarget<GlideDrawable>() {
+                            @Override
+                            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                                cardView.setBadgeImage(resource);
+                            }
+                        });
+            }
+
+            Glide.with(cardView.getContext())
+                    .load(TextUtils.isEmpty(timer.getPosterUrl()) ? timer.getLogoUrl() : timer.getPosterUrl())
+                    .centerCrop()
+                    .error(drawableUnknown)
+                    .placeholder(drawableUnknown)
+                    .into(new SimpleTarget<GlideDrawable>() {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                            cardView.setMainImage(resource);
+                        }
+                    });
+        }
+    }
 
     public TimerPresenter(@NonNull Connection connection) {
         this.connection = connection;
@@ -88,57 +148,9 @@ public class TimerPresenter extends Presenter {
         cardView.setMainImageDimensions(391, 220);
         cardView.getMainImageView().setPadding(0, 0, 0, 0);
 
-        final Drawable drawableUnknown = resources.getDrawable(R.drawable.recording_unkown, null);
-
         String language = SetupUtils.getLanguage(context);
-        final ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
-
-        //
-        AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-                String url = null;
-
-                try {
-                    artwork.fetchForEvent(timer);
-                    url = timer.getPosterUrl();
-                    if(TextUtils.isEmpty(url)) {
-                        url = timer.getBackgroundUrl();
-                    }
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return url;
-            }
-
-            protected void onPostExecute(String url) {
-                if(!TextUtils.isEmpty(timer.getLogoUrl())) {
-                    Glide.with(cardView.getContext())
-                            .load(timer.getLogoUrl())
-                            .error(drawableUnknown)
-                            .placeholder(drawableUnknown)
-                            .into(new SimpleTarget<GlideDrawable>() {
-                                @Override
-                                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                                    cardView.setBadgeImage(resource);
-                                }
-                            });
-                }
-
-                Glide.with(cardView.getContext())
-                        .load(TextUtils.isEmpty(timer.getPosterUrl()) ? timer.getLogoUrl() : timer.getPosterUrl())
-                        .centerCrop()
-                        .error(drawableUnknown)
-                        .placeholder(drawableUnknown)
-                        .into(new SimpleTarget<GlideDrawable>() {
-                            @Override
-                            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                                cardView.setMainImage(resource);
-                            }
-                        });
-            }
-        };
+        ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
+        TimerArtworkTask task = new TimerArtworkTask(artwork, timer, cardView);
 
         task.execute();
     }

@@ -20,14 +20,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.robotv.msgexchange.Packet;
-import org.xvdr.robotv.client.PacketAdapter;
+import org.robotv.client.PacketAdapter;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.activity.EpgSearchActivity;
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.timers.presenter.EpgEventPresenter;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.model.Event;
-import org.xvdr.robotv.client.Connection;
+import org.robotv.client.model.Event;
+import org.robotv.client.Connection;
 
 import java.util.ArrayList;
 import java.util.Collections;

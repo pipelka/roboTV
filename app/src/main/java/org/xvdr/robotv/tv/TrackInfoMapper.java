@@ -4,7 +4,7 @@ import android.media.tv.TvTrackInfo;
 import android.os.Build;
 import android.util.Log;
 
-import org.xvdr.robotv.client.StreamBundle;
+import org.xvdr.player.StreamBundle;
 
 public class TrackInfoMapper {
 

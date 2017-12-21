@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide;
 
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.artwork.ArtworkHolder;
+import org.robotv.client.artwork.ArtworkHolder;
 
 
 public class ArtworkPresenter extends Presenter {

@@ -28,11 +28,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import org.robotv.client.RelatedContentExtractor;
 import org.xvdr.recordings.activity.CoverSearchActivity;
 import org.xvdr.recordings.activity.PlayerActivity;
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.recordings.model.MovieCollectionAdapter;
-import org.xvdr.recordings.model.RelatedContentExtractor;
 import org.xvdr.recordings.model.SortedArrayObjectAdapter;
 import org.xvdr.recordings.presenter.ActionPresenterSelector;
 import org.xvdr.recordings.presenter.ColorAction;
@@ -41,7 +41,7 @@ import org.xvdr.recordings.presenter.LatestCardPresenter;
 import org.xvdr.recordings.util.BackgroundManagerTarget;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.model.Event;
+import org.robotv.client.model.Event;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.ui.MovieStepFragment;
 

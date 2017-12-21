@@ -6,7 +6,7 @@ import android.support.v17.leanback.widget.SpeechRecognitionCallback;
 
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.fragment.CreateTimerFragment;
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.robotv.R;
 import org.xvdr.timers.fragment.EpgSearchFragment;
 import org.xvdr.ui.DataServiceActivity;

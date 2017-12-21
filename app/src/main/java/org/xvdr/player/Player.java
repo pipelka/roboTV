@@ -33,8 +33,7 @@ import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import org.xvdr.player.extractor.RoboTvExtractor;
 import org.xvdr.player.source.RoboTvDataSourceFactory;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.StreamBundle;
+import org.robotv.client.Connection;
 
 import java.io.IOException;
 

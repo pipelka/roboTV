@@ -10,7 +10,7 @@ import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.util.Log;
 
-import org.xvdr.robotv.client.Connection;
+import org.robotv.client.Connection;
 
 import java.util.ArrayList;
 import java.util.List;

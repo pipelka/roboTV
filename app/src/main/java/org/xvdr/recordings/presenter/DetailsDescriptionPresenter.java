@@ -4,8 +4,8 @@ import android.content.Context;
 import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
 
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.model.Event;
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Event;
+import org.robotv.client.model.Movie;
 
 public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPresenter {
     @Override

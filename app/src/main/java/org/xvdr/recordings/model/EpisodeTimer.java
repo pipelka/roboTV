@@ -1,6 +1,6 @@
 package org.xvdr.recordings.model;
 
-import org.xvdr.robotv.client.model.Timer;
+import org.robotv.client.model.Timer;
 
 import java.util.ArrayList;
 

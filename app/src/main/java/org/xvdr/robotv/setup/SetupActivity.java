@@ -12,7 +12,7 @@ import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.syncadapter.SyncUtils;
 import org.xvdr.sync.ChannelSyncAdapter;
-import org.xvdr.robotv.client.Connection;
+import org.robotv.client.Connection;
 
 public class SetupActivity extends Activity {
     private static final String TAG = "Setup";

@@ -10,7 +10,7 @@ import com.google.android.exoplayer2.extractor.TrackOutput;
 import com.google.android.exoplayer2.source.SampleQueue;
 import com.google.android.exoplayer2.util.MimeTypes;
 
-import org.xvdr.robotv.client.StreamBundle;
+import org.xvdr.player.StreamBundle;
 
 import java.util.Collections;
 import java.util.Comparator;

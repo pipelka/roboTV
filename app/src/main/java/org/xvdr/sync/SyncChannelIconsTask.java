@@ -8,9 +8,9 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.xvdr.robotv.client.Channels;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.model.Channel;
+import org.robotv.client.Channels;
+import org.robotv.client.Connection;
+import org.robotv.client.model.Channel;
 import org.xvdr.robotv.setup.SetupUtils;
 
 import java.io.BufferedInputStream;

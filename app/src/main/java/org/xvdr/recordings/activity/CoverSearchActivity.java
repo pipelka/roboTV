@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.SpeechRecognitionCallback;
 
-import org.xvdr.robotv.client.model.Movie;
+import org.robotv.client.model.Movie;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.artwork.ArtworkHolder;
+import org.robotv.client.artwork.ArtworkHolder;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.ui.DataServiceActivity;
 

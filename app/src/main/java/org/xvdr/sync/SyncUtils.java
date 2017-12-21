@@ -12,10 +12,10 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import org.robotv.msgexchange.Packet;
-import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.PacketAdapter;
-import org.xvdr.robotv.client.model.Event;
+import org.robotv.client.artwork.ArtworkFetcher;
+import org.robotv.client.Connection;
+import org.robotv.client.PacketAdapter;
+import org.robotv.client.model.Event;
 
 import java.io.IOException;
 import java.util.List;

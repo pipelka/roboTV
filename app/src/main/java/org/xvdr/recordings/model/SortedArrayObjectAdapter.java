@@ -1,15 +1,10 @@
 package org.xvdr.recordings.model;
 
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.ClassPresenterSelector;
 import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.PresenterSelector;
-
-import org.xvdr.robotv.client.model.Event;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.TreeSet;
 
 public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {

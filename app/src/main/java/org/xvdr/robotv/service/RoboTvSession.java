@@ -18,8 +18,8 @@ import com.google.android.exoplayer2.Format;
 
 import org.xvdr.player.Player;
 import org.xvdr.robotv.R;
-import org.xvdr.robotv.client.Connection;
-import org.xvdr.robotv.client.StreamBundle;
+import org.robotv.client.Connection;
+import org.xvdr.player.StreamBundle;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.tv.TrackInfoMapper;
 import org.xvdr.sync.SyncUtils;
