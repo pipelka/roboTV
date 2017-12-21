@@ -96,9 +96,8 @@
 
 static {
 	try {
-                System.loadLibrary("gnustl_shared");
 		System.loadLibrary("msgexchange");
-		System.loadLibrary("jniwrap");
+		System.loadLibrary("msgexchange_jni");
 	}
 	catch (UnsatisfiedLinkError e) {
 		e.printStackTrace();

@@ -8,8 +8,8 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.xvdr.jniwrap.Packet;
-import org.xvdr.jniwrap.SessionListener;
+import org.robotv.msgexchange.Packet;
+import org.robotv.msgexchange.SessionListener;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;

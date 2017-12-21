@@ -20,24 +20,6 @@ android {
         versionCode 1
         versionName "0.7.3.${gitAbbreviatedId}"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
-
-        ndk {
-            moduleName "robotv-jni"
-            abiFilters 'x86', 'armeabi-v7a'
-            stl "gnustl_shared"
-        }
-
-        externalNativeBuild {
-            cmake {
-                arguments "-DANDROID_PLATFORM=android-21", "-DANDROID_TOOLCHAIN=gcc", "-DANDROID_STL=gnustl_shared"
-            }
-        }
-    }
-
-    externalNativeBuild {
-        cmake {
-            path "cpp/CMakeLists.txt"
-        }
     }
 
     buildTypes {
@@ -63,4 +45,5 @@ dependencies {
     compile "com.android.support:support-core-utils:${project.ext.supportVersion}"
     compile "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
     compile project(path: ':extension-ffmpeg')
+    compile project(path: ':msgexchange')
 }

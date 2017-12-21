@@ -19,7 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.xvdr.jniwrap.Packet;
+import org.robotv.msgexchange.Packet;
 import org.xvdr.robotv.client.PacketAdapter;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.timers.activity.EpgSearchActivity;

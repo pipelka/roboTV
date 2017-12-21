@@ -30,7 +30,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_PLATFORM=android-21", "-DANDROID_TOOLCHAIN=gcc", "-DANDROID_STL=gnustl_shared"
+                arguments "-DANDROID_PLATFORM=android-21", "-DANDROID_TOOLCHAIN=gcc", "-DANDROID_STL=gnustl_static"
             }
         }
     }

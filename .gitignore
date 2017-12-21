@@ -31,3 +31,4 @@ app/cpp/ffmpeg/libs/x86/pkgconfig
 captures
 extensions/ffmpeg/.externalNativeBuild
 extensions/ffmpeg/extension-ffmpeg.iml
+msgexchange/.externalNativeBuild

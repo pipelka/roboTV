@@ -4,8 +4,8 @@ import android.os.Handler;
 
 import com.google.android.exoplayer2.upstream.DataSource;
 
-import org.xvdr.jniwrap.Packet;
-import org.xvdr.jniwrap.SessionListener;
+import org.robotv.msgexchange.Packet;
+import org.robotv.msgexchange.SessionListener;
 import org.xvdr.player.PositionReference;
 import org.xvdr.robotv.client.Connection;
 

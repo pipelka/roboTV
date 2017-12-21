@@ -3,7 +3,7 @@ package org.xvdr.robotv.artwork;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.xvdr.jniwrap.Packet;
+import org.robotv.msgexchange.Packet;
 import org.xvdr.robotv.artwork.provider.ArtworkProvider;
 import org.xvdr.robotv.artwork.provider.HttpEpgImageProvider;
 import org.xvdr.robotv.artwork.provider.RoboTvProvider;

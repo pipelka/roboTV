@@ -11,7 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
-import org.xvdr.jniwrap.Packet;
+import org.robotv.msgexchange.Packet;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.client.Connection;
 import org.xvdr.robotv.client.PacketAdapter;

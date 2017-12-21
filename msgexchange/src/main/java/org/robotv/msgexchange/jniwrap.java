@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.jniwrap;
+package org.robotv.msgexchange;
 
 public class jniwrap {
 }

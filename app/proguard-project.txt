@@ -14,18 +14,3 @@
 -keepclassmembers public class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule {
     public *;
 }
-
--keep public class org.xvdr.jniwrap.jniwrapJNI
--keepclassmembers public class org.xvdr.jniwrap.jniwrapJNI {
-    public *;
-}
-
--keep public class org.xvdr.jniwrap.Packet
--keepclassmembers public class org.xvdr.jniwrap.Packet {
-    *;
-}
-
--keep public class org.xvdr.jniwrap.SessionListener
--keepclassmembers public class org.xvdr.jniwrap.SessionListener {
-    *;
-}

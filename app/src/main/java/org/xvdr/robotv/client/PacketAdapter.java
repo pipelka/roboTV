@@ -2,7 +2,7 @@ package org.xvdr.robotv.client;
 
 import android.text.TextUtils;
 
-import org.xvdr.jniwrap.Packet;
+import org.robotv.msgexchange.Packet;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.model.Channel;
 import org.xvdr.robotv.client.model.Event;

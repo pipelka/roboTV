@@ -3,7 +3,7 @@ package org.xvdr.robotv.client;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.xvdr.jniwrap.Packet;
+import org.robotv.msgexchange.Packet;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
 import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.model.Movie;

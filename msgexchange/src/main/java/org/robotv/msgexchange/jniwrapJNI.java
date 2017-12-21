@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.xvdr.jniwrap;
+package org.robotv.msgexchange;
 
 public class jniwrapJNI {
   public final static native long new_Packet__SWIG_0(int jarg1, int jarg2, long jarg3);
@@ -105,9 +105,8 @@ public class jniwrapJNI {
 
 static {
 	try {
-                System.loadLibrary("gnustl_shared");
 		System.loadLibrary("msgexchange");
-		System.loadLibrary("jniwrap");
+		System.loadLibrary("msgexchange_jni");
 	}
 	catch (UnsatisfiedLinkError e) {
 		e.printStackTrace();

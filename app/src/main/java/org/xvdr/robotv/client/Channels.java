@@ -1,6 +1,6 @@
 package org.xvdr.robotv.client;
 
-import org.xvdr.jniwrap.Packet;
+import org.robotv.msgexchange.Packet;
 import org.xvdr.robotv.client.model.Channel;
 
 import java.util.ArrayList;
