@@ -1,7 +1,5 @@
 package org.xvdr.robotv.client.model;
 
-import org.xvdr.robotv.artwork.ArtworkHolder;
-
 public class Movie extends Event {
 
     private String folder;
@@ -75,13 +73,9 @@ public class Movie extends Event {
         return isSeriesHeader;
     }
 
-    public void setArtwork(ArtworkHolder artwork) {
-        if(artwork == null) {
-            return;
-        }
-
-        setPosterUrl(artwork.getPosterUrl());
-        setBackgroundUrl(artwork.getBackgroundUrl());
+    public void setArtwork(String poster, String background) {
+        setPosterUrl(poster);
+        setBackgroundUrl(background);
     }
 
     public void setArtwork(Movie movie) {

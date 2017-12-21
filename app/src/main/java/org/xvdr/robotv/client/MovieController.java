@@ -27,12 +27,10 @@ public class MovieController {
 
     final private Connection connection;
     final private Handler handler;
-    final private String language;
 
     private Collection<Movie> movieCollection = null;
 
-    public MovieController(Connection connection, String language) {
-        this.language = language;
+    public MovieController(Connection connection) {
         this.connection = connection;
         this.handler = new Handler();
     }
@@ -59,7 +57,7 @@ public class MovieController {
             }
         });
 
-        MovieCollectionLoaderTask loaderTask = new MovieCollectionLoaderTask(connection, language);
+        MovieCollectionLoaderTask loaderTask = new MovieCollectionLoaderTask(connection);
         loaderTask.load(new MovieCollectionLoaderTask.Listener() {
             @Override
             public void onCompleted(Collection<Movie> list) {
@@ -99,7 +97,9 @@ public class MovieController {
         for(Movie m : movieCollection) {
             if (m.getRecordingId() == id) {
                 Log.d(TAG, "updating movie entry " + id);
-                m.setArtwork(holder);
+                if(holder != null) {
+                    m.setArtwork(holder.getPosterUrl(), holder.getBackgroundUrl());
+                }
                 break;
             }
         }
@@ -108,8 +108,8 @@ public class MovieController {
         ArtworkUtils.setMovieArtwork(connection, movie, holder);
     }
 
-    public int renameMovie(Movie movie, String newName) {
-        return connection.renameRecording(movie.getRecordingId(), newName);
+    public void renameMovie(Movie movie, String newName) {
+        connection.renameRecording(movie.getRecordingId(), newName);
     }
 
     public TreeSet<String> getFolderList() {
@@ -131,13 +131,11 @@ public class MovieController {
         return folderList;
     }
 
-    public boolean setPlaybackPosition(Movie movie, long lastPosition) {
+    public void setPlaybackPosition(Movie movie, long lastPosition) {
         Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_SETPOSITION);
 
         p.putString(movie.getRecordingIdString());
         p.putU64(BigInteger.valueOf(lastPosition));
-
-        return (connection.transmitMessage(p) != null);
     }
 
     public long getPlaybackPosition(Movie movie) {

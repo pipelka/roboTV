@@ -5,11 +5,7 @@ import android.util.Log;
 
 import org.robotv.msgexchange.Packet;
 import org.xvdr.robotv.client.model.Movie;
-import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.artwork.ArtworkHolder;
-import org.xvdr.robotv.artwork.ArtworkUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,7 +20,7 @@ class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<M
     private Connection connection;
     private Listener listener;
 
-    MovieCollectionLoaderTask(Connection connection, String language) {
+    MovieCollectionLoaderTask(Connection connection) {
         this.connection = connection;
     }
 

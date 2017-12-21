@@ -46,7 +46,9 @@ public class CoverSearchActivity extends DataServiceActivity {
             service.getMovieController().setMovieArtwork(mMovie, holder);
         }
 
-        mMovie.setArtwork(holder);
+        if(holder != null) {
+            mMovie.setArtwork(holder.getPosterUrl(), holder.getBackgroundUrl());
+        }
 
         Intent intent = new Intent();
         intent.putExtra(EXTRA_MOVIE, mMovie);

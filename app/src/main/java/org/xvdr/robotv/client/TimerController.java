@@ -4,16 +4,98 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.robotv.msgexchange.Packet;
-import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.model.Movie;
 import org.xvdr.robotv.client.model.Timer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class TimerController {
+
+    private static class TimerLoaderTask extends AsyncTask<Void, Void, Collection<Timer>> {
+
+        final Connection connection;
+        final LoaderCallback listener;
+
+        TimerLoaderTask(Connection connection, LoaderCallback listener) {
+            this.connection = connection;
+            this.listener = listener;
+        }
+
+        @Override
+        protected Collection<Timer> doInBackground(Void... params) {
+            Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_GETLIST);
+            Packet response = connection.transmitMessage(request);
+
+            if(response == null) {
+                return null;
+            }
+
+            int count = (int) response.getU32();
+            Collection<Timer> timers = new ArrayList<>(count);
+
+            while(!response.eop()) {
+                Timer timer = PacketAdapter.toTimer(response);
+                timers.add(timer);
+            }
+
+            return timers;
+        }
+
+        @Override
+        protected void onPostExecute(Collection<Timer> result) {
+            if(listener != null) {
+                listener.onTimersUpdated(result);
+            }
+        }
+
+    }
+
+    private static class SearchTimerLoaderTask extends AsyncTask<Void, Void, Collection<Timer>> {
+
+        final Connection connection;
+        final LoaderCallback listener;
+
+        SearchTimerLoaderTask(Connection connection, LoaderCallback listener) {
+            this.connection = connection;
+            this.listener = listener;
+        }
+        @Override
+        protected Collection<Timer> doInBackground(Void... params) {
+            Packet request = connection.CreatePacket(Connection.ROBOTV_SEARCHTIMER_GETLIST);
+            Packet response = connection.transmitMessage(request);
+
+            if(response == null) {
+                return null;
+            }
+
+            response.uncompress();
+
+            int status = (int) response.getU32();
+
+            if(status != 0) {
+                Log.e(TAG, "error loading search timers. status: " + status);
+                return null;
+            }
+
+            Collection<Timer> timers = new ArrayList<>(10);
+
+            while(!response.eop()) {
+                Timer timer = PacketAdapter.toSearchTimer(response);
+                timers.add(timer);
+            }
+
+            return timers;
+        }
+
+        @Override
+        protected void onPostExecute(Collection<Timer> result) {
+            if(listener != null) {
+                listener.onTimersUpdated(result);
+            }
+        }
+
+    }
 
     public interface LoaderCallback {
         void onTimersUpdated(Collection<Timer> timers);
@@ -22,13 +104,11 @@ public class TimerController {
     private static final String TAG = "TimerController";
 
     final private Connection connection;
-    final private String language;
 
     private int priority = 80;
 
-    public TimerController(Connection connection, String language) {
+    public TimerController(Connection connection) {
         this.connection = connection;
-        this.language = language;
     }
 
     public boolean createTimer(Movie movie, String seriesFolder) {
@@ -76,105 +156,12 @@ public class TimerController {
     }
 
     public void loadTimers(final LoaderCallback listener) {
-        AsyncTask<Void, Void, Collection<Timer>> task = new AsyncTask<Void, Void, Collection<Timer>>() {
-
-            @Override
-            protected Collection<Timer> doInBackground(Void... params) {
-                ArtworkFetcher fetcher = new ArtworkFetcher(connection, language);
-                Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_GETLIST);
-                Packet response = connection.transmitMessage(request);
-
-                if(response == null) {
-                    return null;
-                }
-
-                int count = (int) response.getU32();
-                Collection<Timer> timers = new ArrayList<>(count);
-
-                while(!response.eop()) {
-                    Timer timer = PacketAdapter.toTimer(response);
-
-                    ArtworkHolder o = null;
-
-                    try {
-                        if(fetcher.fetchForEvent(timer)) {
-                            timer.setPosterUrl(timer.getBackgroundUrl());
-                        }
-                    }
-                    catch(IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    timers.add(timer);
-                }
-
-                return timers;
-            }
-
-            @Override
-            protected void onPostExecute(Collection<Timer> result) {
-                if(listener != null) {
-                    listener.onTimersUpdated(result);
-                }
-            }
-
-        };
-
+        TimerLoaderTask task = new TimerLoaderTask(connection, listener);
         task.execute();
     }
 
     public void loadSearchTimers(final LoaderCallback listener) {
-        AsyncTask<Void, Void, Collection<Timer>> task = new AsyncTask<Void, Void, Collection<Timer>>() {
-
-            @Override
-            protected Collection<Timer> doInBackground(Void... params) {
-                ArtworkFetcher fetcher = new ArtworkFetcher(connection, language);
-                Packet request = connection.CreatePacket(Connection.ROBOTV_SEARCHTIMER_GETLIST);
-                Packet response = connection.transmitMessage(request);
-
-                if(response == null) {
-                    return null;
-                }
-
-                response.uncompress();
-
-                int status = (int) response.getU32();
-
-                if(status != 0) {
-                    Log.e(TAG, "error loading search timers. status: " + status);
-                    return null;
-                }
-
-                Collection<Timer> timers = new ArrayList<>(10);
-
-                while(!response.eop()) {
-                    Timer timer = PacketAdapter.toSearchTimer(response);
-
-                    ArtworkHolder o = null;
-
-                    try {
-                        fetcher.fetchForEvent(timer);
-                    }
-                    catch(IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    timer.setPosterUrl(timer.getBackgroundUrl());
-                    timers.add(timer);
-                }
-
-                return timers;
-            }
-
-            @Override
-            protected void onPostExecute(Collection<Timer> result) {
-                if(listener != null) {
-                    listener.onTimersUpdated(result);
-                }
-            }
-
-        };
-
+        SearchTimerLoaderTask task = new SearchTimerLoaderTask(connection, listener);
         task.execute();
     }
 

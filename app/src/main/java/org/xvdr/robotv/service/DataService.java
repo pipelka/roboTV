@@ -12,7 +12,6 @@ import org.robotv.msgexchange.Packet;
 import org.robotv.msgexchange.SessionListener;
 import org.xvdr.robotv.R;
 import org.xvdr.robotv.artwork.ArtworkFetcher;
-import org.xvdr.robotv.artwork.ArtworkHolder;
 import org.xvdr.robotv.client.PacketAdapter;
 import org.xvdr.robotv.client.model.Event;
 import org.xvdr.robotv.client.Connection;
@@ -170,8 +169,8 @@ public class DataService extends Service {
         String language = SetupUtils.getLanguage(this);
         artwork = new ArtworkFetcher(connection, language);
 
-        movieController = new MovieController(connection, language);
-        timerController = new TimerController(connection, language);
+        movieController = new MovieController(connection);
+        timerController = new TimerController(connection);
     }
 
     @Override
@@ -358,7 +357,6 @@ public class DataService extends Service {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                ArtworkHolder o = null;
                 String url = timer.getLogoUrl();
 
 
