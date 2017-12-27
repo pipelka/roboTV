@@ -6,7 +6,6 @@ import com.google.android.exoplayer2.upstream.DataSource;
 
 import org.robotv.msgexchange.Packet;
 import org.robotv.msgexchange.SessionListener;
-import org.xvdr.player.PositionReference;
 import org.robotv.client.Connection;
 
 import java.io.IOException;

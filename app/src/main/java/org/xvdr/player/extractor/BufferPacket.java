@@ -1,4 +1,4 @@
-package org.xvdr.player;
+package org.xvdr.player.extractor;
 
 public interface BufferPacket {
 

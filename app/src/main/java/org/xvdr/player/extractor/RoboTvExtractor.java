@@ -13,8 +13,7 @@ import com.google.android.exoplayer2.extractor.SeekMap;
 import com.google.android.exoplayer2.extractor.TrackOutput;
 import com.google.android.exoplayer2.util.TimestampAdjuster;
 
-import org.xvdr.player.BufferPacket;
-import org.xvdr.player.PositionReference;
+import org.xvdr.player.source.PositionReference;
 import org.robotv.client.Connection;
 import org.xvdr.player.StreamBundle;
 

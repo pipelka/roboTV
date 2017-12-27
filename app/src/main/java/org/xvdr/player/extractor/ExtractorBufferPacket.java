@@ -2,8 +2,6 @@ package org.xvdr.player.extractor;
 
 import com.google.android.exoplayer2.extractor.ExtractorInput;
 
-import org.xvdr.player.BufferPacket;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

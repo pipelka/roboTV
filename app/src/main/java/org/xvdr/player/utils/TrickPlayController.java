@@ -1,11 +1,12 @@
-package org.xvdr.player;
+package org.xvdr.player.utils;
 
 import android.os.Handler;
-import android.util.Log;
 
 import com.google.android.exoplayer2.ExoPlayer;
 
-class TrickPlayController {
+import org.xvdr.player.source.PositionReference;
+
+public class TrickPlayController {
 
     final private PositionReference position;
     final private ExoPlayer player;
@@ -23,13 +24,13 @@ class TrickPlayController {
         }
     };
 
-    TrickPlayController(Handler handler, PositionReference position, ExoPlayer player) {
+    public TrickPlayController(Handler handler, PositionReference position, ExoPlayer player) {
         this.position = position;
         this.player = player;
         this.handler = handler;
     }
 
-    void start(float speed) {
+    public void start(float speed) {
         if(speed == 1.0) {
             stop();
             return;
@@ -58,7 +59,7 @@ class TrickPlayController {
         player.seekTo(timeUs / 1000);
     }
 
-    void stop() {
+    public void stop() {
         if(!started) {
             return;
         }
@@ -69,17 +70,17 @@ class TrickPlayController {
         player.setPlayWhenReady(true);
     }
 
-    void reset() {
+    public void reset() {
         handler.removeCallbacks(doTick);
         playbackSpeed = 1;
         started = false;
     }
 
-    void postTick() {
+    public void postTick() {
         handler.postDelayed(doTick, 100);
     }
 
-    boolean activated() {
+    public boolean activated() {
         return started;
     }
 }

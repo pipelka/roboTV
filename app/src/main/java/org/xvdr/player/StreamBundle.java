@@ -6,6 +6,8 @@ import android.util.SparseIntArray;
 
 import com.google.android.exoplayer2.util.MimeTypes;
 
+import org.xvdr.player.extractor.BufferPacket;
+
 import java.util.ArrayList;
 
 public class StreamBundle extends ArrayList<StreamBundle.Stream> {

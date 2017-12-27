@@ -1,6 +1,4 @@
-package org.xvdr.player;
-
-import com.google.android.exoplayer2.C;
+package org.xvdr.player.source;
 
 public class PositionReference {
 
@@ -10,9 +8,7 @@ public class PositionReference {
     private long endPosition;
     private long currentPosition;
 
-    static private long saneWindowMs = 3 * 60 * 60 * 1000;
-
-    PositionReference() {
+    public PositionReference() {
         reset();
     }
 
@@ -34,7 +30,7 @@ public class PositionReference {
         return startPosition;
     }
 
-    public void setStartPosition(long pos) {
+    void setStartPosition(long pos) {
         if(!isPositionSane(pos)) {
             return;
         }
@@ -42,7 +38,7 @@ public class PositionReference {
         startPosition = pos;
     }
 
-    long getDuration() {
+    public long getDuration() {
         return endPosition - startPosition;
     }
 
@@ -50,7 +46,7 @@ public class PositionReference {
         return endPosition;
     }
 
-    public void setEndPosition(long pos) {
+    void setEndPosition(long pos) {
         if(!isPositionSane(pos)) {
             return;
         }
@@ -64,10 +60,11 @@ public class PositionReference {
     }
 
     private boolean isPositionSane(long pos) {
+        long saneWindowMs = 3 * 60 * 60 * 1000;
         return (Math.abs(currentPosition - pos) <= saneWindowMs);
     }
 
-    long timeUsFromPosition(long position) {
+    public long timeUsFromPosition(long position) {
         return timeUs + (position - currentPosition) * 1000;
     }
 
