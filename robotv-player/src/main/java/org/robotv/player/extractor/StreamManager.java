@@ -1,4 +1,4 @@
-package org.xvdr.player.extractor;
+package org.robotv.player.extractor;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,7 +10,7 @@ import com.google.android.exoplayer2.extractor.TrackOutput;
 import com.google.android.exoplayer2.source.SampleQueue;
 import com.google.android.exoplayer2.util.MimeTypes;
 
-import org.xvdr.player.StreamBundle;
+import org.robotv.player.StreamBundle;
 
 import java.util.Collections;
 import java.util.Comparator;

@@ -16,7 +16,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
 
-import org.xvdr.player.Player;
+import org.robotv.player.Player;
+import org.robotv.player.StreamBundle;
 import org.xvdr.recordings.fragment.PlaybackOverlayFragment;
 import org.xvdr.recordings.fragment.VideoDetailsFragment;
 import org.robotv.client.model.Movie;
@@ -25,7 +26,6 @@ import org.xvdr.robotv.R;
 import org.xvdr.robotv.service.DataService;
 import org.xvdr.robotv.service.NotificationHandler;
 import org.xvdr.robotv.setup.SetupUtils;
-import org.xvdr.player.StreamBundle;
 import org.xvdr.ui.DataServiceActivity;
 
 import java.io.IOException;
@@ -111,7 +111,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         int playerState = mPlayer.getPlaybackState();
         int state = PlaybackState.STATE_NONE;
 
-        if(playerState == ExoPlayer.STATE_BUFFERING) {
+        if(playerState == com.google.android.exoplayer2.Player.STATE_BUFFERING) {
             state = PlaybackState.STATE_BUFFERING;
         }
         else if(mPlayer.isPaused()) {
@@ -128,7 +128,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     }
 
     private void initViews() {
-        SurfaceView mVideoView = (SurfaceView) findViewById(R.id.videoView);
+        SurfaceView mVideoView = findViewById(R.id.videoView);
         mPlayer.setSurface(mVideoView.getHolder().getSurface());
         mSelectedMovie = (Movie) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
 
@@ -188,7 +188,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if(playWhenReady && (playbackState == ExoPlayer.STATE_READY)) {
+        if(playWhenReady && (playbackState == com.google.android.exoplayer2.Player.STATE_READY)) {
             mControls.startProgressAutomation();
         }
     }
@@ -287,7 +287,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     @Override
     public void onConnected(DataService service) {
         // check if thats a service reconnect
-        if(mPlayer != null && mPlayer.getPlaybackState() > ExoPlayer.STATE_IDLE) {
+        if(mPlayer != null && mPlayer.getPlaybackState() > com.google.android.exoplayer2.Player.STATE_IDLE) {
             return;
         }
 

@@ -1,4 +1,4 @@
-package org.xvdr.player;
+package org.robotv.player;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.os.ConditionVariable;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
+
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -31,11 +32,11 @@ import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
-import org.xvdr.player.extractor.RoboTvExtractor;
-import org.xvdr.player.source.PositionReference;
-import org.xvdr.player.source.RoboTvDataSourceFactory;
 import org.robotv.client.Connection;
-import org.xvdr.player.utils.TrickPlayController;
+import org.robotv.player.extractor.RoboTvExtractor;
+import org.robotv.player.source.PositionReference;
+import org.robotv.player.source.RoboTvDataSourceFactory;
+import org.robotv.player.utils.TrickPlayController;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-include ':app', ':msgexchange', ':robotv-client'
+include ':app', ':msgexchange', ':robotv-client', ':robotv-player'
 include ':extension-ffmpeg'
 
 project(':extension-ffmpeg').projectDir = new File(settingsDir, 'extensions/ffmpeg')

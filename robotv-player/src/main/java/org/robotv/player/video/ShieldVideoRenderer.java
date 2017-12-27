@@ -1,4 +1,4 @@
-package org.xvdr.player.video;
+package org.robotv.player.video;
 
 import android.content.Context;
 import android.media.MediaCodec;

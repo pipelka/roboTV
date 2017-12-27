@@ -1,4 +1,4 @@
-package org.xvdr.player.extractor;
+package org.robotv.player.extractor;
 
 import com.google.android.exoplayer2.extractor.ExtractorInput;
 
@@ -25,11 +25,11 @@ class ExtractorBufferPacket implements BufferPacket {
         buffer.clear();
     }
 
-    public int position() {
+    int position() {
         return buffer.position();
     }
 
-    public void read(ExtractorInput input, int length) throws IOException, InterruptedException {
+    void read(ExtractorInput input, int length) throws IOException, InterruptedException {
         input.readFully(data(), 0, length);
         rewind();
     }

@@ -26,7 +26,8 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.exoplayer2.util.MimeTypes;
 
-import org.xvdr.player.Player;
+import org.robotv.player.Player;
+import org.robotv.player.StreamBundle;
 import org.xvdr.recordings.activity.PlayerActivity;
 import org.robotv.client.model.Movie;
 import org.xvdr.recordings.presenter.ActionPresenterSelector;
@@ -34,7 +35,6 @@ import org.xvdr.recordings.presenter.ColorAction;
 import org.xvdr.recordings.presenter.DetailsDescriptionPresenter;
 import org.xvdr.recordings.util.Utils;
 import org.xvdr.robotv.R;
-import org.xvdr.player.StreamBundle;
 
 import java.util.Locale;
 

@@ -1,10 +1,10 @@
-package org.xvdr.player.utils;
+package org.robotv.player.utils;
 
 import android.os.Handler;
 
 import com.google.android.exoplayer2.ExoPlayer;
 
-import org.xvdr.player.source.PositionReference;
+import org.robotv.player.source.PositionReference;
 
 public class TrickPlayController {
 

@@ -1,4 +1,4 @@
-package org.xvdr.player;
+package org.robotv.player;
 
 import android.content.Context;
 import android.os.Handler;
@@ -16,7 +16,7 @@ import com.google.android.exoplayer2.metadata.MetadataOutput;
 import com.google.android.exoplayer2.text.TextOutput;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
-import org.xvdr.player.video.VideoRendererFactory;
+import org.robotv.player.video.VideoRendererFactory;
 
 import java.util.ArrayList;
 

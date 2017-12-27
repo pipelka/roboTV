@@ -16,10 +16,10 @@ import android.view.Surface;
 
 import com.google.android.exoplayer2.Format;
 
-import org.xvdr.player.Player;
+import org.robotv.player.Player;
+import org.robotv.player.StreamBundle;
 import org.xvdr.robotv.R;
 import org.robotv.client.Connection;
-import org.xvdr.player.StreamBundle;
 import org.xvdr.robotv.setup.SetupUtils;
 import org.xvdr.robotv.tv.TrackInfoMapper;
 import org.xvdr.sync.SyncUtils;
@@ -313,10 +313,10 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         }
     }
 
-    private boolean tune(Uri channelUri) {
+    private void tune(Uri channelUri) {
         if(mPlayer == null) {
             Log.d(TAG, "tune: mPlayer == null ?");
-            return false;
+            return;
         }
 
         Log.i(TAG, "onTune: " + channelUri);
@@ -327,7 +327,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         // get information (id's) of the channel
         if(!SyncUtils.getChannelInfo(mContentResolver, channelUri, holder)) {
             mNotification.error(getResources().getString(R.string.channel_not_found));
-            return false;
+            return;
         }
 
         // set current channel uri
@@ -341,7 +341,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         mPlayer.play();
 
         Log.i(TAG, "successfully switched channel");
-        return true;
     }
 
     private Resources getResources() {

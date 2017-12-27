@@ -1,4 +1,4 @@
-package org.xvdr.player;
+package org.robotv.player;
 
 import android.util.Log;
 import android.util.SparseArray;
@@ -6,7 +6,7 @@ import android.util.SparseIntArray;
 
 import com.google.android.exoplayer2.util.MimeTypes;
 
-import org.xvdr.player.extractor.BufferPacket;
+import org.robotv.player.extractor.BufferPacket;
 
 import java.util.ArrayList;
 
