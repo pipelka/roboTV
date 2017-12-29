@@ -58,6 +58,7 @@ public class ChannelSyncAdapter {
     private ContentResolver resolver;
     private OkHttpClient client;
     private ProgressCallback progressCallback = null;
+    private boolean cancelled = false;
 
     public ChannelSyncAdapter(Connection connection, Context context, String inputId) {
         this.context = context;
@@ -95,6 +96,10 @@ public class ChannelSyncAdapter {
         Log.d(TAG, String.format("syncing %d channels", list.size()));
 
         for(Channel entry : list) {
+
+            if(cancelled) {
+                return;
+            }
 
             // skip obsolete channels
             if(entry.getName().endsWith("OBSOLETE")) {
@@ -201,6 +206,11 @@ public class ChannelSyncAdapter {
         new Channels().load(connection, language, new Channels.Callback() {
             @Override
             public boolean onChannel(final Channel entry) {
+
+                if(cancelled) {
+                    return false;
+                }
+
                 final Uri uri = existingChannels.get(entry.getNumber());
 
                 if(uri != null) {
@@ -285,6 +295,11 @@ public class ChannelSyncAdapter {
 
         // fetch epg entries for each channel
         for(SortedMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
+
+            if(cancelled) {
+                return;
+            }
+
             Log.d(TAG, String.format("importing EPG of channel %d", pair.getKey()));
 
             syncChannelEPG(
@@ -351,6 +366,14 @@ public class ChannelSyncAdapter {
                 cursor.close();
             }
         }
+    }
+
+    void reset() {
+        cancelled = false;
+    }
+
+    void cancel() {
+        cancelled = true;
     }
 
     private static Uri getUriToResource(@NonNull Context context, @AnyRes int resId) throws Resources.NotFoundException {
