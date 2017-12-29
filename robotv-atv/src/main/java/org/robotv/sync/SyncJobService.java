@@ -23,6 +23,8 @@ public class SyncJobService extends JobService {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
+            adapter.reset();
+
             if(!isCancelled()) {
                 adapter.syncChannels();
             }
@@ -36,6 +38,10 @@ public class SyncJobService extends JobService {
             }
 
             return !isCancelled();
+        }
+
+        void cancelJob() {
+            adapter.cancel();
         }
     }
 
@@ -73,6 +79,7 @@ public class SyncJobService extends JobService {
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
         if(syncTask != null) {
+            syncTask.cancelJob();
             syncTask.cancel(true);
         }
 
