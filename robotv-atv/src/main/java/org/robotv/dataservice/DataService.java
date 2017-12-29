@@ -408,6 +408,7 @@ public class DataService extends Service {
                 new ComponentName(this, SyncJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPeriodic(1000 * 60 * 60 * 3) // 3 hours
+                .setPersisted(true)
                 .build();
 
         Log.d(TAG, "added sync job to scheduler");

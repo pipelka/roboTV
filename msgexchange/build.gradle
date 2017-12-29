@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion project.ext.compileSdkVersion
+    buildToolsVersion project.ext.buildToolsVersion
     
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 27
+        minSdkVersion project.ext.minSdkVersion
+        targetSdkVersion project.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -14,7 +15,7 @@ android {
         ndk {
             moduleName "msgexchange_jni"
             abiFilters 'x86', 'armeabi-v7a'
-            stl "gnustl_shared"
+            stl "gnustl_static"
         }
 
         externalNativeBuild {
