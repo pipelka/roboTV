@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<tv-input xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="org.xvdr.robotv.setup.SettingsActivity"
-    android:setupActivity="org.xvdr.robotv.setup.SetupActivity" />
