@@ -269,7 +269,7 @@ public class Event implements Serializable {
     }
 
     public String getTitle() {
-        return title;
+        return title == null ? "" : title;
     }
 
     public String getShortText() {
