@@ -142,8 +142,7 @@ public class ChannelSyncAdapter {
             // insert new channel
             if(channelUri == null) {
                 Log.d(TAG, String.format("adding new channel %d - %s", entry.getNumber(), entry.getName()));
-                channelUri = resolver.insert(TvContract.Channels.CONTENT_URI, values);
-                fetchChannelLogo(channelUri, entry.getIconURL());
+                resolver.insert(TvContract.Channels.CONTENT_URI, values);
             }
             // update existing channel
             else {
