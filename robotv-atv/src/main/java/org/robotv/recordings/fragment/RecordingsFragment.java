@@ -21,6 +21,7 @@ import android.view.View;
 
 import com.bumptech.glide.Glide;
 
+import org.robotv.client.model.Event;
 import org.robotv.recordings.activity.DetailsActivity;
 import org.robotv.recordings.activity.SearchActivity;
 import org.robotv.recordings.model.EpisodeTimer;
@@ -165,13 +166,9 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
         setOnItemViewSelectedListener(new OnItemViewSelectedListener() {
             @Override
             public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                if(item instanceof Movie) {
-                    Movie movie = (Movie) item;
-                    updateBackground(movie.getBackgroundUrl());
-                }
-                else if(item instanceof Timer) {
-                    Timer timer = (Timer) item;
-                    updateBackground(timer.getPosterUrl());
+                if(item instanceof Event) {
+                    Event event = (Event) item;
+                    updateBackground(event.getBackgroundUrl());
                 }
             }
         });
@@ -198,9 +195,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     @Override
     public void onStart() {
         super.onStart();
-        if(!TextUtils.isEmpty(backgroundUrl)) {
-            updateBackground(backgroundUrl);
-        }
+        updateBackground(backgroundUrl);
     }
 
     @Override
@@ -236,6 +231,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
                 }
 
                 startEntranceTransition();
+                updateBackground(backgroundUrl);
                 break;
         }
     }
