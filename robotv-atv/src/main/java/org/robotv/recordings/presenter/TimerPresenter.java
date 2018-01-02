@@ -77,10 +77,12 @@ public class TimerPresenter extends Presenter {
             }
 
             Glide.with(cardView.getContext())
-                    .load(TextUtils.isEmpty(timer.getPosterUrl()) ? timer.getLogoUrl() : timer.getPosterUrl())
+                    .load(TextUtils.isEmpty(timer.getBackgroundUrl()) ? timer.getLogoUrl() : timer.getBackgroundUrl())
                     .centerCrop()
                     .error(drawableUnknown)
                     .placeholder(drawableUnknown)
+                    .override(391, 220)
+                    .centerCrop()
                     .into(new SimpleTarget<GlideDrawable>() {
                         @Override
                         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
