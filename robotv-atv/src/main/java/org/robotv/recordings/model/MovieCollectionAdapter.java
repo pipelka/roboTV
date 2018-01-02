@@ -343,8 +343,13 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         // add or replace timers
         int index = 0;
         for(Timer timer: newTimers) {
+            if(timer == null) {
+                continue;
+            }
+
             if(index < timerAdapter.size()) {
-                if(!timerAdapter.get(index).equals(timer)) {
+                Timer t = (Timer) timerAdapter.get(index);
+                if(t != null && !t.equals(timer)) {
                     timerAdapter.replace(index, timer);
                 }
             }
