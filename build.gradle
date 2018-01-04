@@ -23,7 +23,7 @@ allprojects {
         compileSdkVersion=27
         targetSdkVersion=27
         buildToolsVersion='27.0.1'
-        exoPlayerVersion='2.6.0'
+        exoPlayerVersion='2.6.1'
         supportVersion='27.0.2'
     }
 }
