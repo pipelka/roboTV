@@ -10,9 +10,8 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.SurfaceView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.exoplayer2.Format;
 
 import org.robotv.player.Player;
@@ -26,6 +25,7 @@ import org.robotv.dataservice.DataService;
 import org.robotv.dataservice.NotificationHandler;
 import org.robotv.setup.SetupUtils;
 import org.robotv.ui.DataServiceActivity;
+import org.robotv.ui.GlideApp;
 
 import java.io.IOException;
 
@@ -85,11 +85,14 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         String url = movie.getPosterUrl();
 
         if(!TextUtils.isEmpty(url)) {
-            Glide.with(this).load(url).asBitmap()
+            GlideApp.with(this)
+            .asBitmap()
+            .load(url)
             .override(Utils.dpToPx(R.integer.artwork_poster_width, this), Utils.dpToPx(R.integer.artwork_poster_height, this))
-            .centerCrop().into(new SimpleTarget<Bitmap>() {
+            .centerCrop()
+            .into(new SimpleTarget<Bitmap>() {
                 @Override
-                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
                     metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, resource);
                     MediaMetadata m = metadataBuilder.build();
                     mSession.setMetadata(m);
@@ -181,8 +184,6 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         if(mPlayer != null) {
             mPlayer.release();
         }
-
-        Glide.get(this).clearMemory();
     }
 
     @Override

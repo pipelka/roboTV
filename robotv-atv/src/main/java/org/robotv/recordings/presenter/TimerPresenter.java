@@ -11,10 +11,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.robotv.recordings.model.EpisodeTimer;
 import org.robotv.recordings.util.Utils;
@@ -23,6 +21,7 @@ import org.robotv.client.artwork.ArtworkFetcher;
 import org.robotv.client.Connection;
 import org.robotv.client.model.Timer;
 import org.robotv.setup.SetupUtils;
+import org.robotv.ui.GlideApp;
 
 import java.io.IOException;
 
@@ -64,13 +63,12 @@ public class TimerPresenter extends Presenter {
         @Override
         protected void onPostExecute(String url) {
             if(!TextUtils.isEmpty(timer.getLogoUrl())) {
-                Glide.with(cardView.getContext())
+                GlideApp.with(cardView.getContext())
                         .load(timer.getLogoUrl())
-                        .error(drawableUnknown)
-                        .placeholder(drawableUnknown)
-                        .into(new SimpleTarget<GlideDrawable>() {
+                        .placeholder(R.drawable.recording_unkown)
+                        .into(new SimpleTarget<Drawable>() {
                             @Override
-                            public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                            public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
                                 cardView.setBadgeImage(resource);
                             }
                         });
@@ -85,16 +83,16 @@ public class TimerPresenter extends Presenter {
 
             cardView.setMainImage(drawableUnknown);
 
-            Glide.with(cardView.getContext())
+            GlideApp.with(cardView.getContext())
                     .load(imageUrl)
                     .error(drawableUnknown)
                     .placeholder(drawableUnknown)
                     .fallback(drawableUnknown)
                     .override(391, 220)
                     .centerCrop()
-                    .into(new SimpleTarget<GlideDrawable>() {
+                    .into(new SimpleTarget<Drawable>() {
                         @Override
-                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                        public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
                             cardView.setMainImage(resource);
                         }
                     });

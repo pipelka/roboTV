@@ -19,6 +19,7 @@ import org.robotv.client.model.Movie;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.setup.SetupUtils;
+import org.robotv.ui.GlideApp;
 
 import java.io.IOException;
 
@@ -50,7 +51,7 @@ public class MoviePresenter extends Presenter {
                 return;
             }
 
-            Glide.with(mCardView.getContext())
+            GlideApp.with(mCardView.getContext())
             .load(link)
             .override(266, 400)
             .centerCrop()

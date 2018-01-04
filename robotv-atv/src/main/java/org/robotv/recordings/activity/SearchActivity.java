@@ -34,7 +34,6 @@ public class SearchActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Glide.get(this).clearMemory();
     }
 
     @Override

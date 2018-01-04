@@ -14,11 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.robotv.robotv.R;
+import org.robotv.ui.GlideApp;
 
 public class NotificationHandler {
 
@@ -56,15 +56,16 @@ public class NotificationHandler {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                Glide.with(mContext)
-                        .load(imageUrl).asBitmap().centerCrop()
+                GlideApp.with(mContext)
+                        .load(imageUrl)
                         .error(R.drawable.ic_info_outline_white_48dp)
-                        .into(new SimpleTarget<Bitmap>() {
+                        .into(new SimpleTarget<Drawable>() {
                             @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                NotificationHandler.this.notify(message, title, new BitmapDrawable(mContext.getResources(), resource));
+                            public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                                NotificationHandler.this.notify(message, title, resource);
                             }
                         });
+                ;
             }
         });
     }

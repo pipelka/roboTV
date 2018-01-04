@@ -1,8 +1,6 @@
 package org.robotv.ui;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,13 +8,13 @@ import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.text.TextUtils;
 
-import com.bumptech.glide.Glide;
-
 import org.robotv.client.model.Movie;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.dataservice.DataService;
 import org.robotv.client.MovieController;
+
+import static org.robotv.robotv.R.drawable.recording_unkown;
 
 public class MovieStepFragment extends GuidedStepFragment {
 
@@ -29,18 +27,16 @@ public class MovieStepFragment extends GuidedStepFragment {
 
     private void getArtwork(Activity activity, String url) {
         try {
-            Bitmap bitmap = Glide.with(activity)
-                    .load(url).asBitmap()
-                    .error(activity.getDrawable(R.drawable.recording_unkown))
-                    .into(
+            drawable = GlideApp.with(activity)
+                    .load(url)
+                    .error(recording_unkown)
+                    .submit(
                             Utils.dp(R.integer.artwork_background_width, activity),
                             Utils.dp(R.integer.artwork_background_height, activity)).get();
-
-            drawable = new BitmapDrawable(activity.getResources(), bitmap);
         }
         catch(Exception e) {
             e.printStackTrace();
-            drawable = activity.getDrawable(R.drawable.recording_unkown);
+            drawable = activity.getDrawable(recording_unkown);
         }
     }
 

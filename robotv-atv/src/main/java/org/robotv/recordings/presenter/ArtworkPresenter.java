@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.artwork.ArtworkHolder;
+import org.robotv.ui.GlideApp;
 
 
 public class ArtworkPresenter extends Presenter {
@@ -33,7 +34,7 @@ public class ArtworkPresenter extends Presenter {
                 return;
             }
 
-            Glide.with(context)
+            GlideApp.with(context)
             .load(link)
             .override(266, 400)
             .centerCrop()

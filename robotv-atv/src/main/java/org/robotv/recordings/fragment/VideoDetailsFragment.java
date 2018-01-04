@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
@@ -25,8 +26,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.robotv.client.RelatedContentExtractor;
 import org.robotv.recordings.activity.CoverSearchActivity;
@@ -43,6 +44,7 @@ import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.model.Event;
 import org.robotv.dataservice.DataService;
+import org.robotv.ui.GlideApp;
 import org.robotv.ui.MovieStepFragment;
 
 import java.util.Arrays;
@@ -178,8 +180,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
             return;
         }
 
-        Glide.with(getActivity())
-        .load(url).asBitmap()
+        GlideApp.with(getActivity())
+        .load(url)
         .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
         .into(backgroundManagerTarget);
     }
@@ -284,17 +286,15 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
             row.setImageDrawable(getResources().getDrawable(R.drawable.recording_unkown, null));
         }
         else {
-            SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>() {
+            SimpleTarget<Drawable> target = new SimpleTarget<Drawable>() {
                 @Override
-                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    if(resource != null) {
-                        row.setImageBitmap(getActivity(), resource);
-                    }
+                public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                    row.setImageDrawable(resource);
                 }
             };
 
-            Glide.with(getActivity())
-                    .load(url).asBitmap()
+            GlideApp.with(getActivity())
+                    .load(url)
                     .override(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()), Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
                     .error(getResources().getDrawable(R.drawable.recording_unkown, null))
                     .placeholder(getResources().getDrawable(R.drawable.recording_unkown, null))

@@ -1,7 +1,7 @@
 package org.robotv.recordings.fragment;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,9 +21,8 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.util.Log;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.exoplayer2.util.MimeTypes;
 
 import org.robotv.player.Player;
@@ -35,6 +34,7 @@ import org.robotv.recordings.presenter.ColorAction;
 import org.robotv.recordings.presenter.DetailsDescriptionPresenter;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
+import org.robotv.ui.GlideApp;
 
 import java.util.Locale;
 
@@ -47,10 +47,10 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         this.player = player;
     }
 
-    private SimpleTarget<Bitmap> controlsRowTarget = new SimpleTarget<Bitmap>() {
+    private SimpleTarget<Drawable> controlsRowTarget = new SimpleTarget<Drawable>() {
         @Override
-        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-            mPlaybackControlsRow.setImageBitmap(PlaybackOverlayFragment.this.getActivity(), resource);
+        public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+            mPlaybackControlsRow.setImageDrawable(resource);
             mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
         }
     };
@@ -154,8 +154,8 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
             return;
         }
 
-        Glide.with(getActivity())
-        .load(url).asBitmap()
+        GlideApp.with(getActivity())
+        .load(url)
         .override(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()),
                 Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
         .into(controlsRowTarget);

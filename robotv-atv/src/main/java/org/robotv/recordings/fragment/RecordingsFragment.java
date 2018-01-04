@@ -38,6 +38,7 @@ import org.robotv.dataservice.DataService;
 import org.robotv.client.MovieController;
 import org.robotv.dataservice.NotificationHandler;
 import org.robotv.setup.SetupUtils;
+import org.robotv.ui.GlideApp;
 
 import java.util.Collection;
 
@@ -74,7 +75,7 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
 
         backgroundUrl = url;
 
-        Glide.with(this).load(url).asBitmap()
+        GlideApp.with(this).load(url)
             .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
             .into(backgroundManagerTarget);
     }
@@ -103,8 +104,8 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
         if(!backgroundManager.isAttached()) {
             backgroundManager.attach(getActivity().getWindow());
 
-            backgroundManager.setColor(color_background);
-            backgroundManager.setDimLayer(new ColorDrawable(Utils.getColor(getActivity(), R.color.dim_background)));
+            /*backgroundManager.setColor(color_background);
+            backgroundManager.setDimLayer(new ColorDrawable(Utils.getColor(getActivity(), R.color.dim_background)));*/
         }
 
         if(backgroundManagerTarget == null) {

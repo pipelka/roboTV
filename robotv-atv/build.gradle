@@ -39,8 +39,9 @@ android {
 
 dependencies {
     compile "com.android.support:leanback-v17:${project.ext.supportVersion}"
-    compile 'com.github.bumptech.glide:glide:3.8.0'
-    compile 'com.github.bumptech.glide:okhttp3-integration:1.5.0@aar'
+    compile "com.github.bumptech.glide:glide:${project.ext.glideVersion}"
+    annotationProcessor "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
+    compile "com.github.bumptech.glide:okhttp3-integration:${project.ext.glideVersion}@aar"
     compile "com.android.support:support-core-utils:${project.ext.supportVersion}"
     compile "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
     compile project(path: ':msgexchange')

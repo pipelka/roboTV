@@ -25,6 +25,7 @@ allprojects {
         buildToolsVersion='27.0.1'
         exoPlayerVersion='2.6.1'
         supportVersion='27.0.2'
+        glideVersion='4.4.0'
     }
 }
 

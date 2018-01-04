@@ -24,7 +24,6 @@ public class RecordingsActivity extends DataServiceActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Glide.get(this).clearMemory();
     }
 
     @Override
