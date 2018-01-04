@@ -76,11 +76,20 @@ public class TimerPresenter extends Presenter {
                         });
             }
 
+            String imageUrl = TextUtils.isEmpty(timer.getBackgroundUrl()) ? timer.getLogoUrl() : timer.getBackgroundUrl();
+
+            if(TextUtils.isEmpty(imageUrl) || imageUrl.equals("x")) {
+                cardView.setMainImage(drawableUnknown);
+                return;
+            }
+
+            cardView.setMainImage(drawableUnknown);
+
             Glide.with(cardView.getContext())
-                    .load(TextUtils.isEmpty(timer.getBackgroundUrl()) ? timer.getLogoUrl() : timer.getBackgroundUrl())
-                    .centerCrop()
+                    .load(imageUrl)
                     .error(drawableUnknown)
                     .placeholder(drawableUnknown)
+                    .fallback(drawableUnknown)
                     .override(391, 220)
                     .centerCrop()
                     .into(new SimpleTarget<GlideDrawable>() {
