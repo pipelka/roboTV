@@ -68,7 +68,6 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
 
     private void updateBackground(String url) {
         if(TextUtils.isEmpty(url) || !url.endsWith(".jpg")) {
-            backgroundManager.setDrawable(null);
             backgroundManager.setColor(color_background);
             return;
         }
@@ -76,7 +75,6 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
         backgroundUrl = url;
 
         GlideApp.with(this).load(url)
-            .error(new ColorDrawable(Utils.getColor(getActivity(), R.color.recordings_background)))
             .into(backgroundManagerTarget);
     }
 
@@ -103,9 +101,6 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
 
         if(!backgroundManager.isAttached()) {
             backgroundManager.attach(getActivity().getWindow());
-
-            /*backgroundManager.setColor(color_background);
-            backgroundManager.setDimLayer(new ColorDrawable(Utils.getColor(getActivity(), R.color.dim_background)));*/
         }
 
         if(backgroundManagerTarget == null) {
