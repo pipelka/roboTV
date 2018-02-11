@@ -47,6 +47,7 @@ import org.robotv.dataservice.DataService;
 import org.robotv.ui.GlideApp;
 import org.robotv.ui.MovieStepFragment;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -402,13 +403,25 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
 
     @Override
     public void onConnected(DataService service) {
+        Log.d(TAG, "intent: " + getActivity().getIntent().toString());
+
         VideoDetailsFragment.this.service = service;
 
         int brandColor = Utils.getColor(getActivity(), R.color.episode_header_color);
         setBrandColor(brandColor);
 
+        Intent intent = getActivity().getIntent();
+        String action = intent.getAction();
+
+        if(action != null && action.equals("android.intent.action.VIEW")) {
+            selectedMovie = Serializable.fr
+        }
         if(selectedMovie == null) {
-            selectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
+            Log.d(TAG, "action: " + intent.getAction());
+            Log.d(TAG, "data: " + intent.getDataString());
+            Serializable s = intent.getSerializableExtra(EXTRA_MOVIE);
+            Log.d(TAG, "extra: " + s.toString());
+            selectedMovie = (Movie) s;
         }
 
         if(selectedMovie.isTvShow()) {
