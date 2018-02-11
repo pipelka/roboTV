@@ -130,4 +130,6 @@
     <string name="edit_recording">Edit recording</string>
     <string name="recording_deleted">Recording deleted</string>
     <string name="delete_search_timer">Delete search timer</string>
+    <string name="search_label">roboTV Movies</string>
+    <string name="search_settings_description">Recorded movies provided by roboTV</string>
 </resources>
