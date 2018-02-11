@@ -109,4 +109,16 @@ public class SetupUtils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         return prefs.getString("inputId", null);
     }
+
+    public static boolean getTunneledVideoPlaybackEnabled(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        return prefs.getBoolean("videotunneledplayback", false);
+    }
+
+    public static void setTunneledVideoPlaybackEnabled(Context context, boolean enabled) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        SharedPreferences.Editor e = prefs.edit();
+        e.putBoolean("videotunneledplayback", enabled);
+        e.apply();
+    }
 }
