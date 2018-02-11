@@ -75,7 +75,7 @@ public class SetupUtils {
 
     public static boolean getTimeshiftEnabled(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        return prefs.getBoolean("timeshift", false);
+        return prefs.getBoolean("timeshift", true);
     }
 
     static void setTimeshiftEnabled(Context context, boolean timeshift) {
