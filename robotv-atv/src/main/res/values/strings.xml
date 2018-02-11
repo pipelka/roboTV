@@ -123,4 +123,6 @@
     <string name="timer_add_all_episodes">Record all episodes</string>
     <string name="record_all_episodes">Scheduling all episodes</string>
     <string name="season_episode">Season %d, Episode %d</string>
+    <string name="search_label">roboTV Movies</string>
+    <string name="search_settings_description">Recorded movies provided by roboTV</string>
 </resources>
