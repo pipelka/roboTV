@@ -27,11 +27,13 @@ public class SetupFragment extends GuidedStepFragment {
     static final int ACTION_PASSTHROUGH = 6;
     static final int ACTION_TIMESHIFT = 8;
     static final int ACTION_SHIELD_WORKAROUND = 9;
+    static final int ACTION_TUNNELEDPLAYBACK = 10;
 
     private GuidedAction mActionServer;
     private GuidedAction mActionLanguage;
     private GuidedAction mActionPassthrough;
     private GuidedAction mActionTimeshift;
+    private GuidedAction mActionTunneledPlayback;
 
     @NonNull
     @Override
@@ -71,6 +73,13 @@ public class SetupFragment extends GuidedStepFragment {
                 .checked(SetupUtils.getPassthrough(getActivity()))
                 .build();
 
+        mActionTunneledPlayback = new GuidedAction.Builder(getActivity())
+                .id(ACTION_TUNNELEDPLAYBACK)
+                .title(getString(R.string.setup_tunneled_playback))
+                .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
+                .checked(SetupUtils.getPassthrough(getActivity()))
+                .build();
+
         mActionTimeshift = new GuidedAction.Builder(getActivity())
                 .id(ACTION_TIMESHIFT)
                 .title(getString(R.string.setup_root_timeshift_title))
@@ -86,6 +95,8 @@ public class SetupFragment extends GuidedStepFragment {
         if (audioCapabilities.supportsEncoding(AudioFormat.ENCODING_AC3)) {
             actions.add(mActionPassthrough);
         }
+
+        actions.add(mActionTunneledPlayback);
 
         actions.add(mActionTimeshift);
 
@@ -130,6 +141,10 @@ public class SetupFragment extends GuidedStepFragment {
 
         boolean timeshift = SetupUtils.getTimeshiftEnabled(getActivity());
         mActionTimeshift.setChecked(timeshift);
+
+        mActionTunneledPlayback.setChecked(
+                SetupUtils.getTunneledVideoPlaybackEnabled(getActivity())
+        );
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
@@ -146,6 +161,10 @@ public class SetupFragment extends GuidedStepFragment {
 
             case ACTION_PASSTHROUGH:
                 SetupUtils.setPassthrough(getActivity(), action.isChecked());
+                break;
+
+            case ACTION_TUNNELEDPLAYBACK:
+                SetupUtils.setTunneledVideoPlaybackEnabled(getActivity(), action.isChecked());
                 break;
 
             case ACTION_TIMESHIFT:
