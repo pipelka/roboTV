@@ -87,11 +87,7 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
         return Uri.parse("robotv://recording/" + recordingId + "?position=" + position);
     }
 
-    public Player(Context context, String server, String language, Listener listener) throws IOException {
-        this(context, server, language, listener, false);
-    }
-
-    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough) throws IOException {
+    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, boolean videlTunneledPlayback) throws IOException {
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
         this.listener = listener;
@@ -107,7 +103,10 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
 
         DefaultTrackSelector trackSelector = new DefaultTrackSelector();
         trackSelector.setParameters(new DefaultTrackSelector.Parameters().withPreferredAudioLanguage(language));
-        trackSelector.setTunnelingAudioSessionId(C.generateAudioSessionIdV21(context));
+
+        if(videlTunneledPlayback) {
+            trackSelector.setTunnelingAudioSessionId(C.generateAudioSessionIdV21(context));
+        }
 
         player = ExoPlayerFactory.newSimpleInstance(
                 new RoboTvRenderersFactory(context, audioPassthrough),
