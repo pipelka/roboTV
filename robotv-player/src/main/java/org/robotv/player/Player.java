@@ -78,6 +78,7 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
     final private TrickPlayController trickPlayController;
     final private ConditionVariable openConditionVariable;
     final private String server;
+    final private ExtractorMediaSource.Factory extractorMediaSourceFactory;
 
     static public Uri createLiveUri(int channelUid) {
         return Uri.parse("robotv://livetv/" + channelUid);
@@ -128,6 +129,9 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
         dataSourceFactory = new RoboTvDataSourceFactory(position, language, this);
         extractorFactory = new RoboTvExtractor.Factory(position, this, language, passthrough);
         trickPlayController = new TrickPlayController(handler, position, player);
+
+        extractorMediaSourceFactory = new ExtractorMediaSource.Factory(dataSourceFactory);
+        extractorMediaSourceFactory.setExtractorsFactory(extractorFactory);
     }
 
     public void release() {
@@ -184,13 +188,7 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
             return;
         }
 
-        MediaSource source = new ExtractorMediaSource(
-                uri,
-                dataSourceFactory,
-                extractorFactory,
-                handler, null
-        );
-
+        MediaSource source = extractorMediaSourceFactory.createMediaSource(uri);
         player.prepare(source);
     }
 
