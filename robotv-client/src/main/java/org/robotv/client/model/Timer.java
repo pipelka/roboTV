@@ -10,9 +10,9 @@ public class Timer extends Event {
     private int lifeTime;
     private int searchTimerId;
     private int recordingId;
-    private String logoUrl;
-    private String posterUrl;
-    private String folder;
+    private String logoUrl = "";
+    private String posterUrl = "";
+    private String folder = "";
 
     static public int preStartRecording = 2 * 60;
     static public int postEndRecording = 5 * 60;
