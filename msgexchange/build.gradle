@@ -2,8 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion project.ext.compileSdkVersion
-    buildToolsVersion project.ext.buildToolsVersion
-    
+
     defaultConfig {
         minSdkVersion project.ext.minSdkVersion
         targetSdkVersion project.ext.targetSdkVersion
@@ -20,7 +19,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_PLATFORM=android-21", "-DANDROID_TOOLCHAIN=gcc", "-DANDROID_STL=gnustl_static"
+                arguments "-DANDROID_PLATFORM=android-21", "-DANDROID_STL=c++_static"
             }
         }
     }
