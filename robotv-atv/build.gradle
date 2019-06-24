@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion project.ext.compileSdkVersion
-    buildToolsVersion project.ext.buildToolsVersion
 
     signingConfigs {
         release {
@@ -34,7 +33,6 @@ android {
         }
     }
 
-    buildToolsVersion "${project.ext.buildToolsVersion}"
 }
 
 dependencies {
