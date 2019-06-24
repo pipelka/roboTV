@@ -48,6 +48,6 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:support-core-utils:${project.ext.supportVersion}"
-    compile "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
+    implementation "com.android.support:support-core-utils:${project.ext.supportVersion}"
+    implementation "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
 }

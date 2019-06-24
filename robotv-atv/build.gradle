@@ -36,13 +36,13 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:leanback-v17:${project.ext.supportVersion}"
-    compile "com.github.bumptech.glide:glide:${project.ext.glideVersion}"
+    implementation "com.android.support:leanback-v17:${project.ext.supportVersion}"
+    implementation "com.github.bumptech.glide:glide:${project.ext.glideVersion}"
     annotationProcessor "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
-    compile "com.github.bumptech.glide:okhttp3-integration:${project.ext.glideVersion}@aar"
-    compile "com.android.support:support-core-utils:${project.ext.supportVersion}"
-    compile "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
-    compile project(path: ':msgexchange')
-    compile project(path: ':robotv-client')
-    compile project(path: ':robotv-player')
+    implementation "com.github.bumptech.glide:okhttp3-integration:${project.ext.glideVersion}@aar"
+    implementation "com.android.support:support-core-utils:${project.ext.supportVersion}"
+    implementation "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
+    implementation project(path: ':msgexchange')
+    implementation project(path: ':robotv-client')
+    implementation project(path: ':robotv-player')
 }
