@@ -137,7 +137,8 @@ public class ChannelSyncAdapter {
                 values.put(TvContract.Channels.COLUMN_APP_LINK_ICON_URI, "");
             }
 
-            Uri channelUri = existingChannels.get(entry.getNumber());
+            //Uri channelUri = existingChannels.get(entry.getNumber());
+            Uri channelUri = null;
 
             // insert new channel
             if(channelUri == null) {
