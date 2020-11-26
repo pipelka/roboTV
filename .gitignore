@@ -32,3 +32,5 @@ captures
 extensions/ffmpeg/.externalNativeBuild
 extensions/ffmpeg/extension-ffmpeg.iml
 msgexchange/.externalNativeBuild
+extensions/ffmpeg/.cxx
+msgexchange/.cxx
