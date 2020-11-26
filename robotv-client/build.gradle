@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion project.ext.compileSdkVersion
+    ndkVersion project.ext.ndkVersion
 
     defaultConfig {
         minSdkVersion project.ext.minSdkVersion
@@ -22,7 +23,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-
 }
 
 dependencies {

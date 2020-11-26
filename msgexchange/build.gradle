@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion project.ext.compileSdkVersion
-    ndkVersion "22.0.6917172"
+    ndkVersion project.ext.ndkVersion
 
     defaultConfig {
         minSdkVersion project.ext.minSdkVersion
@@ -16,12 +16,6 @@ android {
             moduleName "msgexchange_jni"
             abiFilters 'x86', 'armeabi-v7a'
             stl "gnustl_static"
-        }
-
-        externalNativeBuild {
-            cmake {
-                arguments "-DANDROID_PLATFORM=android-21", "-DANDROID_STL=c++_static"
-            }
         }
     }
 

@@ -15,7 +15,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion project.ext.compileSdkVersion
-    ndkVersion "22.0.6917172"
+    ndkVersion project.ext.ndkVersion
 
     defaultConfig {
         minSdkVersion project.ext.minSdkVersion
@@ -27,16 +27,9 @@ android {
             abiFilters 'x86', 'armeabi-v7a'
             stl "gnustl_shared"
         }
-
-        externalNativeBuild {
-            cmake {
-                arguments "-DANDROID_PLATFORM=android-21", "-DANDROID_STL=c++_static"
-            }
-        }
     }
 
     sourceSets.main {
-        //jniLibs.srcDir 'src/main/cpp/ffmpeg/libs'
         jni.srcDirs = [] // Disable the automatic ndk-build call by Android Studio.
     }
 
