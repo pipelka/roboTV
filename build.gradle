@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         classpath 'org.ajoberstar:grgit:1.1.0'
     }
 }
@@ -20,11 +20,11 @@ allprojects {
     }
     project.ext {
         minSdkVersion=22
-        compileSdkVersion=27
+        compileSdkVersion=28
         targetSdkVersion=24
-        buildToolsVersion='27.0.3'
+        buildToolsVersion='27.0.0'
         exoPlayerVersion='2.6.1'
-        supportVersion='27.0.2'
+        supportVersion='27.0.0'
         glideVersion='4.4.0'
     }
 }

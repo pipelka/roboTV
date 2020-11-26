@@ -32,6 +32,11 @@ android {
             archivesBaseName = "robotv"
         }
     }
+    ndkVersion '21.1.6352462'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 
 }
 
