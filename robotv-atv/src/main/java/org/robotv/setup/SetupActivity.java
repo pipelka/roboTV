@@ -55,7 +55,7 @@ public class SetupActivity extends Activity {
             @Override
             public void run() {
                 channelSync.setProgressCallback(progress);
-                channelSync.syncChannels();
+                channelSync.syncChannels(true);
                 mConnection.close();
 
                 new DataServiceClient(SetupActivity.this, new DataService.Listener() {
