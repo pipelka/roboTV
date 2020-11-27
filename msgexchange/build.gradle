@@ -14,8 +14,7 @@ android {
 
         ndk {
             moduleName "msgexchange_jni"
-            abiFilters 'x86', 'armeabi-v7a'
-            stl "gnustl_static"
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
         }
     }
 
