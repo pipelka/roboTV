@@ -135,6 +135,8 @@ public class MovieController {
 
         p.putString(movie.getRecordingIdString());
         p.putU64(BigInteger.valueOf(lastPosition));
+
+        connection.transmitMessage(p);
     }
 
     public long getPlaybackPosition(Movie movie) {
