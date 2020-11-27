@@ -326,7 +326,7 @@ void releaseContext(AVCodecContext *context) {
     return;
   }
   AVAudioResampleContext *resampleContext;
-  if (resampleContext = (AVAudioResampleContext *)context->opaque) {
+  if ((resampleContext = (AVAudioResampleContext *)context->opaque)) {
     avresample_free(&resampleContext);
     context->opaque = NULL;
   }
