@@ -26,7 +26,7 @@ public class SyncJobService extends JobService {
             adapter.reset();
 
             if(!isCancelled()) {
-                adapter.syncChannels();
+                adapter.syncChannels(false);
             }
 
             if(!isCancelled()) {
