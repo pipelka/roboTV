@@ -23,9 +23,9 @@ allprojects {
         compileSdkVersion=28
         ndkVersion='21.1.6352462'
         targetSdkVersion=24
-        buildToolsVersion='27.0.0'
+        buildToolsVersion='27.0.3'
         exoPlayerVersion='2.6.1'
-        supportVersion='27.0.0'
+        supportVersion='27.0.2'
         glideVersion='4.4.0'
     }
 }
