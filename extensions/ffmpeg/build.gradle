@@ -24,8 +24,7 @@ android {
 
         ndk {
             moduleName "ffmpeg"
-            abiFilters 'x86', 'armeabi-v7a'
-            stl "gnustl_shared"
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
         }
     }
 

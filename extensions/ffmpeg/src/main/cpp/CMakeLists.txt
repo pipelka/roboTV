@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.6)
  
 if( "${CMAKE_ANDROID_ARCH_ABI}" STREQUAL "x86" )
     set(FFMPEG_LIBDIR "${CMAKE_SOURCE_DIR}/ffmpeg/libs/x86")
-else()
+elseif( "${CMAKE_ANDROID_ARCH_ABI}" STREQUAL "armeabi-v7a" )
     set(FFMPEG_LIBDIR "${CMAKE_SOURCE_DIR}/ffmpeg/libs/armeabi-v7a")
+elseif( "${CMAKE_ANDROID_ARCH_ABI}" STREQUAL "arm64-v8a" )
+    set(FFMPEG_LIBDIR "${CMAKE_SOURCE_DIR}/ffmpeg/libs/arm64-v8a")
 endif()
 
 
