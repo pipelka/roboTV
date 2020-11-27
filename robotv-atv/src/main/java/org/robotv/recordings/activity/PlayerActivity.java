@@ -177,7 +177,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
 
         stopPlayback();
