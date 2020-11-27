@@ -20,6 +20,7 @@ import android.util.Log;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.model.Channel;
+import org.robotv.setup.SetupActivity;
 import org.robotv.setup.SetupUtils;
 import org.robotv.client.Channels;
 import org.robotv.client.Connection;
@@ -52,11 +53,11 @@ public class ChannelSyncAdapter {
 
     private static final String TAG = "ChannelSyncAdapter";
 
-    private Context context;
-    private Connection connection;
-    private String inputId;
-    private ContentResolver resolver;
-    private OkHttpClient client;
+    private final Context context;
+    private final Connection connection;
+    private final String inputId;
+    private final ContentResolver resolver;
+    private final OkHttpClient client;
     private ProgressCallback progressCallback = null;
     private boolean cancelled = false;
 
@@ -76,7 +77,14 @@ public class ChannelSyncAdapter {
         progressCallback = callback;
     }
 
-    public void syncChannels() {
+    public void syncChannels(boolean cleanup) {
+        // remove all channels (do a total resync)
+        if(cleanup) {
+            Log.i(TAG, "removing channels ...");
+            Uri uri = TvContract.buildChannelsUriForInput(this.inputId);
+            resolver.delete(uri, null, null);
+        }
+
         Log.i(TAG, "syncing channel list ...");
 
         // fetch existing channel list
@@ -87,7 +95,6 @@ public class ChannelSyncAdapter {
 
         Channels list = new Channels();
         String language = SetupUtils.getLanguageISO3(context);
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
         list.load(connection, language);
 
@@ -137,8 +144,8 @@ public class ChannelSyncAdapter {
                 values.put(TvContract.Channels.COLUMN_APP_LINK_ICON_URI, "");
             }
 
-            //Uri channelUri = existingChannels.get(entry.getNumber());
-            Uri channelUri = null;
+            // add/update channel
+            Uri channelUri = existingChannels.get(entry.getNumber());
 
             // insert new channel
             if(channelUri == null) {
@@ -148,20 +155,8 @@ public class ChannelSyncAdapter {
             // update existing channel
             else {
                 Log.d(TAG, String.format("updating channel %d - %s", entry.getNumber(), entry.getName()));
-                ops.add(ContentProviderOperation.newUpdate(channelUri).withValues(values).build());
+                resolver.update(channelUri, values, null, null);
                 existingChannels.remove(entry.getNumber());
-            }
-
-            if(ops.size() == 100) {
-                Log.d(TAG, "batch commiting changes");
-
-                try {
-                    context.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
-                } catch (RemoteException | OperationApplicationException e) {
-                    Log.e(TAG, "batch operation failed !");
-                }
-
-                ops.clear();
             }
 
             if (progressCallback != null) {
@@ -172,21 +167,10 @@ public class ChannelSyncAdapter {
         }
 
         // remove orphaned channels
-
         Log.d(TAG, String.format("removing %d orphaned channels", existingChannels.size()));
 
         for(SortedMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
-            ops.add(ContentProviderOperation.newDelete(pair.getValue()).build());
-        }
-
-        // push pending operations
-
-        Log.d(TAG, "batch commiting final changes");
-        try {
-            context.getContentResolver().applyBatch(TvContract.AUTHORITY, ops);
-        }
-        catch(RemoteException | OperationApplicationException e) {
-            Log.e(TAG, "Failed to update EPG for channel !", e);
+            resolver.delete(pair.getValue(), null, null);
         }
 
         if(progressCallback != null) {
@@ -350,20 +334,11 @@ public class ChannelSyncAdapter {
         Uri channelUri = TvContract.buildChannelsUriForInput(inputId);
         String[] projection = {TvContract.Channels._ID, TvContract.Channels.COLUMN_DISPLAY_NUMBER};
 
-        Cursor cursor = null;
-
-        try {
-            cursor = resolver.query(channelUri, projection, null, null, null);
-
-            while(cursor != null && cursor.moveToNext()) {
+        try (Cursor cursor = resolver.query(channelUri, projection, null, null, null)) {
+            while (cursor != null && cursor.moveToNext()) {
                 long channelId = cursor.getLong(0);
                 int number = Integer.parseInt(cursor.getString(1));
                 existingChannels.put(number, TvContract.buildChannelUri(channelId));
-            }
-        }
-        finally {
-            if(cursor != null) {
-                cursor.close();
             }
         }
     }
