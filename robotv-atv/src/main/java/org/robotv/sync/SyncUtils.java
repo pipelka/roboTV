@@ -268,8 +268,7 @@ public class SyncUtils {
 
         Log.d(TAG, String.format("Fetching %s EPG entries for channel %d - %s", (appendEntries ? "new" : "all"), holder.displayNumber, holder.displayName));
 
-        //long last = appendEntries ? getLastProgramEndTimeMillis(resolver, holder.channelUri) / 1000 : 0;
-        long last = getLastProgramEndTimeMillis(resolver, holder.channelUri) / 1000;
+        long last = appendEntries ? getLastProgramEndTimeMillis(resolver, holder.channelUri) / 1000 : 0;
 
         if(last > start) {
             start = last;
