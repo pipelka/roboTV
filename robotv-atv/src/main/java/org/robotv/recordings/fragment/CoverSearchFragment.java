@@ -53,6 +53,8 @@ public class CoverSearchFragment extends SearchFragment implements SearchFragmen
 
                     HeaderItem header = new HeaderItem(title);
                     ListRow listRow = new ListRow(header, listRowAdapter);
+
+                    mRowsAdapter.clear();
                     mRowsAdapter.add(listRow);
 
                     listRowAdapter.addAll(0, list);
