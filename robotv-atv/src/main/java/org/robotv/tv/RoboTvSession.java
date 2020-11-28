@@ -24,7 +24,6 @@ import org.robotv.client.Connection;
 import org.robotv.setup.SetupUtils;
 import org.robotv.sync.SyncUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,18 +32,17 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     private static final String TAG = "TVSession";
 
     private Uri mCurrentChannelUri;
-    private String mInputId;
 
-    private Player mPlayer;
-    private TvInputService mContext;
+    private final Player mPlayer;
+    private final TvInputService mContext;
 
-    private Handler mHandler;
-    private NotificationHandler mNotification;
+    private final Handler mHandler;
+    private final NotificationHandler mNotification;
 
     private class TuneRunnable implements Runnable {
-        private Uri mChannelUri;
+        private final Uri mChannelUri;
 
-        void setChannelUri(Uri channelUri) {
+        TuneRunnable(Uri channelUri) {
             mChannelUri = channelUri;
         }
 
@@ -54,39 +52,31 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         }
     }
 
-    private TuneRunnable mTune = new TuneRunnable();
+    private final ContentResolver mContentResolver;
 
-    private ContentResolver mContentResolver;
-
-    RoboTvSession(TvInputService context, String inputId) {
+    RoboTvSession(TvInputService context/*, String inputId*/) {
         super(context);
+
         mContext = context;
-        mInputId = inputId;
         mContentResolver =  mContext.getContentResolver();
-
         mNotification = new NotificationHandler(mContext);
-
         mHandler = new Handler();
 
         // player init
-        try {
-            mPlayer = new Player(
-                mContext,
-                SetupUtils.getServer(mContext),                       // Server
-                SetupUtils.getLanguageISO3(mContext),                 // Language
-                this,                                          // Listener
-                SetupUtils.getPassthrough(mContext),                  // AC3 passthrough
-                SetupUtils.getTunneledVideoPlaybackEnabled(mContext)
-            );
-        }
-        catch(IOException e) {
-            mNotification.error(getResources().getString(R.string.connect_unable));
-            e.printStackTrace();
-        }
+        mPlayer = new Player(
+            mContext,
+            SetupUtils.getServer(mContext),                       // Server
+            SetupUtils.getLanguageISO3(mContext),                 // Language
+            this,                                          // Listener
+            SetupUtils.getPassthrough(mContext),                  // AC3 passthrough
+            SetupUtils.getTunneledVideoPlaybackEnabled(mContext)
+        );
     }
 
     @Override
     public void onRelease() {
+        Log.i(TAG, "release");
+
         if(mPlayer != null) {
             mPlayer.release();
         }
@@ -98,8 +88,15 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
             return false;
         }
 
-        Log.i(TAG, "set surface");
-        mPlayer.setSurface(surface);
+        if(surface == null) {
+            Log.i(TAG, "set null surface");
+            mPlayer.pause();
+        }
+        else {
+            Log.i(TAG, "set surface");
+            mPlayer.setSurface(surface);
+        }
+
         return true;
     }
 
@@ -117,25 +114,13 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public boolean onTune(final Uri channelUri) {
-        Log.d(TAG, "postTune: " + channelUri.toString());
-        postTune(channelUri, 0);
+        tune(channelUri);
         return true;
     }
 
-    private void postTune(final Uri channelUri, long delayMillis) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
-            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
-        }
-
-        // remove pending tune request
-        mHandler.removeCallbacks(mTune);
-
-        if(channelUri != null) {
-            mTune.setChannelUri(channelUri);
-        }
-
-        // post new tune request
-        mHandler.postDelayed(mTune, delayMillis);
+    private void scheduleRetune() {
+        // post re-tune request
+        mHandler.postDelayed(new TuneRunnable(mCurrentChannelUri), 10000);
     }
 
     @Override
@@ -220,7 +205,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL);
         mNotification.error(getResources().getString(R.string.connection_lost));
 
-        postTune(null, 10 * 1000);
+        scheduleRetune();
     }
 
     @Override
@@ -290,6 +275,10 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     @Override
     public void onRenderedFirstFrame() {
         notifyVideoAvailable();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
+            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+        }
     }
 
     @Override
@@ -305,7 +294,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
             case Connection.STATUS_CONNECTION_FAILED:
                 mNotification.notify(getResources().getString(R.string.failed_connect));
-                postTune(null, 10 * 1000);
+                scheduleRetune();
                 break;
 
             default:
@@ -322,7 +311,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         Log.i(TAG, "onTune: " + channelUri);
 
-        // create chennl placeholder
+        // create channel placeholder
         SyncUtils.ChannelHolder holder = new SyncUtils.ChannelHolder();
 
         // get information (id's) of the channel
@@ -338,7 +327,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         Uri uri = Player.createLiveUri(holder.channelUid);
 
         // start playback
-        mPlayer.openSync(uri);
+        mPlayer.open(uri);
         mPlayer.play();
 
         Log.i(TAG, "successfully switched channel");
