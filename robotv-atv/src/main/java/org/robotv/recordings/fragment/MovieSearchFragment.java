@@ -36,21 +36,27 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
             Packet req = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_SEARCH, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
             req.putString(query);
 
-            Packet resp = mConnection.transmitMessage(req);
+            final Packet resp = mConnection.transmitMessage(req);
 
-            // no results
-            if(resp == null || resp.eop()) {
-                HeaderItem header = new HeaderItem(getString(R.string.no_search_results, query));
-                ListRow listRow = new ListRow(header, new ArrayObjectAdapter());
-                mRowsAdapter.add(listRow);
-                return;
-            }
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mRowsAdapter.clear();
 
-            // results
-            while(!resp.eop()) {
-                Movie movie = PacketAdapter.toMovie(resp);
-                mRowsAdapter.add(movie);
-            }
+                    // no results
+                    if (resp == null || resp.eop()) {
+                        HeaderItem header = new HeaderItem(getString(R.string.no_search_results, query));
+                        ListRow listRow = new ListRow(header, new ArrayObjectAdapter());
+                        mRowsAdapter.add(listRow);
+                    } else {
+                        // results
+                        while (!resp.eop()) {
+                            Movie movie = PacketAdapter.toMovie(resp);
+                            mRowsAdapter.add(movie);
+                        }
+                    }
+                }
+            });
         }
 
         void setSearchQuery(String newQuery) {
