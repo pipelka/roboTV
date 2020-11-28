@@ -18,7 +18,7 @@ public class RoboTvInputService extends TvInputService {
 
     @Override
     public final Session onCreateSession(String inputId) {
-        return new RoboTvSession(this, inputId);
+        return new RoboTvSession(this);
     }
 
     @Override
