@@ -68,7 +68,7 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
         void onStreamError(int status);
     }
 
-    private Listener listener;
+    private final Listener listener;
     private Handler handler;
 
     final private SimpleExoPlayer player;
@@ -88,7 +88,7 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
         return Uri.parse("robotv://recording/" + recordingId + "?position=" + position);
     }
 
-    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, boolean videlTunneledPlayback) throws IOException {
+    public Player(Context context, String server, String language, Listener listener, boolean audioPassthrough, boolean videlTunneledPlayback) {
         AudioCapabilities audioCapabilities = AudioCapabilities.getCapabilities(context);
 
         this.listener = listener;
@@ -135,14 +135,13 @@ public class Player implements com.google.android.exoplayer2.Player.EventListene
     }
 
     public void release() {
-        stop();
-
-        handler = null;
-
         player.removeListener(this);
+
+        stop();
         player.release();
 
         dataSourceFactory.release();
+        handler = null;
     }
 
     public void setSurface(Surface surface) {
