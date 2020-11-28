@@ -50,20 +50,14 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
         mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
 
-        try {
-            mPlayer = new Player(
-                this,
-                SetupUtils.getServer(this),                       // Server
-                SetupUtils.getLanguageISO3(this),                 // Language
-                this,                                      // Listener
-                SetupUtils.getPassthrough(this),                  // AC3 passthrough
-                SetupUtils.getTunneledVideoPlaybackEnabled(this)
-            );
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-            return;
-        }
+        mPlayer = new Player(
+            this,
+            SetupUtils.getServer(this),                       // Server
+            SetupUtils.getLanguageISO3(this),                 // Language
+            this,                                      // Listener
+            SetupUtils.getPassthrough(this),                  // AC3 passthrough
+            SetupUtils.getTunneledVideoPlaybackEnabled(this)
+        );
 
         mControls.setPlayer(mPlayer);
 
