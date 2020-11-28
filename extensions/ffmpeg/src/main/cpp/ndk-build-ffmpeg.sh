@@ -14,19 +14,36 @@ rm -Rf include
 
 [ -d ffmpeg ] || ( git clone git://source.ffmpeg.org/ffmpeg ffmpeg && cd ffmpeg && git checkout b96a6e2 && cd .. )
 
-# armeabi-v7a
+# arm64-v8a
+
+TOOLCHAIN_PREFIX="${NDK_PATH}/toolchains/llvm/prebuilt/linux-x86_64"
+SYSROOT="${TOOLCHAIN_PREFIX}/sysroot"
+CROSS_PREFIX="${TOOLCHAIN_PREFIX}/bin/"
+
+NDK_ABIARCH=aarch64-linux-android
 
 cd ffmpeg
+
+make clean | true
+find . -name "*.o" | xargs rm > /dev/null 2>&1
+
 ./configure \
+    --cross-prefix=$CROSS_PREFIX \
     --prefix=.. \
-    --libdir=../libs/armeabi-v7a \
-    --arch=arm \
-    --cpu=armv7-a \
-    --cross-prefix="${NDK_PATH}/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-" \
+    --libdir=../libs/arm64-v8a \
+    --enable-cross-compile \
+    --arch=arm64 \
+    --cpu=cortex-a57 \
     --target-os=android \
-    --sysroot="${NDK_PATH}/platforms/android-22/arch-arm/" \
-    --extra-cflags="-march=armv7-a -mfloat-abi=softfp" \
-    --extra-ldflags="-Wl,--fix-cortex-a8" \
+    --sysroot="${SYSROOT}" \
+    --extra-cflags="-march=armv8-a -O3" \
+    --extra-ldflags="" \
+    --cc="${CROSS_PREFIX}${NDK_ABIARCH}21-clang" \
+    --cxx="${CROSS_PREFIX}${NDK_ABIARCH}21-clang++" \
+    --nm="${CROSS_PREFIX}${NDK_ABIARCH}-nm" \
+    --ld="${CROSS_PREFIX}${NDK_ABIARCH}21-clang" \
+    --ar="${CROSS_PREFIX}${NDK_ABIARCH}-ar" \
+    --strip="${CROSS_PREFIX}${NDK_ABIARCH}-strip" \
     --extra-ldexeflags=-pie \
     --disable-static \
     --disable-neon \
@@ -45,31 +62,39 @@ cd ffmpeg
     --enable-decoder=aac_latm \
     --enable-decoder=ac3 \
     --enable-decoder=eac3 \
-    --enable-decoder=mp3
-
-make clean
-find . -name "*.o" | xargs rm
+    --enable-decoder=mp3 || \
+    exit 1
 
 make -j4
 make install-libs
 
+make clean
+find . -name "*.o" | xargs rm
 
-# x86
+# armeabi-v7a
+
+NDK_ABIARCH=arm-linux-androideabi
 
 ./configure \
+    --cross-prefix=$CROSS_PREFIX \
     --prefix=.. \
-    --libdir=../libs/x86 \
-    --arch=x86 \
-    --cpu=i686 \
-    --cross-prefix="${NDK_PATH}/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-" \
+    --libdir=../libs/armeabi-v7a \
+    --enable-cross-compile \
+    --arch=arm \
+    --cpu=armv7-a \
     --target-os=android \
-    --sysroot="${NDK_PATH}/platforms/android-22/arch-x86/" \
-    --extra-cflags="-std=c99 -O3 -Wall -fpic -pipe -DANDROID -DNDEBUG -march=atom -msse3 -ffast-math -mfpmath=sse" \
-    --extra-ldflags="-lm -lz -Wl,--no-undefined -Wl,-z,noexecstack" \
-    --enable-version3 \
-    --enable-pic \
-    --disable-asm \
+    --sysroot="${SYSROOT}" \
+    --extra-cflags="-march=armv7-a -mfloat-abi=softfp -O3" \
+    --extra-ldflags="" \
+    --cc="${CROSS_PREFIX}armv7a-linux-androideabi21-clang" \
+    --cxx="${CROSS_PREFIX}armv7a-linux-androideabi21-clang++" \
+    --nm="${CROSS_PREFIX}${NDK_ABIARCH}-nm" \
+    --ld="${CROSS_PREFIX}armv7a-linux-androideabi21-clang" \
+    --ar="${CROSS_PREFIX}${NDK_ABIARCH}-ar" \
+    --strip="${CROSS_PREFIX}${NDK_ABIARCH}-strip" \
+    --extra-ldexeflags=-pie \
     --disable-static \
+    --disable-neon \
     --enable-shared \
     --disable-doc \
     --disable-programs \
@@ -85,11 +110,13 @@ make install-libs
     --enable-decoder=aac_latm \
     --enable-decoder=ac3 \
     --enable-decoder=eac3 \
-    --enable-decoder=mp3
+    --enable-decoder=mp3 || \
+    exit 1
+
+make -j4
+make install-libs
 
 make clean
 find . -name "*.o" | xargs rm
 
-make -j4
-make install-libs
 make install-headers
