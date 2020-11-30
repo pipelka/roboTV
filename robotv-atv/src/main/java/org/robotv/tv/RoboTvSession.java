@@ -9,7 +9,6 @@ import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
@@ -77,9 +76,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     public void onRelease() {
         Log.i(TAG, "release");
 
-        if(mPlayer != null) {
-            mPlayer.release();
-        }
+        mPlayer.release();
     }
 
     @Override
@@ -90,13 +87,12 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         if(surface == null) {
             Log.i(TAG, "set null surface");
-            mPlayer.pause();
-        }
-        else {
-            Log.i(TAG, "set surface");
-            mPlayer.setSurface(surface);
+            mPlayer.stop();
+            return true;
         }
 
+        Log.i(TAG, "set surface");
+        mPlayer.setSurface(surface);
         return true;
     }
 
@@ -198,10 +194,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public void onDisconnect() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
-            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_UNAVAILABLE);
-        }
-
+        notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_UNAVAILABLE);
         notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL);
         mNotification.error(getResources().getString(R.string.connection_lost));
 
@@ -275,10 +268,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     @Override
     public void onRenderedFirstFrame() {
         notifyVideoAvailable();
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && SetupUtils.getTimeshiftEnabled(mContext)) {
-            notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
-        }
+        notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
     }
 
     @Override
