@@ -397,11 +397,9 @@ public class DataService extends Service {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if(jobScheduler.getPendingJob(SYNC_JOB_ID) != null && !force) {
-                Log.d(TAG, "sync job already pending");
-                return;
-            }
+        if(jobScheduler.getPendingJob(SYNC_JOB_ID) != null && !force) {
+            Log.d(TAG, "sync job already pending");
+            return;
         }
 
         JobInfo jobInfo = new JobInfo.Builder(SYNC_JOB_ID,
