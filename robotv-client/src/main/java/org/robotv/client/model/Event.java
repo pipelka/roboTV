@@ -205,9 +205,6 @@ public class Event implements Serializable {
         this.contentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
         this.channelUid = channelUid;
 
-        // trim & replace special chars
-        plot = plot.trim().replace("\\n", " ");
-
         if(!TextUtils.isEmpty(title)) {
             this.title = title.trim();
         }
@@ -216,9 +213,11 @@ public class Event implements Serializable {
             this.shortText = subTitle.trim();
         }
 
-        if(!TextUtils.isEmpty(plot)) {
-            this.description = plot;
-        }
+        // trim & replace special chars
+        plot = (plot == null) ? "" : plot;
+        plot = plot.trim().replace("\\n", " ");
+
+        this.description = plot;
 
         this.duration = durationSec;
         this.eventId = eventId;
