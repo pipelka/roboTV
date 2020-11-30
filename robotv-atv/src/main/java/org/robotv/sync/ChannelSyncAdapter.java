@@ -134,15 +134,11 @@ public class ChannelSyncAdapter {
             values.put(TvContract.Channels.COLUMN_TYPE, TvContract.Channels.TYPE_DVB_S2);
             values.put(TvContract.Channels.COLUMN_SEARCHABLE, 1);
             values.put(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA, Integer.toString(entry.getUid()));
-
-            // channel link needs Android M
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                values.put(TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI, getUriToResource(context, R.drawable.banner_timers).toString());
-                values.put(TvContract.Channels.COLUMN_APP_LINK_INTENT_URI, link);
-                values.put(TvContract.Channels.COLUMN_APP_LINK_TEXT, context.getString(R.string.timer_title));
-                values.put(TvContract.Channels.COLUMN_APP_LINK_COLOR, Utils.getColor(context, R.color.primary_color));
-                values.put(TvContract.Channels.COLUMN_APP_LINK_ICON_URI, "");
-            }
+            values.put(TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI, getUriToResource(context, R.drawable.banner_timers).toString());
+            values.put(TvContract.Channels.COLUMN_APP_LINK_INTENT_URI, link);
+            values.put(TvContract.Channels.COLUMN_APP_LINK_TEXT, context.getString(R.string.timer_title));
+            values.put(TvContract.Channels.COLUMN_APP_LINK_COLOR, Utils.getColor(context, R.color.primary_color));
+            values.put(TvContract.Channels.COLUMN_APP_LINK_ICON_URI, "");
 
             // add/update channel
             Uri channelUri = existingChannels.get(entry.getNumber());
