@@ -283,7 +283,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
                 break;
 
             case Connection.STATUS_CONNECTION_FAILED:
-                mNotification.notify(getResources().getString(R.string.failed_connect));
                 scheduleRetune();
                 break;
 
