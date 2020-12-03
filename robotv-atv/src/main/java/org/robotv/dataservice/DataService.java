@@ -6,7 +6,6 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -51,6 +50,7 @@ public class DataService extends Service {
 
     private int connectionStatus = STATUS_Server_NotConnected;
     private String seriesFolder = null;
+    private boolean wasConnected = false;
 
     public interface Listener {
         void onConnected(DataService service);
@@ -95,9 +95,7 @@ public class DataService extends Service {
                 case Connection.XVDR_STATUS_TIMERCHANGE:
                     if(!p.eop()) {
                         Timer timer = PacketAdapter.toTimer(p);
-                        if(timer != null) {
-                            onTimerAdded(timer);
-                        }
+                        onTimerAdded(timer);
                     }
                     postOnTimersUpdate();
                     break;
@@ -111,18 +109,24 @@ public class DataService extends Service {
         }
     };
 
-    private Runnable mOpenRunnable = new Runnable() {
+    private final Runnable mOpenRunnable = new Runnable() {
         @Override
         public void run() {
             if(!open()) {
                 if(!TextUtils.isEmpty(SetupUtils.getServer(DataService.this))) {
-                    notification.error(getResources().getString(R.string.failed_connect));
+                    if(wasConnected) {
+                        notification.error(getResources().getString(R.string.failed_connect));
+                    }
+                    wasConnected = false;
                 }
                 handler.postDelayed(mOpenRunnable, 10 * 1000);
                 return;
             }
 
-            notification.notify(getResources().getString(R.string.service_connected));
+            if(!wasConnected) {
+                notification.notify(getResources().getString(R.string.service_connected));
+                wasConnected = true;
+            }
         }
     };
 
@@ -164,7 +168,7 @@ public class DataService extends Service {
         handlerThread = new HandlerThread("dataservice");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
-        listenerHandler = new Handler();
+        listenerHandler = new Handler(handlerThread.getLooper()); // TODO - use handlerThread ?
 
         notification = new NotificationHandler(this);
 
