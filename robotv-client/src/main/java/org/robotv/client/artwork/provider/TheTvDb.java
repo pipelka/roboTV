@@ -19,6 +19,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class TheTvDb extends HttpArtworkProvider {
 
@@ -27,7 +28,7 @@ public class TheTvDb extends HttpArtworkProvider {
     private final static String imageBaseUrl = "http://www.thetvdb.com/banners/";
     private final static String apiKey = "201D2A17712E85AF";
 
-    private String language;
+    private final String language;
     static private String token;
     static private long tokenTimestamp;
 
@@ -84,12 +85,19 @@ public class TheTvDb extends HttpArtworkProvider {
             return false;
         }
 
-        JSONObject o;
+        JSONObject o = null;
         try {
-            o = new JSONObject(response.body().string());
+            ResponseBody body = response.body();
+            if(body != null) {
+                o = new JSONObject(body.string());
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
+            return false;
+        }
+
+        if(o == null) {
             return false;
         }
 
@@ -122,9 +130,12 @@ public class TheTvDb extends HttpArtworkProvider {
         JSONObject o;
 
         try {
-            String responseString = response.body().string();
+            ResponseBody body = response.body();
+            if(body == null) {
+                return null;
+            }
 
-            o = new JSONObject(responseString);
+            o = new JSONObject(body.string());
             JSONArray data = o.optJSONArray("data");
 
             if(data == null) {
@@ -145,7 +156,7 @@ public class TheTvDb extends HttpArtworkProvider {
     }
 
     @Override
-    protected ArtworkHolder searchMovie(Event event) throws IOException {
+    protected ArtworkHolder searchMovie(Event event) {
         // only tv shows for tvdb
         return null;
     }
@@ -200,9 +211,12 @@ public class TheTvDb extends HttpArtworkProvider {
     }
 
     public List<ArtworkHolder> searchAll(String title) {
-        login();
-
         List<ArtworkHolder> result = new ArrayList<>();
+
+        if(!login()) {
+            return result;
+        }
+
         int id = search(title);
 
         if(id == 0) {
@@ -253,8 +267,10 @@ public class TheTvDb extends HttpArtworkProvider {
     }
 
     @Override
-    protected ArtworkHolder searchTv(Event event) throws IOException {
-        login();
+    protected ArtworkHolder searchTv(Event event) {
+        if(!login()) {
+            return null;
+        }
 
         int id = search(event.getTitle());
 
@@ -266,11 +282,6 @@ public class TheTvDb extends HttpArtworkProvider {
         // https://api.thetvdb.com/series/xxxx/images/query?keyType=fanart&resolution=1920x1080&subKey=graphical
 
         JSONArray data = getFanart(id);
-
-        if(data == null) {
-            return null;
-        }
-
         JSONObject s = data.optJSONObject(0);
 
         if(s == null) {
@@ -285,10 +296,6 @@ public class TheTvDb extends HttpArtworkProvider {
         }
 
         data = getPosters(id);
-
-        if(data == null) {
-            return null;
-        }
 
         s = data.optJSONObject(0);
 

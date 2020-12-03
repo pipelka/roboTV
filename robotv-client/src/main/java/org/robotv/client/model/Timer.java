@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 public class Timer extends Event {
 
-    private int id;
+    private final int id;
     private int flags;
     private int priority;
     private int lifeTime;

@@ -17,7 +17,7 @@ public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Colle
 
     private final static String TAG = "MovieCollectionTask";
 
-    private Connection connection;
+    private final Connection connection;
     private Listener listener;
 
     MovieCollectionLoaderTask(Connection connection) {

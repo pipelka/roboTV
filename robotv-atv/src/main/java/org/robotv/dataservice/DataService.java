@@ -168,7 +168,7 @@ public class DataService extends Service {
         handlerThread = new HandlerThread("dataservice");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
-        listenerHandler = new Handler(handlerThread.getLooper()); // TODO - use handlerThread ?
+        listenerHandler = new Handler();
 
         notification = new NotificationHandler(this);
 

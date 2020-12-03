@@ -19,8 +19,8 @@ public class TheMovieDatabase extends HttpArtworkProvider {
     private final static String TAG = "TheMovieDatabase";
     private final static String IMAGE_BASE_PATH = "http://image.tmdb.org/t/p/w1280";
 
-    private String mApiKey;
-    private String mLanguage;
+    private final String mApiKey;
+    private final String mLanguage;
 
     public TheMovieDatabase(String apiKey, String language) {
         super(1);
@@ -32,7 +32,7 @@ public class TheMovieDatabase extends HttpArtworkProvider {
 
     private String simplifyString(String title) {
         String result = title.toLowerCase();
-        result = result.replaceAll(",", "").replaceAll("-", "").replaceAll("  ", " ");
+        result = result.replaceAll(",", "").replaceAll("-", "").replaceAll(" {2}", " ");
 
         return result;
     }

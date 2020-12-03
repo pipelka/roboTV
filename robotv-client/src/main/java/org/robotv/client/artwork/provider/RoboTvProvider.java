@@ -7,7 +7,7 @@ import org.robotv.client.Connection;
 
 public class RoboTvProvider extends SimpleArtworkProvider {
 
-    private Connection mConnection;
+    private final Connection mConnection;
 
     public RoboTvProvider(Connection connection) {
         mConnection = connection;

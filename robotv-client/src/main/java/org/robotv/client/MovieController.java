@@ -104,7 +104,9 @@ public class MovieController {
         }
 
         // update on server
-        ArtworkUtils.setMovieArtwork(connection, movie, holder);
+        if(holder != null) {
+            ArtworkUtils.setMovieArtwork(connection, movie, holder);
+        }
     }
 
     public void renameMovie(Movie movie, String newName) {

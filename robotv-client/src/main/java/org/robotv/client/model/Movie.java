@@ -86,11 +86,11 @@ public class Movie extends Event {
     @Override
     public String toString() {
         return "Movie {" +
-               "folder=\'" + folder + "\'" +
-               ", episodeCount=\'" + episodeCount + "\'" +
-               ", recordingId=\'" + recordingId + "\'" +
-               ", channelName=\'" + channelName + "\'" +
-               ", playCount=\'" + playCount + "\'" +
+               "folder='" + folder + "'" +
+               ", episodeCount='" + episodeCount + "'" +
+               ", recordingId='" + recordingId + "'" +
+               ", channelName='" + channelName + "'" +
+               ", playCount='" + playCount + "'" +
                "}";
     }
 

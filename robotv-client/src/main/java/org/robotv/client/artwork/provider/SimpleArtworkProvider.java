@@ -7,12 +7,12 @@ import java.io.IOException;
 
 abstract class SimpleArtworkProvider extends HttpArtworkProvider {
     @Override
-    protected ArtworkHolder searchMovie(Event event) throws IOException {
+    protected ArtworkHolder searchMovie(Event event) {
         return null;
     }
 
     @Override
-    protected ArtworkHolder searchTv(Event event) throws IOException {
+    protected ArtworkHolder searchTv(Event event) {
         return null;
     }
 

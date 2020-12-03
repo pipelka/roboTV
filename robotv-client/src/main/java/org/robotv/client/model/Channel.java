@@ -2,12 +2,12 @@ package org.robotv.client.model;
 
 public class Channel {
 
-    private int number = 0;
-    private String name;
-    private int uid = 0;
-    private int caid = 0;
-    private String iconURL;
-    private String serviceReference;
+    private final int number;
+    private final String name;
+    private final int uid;
+    private final int caid;
+    private final String iconURL;
+    private final String serviceReference;
     private String groupName;
     private boolean radio = false;
     private String channelUri;

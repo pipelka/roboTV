@@ -10,6 +10,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 abstract class HttpArtworkProvider extends ArtworkProvider {
 
@@ -18,7 +19,7 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
     private final static Object lock = new Object();
 
     private int mDelayAfterRequestMs = 0;
-    private OkHttpClient client;
+    private final OkHttpClient client;
 
     HttpArtworkProvider() {
         this(5);
@@ -92,7 +93,12 @@ abstract class HttpArtworkProvider extends ArtworkProvider {
             response = client.newCall(request).execute();
         }
 
-        return response.body().string();
+        ResponseBody body = response.body();
+        if(body != null) {
+            return body.string();
+        }
+
+        return "";
     }
 
     protected OkHttpClient getClient() {

@@ -9,13 +9,13 @@ import java.util.Collection;
 
 public class RelatedContentExtractor {
 
-    private Collection<Movie> collection;
+    private final Collection<Movie> collection;
 
     public RelatedContentExtractor(Collection<Movie> collection) {
         this.collection = collection;
     }
 
-    private Collection<Movie> result = new ArrayList<>(50);
+    private final Collection<Movie> result = new ArrayList<>(50);
 
     public Collection<Movie> getSeries(String title) {
         if(collection == null || title == null) {

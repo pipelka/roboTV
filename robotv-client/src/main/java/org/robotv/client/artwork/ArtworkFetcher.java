@@ -20,9 +20,9 @@ public class ArtworkFetcher {
     private static final String TAG = "ArtworkFetcher";
     public final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
-    private Connection mConnection;
-    private ArtworkProvider[] providers;
-    private String mEpgImageTemplateUrl = "";
+    private final Connection mConnection;
+    private final ArtworkProvider[] providers;
+    private String mEpgImageTemplateUrl;
 
     static private TheMovieDatabase tmdb = null;
 

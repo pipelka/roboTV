@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class HttpEpgImageProvider extends SimpleArtworkProvider {
 
-    private String mTemplateUrl;
+    private final String mTemplateUrl;
 
     public HttpEpgImageProvider(String templateUrl) {
         mTemplateUrl = templateUrl;

@@ -1,5 +1,6 @@
 package org.robotv.client.model;
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
 import java.io.Serializable;
@@ -15,7 +16,7 @@ import static java.lang.Integer.parseInt;
 
 public class Event implements Serializable {
 
-    public class SeasonEpisodeHolder implements Serializable {
+    public static class SeasonEpisodeHolder implements Serializable {
         public int season = 0;
         public int episode = 0;
 
@@ -26,13 +27,13 @@ public class Event implements Serializable {
         @Override
         public String toString() {
             return "SeasonEpisodeHolder {" +
-                    "season=\'" + season + "\'" +
-                    ", episode=\'" + episode + "\'" +
+                    "season='" + season + "'" +
+                    ", episode='" + episode + "'" +
                     "}";
         }
     }
 
-    private class StringHolder {
+    private static class StringHolder {
         public String string;
     }
 
@@ -40,9 +41,9 @@ public class Event implements Serializable {
     private String title;
     private String shortText;
     private String description;
-    private int duration;
+    private final int duration;
     private int year;
-    private int eventId;
+    private final int eventId;
     private long startTime;
     private int channelUid;
     private long vpsTime;
@@ -50,11 +51,11 @@ public class Event implements Serializable {
     private String posterUrl;
     private String backgroundUrl;
 
-    private SeasonEpisodeHolder seasonEpisode = new SeasonEpisodeHolder();
+    private final SeasonEpisodeHolder seasonEpisode = new SeasonEpisodeHolder();
 
-    private static Pattern yearPattern = Pattern.compile("\\b(19|20)\\d{2}\\b");
+    private static final Pattern yearPattern = Pattern.compile("\\b(19|20)\\d{2}\\b");
 
-    private static Pattern seasonEpisodePatterns[] = {
+    private static final Pattern[] seasonEpisodePatterns = {
             Pattern.compile("\\b(\\d).+[S|s]taffel.+[F|f]olge\\W+(\\d+)\\b"),
             Pattern.compile("\\b[S|s]taffel\\W+(\\d).+[F|f]olge\\W+(\\d+)\\b"),
             Pattern.compile("\\b[S|s]taffel\\W+(\\d).+[E|e]pisode\\W+(\\d+)\\b"),
@@ -62,19 +63,19 @@ public class Event implements Serializable {
             Pattern.compile("\\bs\\W+(\\d+)\\W+ep\\W+(\\d+)\\b")
     };
 
-    private static Pattern episodeSeasonPatterns[] = {
+    private static final Pattern[] episodeSeasonPatterns = {
             Pattern.compile("\\b(\\d).+[F|f]olge.+[S|s]taffel\\W++(\\d+)\\b"),
             Pattern.compile("\\bE(\\d+).+S(\\d+)\\b"),
             Pattern.compile("\\bE[P|p]\\.?\\W+(\\d+)+\\W+\\(?\\W+(\\d+)\\b\\)")
     };
 
-    private static Pattern episodeOnlyPatterns[] = {
+    private static final Pattern[] episodeOnlyPatterns = {
             Pattern.compile("\\b[F|f]olge\\W+(\\d+)\\b"),
             Pattern.compile("\\b(\\d+)\\W+[F|f]olge\\b"),
             Pattern.compile("\\b[E|e]pisode\\W+(\\d)+\\b")
     };
 
-    private static String[] genreFilm = {
+    private static final String[] genreFilm = {
         "abenteuerfilm",
         "actiondrama",
         "actionfilm",
@@ -108,7 +109,7 @@ public class Event implements Serializable {
         "zeichentrickfilm"
     };
 
-    private static String[] genreSoap = {
+    private static final String[] genreSoap = {
         "actionserie",
         "comedyserie",
         "comedy-serie",
@@ -133,7 +134,7 @@ public class Event implements Serializable {
         "zeichentrickserie"
     };
 
-    private static String[] genreSoapOrMovie = {
+    private static final String[] genreSoapOrMovie = {
         "abenteuer",
         "action",
         "animation",
@@ -148,7 +149,7 @@ public class Event implements Serializable {
         "zeichentrick"
     };
 
-    private static String[] genreSportTitle = {
+    private static final String[] genreSportTitle = {
         "fußball",
         "fussball",
         "tennis",
@@ -159,7 +160,7 @@ public class Event implements Serializable {
         "eishockey"
     };
 
-    private static int[] genreSportTitleId = {
+    private static final int[] genreSportTitleId = {
         0x43,
         0x43,
         0x44,
@@ -184,6 +185,7 @@ public class Event implements Serializable {
             event.channelUid
         );
 
+        parentalRating = event.parentalRating;
         year = event.year;
         vpsTime = event.vpsTime;
         posterUrl = event.posterUrl;
@@ -313,6 +315,7 @@ public class Event implements Serializable {
     }
 
 
+    @SuppressLint("SimpleDateFormat")
     public String getTime() {
         return new SimpleDateFormat("HH:mm").format(new Date((getStartTime() * 1000)));
     }
@@ -526,18 +529,18 @@ public class Event implements Serializable {
     @Override
     public String toString() {
         return "Event {" +
-                "contentId=\'" + contentId + "\'" +
-                ", title=\'" + title + "\'" +
-                ", shortText=\'" + shortText + "\'" +
-                ", description=\'" + description + "\'" +
-                ", duration=\'" + duration + "\'" +
-                ", year=\'" + year + "\'" +
-                ", eventId=\'" + eventId + "\'" +
-                ", startTime=\'" + startTime + "\'" +
-                ", channelUid=\'" + channelUid + "\'" +
-                ", vpsTime=\'" + vpsTime + "\'" +
-                ", posterUrl=\'" + posterUrl + "\'" +
-                ", backgroundUrl=\'" + backgroundUrl + "\'" +
+                "contentId='" + contentId + "'" +
+                ", title='" + title + "'" +
+                ", shortText='" + shortText + "'" +
+                ", description='" + description + "'" +
+                ", duration='" + duration + "'" +
+                ", year='" + year + "'" +
+                ", eventId='" + eventId + "'" +
+                ", startTime='" + startTime + "'" +
+                ", channelUid='" + channelUid + "'" +
+                ", vpsTime='" + vpsTime + "'" +
+                ", posterUrl='" + posterUrl + "'" +
+                ", backgroundUrl='" + backgroundUrl + "'" +
                 "}";
     }
 

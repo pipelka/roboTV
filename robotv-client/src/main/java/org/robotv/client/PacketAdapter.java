@@ -159,11 +159,11 @@ public class PacketAdapter {
         int id = (int) response.getU32();                   // id
         String title = response.getString();                // search term (title)
         int channelUid = (int) response.getU32();           // channel uid
-        String channelName = response.getString();          // channel name
+        /*String channelName =*/ response.getString();      // channel name
         boolean seriesRecording = (response.getU32() == 1); // is series recording
-        String folder = response.getString();               // folder
+        /*String folder =*/ response.getString();           // folder
         String logoUrl = response.getString();              // channel logo url
-        String definition = response.getString();           // epgsearch timer description
+        /*String definition =*/ response.getString();       // epgsearch timer description
 
         int contentId = seriesRecording ? 0x15 : 0x10;
         Timer timer = new Timer(id, new Event(contentId, title, "", "", 0, 0));

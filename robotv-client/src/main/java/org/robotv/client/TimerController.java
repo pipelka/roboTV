@@ -105,7 +105,7 @@ public class TimerController {
 
     final private Connection connection;
 
-    private int priority = 80;
+    private final int priority = 80;
 
     public TimerController(Connection connection) {
         this.connection = connection;

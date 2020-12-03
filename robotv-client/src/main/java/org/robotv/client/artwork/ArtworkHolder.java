@@ -2,8 +2,8 @@ package org.robotv.client.artwork;
 
 public class ArtworkHolder {
 
-    private String mPosterUrl;
-    private String mBackgroundUrl;
+    private final String mPosterUrl;
+    private final String mBackgroundUrl;
     private String mTitle;
 
     public ArtworkHolder(String posterUrl, String backgroundUrl) {

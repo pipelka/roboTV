@@ -15,8 +15,7 @@ public class Connection extends Session {
     public final static int STATUS_BLOCKED_BY_RECORDING = 1;
     public final static int STATUS_CONNECTION_FAILED = 2;
 
-    private String mSessionName = "XVDR Client";
-    private short mCompressionLevel = 0;
+    private final String mSessionName;
     private String mLanguage = "deu";
     private boolean mEnableStatus = false;
 
@@ -141,7 +140,7 @@ public class Connection extends Session {
         Packet req = CreatePacket(XVDR_LOGIN);
 
         req.setProtocolVersion(XVDRPROTOCOLVERSION);
-        req.putU8(mCompressionLevel);
+        req.putU8((short) 0);
         req.putString(mSessionName);
         req.putU8((short)(mEnableStatus ? 1 : 0));
         req.putU8((short)getPriority());
