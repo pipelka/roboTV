@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.1'
-        classpath 'org.ajoberstar:grgit:1.1.0'
     }
 }
 
@@ -27,19 +26,5 @@ allprojects {
         exoPlayerVersion='2.6.1'
         supportVersion='27.0.2'
         glideVersion='4.9.0'
-    }
-}
-
-ext {
-    try {
-        git = org.ajoberstar.grgit.Grgit.open(file('.'))
-        gitRevision = git.head().id
-        gitAbbreviatedId = git.head().abbreviatedId;
-        gitBranch =  git.branch.current.name;
-    }
-    catch(Exception e) {
-        gitRevision = "unknown"
-        gitAbbreviatedId = "unknown";
-        gitBranch =  "unknown";
     }
 }
