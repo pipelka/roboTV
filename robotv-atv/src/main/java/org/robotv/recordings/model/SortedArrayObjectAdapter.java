@@ -1,7 +1,7 @@
 package org.robotv.recordings.model;
 
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.Presenter;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.Presenter;
 
 import java.util.Collection;
 import java.util.Comparator;

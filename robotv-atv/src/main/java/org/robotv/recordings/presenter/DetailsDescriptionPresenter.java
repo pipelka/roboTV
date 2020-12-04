@@ -1,7 +1,7 @@
 package org.robotv.recordings.presenter;
 
 import android.content.Context;
-import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
+import androidx.leanback.widget.AbstractDetailsDescriptionPresenter;
 
 import org.robotv.robotv.R;
 import org.robotv.client.model.Event;

@@ -1,7 +1,7 @@
 package org.robotv.recordings.presenter;
 
 import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.widget.Action;
+import androidx.leanback.widget.Action;
 
 public class ColorAction extends Action {
     private int color;

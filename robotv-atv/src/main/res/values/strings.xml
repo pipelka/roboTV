@@ -124,4 +124,5 @@
     <string name="record_all_episodes">Scheduling all episodes</string>
     <string name="season_episode">Season %d, Episode %d</string>
     <string name="setup_tunneled_playback">Tunneled Videoplayback</string>
+    <string name="movie">Movie</string>
 </resources>

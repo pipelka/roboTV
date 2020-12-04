@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.tv.TvInputInfo;
 import android.os.Bundle;
-import android.support.v17.leanback.app.GuidedStepFragment;
+import androidx.leanback.app.GuidedStepFragment;
 import android.util.Log;
 import android.widget.Toast;
 

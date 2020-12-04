@@ -1,8 +1,8 @@
 package org.robotv.recordings.presenter;
 
 import android.content.res.Resources;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;

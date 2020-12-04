@@ -1,8 +1,8 @@
 package org.robotv.timers.presenter;
 
 import android.content.Context;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
 import android.text.TextUtils;
 
 import org.robotv.client.Connection;

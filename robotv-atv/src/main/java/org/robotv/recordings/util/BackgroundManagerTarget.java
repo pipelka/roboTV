@@ -1,7 +1,7 @@
 package org.robotv.recordings.util;
 
 import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.app.BackgroundManager;
+import androidx.leanback.app.BackgroundManager;
 
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;

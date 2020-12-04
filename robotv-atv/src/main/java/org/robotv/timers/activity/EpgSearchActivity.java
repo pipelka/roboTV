@@ -2,7 +2,7 @@ package org.robotv.timers.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v17.leanback.widget.SpeechRecognitionCallback;
+import androidx.leanback.widget.SpeechRecognitionCallback;
 
 import org.robotv.dataservice.DataService;
 import org.robotv.timers.fragment.CreateTimerFragment;

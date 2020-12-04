@@ -108,4 +108,5 @@
     <string name="record_all_episodes">Alle Folgen werden aufgenommen</string>
     <string name="season_episode">%d. Staffel, Folge %d</string>
     <string name="setup_tunneled_playback">Tunneled Videoplayback</string>
+    <string name="movie">Film</string>
 </resources>

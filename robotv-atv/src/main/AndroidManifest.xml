@@ -33,6 +33,7 @@
         android:required="true" />
 
     <application android:label="@string/robotv_input"
+            android:usesCleartextTraffic="true"
             android:icon="@drawable/ic_live_tv_white_48dp"
             android:theme="@style/Theme.Leanback" >
         <!-- Launched by the TV app before it uses RoboTvInputService to set up channels for this
@@ -137,6 +138,7 @@
 
         <activity
             android:name="org.robotv.recordings.activity.DetailsActivity"
+
             android:theme="@style/Theme.Leanback">
 
             <intent-filter>

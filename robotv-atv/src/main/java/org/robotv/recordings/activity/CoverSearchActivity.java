@@ -2,8 +2,8 @@ package org.robotv.recordings.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v17.leanback.app.SearchFragment;
-import android.support.v17.leanback.widget.SpeechRecognitionCallback;
+import androidx.leanback.app.SearchFragment;
+import androidx.leanback.widget.SpeechRecognitionCallback;
 
 import org.robotv.client.model.Movie;
 import org.robotv.robotv.R;

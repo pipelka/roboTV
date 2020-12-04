@@ -3,10 +3,8 @@ package org.robotv.recordings.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v17.leanback.app.SearchFragment;
-import android.support.v17.leanback.widget.SpeechRecognitionCallback;
-
-import com.bumptech.glide.Glide;
+import androidx.leanback.app.SearchFragment;
+import androidx.leanback.widget.SpeechRecognitionCallback;
 
 import org.robotv.robotv.R;
 

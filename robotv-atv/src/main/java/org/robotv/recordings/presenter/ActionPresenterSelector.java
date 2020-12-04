@@ -15,9 +15,9 @@
 package org.robotv.recordings.presenter;
 
 import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.widget.Action;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.PresenterSelector;
+import androidx.leanback.widget.Action;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.PresenterSelector;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +56,7 @@ public class ActionPresenterSelector extends PresenterSelector {
 
         ActionViewHolder(View view, int layoutDirection) {
             super(view);
-            mButton = (Button) view.findViewById(android.support.v17.leanback.R.id.lb_action_button);
+            mButton = (Button) view.findViewById(androidx.leanback.R.id.lb_action_button);
             mLayoutDirection = layoutDirection;
         }
     }
@@ -64,14 +64,14 @@ public class ActionPresenterSelector extends PresenterSelector {
     private void setActionIcon(ActionViewHolder viewHolder, Drawable icon) {
         if(icon != null) {
             final int startPadding = viewHolder.view.getResources()
-                                     .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_with_icon_padding_start);
+                                     .getDimensionPixelSize(androidx.leanback.R.dimen.lb_action_with_icon_padding_start);
             final int endPadding = viewHolder.view.getResources()
-                                   .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_with_icon_padding_end);
+                                   .getDimensionPixelSize(androidx.leanback.R.dimen.lb_action_with_icon_padding_end);
             viewHolder.view.setPaddingRelative(startPadding, 0, endPadding, 0);
         }
         else {
             final int padding = viewHolder.view.getResources()
-                                .getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_action_padding_horizontal);
+                                .getDimensionPixelSize(androidx.leanback.R.dimen.lb_action_padding_horizontal);
             viewHolder.view.setPaddingRelative(padding, 0, padding, 0);
         }
 
@@ -87,7 +87,7 @@ public class ActionPresenterSelector extends PresenterSelector {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent) {
             View v = LayoutInflater.from(parent.getContext())
-                     .inflate(android.support.v17.leanback.R.layout.lb_action_1_line, parent, false);
+                     .inflate(androidx.leanback.R.layout.lb_action_1_line, parent, false);
             return new ActionViewHolder(v, parent.getLayoutDirection());
         }
 
@@ -114,7 +114,7 @@ public class ActionPresenterSelector extends PresenterSelector {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent) {
             View v = LayoutInflater.from(parent.getContext())
-                     .inflate(android.support.v17.leanback.R.layout.lb_action_2_lines, parent, false);
+                     .inflate(androidx.leanback.R.layout.lb_action_2_lines, parent, false);
             return new ActionViewHolder(v, parent.getLayoutDirection());
         }
 

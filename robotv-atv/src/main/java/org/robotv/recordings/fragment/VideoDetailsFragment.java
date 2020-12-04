@@ -5,22 +5,22 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v17.leanback.app.BackgroundManager;
-import android.support.v17.leanback.app.BrowseFragment;
-import android.support.v17.leanback.widget.Action;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.ClassPresenterSelector;
-import android.support.v17.leanback.widget.DetailsOverviewRow;
-import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ListRowPresenter;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowPresenter;
-import android.support.v17.leanback.widget.SectionRow;
-import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
+import androidx.leanback.app.BackgroundManager;
+import androidx.leanback.app.BrowseFragment;
+import androidx.leanback.widget.Action;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ClassPresenterSelector;
+import androidx.leanback.widget.DetailsOverviewRow;
+import androidx.leanback.widget.DetailsOverviewRowPresenter;
+import androidx.leanback.widget.HeaderItem;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.ListRowPresenter;
+import androidx.leanback.widget.OnItemViewClickedListener;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.Row;
+import androidx.leanback.widget.RowPresenter;
+import androidx.leanback.widget.SectionRow;
+import androidx.leanback.widget.SparseArrayObjectAdapter;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -30,6 +30,7 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
 import org.robotv.client.RelatedContentExtractor;
+import org.robotv.dataservice.NotificationHandler;
 import org.robotv.recordings.activity.CoverSearchActivity;
 import org.robotv.recordings.activity.PlayerActivity;
 import org.robotv.client.model.Movie;
@@ -210,8 +211,8 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
             addEpisodeRows(adapter, selectedMovie);
         }
         else {
-            setHeadersState(HEADERS_DISABLED);
             addDetailRow(adapter, selectedMovie);
+            setHeadersState(HEADERS_HIDDEN);
         }
 
         setExtraActions(adapter);
@@ -284,7 +285,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
 
         row.setHeaderItem(new HeaderItem(
                 episode.valid() ? getString(R.string.episode_nr, episode.episode) :
-                movie.getShortText()));
+                getString(R.string.movie)));
         row.setItem(movie);
 
         String url = movie.getPosterUrl();
@@ -406,6 +407,13 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHeadersTransitionOnBackEnabled(true);
+        prepareEntranceTransition();
+    }
+
+    @Override
     public void onConnected(DataService service) {
         VideoDetailsFragment.this.service = service;
 
@@ -421,6 +429,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
         }
 
         initBackground();
+        setHeadersTransitionOnBackEnabled(true);
         initDetails();
 
         startEntranceTransition();
