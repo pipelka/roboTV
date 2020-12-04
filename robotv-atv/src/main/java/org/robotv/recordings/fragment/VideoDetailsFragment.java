@@ -2,7 +2,6 @@ package org.robotv.recordings.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -27,6 +26,7 @@ import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
 import org.robotv.client.RelatedContentExtractor;
@@ -68,6 +68,7 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
     private DataService service;
     private BackgroundManager backgroundManager;
     private MovieStepFragment actionFragment;
+    private Target<Drawable> mTarget;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -89,6 +90,12 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Glide.with(this).clear(mTarget);
     }
 
     @Override
@@ -286,20 +293,18 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
             row.setImageDrawable(getResources().getDrawable(R.drawable.recording_unkown, null));
         }
         else {
-            SimpleTarget<Drawable> target = new SimpleTarget<Drawable>() {
-                @Override
-                public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    row.setImageDrawable(resource);
-                }
-            };
-
-            GlideApp.with(getActivity())
+            mTarget = GlideApp.with(getActivity())
                     .load(url)
                     .override(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()), Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
                     .error(getResources().getDrawable(R.drawable.recording_unkown, null))
                     .placeholder(getResources().getDrawable(R.drawable.recording_unkown, null))
                     .centerCrop()
-                    .into(target);
+                    .into(new SimpleTarget<Drawable>() {
+                        @Override
+                        public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                            row.setImageDrawable(resource);
+                        }
+                    });
         }
 
         SparseArrayObjectAdapter actions = new SparseArrayObjectAdapter();

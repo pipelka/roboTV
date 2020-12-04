@@ -6,8 +6,6 @@ import android.support.v17.leanback.widget.Presenter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.artwork.ArtworkHolder;
@@ -17,7 +15,7 @@ import org.robotv.ui.GlideApp;
 public class ArtworkPresenter extends Presenter {
 
     static class ViewHolder extends Presenter.ViewHolder {
-        private ImageCardView mCardView;
+        private final ImageCardView mCardView;
 
         public ViewHolder(View view) {
             super(view);

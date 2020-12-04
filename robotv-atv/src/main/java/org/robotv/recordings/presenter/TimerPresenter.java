@@ -27,14 +27,14 @@ import java.io.IOException;
 
 public class TimerPresenter extends Presenter {
 
-    private Connection connection;
+    private final Connection connection;
 
 
     private static class TimerArtworkTask extends AsyncTask<Void, Void, String> {
 
         ArtworkFetcher artwork;
         Timer timer;
-        ImageCardView cardView;
+        final ImageCardView cardView;
         Drawable drawableUnknown;
 
         TimerArtworkTask(ArtworkFetcher artwork, Timer timer, ImageCardView cardView) {
@@ -104,7 +104,7 @@ public class TimerPresenter extends Presenter {
     }
 
     static public class ViewHolder extends Presenter.ViewHolder {
-        private ImageCardView cardView;
+        private final ImageCardView cardView;
 
         public ViewHolder(View view) {
             super(view);

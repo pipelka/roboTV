@@ -12,14 +12,11 @@ import org.robotv.robotv.R;
 
 public class IconActionPresenter extends Presenter {
 
-    private int width = 250;
-    private int height = 220;
+    private final int width;
+    private final int height;
 
-    private int iconWidth = 48;
-    private int iconHeight = 48;
-
-    public IconActionPresenter() {
-    }
+    private static final int iconWidth = 48;
+    private static final int iconHeight = 48;
 
     public IconActionPresenter(int width, int height) {
         this.width = width;
@@ -27,7 +24,7 @@ public class IconActionPresenter extends Presenter {
     }
 
     static public class ViewHolder extends Presenter.ViewHolder {
-        private ImageCardView cardView;
+        private final ImageCardView cardView;
 
         public ViewHolder(View view) {
             super(view);

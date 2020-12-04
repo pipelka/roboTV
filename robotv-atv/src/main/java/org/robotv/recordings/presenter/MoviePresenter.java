@@ -11,8 +11,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-
 import org.robotv.client.artwork.ArtworkFetcher;
 import org.robotv.client.Connection;
 import org.robotv.client.model.Movie;
@@ -25,14 +23,47 @@ import java.io.IOException;
 
 public class MoviePresenter extends Presenter {
 
-    protected Connection connection = null;
+    protected Connection connection;
 
     public MoviePresenter(@NonNull Connection connection) {
         this.connection = connection;
     }
 
     static public class ViewHolder extends Presenter.ViewHolder {
-        private ImageCardView mCardView;
+        private final ImageCardView mCardView;
+
+        static class UpdateTask extends AsyncTask<Void, Void, String> {
+            final ArtworkFetcher artwork;
+            final Movie movie;
+            final ViewHolder view;
+
+            public UpdateTask(ArtworkFetcher artwork, Movie movie, ViewHolder view) {
+                this.artwork = artwork;
+                this.movie = movie;
+                this.view = view;
+            }
+
+            @Override
+            protected String doInBackground(Void... params) {
+                String url = null;
+
+                try {
+                    artwork.fetchForEvent(movie);
+                    url = movie.getPosterUrl();
+                    if(TextUtils.isEmpty(url)) {
+                        url = movie.getBackgroundUrl();
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return url;
+            }
+
+            protected void onPostExecute(String url) {
+                view.updateCardViewImage(view.getCardView().getContext(), url);
+            }
+        }
 
         public ViewHolder(View view) {
             super(view);
@@ -51,7 +82,7 @@ public class MoviePresenter extends Presenter {
                 return;
             }
 
-            GlideApp.with(mCardView.getContext())
+            GlideApp.with(context)
             .load(link)
             .override(266, 400)
             .centerCrop()
@@ -64,29 +95,7 @@ public class MoviePresenter extends Presenter {
             String language = SetupUtils.getLanguage(context);
             final ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
 
-            AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
-                @Override
-                protected String doInBackground(Void... params) {
-                    String url = null;
-
-                    try {
-                        artwork.fetchForEvent(movie);
-                        url = movie.getPosterUrl();
-                        if(TextUtils.isEmpty(url)) {
-                            url = movie.getBackgroundUrl();
-                        }
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return url;
-                }
-
-                protected void onPostExecute(String url) {
-                    updateCardViewImage(context, url);
-                }
-            };
-
+            UpdateTask task = new UpdateTask(artwork, movie, this);
             task.execute();
         }
     }
