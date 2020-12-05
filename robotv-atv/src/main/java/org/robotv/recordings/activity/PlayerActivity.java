@@ -48,7 +48,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         notificationHandler = new NotificationHandler(this);
         lastUpdateTimeStamp = 0;
 
-        mControls = (PlaybackOverlayFragment) getFragmentManager().findFragmentById(R.id.playback);
+        mControls = (PlaybackOverlayFragment) getSupportFragmentManager().findFragmentById(R.id.playback);
 
         mPlayer = new Player(
             this,
@@ -62,7 +62,6 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         mControls.setPlayer(mPlayer);
 
         mSession = new MediaSession(this, "roboTV Movie");
-        mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         initViews();
         setServiceListener(this);

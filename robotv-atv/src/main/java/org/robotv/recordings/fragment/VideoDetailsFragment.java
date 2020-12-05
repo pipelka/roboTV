@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.leanback.app.BackgroundManager;
 import androidx.leanback.app.BrowseFragment;
+import androidx.leanback.app.DetailsSupportFragment;
 import androidx.leanback.widget.Action;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ClassPresenterSelector;
@@ -52,7 +53,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 
-public class VideoDetailsFragment extends BrowseFragment implements DataService.Listener {
+public class VideoDetailsFragment extends DetailsSupportFragment implements DataService.Listener {
 
     public static final String TAG = "VideoDetailsFragment";
     public static final String EXTRA_MOVIE = "extra_movie";
@@ -75,20 +76,17 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setOnItemViewClickedListener(new OnItemViewClickedListener() {
-            @Override
-            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                if(item instanceof ColorAction) {
-                    handleExtraActions((ColorAction) item);
-                }
-                else if(item instanceof Action) {
-                    Action action = (Action) item;
-                    Movie movie = (Movie) ((DetailsOverviewRow) row).getItem();
-                    handleDetailActions(action, movie);
-                }
-                else if(item instanceof Movie) {
-                    playbackMovie((Movie) item);
-                }
+        setOnItemViewClickedListener((OnItemViewClickedListener) (itemViewHolder, item, rowViewHolder, row) -> {
+            if(item instanceof ColorAction) {
+                handleExtraActions((ColorAction) item);
+            }
+            else if(item instanceof Action) {
+                Action action = (Action) item;
+                Movie movie = (Movie) ((DetailsOverviewRow) row).getItem();
+                handleDetailActions(action, movie);
+            }
+            else if(item instanceof Movie) {
+                playbackMovie((Movie) item);
             }
         });
     }
@@ -212,7 +210,6 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
         }
         else {
             addDetailRow(adapter, selectedMovie);
-            setHeadersState(HEADERS_HIDDEN);
         }
 
         setExtraActions(adapter);
@@ -409,16 +406,12 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHeadersTransitionOnBackEnabled(true);
         prepareEntranceTransition();
     }
 
     @Override
     public void onConnected(DataService service) {
         VideoDetailsFragment.this.service = service;
-
-        int brandColor = Utils.getColor(getActivity(), R.color.episode_header_color);
-        setBrandColor(brandColor);
 
         if(selectedMovie == null) {
             selectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(EXTRA_MOVIE);
@@ -429,7 +422,6 @@ public class VideoDetailsFragment extends BrowseFragment implements DataService.
         }
 
         initBackground();
-        setHeadersTransitionOnBackEnabled(true);
         initDetails();
 
         startEntranceTransition();

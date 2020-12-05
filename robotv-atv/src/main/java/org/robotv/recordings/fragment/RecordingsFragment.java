@@ -3,23 +3,18 @@ package org.robotv.recordings.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.leanback.app.BackgroundManager;
-import androidx.leanback.app.BrowseFragment;
+import androidx.leanback.app.BrowseSupportFragment;
 import androidx.leanback.app.ProgressBarManager;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
-import androidx.leanback.widget.OnItemViewClickedListener;
-import androidx.leanback.widget.OnItemViewSelectedListener;
-import androidx.leanback.widget.Presenter;
-import androidx.leanback.widget.RowPresenter;
 
-import androidx.leanback.widget.Row;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 
 import org.robotv.client.model.Event;
 import org.robotv.recordings.activity.DetailsActivity;
+import org.robotv.recordings.activity.PlayerActivity;
 import org.robotv.recordings.activity.SearchActivity;
 import org.robotv.recordings.model.EpisodeTimer;
 import org.robotv.recordings.model.IconAction;
@@ -39,9 +34,12 @@ import org.robotv.ui.GlideApp;
 
 import java.util.Collection;
 
-public class RecordingsFragment extends BrowseFragment implements DataService.Listener, MovieController.LoaderCallback {
+public class RecordingsFragment extends BrowseSupportFragment implements DataService.Listener, MovieController.LoaderCallback {
 
     private final static String TAG = "RecordingsFragment";
+
+    public static final String EXTRA_MOVIE = "extra_movie";
+    public static final String EXTRA_SHOULD_AUTO_START = "extra_should_auto_start";
 
     private MovieCollectionAdapter mAdapter;
     private BackgroundManager backgroundManager;
@@ -122,56 +120,46 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     }
 
     private void setupEventListeners() {
-        setOnItemViewClickedListener(new OnItemViewClickedListener() {
-            @Override
-            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                if(item instanceof Movie) {
-                    Movie movie = (Movie) item;
-
-                    Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                    intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
-                    startActivity(intent);
-                }
-                else if(item instanceof EpisodeTimer) {
-                    // TODO - add search timer handling
-                }
-                else if(item instanceof Timer) {
-                    Timer timer = (Timer) item;
-
-                    new EditTimerFragment().startGuidedStep(
-                            getActivity(),
-                            timer,
-                            service,
-                            R.id.container);
-                }
-                else if(item instanceof IconAction) {
-                    IconAction action = (IconAction) item;
-                    if(action.getActionId() == 100) {
-                        startEpgSearchActivity();
-                    }
-                    if(action.getActionId() == 101) {
-                        startSetupActivity();
-                    }
-                }
-            }
-        });
-
-        setOnItemViewSelectedListener(new OnItemViewSelectedListener() {
-            @Override
-            public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                if(item instanceof Event) {
-                    Event event = (Event) item;
-                    updateBackground(event.getBackgroundUrl());
-                }
-            }
-        });
-
-        setOnSearchClickedListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), SearchActivity.class);
+        setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
+            if(item instanceof Movie) {
+                Movie movie = (Movie) item;
+                Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
                 startActivity(intent);
             }
+            else if(item instanceof EpisodeTimer) {
+                // TODO - add search timer handling
+            }
+            else if(item instanceof Timer) {
+                Timer timer = (Timer) item;
+
+                new EditTimerFragment().startGuidedStep(
+                        getActivity(),
+                        timer,
+                        service,
+                        R.id.container);
+            }
+            else if(item instanceof IconAction) {
+                IconAction action = (IconAction) item;
+                if(action.getActionId() == 100) {
+                    startEpgSearchActivity();
+                }
+                if(action.getActionId() == 101) {
+                    startSetupActivity();
+                }
+            }
+        });
+
+        setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
+            if(item instanceof Event) {
+                Event event = (Event) item;
+                updateBackground(event.getBackgroundUrl());
+            }
+        });
+
+        setOnSearchClickedListener(view -> {
+            Intent intent = new Intent(getActivity(), SearchActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -182,6 +170,13 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
 
     private void startSetupActivity() {
         Intent intent = new Intent(getActivity(), org.robotv.setup.SetupActivity.class);
+        startActivity(intent);
+    }
+
+    private void playbackMovie(Movie movie) {
+        Intent intent = new Intent(getActivity(), PlayerActivity.class);
+        intent.putExtra(EXTRA_MOVIE, movie);
+        intent.putExtra(EXTRA_SHOULD_AUTO_START, true);
         startActivity(intent);
     }
 
@@ -265,11 +260,6 @@ public class RecordingsFragment extends BrowseFragment implements DataService.Li
     }
 
     protected void loadTimers(DataService service) {
-        service.getTimerController().loadTimers(new TimerController.LoaderCallback() {
-            @Override
-            public void onTimersUpdated(Collection<Timer> timers) {
-                mAdapter.loadTimers(timers);
-            }
-        });
+        service.getTimerController().loadTimers(timers -> mAdapter.loadTimers(timers));
     }
 }

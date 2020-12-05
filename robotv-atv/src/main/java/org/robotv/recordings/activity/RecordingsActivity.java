@@ -17,7 +17,7 @@ public class RecordingsActivity extends DataServiceActivity {
 
         setContentView(R.layout.activity_recordings);
 
-        RecordingsFragment fragment = (RecordingsFragment) getFragmentManager().findFragmentById(R.id.container);
+        RecordingsFragment fragment = (RecordingsFragment) getSupportFragmentManager().findFragmentById(R.id.container);
         setServiceListener(fragment);
     }
 

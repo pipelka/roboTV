@@ -38,7 +38,7 @@ import org.robotv.ui.GlideApp;
 
 import java.util.Locale;
 
-public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackFragment {
+public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSupportFragment {
 
     private Player player;
     private long selectedTrackId = 0;
@@ -103,43 +103,41 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackFragm
         addPlaybackControlsRow();
 
         /* onClick */
-        playbackControlsRowPresenter.setOnActionClickedListener(new OnActionClickedListener() {
-            public void onActionClicked(Action action) {
-                if(action.getId() == mPlayPauseAction.getId()) {
-                    togglePlayback(mPlayPauseAction.getIndex() == PlaybackControlsRow.PlayPauseAction.INDEX_PLAY);
-                }
-                else if(action.getId() == mFastForwardAction.getId()) {
-                    fastForward(30 * 1000);
-                }
-                else if(action.getId() == mRewindAction.getId()) {
-                    rewind(30 * 1000);
-                }
-                else if(action.getId() == mSkipNextAction.getId()) {
-                    fastForward(5 * 60 * 1000);
-                }
-                else if(action.getId() == mSkipPreviousAction.getId()) {
-                    rewind(5 * 60 * 1000);
-                }
+        playbackControlsRowPresenter.setOnActionClickedListener(action -> {
+            if(action.getId() == mPlayPauseAction.getId()) {
+                togglePlayback(mPlayPauseAction.getIndex() == PlaybackControlsRow.PlayPauseAction.INDEX_PLAY);
+            }
+            else if(action.getId() == mFastForwardAction.getId()) {
+                fastForward(30 * 1000);
+            }
+            else if(action.getId() == mRewindAction.getId()) {
+                rewind(30 * 1000);
+            }
+            else if(action.getId() == mSkipNextAction.getId()) {
+                fastForward(5 * 60 * 1000);
+            }
+            else if(action.getId() == mSkipPreviousAction.getId()) {
+                rewind(5 * 60 * 1000);
+            }
 
-                // audio track selection
-                if(action instanceof ColorAction) {
-                    String trackId = Long.toString(action.getId());
-                    player.selectAudioTrack(trackId);
-                }
+            // audio track selection
+            if(action instanceof ColorAction) {
+                String trackId = Long.toString(action.getId());
+                player.selectAudioTrack(trackId);
+            }
 
-                if(action instanceof PlaybackControlsRow.MultiAction) {
-                    /* Following action is subclass of MultiAction
-                     * - PlayPauseAction
-                     * - FastForwardAction
-                     * - RewindAction
-                     * - ThumbsAction
-                     * - RepeatAction
-                     * - ShuffleAction
-                     * - HighQualityAction
-                     * - ClosedCaptioningAction
-                     */
-                    notifyChanged(action);
-                }
+            if(action instanceof PlaybackControlsRow.MultiAction) {
+                /* Following action is subclass of MultiAction
+                 * - PlayPauseAction
+                 * - FastForwardAction
+                 * - RewindAction
+                 * - ThumbsAction
+                 * - RepeatAction
+                 * - ShuffleAction
+                 * - HighQualityAction
+                 * - ClosedCaptioningAction
+                 */
+                notifyChanged(action);
             }
         });
 
@@ -178,12 +176,9 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackFragm
         audioTrackActionAdapter = new ArrayObjectAdapter(actionPresenterSelector);
         mRowsAdapter.add(new ListRow(new HeaderItem(getString(R.string.audiotrack)), audioTrackActionAdapter));
 
-        setOnItemViewClickedListener(new BaseOnItemViewClickedListener() {
-            @Override
-            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Object row) {
-                Action action = (Action) item;
-                player.selectAudioTrack(Long.toString(action.getId()));
-            }
+        setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
+            Action action = (Action) item;
+            player.selectAudioTrack(Long.toString(action.getId()));
         });
 
         Activity activity = getActivity();
