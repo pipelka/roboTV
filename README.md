@@ -59,4 +59,4 @@ https://github.com/pipelka/vdr-plugin-robotv
 - [x] Timeshift Reverse Play
 - [x] Management of TV shows (Season / Episode)
 - [x] Notifications about timers / recordings
-- [ ] H265 (UHD) Support (VDR 2.3.x)
+- [x] H265 (UHD) Support
