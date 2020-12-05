@@ -3,7 +3,6 @@ package org.robotv.recordings.presenter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
@@ -20,83 +19,72 @@ import org.robotv.setup.SetupUtils;
 import org.robotv.ui.GlideApp;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MoviePresenter extends Presenter {
 
-    protected Connection connection;
+    static private final ExecutorService threadPool = Executors.newCachedThreadPool();
+
+    protected final Connection connection;
 
     public MoviePresenter(@NonNull Connection connection) {
         this.connection = connection;
     }
 
-    static public class ViewHolder extends Presenter.ViewHolder {
+    public static class ViewHolder extends Presenter.ViewHolder {
         private final ImageCardView mCardView;
+        private final Drawable mDrawableUnknown;
 
-        static class UpdateTask extends AsyncTask<Void, Void, String> {
-            final ArtworkFetcher artwork;
-            final Movie movie;
-            final ViewHolder view;
+        private void updateTask(ArtworkFetcher artwork, Movie movie, ViewHolder view) {
+            String url = null;
 
-            public UpdateTask(ArtworkFetcher artwork, Movie movie, ViewHolder view) {
-                this.artwork = artwork;
-                this.movie = movie;
-                this.view = view;
-            }
-
-            @Override
-            protected String doInBackground(Void... params) {
-                String url = null;
-
-                try {
-                    artwork.fetchForEvent(movie);
-                    url = movie.getPosterUrl();
-                    if(TextUtils.isEmpty(url)) {
-                        url = movie.getBackgroundUrl();
-                    }
+            try {
+                artwork.fetchForEvent(movie);
+                url = movie.getPosterUrl();
+                if(TextUtils.isEmpty(url)) {
+                    url = movie.getBackgroundUrl();
                 }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return url;
+            }
+            catch (IOException e) {
+                e.printStackTrace();
             }
 
-            protected void onPostExecute(String url) {
-                view.updateCardViewImage(view.getCardView().getContext(), url);
-            }
+            final String finalUrl = url;
+            view.mCardView.post(() -> updateCardViewImage(finalUrl));
         }
 
         public ViewHolder(View view) {
             super(view);
             mCardView = (ImageCardView) view;
+            mDrawableUnknown = view.getContext().getDrawable(R.drawable.recording_unkown);
         }
 
         public ImageCardView getCardView() {
             return mCardView;
         }
 
-        private void updateCardViewImage(Context context, String link) {
-            Drawable drawableUnknown = context.getDrawable(R.drawable.recording_unkown);
-
+        private void updateCardViewImage(String link) {
             if(link == null || link.isEmpty() || link.equals("x")) {
-                mCardView.setMainImage(drawableUnknown);
+                mCardView.setMainImage(mDrawableUnknown);
                 return;
             }
 
-            GlideApp.with(context)
-            .load(link)
-            .override(266, 400)
-            .centerCrop()
-            .error(drawableUnknown)
-            .placeholder(drawableUnknown)
-            .into(mCardView.getMainImageView());
+
+            GlideApp.with(mCardView)
+                .load(link)
+                .override(266, 400)
+                .centerCrop()
+                .error(mDrawableUnknown)
+                .placeholder(mDrawableUnknown)
+                .into(mCardView.getMainImageView());
         }
 
         public void update(final Movie movie, Connection connection, final Context context) {
             String language = SetupUtils.getLanguage(context);
             final ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
 
-            UpdateTask task = new UpdateTask(artwork, movie, this);
-            task.execute();
+            threadPool.execute(() -> updateTask(artwork, movie, ViewHolder.this));
         }
     }
 
