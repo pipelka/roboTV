@@ -19,10 +19,6 @@ public class Utils {
     }
 
     public static int getColor(Context context, int id) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getResources().getColor(id, null);
-        }
-
-        return context.getResources().getColor(id);
+        return context.getResources().getColor(id, null);
     }
 }
