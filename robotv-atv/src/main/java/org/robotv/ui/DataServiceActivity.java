@@ -1,12 +1,13 @@
 package org.robotv.ui;
 
-import android.app.Activity;
 import android.util.Log;
 
 import org.robotv.dataservice.DataService;
 import org.robotv.dataservice.DataServiceClient;
 
-public class DataServiceActivity extends Activity {
+import androidx.fragment.app.FragmentActivity;
+
+public class DataServiceActivity extends FragmentActivity {
 
     final private static String TAG = "DataServiceActivity";
 
