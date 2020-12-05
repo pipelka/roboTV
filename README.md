@@ -18,23 +18,23 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 
 ## System requirements
 
-* [Android TV](https://www.android.com/tv/) (minimum API Level 22 Android 5.1 Lollipop)
-* [VDR 2.2](http://www.vdr-wiki.de/)
+* [Android TV](https://www.android.com/tv/) (minimum API Level 29 Android TV 9 Pie)
+* [VDR 2.4](http://www.vdr-wiki.de/)
 * [vdr-plugin-robotv](https://github.com/pipelka/vdr-plugin-robotv)
 * [vdr-epgsearch](http://www.vdr-wiki.de/wiki/index.php/Epgsearch-plugin) (recommended)
 
-The Google [Nexus Player](https://www.google.com/nexus/player/) and the NVIDIA [Shield Android TV](https://shield.nvidia.com/android-tv) are used for development.
+The Xiaomi [Mi Box](https://www.mi.com/global/mibox) and the NVIDIA [Shield Android TV](https://shield.nvidia.com/android-tv) are used for development.
+A Sony Bravia TV (KD-43FX7596) with AndroidTV also uses RoboTV in our home.
 
 ### Server Deployment
 
-The roboTV server (VDR, plugins, configuration) can be deployed easily with the "robotv-server" docker image:
-https://github.com/pipelka/docker-robotv-server
+The roboTV server (VDR, plugins, configuration) can be deployed easily with the "robotv" docker image:
+https://github.com/pipelka/vdr-plugin-robotv
 
 ## Building
 
 1. Download [Android Studio](https://developer.android.com/studio/index.html)
-2. Download the [Android NDK 12](https://developer.android.com/ndk/downloads/index.html) (or higher).
-3. Set the SDK and NDK location in Android Studio (Project Structure) or "local.properties".
+2. Set the SDK in Android Studio (Project Structure) or "local.properties".
 4. ./gradlew assembleDebug
 
 # Current Features
@@ -60,9 +60,3 @@ https://github.com/pipelka/docker-robotv-server
 - [x] Management of TV shows (Season / Episode)
 - [x] Notifications about timers / recordings
 - [ ] H265 (UHD) Support (VDR 2.3.x)
-
-# Planned Features
-
-- [ ] enriched EPG information for TV shows
-- [ ] full epgsearch support
-- [ ] Teletext support
