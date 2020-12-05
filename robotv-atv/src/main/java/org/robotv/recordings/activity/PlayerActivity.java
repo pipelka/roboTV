@@ -27,8 +27,6 @@ import org.robotv.setup.SetupUtils;
 import org.robotv.ui.DataServiceActivity;
 import org.robotv.ui.GlideApp;
 
-import java.io.IOException;
-
 public class PlayerActivity extends DataServiceActivity implements Player.Listener, DataService.Listener {
 
     public static final String TAG = "PlayerActivity";
@@ -156,17 +154,6 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     @Override
     public void onPause() {
         super.onPause();
-
-        if(!requestVisibleBehind(true)) {
-            stopPlayback();
-        }
-    }
-
-    @Override
-    public void onVisibleBehindCanceled() {
-        // App-specific method to stop playback and release resources
-        super.onVisibleBehindCanceled();
-        stopPlayback();
     }
 
     @Override
@@ -243,12 +230,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
     @Override
     public void onTracksChanged(final StreamBundle bundle) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mControls.updateAudioTracks(bundle);
-            }
-        });
+        runOnUiThread(() -> mControls.updateAudioTracks(bundle));
     }
 
     @Override
@@ -257,12 +239,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
             return;
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mControls.updateAudioTrackSelection(Long.parseLong(format.id));
-            }
-        });
+        runOnUiThread(() -> mControls.updateAudioTrackSelection(Long.parseLong(format.id)));
     }
 
     @Override
