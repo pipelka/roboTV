@@ -168,14 +168,11 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
         setSearchResultProvider(this);
 
-        setOnItemViewClickedListener(new OnItemViewClickedListener() {
-            @Override
-            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                Movie movie = (Movie) item;
+        setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
+            Movie movie = (Movie) item;
 
-                EpgSearchActivity activity = (EpgSearchActivity) getActivity();
-                activity.selectEvent(movie);
-            }
+            EpgSearchActivity activity = (EpgSearchActivity) getActivity();
+            activity.selectEvent(movie);
         });
 
         loader = new EpgSearchLoader();

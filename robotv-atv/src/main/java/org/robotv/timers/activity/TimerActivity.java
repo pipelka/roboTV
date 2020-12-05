@@ -20,7 +20,7 @@ public class TimerActivity extends DataServiceActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
 
-        TimerFragment fragment = (TimerFragment) getFragmentManager().findFragmentById(R.id.timer_fragment);
+        TimerFragment fragment = (TimerFragment) getSupportFragmentManager().findFragmentById(R.id.timer_fragment);
         setServiceListener(fragment);
     }
 

@@ -4,16 +4,12 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.leanback.app.BrowseFragment;
+import androidx.leanback.app.DetailsSupportFragment;
 import androidx.leanback.app.ProgressBarManager;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
-import androidx.leanback.widget.OnItemViewClickedListener;
-import androidx.leanback.widget.Presenter;
-import androidx.leanback.widget.Row;
-import androidx.leanback.widget.RowPresenter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +25,7 @@ import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.Connection;
 
-public class TimerFragment extends BrowseFragment implements DataService.Listener {
+public class TimerFragment extends DetailsSupportFragment implements DataService.Listener {
 
     private class EpgSearchLoader extends AsyncTask<Void, Void, ArrayObjectAdapter> {
 
@@ -124,29 +120,19 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
         channelName = getActivity().getIntent().getStringExtra("name");
 
         setTitle(getString(R.string.timer_title));
-        setHeadersTransitionOnBackEnabled(true);
 
-        int color_brand = Utils.getColor(getActivity(), R.color.primary_color);
-
-        setBrandColor(color_brand);
         setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));
 
         handler = new Handler();
 
-        setOnItemViewClickedListener(new OnItemViewClickedListener() {
-            @Override
-            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                Movie movie = (Movie) item;
-                ((TimerActivity) getActivity()).selectEvent(movie);
-            }
+        setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
+            Movie movie = (Movie) item;
+            ((TimerActivity) getActivity()).selectEvent(movie);
         });
 
-        setOnSearchClickedListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), EpgSearchActivity.class);
-                startActivity(intent);
-            }
+        setOnSearchClickedListener(view -> {
+            Intent intent = new Intent(getActivity(), EpgSearchActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -169,12 +155,9 @@ public class TimerFragment extends BrowseFragment implements DataService.Listene
     public void onConnected(DataService service) {
         connection = service.getConnection();
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                setHeadersState(HEADERS_DISABLED);
-                loadEpgForChannel();
-            }
+        handler.post(() -> {
+            //setHeadersState(HEADERS_HIDDEN);
+            loadEpgForChannel();
         });
     }
 
