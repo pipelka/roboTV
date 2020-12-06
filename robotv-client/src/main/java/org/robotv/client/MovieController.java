@@ -48,29 +48,23 @@ public class MovieController {
     }
 
     public void loadMovieCollection(final LoaderCallback listener) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "started movie collection update");
-                listener.onMovieCollectionUpdated(null, STATUS_Collection_Busy);
-            }
+        handler.post(() -> {
+            Log.i(TAG, "started movie collection update");
+            listener.onMovieCollectionUpdated(null, STATUS_Collection_Busy);
         });
 
         MovieCollectionLoaderTask loaderTask = new MovieCollectionLoaderTask(connection);
-        loaderTask.load(new MovieCollectionLoaderTask.Listener() {
-            @Override
-            public void onCompleted(Collection<Movie> list) {
-                if(list == null) {
-                    movieCollection = null;
-                    listener.onMovieCollectionUpdated(null, STATUS_Collection_Error);
-                    return;
-                }
-
-                Log.d(TAG, "finished loading (" + list.size() + " movies)");
-
-                movieCollection = list;
-                listener.onMovieCollectionUpdated(movieCollection, STATUS_Collection_Ready);
+        loaderTask.load(list -> {
+            if(list == null) {
+                movieCollection = null;
+                listener.onMovieCollectionUpdated(null, STATUS_Collection_Error);
+                return;
             }
+
+            Log.d(TAG, "finished loading (" + list.size() + " movies)");
+
+            movieCollection = list;
+            listener.onMovieCollectionUpdated(movieCollection, STATUS_Collection_Ready);
         });
     }
 
