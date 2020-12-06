@@ -3,7 +3,6 @@ package org.robotv.recordings.presenter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
@@ -21,47 +20,26 @@ import org.robotv.client.artwork.ArtworkFetcher;
 import org.robotv.client.Connection;
 import org.robotv.client.model.Timer;
 import org.robotv.setup.SetupUtils;
+import org.robotv.ui.ExecutorPresenter;
 import org.robotv.ui.GlideApp;
 
 import java.io.IOException;
 
-public class TimerPresenter extends Presenter {
+public class TimerPresenter extends ExecutorPresenter {
 
     private final Connection connection;
 
+    private void timerArtworkTask(ArtworkFetcher artwork, Timer timer, ImageCardView cardView) {
+        Drawable drawableUnknown = cardView.getResources().getDrawable(R.drawable.recording_unkown, null);
 
-    private static class TimerArtworkTask extends AsyncTask<Void, Void, String> {
-
-        ArtworkFetcher artwork;
-        Timer timer;
-        final ImageCardView cardView;
-        Drawable drawableUnknown;
-
-        TimerArtworkTask(ArtworkFetcher artwork, Timer timer, ImageCardView cardView) {
-            this.artwork = artwork;
-            this.timer = timer;
-            this.cardView = cardView;
-            this.drawableUnknown = cardView.getResources().getDrawable(R.drawable.recording_unkown, null);
+        try {
+            artwork.fetchForEvent(timer);
         }
-        @Override
-        protected String doInBackground(Void... params) {
-            String url = null;
-
-            try {
-                artwork.fetchForEvent(timer);
-                url = timer.getPosterUrl();
-                if(TextUtils.isEmpty(url)) {
-                    url = timer.getBackgroundUrl();
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            return url;
+        catch (IOException e) {
+            e.printStackTrace();
         }
 
-        @Override
-        protected void onPostExecute(String url) {
+        cardView.post(() -> {
             if(!TextUtils.isEmpty(timer.getLogoUrl())) {
                 GlideApp.with(cardView.getContext())
                         .load(timer.getLogoUrl())
@@ -96,7 +74,7 @@ public class TimerPresenter extends Presenter {
                             cardView.setMainImage(resource);
                         }
                     });
-        }
+        });
     }
 
     public TimerPresenter(@NonNull Connection connection) {
@@ -159,9 +137,8 @@ public class TimerPresenter extends Presenter {
 
         String language = SetupUtils.getLanguage(context);
         ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
-        TimerArtworkTask task = new TimerArtworkTask(artwork, timer, cardView);
 
-        task.execute();
+        execute(() -> timerArtworkTask(artwork, timer, cardView));
     }
 
     @Override
