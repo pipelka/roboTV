@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -168,7 +169,7 @@ public class DataService extends Service {
         handlerThread = new HandlerThread("dataservice");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
-        listenerHandler = new Handler();
+        listenerHandler = new Handler(Looper.getMainLooper());
 
         notification = new NotificationHandler(this);
 
@@ -240,21 +241,18 @@ public class DataService extends Service {
 
         final Event event = PacketAdapter.toEvent(p);
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if(artwork.fetchForEvent(event)) {
-                        notification.notify(message, event.getTitle(), event.getBackgroundUrl());
-                    }
-                    else {
-                        notification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
-                    }
+        handler.post(() -> {
+            try {
+                if(artwork.fetchForEvent(event)) {
+                    notification.notify(message, event.getTitle(), event.getBackgroundUrl());
                 }
-                catch(IOException e) {
-                    e.printStackTrace();
+                else {
                     notification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
                 }
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+                notification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
             }
         });
     }
@@ -312,77 +310,57 @@ public class DataService extends Service {
             return;
         }
 
-        listenerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                listener.onConnected(DataService.this);
-            }
-        });
+        listenerHandler.post(() -> listener.onConnected(DataService.this));
     }
 
     private void postOnConnected() {
         Log.d(TAG, "postOnConnected");
-        listenerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < listeners.size(); i++) {
-                    listeners.get(i).onConnected(DataService.this);
-                }
+        listenerHandler.post(() -> {
+            for (int i = 0; i < listeners.size(); i++) {
+                listeners.get(i).onConnected(DataService.this);
             }
         });
     }
 
     private void postOnConnectionError() {
         Log.d(TAG, "postOnConnectionError");
-        listenerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < listeners.size(); i++) {
-                    listeners.get(i).onConnectionError(DataService.this);
-                }
+        listenerHandler.post(() -> {
+            for (int i = 0; i < listeners.size(); i++) {
+                listeners.get(i).onConnectionError(DataService.this);
             }
         });
     }
 
     private void postOnMovieUpdate() {
-        listenerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < listeners.size(); i++) {
-                    listeners.get(i).onMovieUpdate(DataService.this);
-                }
+        listenerHandler.post(() -> {
+            for (int i = 0; i < listeners.size(); i++) {
+                listeners.get(i).onMovieUpdate(DataService.this);
             }
         });
     }
 
     private void postOnTimersUpdate() {
-        listenerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < listeners.size(); i++) {
-                    listeners.get(i).onTimersUpdated(DataService.this);
-                }
+        listenerHandler.post(() -> {
+            for (int i = 0; i < listeners.size(); i++) {
+                listeners.get(i).onTimersUpdated(DataService.this);
             }
         });
     }
 
     private void onTimerAdded(final Timer timer) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                String url = timer.getLogoUrl();
+        handler.post(() -> {
+            String url = timer.getLogoUrl();
 
 
-                try {
-                    if(artwork.fetchForEvent(timer)) {
-                        url = timer.getPosterUrl();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+            try {
+                if(artwork.fetchForEvent(timer)) {
+                    url = timer.getPosterUrl();
                 }
-
-                notification.notify(getString(R.string.timer_created), timer.getTitle(), url);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
+            notification.notify(getString(R.string.timer_created), timer.getTitle(), url);
         });
     }
 
