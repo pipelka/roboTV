@@ -9,10 +9,10 @@ import android.os.IBinder;
 public class DataServiceClient {
 
     private DataService service;
-    private Context context;
-    private DataService.Listener listener;
+    private final Context context;
+    private final DataService.Listener listener;
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder serviceBinder) {
