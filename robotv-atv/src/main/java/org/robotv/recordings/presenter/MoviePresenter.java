@@ -16,15 +16,11 @@ import org.robotv.client.model.Movie;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.setup.SetupUtils;
+import org.robotv.ui.ExecutorPresenter;
 import org.robotv.ui.GlideApp;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-public class MoviePresenter extends Presenter {
-
-    static private final ExecutorService threadPool = Executors.newCachedThreadPool();
+public class MoviePresenter extends ExecutorPresenter {
 
     protected final Connection connection;
 
@@ -36,22 +32,26 @@ public class MoviePresenter extends Presenter {
         private final ImageCardView mCardView;
         private final Drawable mDrawableUnknown;
 
-        private void updateTask(ArtworkFetcher artwork, Movie movie, ViewHolder view) {
-            String url = null;
+        private void setArtwork(Movie movie) {
+            String url = movie.getPosterUrl();
 
+            if(TextUtils.isEmpty(url)) {
+                url = movie.getBackgroundUrl();
+            }
+
+            final String finalUrl = url;
+            mCardView.post(() -> updateCardViewImage(finalUrl));
+        }
+
+        private void updateTask(ArtworkFetcher artwork, Movie movie, ViewHolder view) {
             try {
                 artwork.fetchForEvent(movie);
-                url = movie.getPosterUrl();
-                if(TextUtils.isEmpty(url)) {
-                    url = movie.getBackgroundUrl();
-                }
             }
             catch (IOException e) {
                 e.printStackTrace();
             }
 
-            final String finalUrl = url;
-            view.mCardView.post(() -> updateCardViewImage(finalUrl));
+            setArtwork(movie);
         }
 
         public ViewHolder(View view) {
@@ -84,7 +84,7 @@ public class MoviePresenter extends Presenter {
             String language = SetupUtils.getLanguage(context);
             final ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
 
-            threadPool.execute(() -> updateTask(artwork, movie, ViewHolder.this));
+            execute(() -> updateTask(artwork, movie, ViewHolder.this));
         }
     }
 
