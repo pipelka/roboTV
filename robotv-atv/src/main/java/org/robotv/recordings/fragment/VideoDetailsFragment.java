@@ -30,6 +30,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
+import org.robotv.client.MovieController;
 import org.robotv.client.RelatedContentExtractor;
 import org.robotv.dataservice.NotificationHandler;
 import org.robotv.recordings.activity.CoverSearchActivity;
@@ -57,6 +58,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
 
     public static final String TAG = "VideoDetailsFragment";
     public static final String EXTRA_MOVIE = "extra_movie";
+    public static final String EXTRA_RECID = "extra_recid";
     public static final String EXTRA_SHOULD_AUTO_START = "extra_should_auto_start";
 
     private static final int ACTION_WATCH = 1;
@@ -334,7 +336,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
 
     private void playbackMovie(Movie movie) {
         Intent intent = new Intent(getActivity(), PlayerActivity.class);
-        intent.putExtra(EXTRA_MOVIE, movie);
+        intent.putExtra(EXTRA_RECID, movie.getRecordingIdString());
         intent.putExtra(EXTRA_SHOULD_AUTO_START, true);
         startActivity(intent);
     }
@@ -357,7 +359,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
         }
 
         SortedArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(
-                MovieCollectionAdapter.compareTimestamps,
+                MovieController.compareTimestamps,
                 new LatestCardPresenter(service.getConnection()));
 
         listRowAdapter.addAll(collection);

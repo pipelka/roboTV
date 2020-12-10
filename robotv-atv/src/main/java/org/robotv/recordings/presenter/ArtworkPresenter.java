@@ -34,7 +34,7 @@ public class ArtworkPresenter extends Presenter {
 
             GlideApp.with(context)
             .load(link)
-            .override(266, 400)
+            .override(MoviePresenter.WIDTH, MoviePresenter.HEIGHT)
             .centerCrop()
             .error(context.getDrawable(R.drawable.recording_unkown))
             .placeholder(context.getDrawable(R.drawable.recording_unkown))
@@ -59,7 +59,7 @@ public class ArtworkPresenter extends Presenter {
         Context context = cardView.getContext();
 
         cardView.setTitleText(holder.getTitle());
-        cardView.setMainImageDimensions(266, 400);
+        cardView.setMainImageDimensions(MoviePresenter.WIDTH, MoviePresenter.HEIGHT);
         cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.primary_color));
 
         vh.updateCardViewImage(cardView.getContext(), holder.getPosterUrl());

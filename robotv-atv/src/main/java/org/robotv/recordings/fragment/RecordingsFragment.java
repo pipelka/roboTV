@@ -19,7 +19,6 @@ import org.robotv.recordings.activity.SearchActivity;
 import org.robotv.recordings.model.EpisodeTimer;
 import org.robotv.recordings.model.IconAction;
 import org.robotv.recordings.presenter.IconActionPresenter;
-import org.robotv.client.TimerController;
 import org.robotv.client.model.Movie;
 import org.robotv.recordings.model.MovieCollectionAdapter;
 import org.robotv.recordings.util.BackgroundManagerTarget;
@@ -32,7 +31,7 @@ import org.robotv.dataservice.NotificationHandler;
 import org.robotv.setup.SetupUtils;
 import org.robotv.ui.GlideApp;
 
-import java.util.Collection;
+import java.util.ArrayList;
 
 public class RecordingsFragment extends BrowseSupportFragment implements DataService.Listener, MovieController.LoaderCallback {
 
@@ -64,6 +63,7 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     private void updateBackground(String url) {
         if(TextUtils.isEmpty(url) || !url.endsWith(".jpg")) {
             backgroundManager.setColor(color_background);
+            backgroundManager.clearDrawable();
             return;
         }
 
@@ -155,6 +155,9 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
                 Event event = (Event) item;
                 updateBackground(event.getBackgroundUrl());
             }
+            else {
+                updateBackground(null);
+            }
         });
 
         setOnSearchClickedListener(view -> {
@@ -187,7 +190,7 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     }
 
     @Override
-    public void onMovieCollectionUpdated(Collection<Movie> collection, int status) {
+    public void onMovieCollectionUpdated(ArrayList<Movie> collection, int status) {
         if(!isAdded()) {
             return;
         }

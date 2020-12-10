@@ -6,22 +6,22 @@ import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.leanback.widget.Action;
 import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.leanback.widget.BaseOnItemViewClickedListener;
 import androidx.leanback.widget.ClassPresenterSelector;
 import androidx.leanback.widget.ControlButtonPresenterSelector;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
-import androidx.leanback.widget.OnActionClickedListener;
 import androidx.leanback.widget.PlaybackControlsRow;
 import androidx.leanback.widget.PlaybackControlsRowPresenter;
-import androidx.leanback.widget.Presenter;
-import androidx.leanback.widget.RowPresenter;
+
 import android.util.Log;
 
-import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.exoplayer2.util.MimeTypes;
 
@@ -32,11 +32,13 @@ import org.robotv.client.model.Movie;
 import org.robotv.recordings.presenter.ActionPresenterSelector;
 import org.robotv.recordings.presenter.ColorAction;
 import org.robotv.recordings.presenter.DetailsDescriptionPresenter;
+import org.robotv.recordings.presenter.MoviePresenter;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.ui.GlideApp;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSupportFragment {
 
@@ -47,11 +49,18 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
         this.player = player;
     }
 
-    private SimpleTarget<Drawable> controlsRowTarget = new SimpleTarget<Drawable>() {
+    private final CustomTarget<Drawable> controlsRowTarget = new CustomTarget<Drawable>() {
         @Override
-        public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+        public void onResourceReady(@NonNull Drawable resource, Transition<? super Drawable> transition) {
             mPlaybackControlsRow.setImageDrawable(resource);
             mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
+        }
+
+        @Override
+        public void onLoadCleared(@Nullable Drawable placeholder) {
+            if(placeholder != null) {
+                mPlaybackControlsRow.setImageDrawable(placeholder);
+            }
         }
     };
 
@@ -77,24 +86,21 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSelectedMovie = (Movie) getActivity().getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
         mHandler = new Handler(Looper.getMainLooper());
 
         setBackgroundType(PlaybackOverlayFragment.BG_LIGHT);
         setControlsOverlayAutoHideEnabled(false);
-
-        setUpRows();
     }
 
     private ArrayObjectAdapter mRowsAdapter;
 
-    private void setUpRows() {
+    public void setUpRows() {
         ClassPresenterSelector ps = new ClassPresenterSelector();
 
         PlaybackControlsRowPresenter playbackControlsRowPresenter;
         playbackControlsRowPresenter = new PlaybackControlsRowPresenter(new DetailsDescriptionPresenter());
 
-        playbackControlsRowPresenter.setBackgroundColor(Utils.getColor(getActivity(), R.color.primary_color));
+        playbackControlsRowPresenter.setBackgroundColor(Utils.getColor(Objects.requireNonNull(getActivity()), R.color.primary_color));
 
         ps.addClassPresenter(PlaybackControlsRow.class, playbackControlsRowPresenter);
         ps.addClassPresenter(ListRow.class, new ListRowPresenter());
@@ -152,10 +158,13 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
             return;
         }
 
-        GlideApp.with(getActivity())
+        Drawable placeholder = Objects.requireNonNull(getContext()).getDrawable(R.drawable.recording_unkown);
+
+        GlideApp.with(this)
         .load(url)
-        .override(Utils.dpToPx(R.integer.artwork_poster_width, getActivity()),
-                Utils.dpToPx(R.integer.artwork_poster_height, getActivity()))
+        .placeholder(placeholder)
+        .error(placeholder)
+        .override(MoviePresenter.WIDTH, MoviePresenter.HEIGHT)
         .into(controlsRowTarget);
     }
 
@@ -183,19 +192,21 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
 
         Activity activity = getActivity();
 
-        // primary actions
-        mPlayPauseAction = new PlaybackControlsRow.PlayPauseAction(activity);
-        mSkipNextAction = new PlaybackControlsRow.SkipNextAction(activity);
-        mSkipPreviousAction = new PlaybackControlsRow.SkipPreviousAction(activity);
-        mFastForwardAction = new PlaybackControlsRow.FastForwardAction(activity);
-        mRewindAction = new PlaybackControlsRow.RewindAction(activity);
+        if(activity != null) {
+            // primary actions
+            mPlayPauseAction = new PlaybackControlsRow.PlayPauseAction(activity);
+            mSkipNextAction = new PlaybackControlsRow.SkipNextAction(activity);
+            mSkipPreviousAction = new PlaybackControlsRow.SkipPreviousAction(activity);
+            mFastForwardAction = new PlaybackControlsRow.FastForwardAction(activity);
+            mRewindAction = new PlaybackControlsRow.RewindAction(activity);
 
-        // PrimaryAction setting
-        mPrimaryActionAdapter.add(mSkipPreviousAction);
-        mPrimaryActionAdapter.add(mRewindAction);
-        mPrimaryActionAdapter.add(mPlayPauseAction);
-        mPrimaryActionAdapter.add(mFastForwardAction);
-        mPrimaryActionAdapter.add(mSkipNextAction);
+            // PrimaryAction setting
+            mPrimaryActionAdapter.add(mSkipPreviousAction);
+            mPrimaryActionAdapter.add(mRewindAction);
+            mPrimaryActionAdapter.add(mPlayPauseAction);
+            mPrimaryActionAdapter.add(mFastForwardAction);
+            mPrimaryActionAdapter.add(mSkipNextAction);
+        }
 
         updateVideoImage(mSelectedMovie.getPosterUrl());
     }
@@ -274,7 +285,7 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
 
                     mRowsAdapter.notifyArrayItemRangeChanged(0, 1);
 
-                    ((PlayerActivity)getActivity()).updatePlaybackState();
+                    updatePlaybackPosition(false);
 
                     mHandler.postDelayed(this, DEFAULT_UPDATE_PERIOD);
                 }
@@ -317,7 +328,7 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
             pause();
         }
 
-        ((PlayerActivity)getActivity()).updatePlaybackState();
+        updatePlaybackPosition(false);
     }
 
     private void notifyChanged(Action action) {
@@ -339,12 +350,23 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
         stopProgressAutomation();
         long position = player.getCurrentPosition() + timeMs;
         player.seek(position);
+        updatePlaybackPosition(true);
     }
 
     public void rewind(int timeMs) {
         stopProgressAutomation();
         long position = Math.max(player.getCurrentPosition() - timeMs, player.getStartPosition());
         player.seek(position);
+        updatePlaybackPosition(true);
+    }
+
+    private void updatePlaybackPosition(boolean force) {
+        PlayerActivity activity = ((PlayerActivity)getActivity());
+        if(activity == null) {
+            return;
+        }
+
+        activity.updatePlaybackPosition(force);
     }
 
     public void togglePlayback(boolean play) {
@@ -360,5 +382,9 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
 
     public boolean isPlaying() {
         return (mCurrentPlaybackState != PlaybackState.STATE_PLAYING);
+    }
+
+    public void setMovie(Movie movie) {
+        mSelectedMovie = movie;
     }
 }

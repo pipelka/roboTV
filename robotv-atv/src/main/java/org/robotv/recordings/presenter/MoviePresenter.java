@@ -24,6 +24,9 @@ public class MoviePresenter extends ExecutorPresenter {
 
     protected final Connection connection;
 
+    final static public int WIDTH = 266;
+    final static public int HEIGHT = 400;
+
     public MoviePresenter(@NonNull Connection connection) {
         this.connection = connection;
     }
@@ -73,7 +76,7 @@ public class MoviePresenter extends ExecutorPresenter {
 
             GlideApp.with(mCardView)
                 .load(link)
-                .override(266, 400)
+                .override(WIDTH, HEIGHT)
                 .centerCrop()
                 .error(mDrawableUnknown)
                 .placeholder(mDrawableUnknown)
@@ -115,7 +118,7 @@ public class MoviePresenter extends ExecutorPresenter {
         }
 
         cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.primary_color));
-        cardView.setMainImageDimensions(266, 400);
+        cardView.setMainImageDimensions(MoviePresenter.WIDTH, MoviePresenter.HEIGHT);
 
         vh.update(movie, connection, context);
     }

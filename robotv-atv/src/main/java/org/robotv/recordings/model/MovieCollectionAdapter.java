@@ -10,6 +10,7 @@ import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import android.text.TextUtils;
 
+import org.robotv.client.MovieController;
 import org.robotv.recordings.presenter.IconActionPresenter;
 import org.robotv.recordings.presenter.MoviePresenter;
 import org.robotv.recordings.presenter.LatestCardPresenter;
@@ -22,74 +23,48 @@ import org.robotv.client.model.Timer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 
 public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
 
-    static public Comparator<Event> compareTimestamps = new Comparator<Event>() {
-        @Override
-        public int compare(Event lhs, Event rhs) {
-            if(lhs.getStartTime() == rhs.getStartTime()) {
-                return 0;
-            }
+    static public final Comparator<Row> compareCategories = (lhs, rhs) -> {
+        HeaderItem lhsHeader = lhs.getHeaderItem();
+        HeaderItem rhsHeader = rhs.getHeaderItem();
+        int r;
 
-            return lhs.getStartTime() > rhs.getStartTime() ? -1 : 1;
-        }
-    };
-
-    private static Comparator<Event> compareTimestampsReverse = new Comparator<Event>() {
-        @Override
-        public int compare(Event lhs, Event rhs) {
-            if(lhs.getStartTime() == rhs.getStartTime()) {
-                return 0;
-            }
-
-            return lhs.getStartTime() < rhs.getStartTime() ? -1 : 1;
-        }
-    };
-
-    private static Comparator<Row> compareCategories = new Comparator<Row>() {
-        @Override
-        public int compare(Row lhs, Row rhs) {
-            HeaderItem lhsHeader = lhs.getHeaderItem();
-            HeaderItem rhsHeader = rhs.getHeaderItem();
-            int r;
-
-            if(lhsHeader.getId() <= 9 && rhsHeader.getId() <= 9) {
-                if(lhsHeader.getId() == rhsHeader.getId()) {
-                    r = 0;
-                }
-                else {
-                    r = (lhsHeader.getId() < rhsHeader.getId()) ? -1 : 1;
-                }
-            }
-            else if(lhsHeader.getId() <= 9) {
-                r = -1;
-            }
-            else if(rhsHeader.getId() <= 9) {
-                r = 1;
-            }
-            else if(lhsHeader.getId() >= 900 && rhsHeader.getId() >= 900) {
-                if(lhsHeader.getId() == rhsHeader.getId()) {
-                    r = 0;
-                }
-                else {
-                    r = (lhsHeader.getId() < rhsHeader.getId()) ? -1 : 1;
-                }
-            }
-            else if(lhsHeader.getId() >= 900) {
-                r = 1;
-            }
-            else if(rhsHeader.getId() >= 900) {
-                r = -1;
+        if(lhsHeader.getId() <= 9 && rhsHeader.getId() <= 9) {
+            if(lhsHeader.getId() == rhsHeader.getId()) {
+                r = 0;
             }
             else {
-                r = lhsHeader.getName().compareTo(rhsHeader.getName());
+                r = (lhsHeader.getId() < rhsHeader.getId()) ? -1 : 1;
             }
-
-            return r;
         }
+        else if(lhsHeader.getId() <= 9) {
+            r = -1;
+        }
+        else if(rhsHeader.getId() <= 9) {
+            r = 1;
+        }
+        else if(lhsHeader.getId() >= 900 && rhsHeader.getId() >= 900) {
+            if(lhsHeader.getId() == rhsHeader.getId()) {
+                r = 0;
+            }
+            else {
+                r = (lhsHeader.getId() < rhsHeader.getId()) ? -1 : 1;
+            }
+        }
+        else if(lhsHeader.getId() >= 900) {
+            r = 1;
+        }
+        else if(rhsHeader.getId() >= 900) {
+            r = -1;
+        }
+        else {
+            r = lhsHeader.getName().compareTo(rhsHeader.getName());
+        }
+
+        return r;
     };
 
     private interface MovieIterator {
@@ -103,7 +78,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
 
     private ArrayObjectAdapter mLatest;
     private ArrayObjectAdapter mTvShows;
-    private Context mContext;
+    private final Context mContext;
 
     public MovieCollectionAdapter(Context context, Connection connection) {
         super(compareCategories, new ListRowPresenter());
@@ -167,7 +142,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         HeaderItem header = new HeaderItem(id, category);
 
         ArrayObjectAdapter listRowAdapter = new SortedArrayObjectAdapter(
-                reverse ? compareTimestampsReverse : compareTimestamps,
+                reverse ? MovieController.compareTimestampsReverse : MovieController.compareTimestamps,
                 presenter);
 
         listrow = new ListRow(header, listRowAdapter);
@@ -281,17 +256,14 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     public void remove(final Movie movie) {
-        iterateAll(new MovieIterator() {
-            @Override
-            public boolean iterate(ArrayObjectAdapter adapter, Movie m) {
-                int id = m.getRecordingId();
-                if(id == movie.getRecordingId()) {
-                    adapter.remove(m);
-                    return true;
-                }
-
-                return false;
+        iterateAll((adapter, m) -> {
+            int id = m.getRecordingId();
+            if(id == movie.getRecordingId()) {
+                adapter.remove(m);
+                return true;
             }
+
+            return false;
         });
     }
 
@@ -328,9 +300,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         }
 
         // add episode timers
-        for(EpisodeTimer timer: episodeTimers) {
-            newTimers.add(timer);
-        }
+        newTimers.addAll(episodeTimers);
 
         // remove items
         int diff = timerAdapter.size() - newTimers.size();
@@ -338,7 +308,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
             timerAdapter.removeItems(timerAdapter.size() - diff, diff);
         }
 
-        Collections.sort(newTimers, compareTimestampsReverse);
+        newTimers.sort(MovieController.compareTimestampsReverse);
 
         // add or replace timers
         int index = 0;
@@ -412,12 +382,9 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
 
     public void loadMovies(Collection<Movie> movieCollection) {
         // reset count
-        iterateAll(new MovieIterator() {
-            @Override
-            public boolean iterate(ArrayObjectAdapter adapter, Movie m) {
-                m.setEpisodeCount(0);
-                return false;
-            }
+        iterateAll((adapter, m) -> {
+            m.setEpisodeCount(0);
+            return false;
         });
 
         // insert all movies
@@ -428,16 +395,13 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         }
 
         // check for removed entries
-        iterateAll(new MovieIterator() {
-            @Override
-            public boolean iterate(ArrayObjectAdapter adapter, Movie m) {
-                if(m.getEpisodeCount() == 0) {
-                    adapter.remove(m);
-                    return true;
-                }
-
-                return false;
+        iterateAll((adapter, m) -> {
+            if(m.getEpisodeCount() == 0) {
+                adapter.remove(m);
+                return true;
             }
+
+            return false;
         });
 
         // update all rows

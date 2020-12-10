@@ -3,8 +3,6 @@ package org.robotv.recordings.activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.bumptech.glide.Glide;
-
 import org.robotv.recordings.fragment.RecordingsFragment;
 import org.robotv.robotv.R;
 import org.robotv.ui.DataServiceActivity;

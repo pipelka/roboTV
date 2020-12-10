@@ -1,31 +1,23 @@
 package org.robotv.recordings.activity;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaMetadata;
-import android.media.session.MediaSession;
-import android.media.session.PlaybackState;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceView;
 
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.google.android.exoplayer2.Format;
 
+import org.robotv.client.MovieController;
 import org.robotv.player.Player;
 import org.robotv.player.StreamBundle;
 import org.robotv.recordings.fragment.PlaybackOverlayFragment;
 import org.robotv.recordings.fragment.VideoDetailsFragment;
 import org.robotv.client.model.Movie;
-import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.dataservice.DataService;
 import org.robotv.dataservice.NotificationHandler;
 import org.robotv.setup.SetupUtils;
 import org.robotv.ui.DataServiceActivity;
-import org.robotv.ui.GlideApp;
 
 public class PlayerActivity extends DataServiceActivity implements Player.Listener, DataService.Listener {
 
@@ -34,7 +26,6 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     private Player mPlayer;
     private PlaybackOverlayFragment mControls;
     private Movie mSelectedMovie;
-    private MediaSession mSession;
     private NotificationHandler notificationHandler;
     private long lastUpdateTimeStamp;
 
@@ -58,97 +49,22 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         );
 
         mControls.setPlayer(mPlayer);
-
-        mSession = new MediaSession(this, "roboTV Movie");
-
-        initViews();
         setServiceListener(this);
     }
 
-    private void updateMetadata(Movie movie) {
-        final MediaMetadata.Builder metadataBuilder = new MediaMetadata.Builder();
-
-        metadataBuilder
-        .putLong(MediaMetadata.METADATA_KEY_DURATION, mSelectedMovie.getDurationMs())
-        .putString(MediaMetadata.METADATA_KEY_TITLE, movie.getTitle())
-        .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, movie.getShortText())
-        .putString(MediaMetadata.METADATA_KEY_DISPLAY_DESCRIPTION, movie.getDescription());
-
-        String url = movie.getPosterUrl();
-
-        if(!TextUtils.isEmpty(url)) {
-            GlideApp.with(this)
-            .asBitmap()
-            .load(url)
-            .override(Utils.dpToPx(R.integer.artwork_poster_width, this), Utils.dpToPx(R.integer.artwork_poster_height, this))
-            .centerCrop()
-            .into(new SimpleTarget<Bitmap>() {
-                @Override
-                public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                    metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, resource);
-                    MediaMetadata m = metadataBuilder.build();
-                    mSession.setMetadata(m);
-                }
-            });
+   private void startPlayback() {
+        if(mSelectedMovie == null) {
             return;
         }
 
-        metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, BitmapFactory.decodeResource(getResources(), R.drawable.recording_unkown));
-        mSession.setMetadata(metadataBuilder.build());
-    }
+        //DataService service = getService();
+        //MovieController controller = service.getMovieController();
+        String recid = mSelectedMovie.getRecordingIdString();
 
-    public void updatePlaybackState() {
-        long position = mPlayer.getDurationSinceStart();
+        long position = 0; //controller.getPlaybackPosition(recid);
 
-        PlaybackState.Builder stateBuilder = new PlaybackState.Builder();
-
-        int playerState = mPlayer.getPlaybackState();
-        int state = PlaybackState.STATE_NONE;
-
-        if(playerState == com.google.android.exoplayer2.Player.STATE_BUFFERING) {
-            state = PlaybackState.STATE_BUFFERING;
-        }
-        else if(mPlayer.isPaused()) {
-            state = PlaybackState.STATE_PAUSED;
-        }
-        else if(!mPlayer.isPaused()) {
-            state = PlaybackState.STATE_PLAYING;
-        }
-
-        stateBuilder.setState(state, position, 1.0f);
-
-        mSession.setPlaybackState(stateBuilder.build());
-        updatePlaybackPosition();
-    }
-
-    private void initViews() {
-        SurfaceView mVideoView = findViewById(R.id.videoView);
-        mPlayer.setSurface(mVideoView.getHolder().getSurface());
-        mSelectedMovie = (Movie) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_MOVIE);
-
-        updateMetadata(mSelectedMovie);
-    }
-
-    private void startPlayback() {
-        Bundle bundle = getIntent().getExtras();
-
-        if(mSelectedMovie == null || bundle == null) {
-            return;
-        }
-
-        DataService service = getService();
-        long position = 0;
-
-        if(service != null) {
-            position = service.getMovieController().getPlaybackPosition(mSelectedMovie);
-        }
-
-        String id = mSelectedMovie.getRecordingIdString();
-
-        mPlayer.open(Player.createRecordingUri(id, position));
+        mPlayer.open(Player.createRecordingUri(recid, position));
         mControls.togglePlayback(true);
-
-        mSession.setActive(true);
     }
 
     @Override
@@ -174,10 +90,10 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         }
     }
 
-    void updatePlaybackPosition() {
+    public void updatePlaybackPosition(boolean force) {
         long now = System.currentTimeMillis();
 
-        if(now - lastUpdateTimeStamp < 5000) {
+        if(now - lastUpdateTimeStamp < 5000 && !force) {
             return;
         }
 
@@ -192,9 +108,6 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     }
 
     protected void stopPlayback() {
-        mSession.setActive(false);
-        mSession.release();
-
         if(mPlayer == null) {
             return;
         }
@@ -261,6 +174,17 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         if(mPlayer != null && mPlayer.getPlaybackState() > com.google.android.exoplayer2.Player.STATE_IDLE) {
             return;
         }
+
+        String recid  = (String) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_RECID);
+
+        Log.d(TAG, "recid: " + recid);
+        mSelectedMovie = service.getMovieController().getMovie(recid);
+
+        SurfaceView mVideoView = findViewById(R.id.videoView);
+        mPlayer.setSurface(mVideoView.getHolder().getSurface());
+
+        mControls.setMovie(mSelectedMovie);
+        mControls.setUpRows();
 
         startPlayback();
     }
