@@ -29,7 +29,7 @@ public class EpgEventPresenter extends MoviePresenter {
 
         cardView.setContentText(subText);
 
-        cardView.setMainImageDimensions(266, 400);
+        cardView.setMainImageDimensions(MoviePresenter.WIDTH, MoviePresenter.HEIGHT);
         cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.primary_color));
 
         vh.update(movie, connection, context);
