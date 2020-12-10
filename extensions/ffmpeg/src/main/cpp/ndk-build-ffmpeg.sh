@@ -119,4 +119,53 @@ make install-libs
 make clean
 find . -name "*.o" | xargs rm
 
+# x86
+
+NDK_ABIARCH=i686-linux-android
+
+./configure \
+    --cross-prefix=$CROSS_PREFIX \
+    --prefix=.. \
+    --libdir=../libs/x86 \
+    --enable-cross-compile \
+    --arch=x86 \
+    --cpu=i686 \
+    --target-os=android \
+    --sysroot="${SYSROOT}" \
+    --extra-cflags="-march=atom -msse3 -ffast-math -mfpmath=sse -O3" \
+    --extra-ldflags="" \
+    --cc="${CROSS_PREFIX}i686-linux-android21-clang" \
+    --cxx="${CROSS_PREFIX}i686-linux-android21-clang++" \
+    --nm="${CROSS_PREFIX}${NDK_ABIARCH}-nm" \
+    --ld="${CROSS_PREFIX}i686-linux-android21-clang" \
+    --ar="${CROSS_PREFIX}${NDK_ABIARCH}-ar" \
+    --strip="${CROSS_PREFIX}${NDK_ABIARCH}-strip" \
+    --extra-ldexeflags=-pie \
+    --disable-static \
+    --disable-asm \
+    --enable-version3 \
+    --enable-pic \
+    --enable-shared \
+    --disable-doc \
+    --disable-programs \
+    --disable-everything \
+    --disable-avdevice \
+    --disable-avformat \
+    --disable-swscale \
+    --disable-postproc \
+    --disable-avfilter \
+    --disable-symver \
+    --enable-avresample \
+    --enable-decoder=h264 \
+    --enable-decoder=aac_latm \
+    --enable-decoder=ac3 \
+    --enable-decoder=eac3 \
+    --enable-decoder=mp3 || \
+    exit 1
+
+make -j4
+make install-libs
+
+make clean
+find . -name "*.o" | xargs rm
 make install-headers
