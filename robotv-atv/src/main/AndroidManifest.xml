@@ -127,7 +127,7 @@
         <activity
             android:name="org.robotv.recordings.activity.RecordingsActivity"
             android:banner="@drawable/banner_movies"
-            android:label="Recordings"
+            android:label="@string/robotv"
             android:theme="@style/Theme.Leanback">
 
             <intent-filter>
