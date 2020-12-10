@@ -1,41 +1,35 @@
 language: android
 jdk: oraclejdk8
 sudo: required
-
 android:
   components:
-    - tools
-    - tools
-    - platform-tools
-    - build-tools-27.0.1
-    - android-27
-    - extra-android-m2repository
-
+  - tools
+  - tools
+  - platform-tools
+  - build-tools-27.0.1
+  - android-27
+  - extra-android-m2repository
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-    - $HOME/.android/build-cache
-
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "$HOME/.android/build-cache"
 before_install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get update
-  - sudo apt-get install libstdc++6
-  - git clone https://github.com/urho3d/android-ndk.git $HOME/android-ndk-root
-  - export ANDROID_NDK_HOME=$HOME/android-ndk-root
-  - yes | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
-
+- sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+- sudo apt-get update
+- sudo apt-get install libstdc++6
+- git clone https://github.com/urho3d/android-ndk.git $HOME/android-ndk-root
+- export ANDROID_NDK_HOME=$HOME/android-ndk-root
+- yes | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
 before_script:
-  - chmod +x gradlew
-
+- chmod +x gradlew
 script:
-  - ./gradlew assembleRelease
-  - if ( ! [ -z ${TRAVIS_TAG} ] && [ -f app/build/outputs/apk/robotv-release.apk ] ) ; then mv app/build/outputs/apk/robotv-release.apk robotv-${TRAVIS_TAG}.apk ; fi
-
+- "./gradlew assembleRelease"
+- if ( ! [ -z ${TRAVIS_TAG} ] && [ -f robotv-atv/build/outputs/apk/release/robotv-release.apk ] )
+  ; then mv robotv-atv/build/outputs/apk/release/robotv-release.apk robotv-${TRAVIS_TAG}.apk ; fi
 deploy:
   provider: releases
   api_key:
@@ -44,4 +38,8 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-
+env:
+  global:
+  - secure: BDDG1UAolZ/OWjj0SXRyzOBACJwe9D0vTbw0IOgfs1ringJCBNiLbpjzY6AqZGjn+wfytzSPj62qS0grklsat0oBMTLFNpa9/m+7jB1MtuzonHQDsTjKIGDx340YnJCG4sRugdA1eOOLgiUZoDNh8z9Sc9z5X7vjrZFQy9bbKy0f9mODBPWa6ZXJP7aiS8ocXEV7edY7VTvEzuryqlnniUAa5/scbE2WPUZLxR33L81acRH814l9VONtoJqIaTDmvlk/s/i7ucaPxdN7FUV/yZjeXobpq06Pw4EQG3YohSWgdAfmRSVn93NGjayGMNCXm8M3VOQf7n8ERa7k/pQRpTknmi9VMBWmA68AVV/98Kp19ZokleT/Avh2Ab9TxqW5d+E3nCkxiKbeq/VrypFz3HqujYUoE8X3Ad2exM4JW5Cvkwu5G9MYahS2NGSaQEWrPY7iy830oPxC2FynHZWzRndvbj9TjgK4UxWjZsvc9ltLwhKFGDkbcqcp3X6xUaqFNbkqo4IxBO18DeWkmOoWhl/GLN4LJbqQ3xWiWrK21/+kOcfaODmaTrmwl3Ov83vZwLdV/GacuRR2Xhhbn1M6BMUh+dXa+ptoM9/iTsfjqsZpmSzvP3bYTKB1+GUB0Ha7+DXqKHyl0muD3bGGYJMFgN7Up+U8Y//aGdpzDMnSuCw=
+  - secure: o0uGfB+kJAoaoxGlwgTyeid8BePQboBcYN2lSLpt4EJ4Ct7a6uI60wkv1xBRHF+j0JZKEZKT8JFARgQuwwJnCVGHGJIWp5FawY6SEJnN7hYt+p9yw1uzd26VZ98zQ7MeaMHj3sZ1db/IKDfRMwyVr9MF0Ifc+PqVPDwGRnrqpVhIQU8L7k6kLWJq3/Z3Tc8qshr4O3gnIIH9BTVRcga2oui39rTtlJM+7DnBQzrbnkyGu8Pz3s7xncdZWazi8/+3VgFSgQ4GqzStv5C9clRL6STjHqw7Fnx/5fRwJ0PZkrJNUAI0HjIPfNxoAc8/FFJghSSHEYq2PJdd42MTD8pw4vGbms+9t/UF5UCh1uswBbk/G8DO+8Ma2IwrQnjO/TCbYv8D4YPZaVlJbikXJXZN3tESrtfdl/T6ml8ywKE82yaO43Dd/MKLYxA4QS5SjkGG3tCUeTrAFpnzS/LwI/u4KziuMpOfv3izMWvYxd0H8ahihlZ6sOhsDjtTVp6GIJNM8Rcy/z7Iuie+EQNwodihVhQ4IgUm9lNS5j8xQmZ2hkjLJMuJA1mptD0xUqR8WE3qhJkctA7lGedq61ffpV3uj04umHFHYa/Z90SfyWGnaGhkflp/GLa282orq0mW4ZeQyURW0tB9/AIkhsIYUFFGY2tRXcZB8hMiqjiH60ONhEQ=
+  - secure: IVd/OlwPEe81rmYv2F6q/Fcw+vr7ODWUggogCItY+l/XHgQRg98Q/X7yIFM23yl26f+g5ZTeVOBlsB8b4Cm1otOq60PhZPcmLLmsaMMyGmN2SNSVx3e3SAtHYb0KTzULSGQeZ8QgG0KTQ2oXIvMm4iYDSziWGN8H0OjS8WGR2Y/j1fM3jdeuI2UvCVyKtNtYZL3PJbK6tGw+6xNH+/r3zSokM+EJv7DjeSc3m96gS54BQb3YAFKY05UlJEeeggdRIW3mZYabXYPKD5TnV7nUfZfPeg17O5op+taHZYXU1eD+RIKmp7/6cH9ve5nmoRmquelE18mGD4vTFyWWkqb72KAsl1sCZ0XdjNvuLCMtq29crcW6+zMZojNgWA7Vb3qjojUIl7zOAPeZ1zn0jlJmZor3aHfYAx2FvXa65CqL7TCTlo3xqYHRyBSVGTz3vs67vmeyKQr3yHEdSMuDD0Z32UH/bSt3GhNXFaKDzJpnFYCKXoAd89j1acBzVtGXYHHNstORdNHKfcYuQ9kKNsvsQR5Lne90mz3XH9CtjT/Aci4eZ2vLcXqQxPo5C2muxAn5Yp9gTLZt8mGyyHF5XkbtTfuiJPTybDBP0IlQPO2ZGLEWQ3eqxMOF+eD57qRBcxIwhDrBBPUwZgVsIxB41exSqqcOOniO75aIqKq65ENLfmQ=
