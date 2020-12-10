@@ -125,4 +125,6 @@
     <string name="season_episode">Season %d, Episode %d</string>
     <string name="setup_tunneled_playback">Tunneled Videoplayback</string>
     <string name="movie">Movie</string>
+    <string name="recordings_channel_title">roboTV Recordings</string>
+    <string name="robotv">roboTV</string>
 </resources>
