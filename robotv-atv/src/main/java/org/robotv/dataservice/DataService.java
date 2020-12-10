@@ -11,6 +11,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.ArraySet;
 import android.util.Log;
 
 import org.robotv.msgexchange.Packet;
@@ -22,16 +23,16 @@ import org.robotv.client.Connection;
 import org.robotv.client.MovieController;
 import org.robotv.client.TimerController;
 import org.robotv.client.model.Timer;
+import org.robotv.recordings.homescreen.RoboTVChannel;
 import org.robotv.robotv.R;
 import org.robotv.setup.SetupUtils;
 import org.robotv.sync.SyncJobService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class DataService extends Service {
 
-    private static final String TAG = "DataService";
+    private static final String TAG = DataService.class.getName();
     private static final int SYNC_JOB_ID = 1111;
 
     public static final int STATUS_Server_Connected = 0;
@@ -48,6 +49,8 @@ public class DataService extends Service {
     private ArtworkFetcher artwork;
     private MovieController movieController;
     private TimerController timerController;
+
+    private final RoboTVChannel channel;
 
     private int connectionStatus = STATUS_Server_NotConnected;
     private String seriesFolder = null;
@@ -131,9 +134,10 @@ public class DataService extends Service {
         }
     };
 
-    private final ArrayList<Listener> listeners = new ArrayList<>();
+    private final ArraySet<Listener> listeners = new ArraySet<>();
 
     public DataService() {
+        channel = new RoboTVChannel(this);
     }
 
     @Override
@@ -195,6 +199,7 @@ public class DataService extends Service {
     }
 
     private boolean open() {
+        Log.d(TAG, "open");
         if(connectionStatus == STATUS_Server_Connected) {
             postOnConnected();
             return true;
@@ -213,6 +218,9 @@ public class DataService extends Service {
 
             return false;
         }
+
+        channel.create();
+        channel.update();
 
         connectionStatus = STATUS_Server_Connected;
         postOnConnected();
@@ -317,7 +325,7 @@ public class DataService extends Service {
         Log.d(TAG, "postOnConnected");
         listenerHandler.post(() -> {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).onConnected(DataService.this);
+                listeners.valueAt(i).onConnected(DataService.this);
             }
         });
     }
@@ -326,15 +334,18 @@ public class DataService extends Service {
         Log.d(TAG, "postOnConnectionError");
         listenerHandler.post(() -> {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).onConnectionError(DataService.this);
+                listeners.valueAt(i).onConnectionError(DataService.this);
             }
         });
     }
 
     private void postOnMovieUpdate() {
+        Log.d(TAG, "postOnMovieUpdate");
+        channel.update();
+
         listenerHandler.post(() -> {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).onMovieUpdate(DataService.this);
+                listeners.valueAt(i).onMovieUpdate(DataService.this);
             }
         });
     }
@@ -342,7 +353,7 @@ public class DataService extends Service {
     private void postOnTimersUpdate() {
         listenerHandler.post(() -> {
             for (int i = 0; i < listeners.size(); i++) {
-                listeners.get(i).onTimersUpdated(DataService.this);
+                listeners.valueAt(i).onTimersUpdated(DataService.this);
             }
         });
     }
