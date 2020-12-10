@@ -206,6 +206,13 @@ public class DataService extends Service {
         }
 
         String server = SetupUtils.getServer(this);
+
+        if(TextUtils.isEmpty(server)) {
+            connectionStatus = STATUS_Server_NotConnected;
+            postOnConnectionError();
+            return false;
+        }
+
         connectionStatus = STATUS_Server_Connecting;
         connection.setPriority(1); // low priority for DataService
 
