@@ -40,7 +40,6 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     public static final String EXTRA_MOVIE = "extra_movie";
     public static final String EXTRA_SHOULD_AUTO_START = "extra_should_auto_start";
 
-    private MovieCollectionAdapter mAdapter;
     private BackgroundManager backgroundManager;
     private BackgroundManagerTarget backgroundManagerTarget;
     private NotificationHandler notification;
@@ -48,16 +47,21 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
 
     private int color_background;
     private String backgroundUrl;
+    private MovieCollectionAdapter loadingAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        prepareEntranceTransition();
         notification = new NotificationHandler(getActivity());
+
+        ProgressBarManager manager = getProgressBarManager();
+        manager.enableProgressBar();
+        manager.show();
 
         setupEventListeners();
         initUI();
-        prepareEntranceTransition();
     }
 
     private void updateBackground(String url) {
@@ -73,7 +77,7 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
             .into(backgroundManagerTarget);
     }
 
-    private void setupPreferences(MovieCollectionAdapter adapter) {
+    private void setupPreferences(ArrayObjectAdapter adapter) {
         if(adapter == null) {
             return;
         }
@@ -199,51 +203,65 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
 
         switch(status) {
             case MovieController.STATUS_Collection_Busy:
-                manager.enableProgressBar();
-                manager.show();
                 break;
             case MovieController.STATUS_Collection_Error:
                 notification.error(getString(R.string.fail_to_load_movielist));
-            case MovieController.STATUS_Collection_Ready:
                 manager.disableProgressBar();
                 manager.hide();
 
-                if(mAdapter == null) {
-                    mAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
-                    setupPreferences(mAdapter);
-                }
+                Log.d(TAG, "startEntranceTransition");
+                startEntranceTransition();
+            case MovieController.STATUS_Collection_Ready:
+                Log.d(TAG, "STATUS_Collection_Ready");
+
+                MovieCollectionAdapter adapter = createAdapter();
 
                 if(status == MovieController.STATUS_Collection_Ready) {
-                    mAdapter.loadMovies(collection);
+                    adapter.loadMovies(collection);
                 }
 
-                if(getAdapter() != mAdapter) {
-                    setAdapter(mAdapter);
-                }
-
-                startEntranceTransition();
                 updateBackground(backgroundUrl);
+                setupPreferences(adapter);
+
+                setAdapter(adapter);
+                setSelectedPosition(0, false);
+
+                manager.disableProgressBar();
+                manager.hide();
+
+                Log.d(TAG, "startEntranceTransition");
+                startEntranceTransition();
                 break;
         }
     }
 
     @Override
     public void onConnected(DataService service) {
+        Log.d(TAG, "onConnected");
         this.service = service;
+
+        prepareEntranceTransition();
 
         service.getMovieController().loadMovieCollection(this);
         loadTimers(service);
     }
 
+    public MovieCollectionAdapter createAdapter() {
+        if(loadingAdapter == null) {
+            loadingAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
+        }
+
+        return loadingAdapter;
+    }
+
     @Override
     public void onConnectionError(DataService service) {
-        // no entries, add at least the setup row
-        if(getAdapter() == null) {
-            mAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
-            setupPreferences(mAdapter);
-            setAdapter(mAdapter);
-            startEntranceTransition();
-        }
+        Log.d(TAG, "onConnectionError");
+
+        MovieCollectionAdapter adapter = createAdapter();
+        setupPreferences(adapter);
+        setSelectedPosition(0, false);
+        setAdapter(adapter);
 
         // missing setup -> start setup activity
         if(TextUtils.isEmpty(SetupUtils.getServer(getActivity()))) {
@@ -263,9 +281,7 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     }
 
     protected void loadTimers(DataService service) {
-        if(mAdapter == null) {
-            return;
-        }
-        service.getTimerController().loadTimers(timers -> mAdapter.loadTimers(timers));
+        MovieCollectionAdapter adapter = createAdapter();
+        service.getTimerController().loadTimers(adapter::loadTimers);
     }
 }
