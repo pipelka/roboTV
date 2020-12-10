@@ -258,15 +258,17 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     public void onConnectionError(DataService service) {
         Log.d(TAG, "onConnectionError");
 
+        // missing setup -> start setup activity
+        if(TextUtils.isEmpty(SetupUtils.getServer(getActivity()))) {
+            startSetupActivity();
+            return;
+        }
+
         MovieCollectionAdapter adapter = createAdapter();
         setupPreferences(adapter);
         setSelectedPosition(0, false);
         setAdapter(adapter);
 
-        // missing setup -> start setup activity
-        if(TextUtils.isEmpty(SetupUtils.getServer(getActivity()))) {
-            startSetupActivity();
-        }
     }
 
     @Override
