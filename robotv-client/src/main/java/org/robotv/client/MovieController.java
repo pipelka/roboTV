@@ -1,15 +1,19 @@
 package org.robotv.client;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
+import org.robotv.client.model.Event;
 import org.robotv.client.model.Movie;
 import org.robotv.msgexchange.Packet;
 import org.robotv.client.artwork.ArtworkHolder;
 import org.robotv.client.artwork.ArtworkUtils;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.TreeSet;
 
 public class MovieController {
@@ -21,17 +25,34 @@ public class MovieController {
     public static final int STATUS_Collection_Error = 2;
 
     public interface LoaderCallback {
-        void onMovieCollectionUpdated(Collection<Movie> collection, int status);
+        void onMovieCollectionUpdated(ArrayList<Movie> collection, int status);
     }
 
     final private Connection connection;
     final private Handler handler;
 
-    private Collection<Movie> movieCollection = null;
+    private ArrayList<Movie> movieCollection = null;
+
+    static public Comparator<Event> compareTimestamps = (lhs, rhs) -> {
+        if(lhs.getStartTime() == rhs.getStartTime()) {
+            return 0;
+        }
+
+        return lhs.getStartTime() > rhs.getStartTime() ? -1 : 1;
+    };
+
+    static public final Comparator<Event> compareTimestampsReverse = (lhs, rhs) -> {
+        if(lhs.getStartTime() == rhs.getStartTime()) {
+            return 0;
+        }
+
+        return lhs.getStartTime() < rhs.getStartTime() ? -1 : 1;
+    };
+
 
     public MovieController(Connection connection) {
         this.connection = connection;
-        this.handler = new Handler();
+        this.handler = new Handler(Looper.getMainLooper());
     }
 
     public int deleteMovie(Movie movie) {
@@ -57,15 +78,24 @@ public class MovieController {
         loaderTask.load(list -> {
             if(list == null) {
                 movieCollection = null;
-                listener.onMovieCollectionUpdated(null, STATUS_Collection_Error);
+                handler.post(() -> {
+                    listener.onMovieCollectionUpdated(null, STATUS_Collection_Error);
+                });
                 return;
             }
 
             Log.d(TAG, "finished loading (" + list.size() + " movies)");
 
             movieCollection = list;
-            listener.onMovieCollectionUpdated(movieCollection, STATUS_Collection_Ready);
+            handler.post(() -> {
+                listener.onMovieCollectionUpdated(movieCollection, STATUS_Collection_Ready);
+            });
         });
+    }
+
+    public ArrayList<Movie> load() {
+        MovieCollectionLoaderTask loaderTask = new MovieCollectionLoaderTask(connection);
+        return loaderTask.loadSync();
     }
 
     public Collection<Movie> getMovieCollection() {
@@ -135,9 +165,9 @@ public class MovieController {
         connection.transmitMessage(p);
     }
 
-    public long getPlaybackPosition(Movie movie) {
+    public long getPlaybackPosition(String recid) {
         Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETPOSITION);
-        p.putString(movie.getRecordingIdString());
+        p.putString(recid);
 
         Packet r = connection.transmitMessage(p);
 
@@ -146,6 +176,23 @@ public class MovieController {
         }
 
         return r.getU64().longValue();
+    }
+
+    public long getPlaybackPosition(Movie movie) {
+        return getPlaybackPosition(movie.getRecordingIdString());
+    }
+
+    public Movie getMovie(String recid) {
+        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETMOVIE);
+        p.putString(recid);
+
+        Packet r = connection.transmitMessage(p);
+
+        if(r == null || r.eop()) {
+            return null;
+        }
+
+        return PacketAdapter.toMovie(r);
     }
 
 }

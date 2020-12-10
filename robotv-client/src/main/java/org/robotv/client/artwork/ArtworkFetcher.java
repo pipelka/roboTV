@@ -3,6 +3,7 @@ package org.robotv.client.artwork;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.robotv.client.model.Movie;
 import org.robotv.msgexchange.Packet;
 import org.robotv.client.artwork.provider.ArtworkProvider;
 import org.robotv.client.artwork.provider.HttpEpgImageProvider;
@@ -17,7 +18,7 @@ import java.io.IOException;
 
 public class ArtworkFetcher {
 
-    private static final String TAG = "ArtworkFetcher";
+    private static final String TAG = ArtworkFetcher.class.getName();
     public final static String TMDB_APIKEY = "958abef9265db99029a13521fddcb648";
 
     private final Connection mConnection;
@@ -67,7 +68,7 @@ public class ArtworkFetcher {
         for (ArtworkProvider provider : providers) {
             if ((o = provider.search(event)) != null) {
                 // skip registering the artwork if it comes from our server cache
-                registerOnServer = (provider != providers[0]);
+                //registerOnServer = (provider != providers[0]);
                 break;
             }
         }
@@ -77,8 +78,15 @@ public class ArtworkFetcher {
             return false;
         }
 
+        event.setPosterUrl(o.getPosterUrl());
+        event.setBackgroundUrl(o.getBackgroundUrl());
+
         // register artwork on server
         if(registerOnServer) {
+            if(event instanceof Movie) {
+                ArtworkUtils.setMovieArtwork(mConnection, (Movie)event, o);
+            }
+
             Packet req = mConnection.CreatePacket(Connection.XVDR_ARTWORK_SET);
             req.putString(event.getTitle());
             req.putU32(event.getContentId());
@@ -94,9 +102,6 @@ public class ArtworkFetcher {
                 Log.d(TAG, "failed to register artwork for '" + event.getTitle() + "' in cache");
             }
         }
-
-        event.setPosterUrl(o.getPosterUrl());
-        event.setBackgroundUrl(o.getBackgroundUrl());
 
         return event.hasArtwork();
     }

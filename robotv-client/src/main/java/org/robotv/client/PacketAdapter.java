@@ -1,5 +1,7 @@
 package org.robotv.client;
 
+import android.util.Log;
+
 import org.robotv.client.model.Channel;
 import org.robotv.client.model.Event;
 import org.robotv.client.model.Movie;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PacketAdapter {
+
+    static private final String TAG = PacketAdapter.class.getName();
 
     public static Movie toMovie(Packet p) {
 

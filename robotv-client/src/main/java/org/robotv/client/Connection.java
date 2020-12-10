@@ -70,6 +70,7 @@ public class Connection extends Session {
     public static final int XVDR_RECORDINGS_GETMARKS = 108;
     public static final int XVDR_RECORDINGS_SETURLS = 109;
     public static final int XVDR_RECORDINGS_SEARCH = 112;
+    public static final int XVDR_RECORDINGS_GETMOVIE = 113;
 
     public static final int XVDR_ARTWORK_SET = 110;
     public static final int XVDR_ARTWORK_GET = 111;

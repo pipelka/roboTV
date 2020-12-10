@@ -1,37 +1,51 @@
 package org.robotv.client;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
+import org.robotv.client.artwork.ArtworkFetcher;
 import org.robotv.msgexchange.Packet;
 import org.robotv.client.model.Movie;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Collection<Movie>> {
+public class MovieCollectionLoaderTask {
+
+    private final static String TAG = MovieCollectionLoaderTask.class.getName();
 
     public interface Listener {
-        void onCompleted(Collection<Movie> adapter);
+        void onCompleted(ArrayList<Movie> adapter);
     }
 
-    private final static String TAG = "MovieCollectionTask";
+    private final static Executor executor = Executors.newSingleThreadExecutor();
 
     private final Connection connection;
-    private Listener listener;
+    private final ArtworkFetcher artwork;
 
     MovieCollectionLoaderTask(Connection connection) {
         this.connection = connection;
+        this.artwork = new ArtworkFetcher(connection, "de");
     }
 
     public void load(Listener listener) {
-        this.listener = listener;
-        execute(connection);
+        executor.execute(() -> {
+            ArrayList<Movie> list = loadSync();
+            for(Movie movie : list) {
+                try {
+                    artwork.fetchForEvent(movie);
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            listener.onCompleted(list);
+        });
     }
 
-    @Override
-    protected Collection<Movie> doInBackground(Connection... params) {
-
+    public ArrayList<Movie> loadSync() {
         // get movies
         Packet request = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETLIST);
         Packet response = connection.transmitMessage(request);
@@ -53,19 +67,4 @@ public class MovieCollectionLoaderTask extends AsyncTask<Connection, Void, Colle
 
         return collection;
     }
-
-    @Override
-    protected void onPostExecute(Collection<Movie> result) {
-        if(listener != null) {
-            listener.onCompleted(result);
-        }
-    }
-
-    @Override
-    protected void onCancelled(Collection<Movie> result) {
-        if(listener != null) {
-            listener.onCompleted(result);
-        }
-    }
-
 }
