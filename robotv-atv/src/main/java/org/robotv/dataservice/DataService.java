@@ -222,7 +222,6 @@ public class DataService extends Service {
         channel.create();
         channel.update();
 
-        connectionStatus = STATUS_Server_Connected;
         postOnConnected();
 
         return true;
@@ -327,6 +326,7 @@ public class DataService extends Service {
             for (int i = 0; i < listeners.size(); i++) {
                 listeners.valueAt(i).onConnected(DataService.this);
             }
+            connectionStatus = STATUS_Server_Connected;
         });
     }
 
