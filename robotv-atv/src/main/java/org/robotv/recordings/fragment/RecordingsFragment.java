@@ -263,6 +263,9 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     }
 
     protected void loadTimers(DataService service) {
+        if(mAdapter == null) {
+            return;
+        }
         service.getTimerController().loadTimers(timers -> mAdapter.loadTimers(timers));
     }
 }
