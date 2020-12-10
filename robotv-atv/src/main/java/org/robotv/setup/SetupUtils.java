@@ -121,4 +121,16 @@ public class SetupUtils {
         e.putBoolean("videotunneledplayback", enabled);
         e.apply();
     }
+
+    public static void setHomescreenChannelId(Context context, long channelId) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        SharedPreferences.Editor e = prefs.edit();
+        e.putLong("homescreenChannelId", channelId);
+        e.apply();
+    }
+
+    public static long getHomescreenChannelId(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        return prefs.getLong("homescreenChannelId", -1);
+    }
 }
