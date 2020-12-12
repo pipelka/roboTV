@@ -9,6 +9,8 @@ import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -49,6 +51,8 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     private String backgroundUrl;
     private MovieCollectionAdapter loadingAdapter;
 
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,8 +77,11 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
 
         backgroundUrl = url;
 
-        GlideApp.with(this).load(url)
-            .into(backgroundManagerTarget);
+        handler.removeCallbacksAndMessages(null);
+        handler.postDelayed(() -> {
+            GlideApp.with(this).load(url)
+                    .into(backgroundManagerTarget);
+        }, 500);
     }
 
     private void setupPreferences(ArrayObjectAdapter adapter) {
@@ -223,8 +230,9 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
                 updateBackground(backgroundUrl);
                 setupPreferences(adapter);
 
-                setAdapter(adapter);
-                setSelectedPosition(0, false);
+                if(getAdapter() == null) {
+                    setAdapter(adapter);
+                }
 
                 manager.disableProgressBar();
                 manager.hide();
@@ -266,7 +274,6 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
 
         MovieCollectionAdapter adapter = createAdapter();
         setupPreferences(adapter);
-        setSelectedPosition(0, false);
         setAdapter(adapter);
 
     }
