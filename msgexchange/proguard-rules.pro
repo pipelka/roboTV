@@ -20,17 +20,11 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep public class org.robotv.msgexchange.jniwrapJNI
--keepclassmembers public class org.robotv.msgexchange.jniwrapJNI {
-    public *;
+-keep public class org.robotv.msgexchange.jniwrapJNI {
+    public static void SwigDirector_SessionListener_onNotification(org.robotv.msgexchange.SessionListener, long);
+    public static void SwigDirector_SessionListener_onDisconnect(org.robotv.msgexchange.SessionListener);
 }
 
--keep public class org.robotv.msgexchange.Packet
--keepclassmembers public class org.robotv.msgexchange.Packet {
-    *;
-}
-
--keep public class org.robotv.msgexchange.SessionListener
--keepclassmembers public class org.robotv.msgexchange.SessionListener {
+-keep public class org.robotv.msgexchange.SessionListener {
     *;
 }
