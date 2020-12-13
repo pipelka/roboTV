@@ -13,3 +13,12 @@
   **[] $VALUES;
   public *;
 }
+
+-keep public class org.robotv.msgexchange.jniwrapJNI {
+    public static void SwigDirector_SessionListener_onNotification(org.robotv.msgexchange.SessionListener, long);
+    public static void SwigDirector_SessionListener_onDisconnect(org.robotv.msgexchange.SessionListener);
+}
+
+-keep public class org.robotv.msgexchange.SessionListener {
+    *;
+}
