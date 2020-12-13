@@ -38,8 +38,8 @@ public class TimerFragment extends DetailsSupportFragment implements DataService
             }
 
             Packet req = connection.CreatePacket(
-                             Connection.XVDR_EPG_GETFORCHANNEL,
-                             Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+                             Connection.EPG_GETFORCHANNEL,
+                             Connection.CHANNEL_REQUEST_RESPONSE);
 
 
             req.putU32(channelUid);

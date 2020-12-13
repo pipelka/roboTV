@@ -18,7 +18,7 @@ public class ArtworkUtils {
     }
 
     private static void setMovieArtwork(Connection connection, Movie movie) {
-        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_SETURLS);
+        Packet p = connection.CreatePacket(Connection.RECORDINGS_SETURLS);
 
         p.putString(movie.getRecordingIdString());
         p.putString(movie.getPosterUrl());

@@ -75,28 +75,28 @@ public class DataService extends Service {
             String message;
 
             // process only STATUS messages
-            if(p.getType() != Connection.XVDR_CHANNEL_STATUS) {
+            if(p.getType() != Connection.CHANNEL_STATUS) {
                 return;
             }
 
             int id = p.getMsgID();
 
             switch(id) {
-                case Connection.XVDR_STATUS_MESSAGE:
+                case Connection.STATUS_MESSAGE:
                     p.getU32(); // type
                     message = p.getString();
                     notification.notify(message);
                     break;
 
-                case Connection.XVDR_STATUS_RECORDING:
+                case Connection.STATUS_RECORDING:
                     onRecording(p);
                     break;
 
-                case Connection.XVDR_STATUS_RECORDINGSCHANGE:
+                case Connection.STATUS_RECORDINGSCHANGE:
                     postOnMovieUpdate();
                     break;
 
-                case Connection.XVDR_STATUS_TIMERCHANGE:
+                case Connection.STATUS_TIMERCHANGE:
                     if(!p.eop()) {
                         Timer timer = PacketAdapter.toTimer(p);
                         onTimerAdded(timer);

@@ -18,7 +18,7 @@ public class RoboTvProvider extends SimpleArtworkProvider {
 
         // request artwork from server cache
 
-        Packet req = mConnection.CreatePacket(Connection.XVDR_ARTWORK_GET);
+        Packet req = mConnection.CreatePacket(Connection.ARTWORK_GET);
         req.putString(event.getTitle());
         req.putU32(event.getContentId());
 

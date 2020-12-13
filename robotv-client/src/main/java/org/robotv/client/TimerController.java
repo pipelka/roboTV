@@ -24,7 +24,7 @@ public class TimerController {
 
         @Override
         protected Collection<Timer> doInBackground(Void... params) {
-            Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_GETLIST);
+            Packet request = connection.CreatePacket(Connection.TIMER_GETLIST);
             Packet response = connection.transmitMessage(request);
 
             if(response == null) {
@@ -62,7 +62,7 @@ public class TimerController {
         }
         @Override
         protected Collection<Timer> doInBackground(Void... params) {
-            Packet request = connection.CreatePacket(Connection.ROBOTV_SEARCHTIMER_GETLIST);
+            Packet request = connection.CreatePacket(Connection.SEARCHTIMER_GETLIST);
             Packet response = connection.transmitMessage(request);
 
             if(response == null) {
@@ -120,7 +120,7 @@ public class TimerController {
             timer.setFolder(movie.getFolder());
         }
 
-        Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_ADD);
+        Packet request = connection.CreatePacket(Connection.TIMER_ADD);
         PacketAdapter.toPacket(timer, priority, request);
 
         Packet response = connection.transmitMessage(request);
@@ -129,7 +129,7 @@ public class TimerController {
     }
 
     public boolean updateTimer(Timer timer) {
-        Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_UPDATE);
+        Packet request = connection.CreatePacket(Connection.TIMER_UPDATE);
         PacketAdapter.toPacket(timer, priority, request);
 
         Packet response = connection.transmitMessage(request);
@@ -138,7 +138,7 @@ public class TimerController {
     }
 
     public boolean createSearchTimer(Movie movie) {
-        Packet request = connection.CreatePacket(Connection.ROBOTV_SEARCHTIMER_ADD);
+        Packet request = connection.CreatePacket(Connection.SEARCHTIMER_ADD);
         request.putU32(movie.getChannelUid());
         request.putString(movie.getTitle());
 
@@ -166,7 +166,7 @@ public class TimerController {
     }
 
     public boolean deleteTimer(int id) {
-        Packet request = connection.CreatePacket(Connection.ROBOTV_TIMER_DELETE);
+        Packet request = connection.CreatePacket(Connection.TIMER_DELETE);
         request.putU32(id);
 
         Packet response = connection.transmitMessage(request);

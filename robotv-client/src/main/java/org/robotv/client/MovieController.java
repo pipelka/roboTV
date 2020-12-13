@@ -140,7 +140,7 @@ public class MovieController {
     public TreeSet<String> getFolderList() {
         TreeSet<String> folderList = new TreeSet<>();
 
-        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETFOLDERS);
+        Packet p = connection.CreatePacket(Connection.RECORDINGS_GETFOLDERS);
         Packet r = connection.transmitMessage(p);
 
         if(r == null) {
@@ -157,7 +157,7 @@ public class MovieController {
     }
 
     public void setPlaybackPosition(Movie movie, long lastPosition) {
-        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_SETPOSITION);
+        Packet p = connection.CreatePacket(Connection.RECORDINGS_SETPOSITION);
 
         p.putString(movie.getRecordingIdString());
         p.putU64(BigInteger.valueOf(lastPosition));
@@ -166,7 +166,7 @@ public class MovieController {
     }
 
     public long getPlaybackPosition(String recid) {
-        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETPOSITION);
+        Packet p = connection.CreatePacket(Connection.RECORDINGS_GETPOSITION);
         p.putString(recid);
 
         Packet r = connection.transmitMessage(p);
@@ -183,7 +183,7 @@ public class MovieController {
     }
 
     public Movie getMovie(String recid) {
-        Packet p = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETMOVIE);
+        Packet p = connection.CreatePacket(Connection.RECORDINGS_GETMOVIE);
         p.putString(recid);
 
         Packet r = connection.transmitMessage(p);

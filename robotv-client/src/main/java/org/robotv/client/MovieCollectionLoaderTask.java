@@ -47,7 +47,7 @@ public class MovieCollectionLoaderTask {
 
     public ArrayList<Movie> loadSync() {
         // get movies
-        Packet request = connection.CreatePacket(Connection.XVDR_RECORDINGS_GETLIST);
+        Packet request = connection.CreatePacket(Connection.RECORDINGS_GETLIST);
         Packet response = connection.transmitMessage(request);
 
         if(response == null) {

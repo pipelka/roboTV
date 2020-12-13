@@ -87,7 +87,7 @@ public class ArtworkFetcher {
                 ArtworkUtils.setMovieArtwork(mConnection, (Movie)event, o);
             }
 
-            Packet req = mConnection.CreatePacket(Connection.XVDR_ARTWORK_SET);
+            Packet req = mConnection.CreatePacket(Connection.ARTWORK_SET);
             req.putString(event.getTitle());
             req.putU32(event.getContentId());
             req.putString(o.getPosterUrl().equals("x") ? "" : o.getPosterUrl());

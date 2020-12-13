@@ -40,7 +40,7 @@ class RoboTvDataSource implements DataSource {
         this.listener = listener;
 
         response = new Packet();
-        request = connection.CreatePacket(Connection.XVDR_CHANNELSTREAM_REQUEST, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        request = connection.CreatePacket(Connection.CHANNELSTREAM_REQUEST, Connection.CHANNEL_REQUEST_RESPONSE);
     }
 
     @Override

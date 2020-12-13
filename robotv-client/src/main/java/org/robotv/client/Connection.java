@@ -26,83 +26,83 @@ public class Connection extends Session {
     public static final int IFRAME = 1;
 
     /** Packet types */
-    public static final int XVDR_CHANNEL_REQUEST_RESPONSE = 1;
-    public static final int XVDR_CHANNEL_STREAM = 2;
-    public static final int XVDR_CHANNEL_STATUS = 5;
+    public static final int CHANNEL_REQUEST_RESPONSE = 1;
+    public static final int CHANNEL_STREAM = 2;
+    public static final int CHANNEL_STATUS = 5;
 
 
-    /* OPCODE 1 - 19: XVDR network functions for general purpose */
-    public static final int XVDR_LOGIN = 1;
-    public static final int XVDR_GET_CONFIG = 8;
+    /* OPCODE 1 - 19: network functions for general purpose */
+    public static final int LOGIN = 1;
+    public static final int GET_CONFIG = 8;
 
-    /* OPCODE 20 - 39: XVDR network functions for live streaming */
-    public static final int XVDR_CHANNELSTREAM_OPEN = 20;
-    public static final int XVDR_CHANNELSTREAM_CLOSE = 21;
-    public static final int XVDR_CHANNELSTREAM_REQUEST = 22;
-    public static final int XVDR_CHANNELSTREAM_PAUSE = 23;
-    public static final int XVDR_CHANNELSTREAM_SIGNAL = 24;
-    public static final int XVDR_CHANNELSTREAM_SEEK = 25;
+    /* OPCODE 20 - 39: network functions for live streaming */
+    public static final int CHANNELSTREAM_OPEN = 20;
+    public static final int CHANNELSTREAM_CLOSE = 21;
+    public static final int CHANNELSTREAM_REQUEST = 22;
+    public static final int CHANNELSTREAM_PAUSE = 23;
+    public static final int CHANNELSTREAM_SIGNAL = 24;
+    public static final int CHANNELSTREAM_SEEK = 25;
 
-    public static final int XVDR_RECSTREAM_OPEN = 40;
-    public static final int XVDR_RECSTREAM_CLOSE = 41;
+    public static final int RECSTREAM_OPEN = 40;
+    public static final int RECSTREAM_CLOSE = 41;
 
-    /* OPCODE 60 - 79: XVDR network functions for channel access */
-    public static final int XVDR_CHANNELS_GETCHANNELS = 63;
+    /* OPCODE 60 - 79: network functions for channel access */
+    public static final int CHANNELS_GETCHANNELS = 63;
 
-    /* OPCODE 80 - 99: RoboTV network functions for timer access */
-    public static final int ROBOTV_TIMER_GETLIST = 82;
-    public static final int ROBOTV_TIMER_ADD = 83;
-    public static final int ROBOTV_TIMER_DELETE = 84;
-    public static final int ROBOTV_TIMER_UPDATE = 85;
-    public static final int ROBOTV_SEARCHTIMER_GETLIST = 86;
-    public static final int ROBOTV_SEARCHTIMER_ADD = 87;
-    public static final int ROBOTV_SEARCHTIMER_DELETE = 88;
+    /* OPCODE 80 - 99: network functions for timer access */
+    public static final int TIMER_GETLIST = 82;
+    public static final int TIMER_ADD = 83;
+    public static final int TIMER_DELETE = 84;
+    public static final int TIMER_UPDATE = 85;
+    public static final int SEARCHTIMER_GETLIST = 86;
+    public static final int SEARCHTIMER_ADD = 87;
+    public static final int SEARCHTIMER_DELETE = 88;
 
-    /* OPCODE 100 - 119: XVDR network functions for recording access */
-    public static final int XVDR_RECORDINGS_DISKSIZE = 100;
-    public static final int XVDR_RECORDINGS_GETFOLDERS = 101;
-    public static final int XVDR_RECORDINGS_GETLIST = 102;
-    public static final int XVDR_RECORDINGS_RENAME = 103;
-    public static final int XVDR_RECORDINGS_DELETE = 104;
-    public static final int XVDR_RECORDINGS_SETPLAYCOUNT = 105;
-    public static final int XVDR_RECORDINGS_SETPOSITION = 106;
-    public static final int XVDR_RECORDINGS_GETPOSITION = 107;
-    public static final int XVDR_RECORDINGS_GETMARKS = 108;
-    public static final int XVDR_RECORDINGS_SETURLS = 109;
-    public static final int XVDR_RECORDINGS_SEARCH = 112;
-    public static final int XVDR_RECORDINGS_GETMOVIE = 113;
+    /* OPCODE 100 - 119: network functions for recording access */
+    public static final int RECORDINGS_DISKSIZE = 100;
+    public static final int RECORDINGS_GETFOLDERS = 101;
+    public static final int RECORDINGS_GETLIST = 102;
+    public static final int RECORDINGS_RENAME = 103;
+    public static final int RECORDINGS_DELETE = 104;
+    public static final int RECORDINGS_SETPLAYCOUNT = 105;
+    public static final int RECORDINGS_SETPOSITION = 106;
+    public static final int RECORDINGS_GETPOSITION = 107;
+    public static final int RECORDINGS_GETMARKS = 108;
+    public static final int RECORDINGS_SETURLS = 109;
+    public static final int RECORDINGS_SEARCH = 112;
+    public static final int RECORDINGS_GETMOVIE = 113;
 
-    public static final int XVDR_ARTWORK_SET = 110;
-    public static final int XVDR_ARTWORK_GET = 111;
+    public static final int ARTWORK_SET = 110;
+    public static final int ARTWORK_GET = 111;
 
-    /* OPCODE 120 - 139: XVDR network functions for epg access and manipulating */
-    public static final int XVDR_EPG_GETFORCHANNEL = 120;
-    public static final int XVDR_EPG_SEARCH = 121;
+    /* OPCODE 120 - 139: network functions for epg access and manipulating */
+    public static final int EPG_GETFORCHANNEL = 120;
+    public static final int EPG_SEARCH = 121;
 
     /** Stream packet types (server -> client) */
-    public static final int XVDR_STREAM_CHANGE = 1;
-    public static final int XVDR_STREAM_STATUS = 2;
-    public static final int XVDR_STREAM_QUEUESTATUS = 3;
-    public static final int XVDR_STREAM_MUXPKT = 4;
-    public static final int XVDR_STREAM_SIGNALINFO = 5;
-    public static final int XVDR_STREAM_DETACH = 7;
-    public static final int XVDR_STREAM_POSITIONS = 8;
+    public static final int STREAM_CHANGE = 1;
+    public static final int STREAM_STATUS = 2;
+    public static final int STREAM_QUEUESTATUS = 3;
+    public static final int STREAM_MUXPKT = 4;
+    public static final int STREAM_SIGNALINFO = 5;
+    public static final int STREAM_DETACH = 7;
+    public static final int STREAM_POSITIONS = 8;
 
     /** Status packet types (server -> client) */
-    public static final int XVDR_STATUS_TIMERCHANGE = 1;
-    public static final int XVDR_STATUS_RECORDING = 2;
-    public static final int XVDR_STATUS_MESSAGE = 3;
-    public static final int XVDR_STATUS_CHANNELCHANGE = 4;
-    public static final int XVDR_STATUS_RECORDINGSCHANGE = 5;
+    public static final int STATUS_TIMERCHANGE = 1;
+    public static final int STATUS_RECORDING = 2;
+    public static final int STATUS_MESSAGE = 3;
+    public static final int STATUS_CHANNELCHANGE = 4;
+    public static final int STATUS_RECORDINGSCHANGE = 5;
 
-    public static final int XVDRPROTOCOLVERSION = 8;
+    public static final int PROTOCOLVERSION = 8;
 
     public Packet CreatePacket(int msgid, int type) {
         return new Packet(msgid, type);
     }
 
     public Packet CreatePacket(int msgid) {
-        return new Packet(msgid, XVDR_CHANNEL_REQUEST_RESPONSE);
+        return new Packet(msgid, CHANNEL_REQUEST_RESPONSE);
     }
 
     public Connection(String sessionName) {
@@ -138,9 +138,9 @@ public class Connection extends Session {
     }
 
     public boolean login() {
-        Packet req = CreatePacket(XVDR_LOGIN);
+        Packet req = CreatePacket(LOGIN);
 
-        req.setProtocolVersion(XVDRPROTOCOLVERSION);
+        req.setProtocolVersion(PROTOCOLVERSION);
         req.putU8((short) 0);
         req.putString(mSessionName);
         req.putU8((short)(mEnableStatus ? 1 : 0));
@@ -174,7 +174,7 @@ public class Connection extends Session {
      * @return returns the status of the operation
      */
     public int openStream(int channelUid, String language, boolean waitForKeyFrame, int priority) {
-        Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_OPEN, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        Packet req = CreatePacket(Connection.CHANNELSTREAM_OPEN, Connection.CHANNEL_REQUEST_RESPONSE);
 
         req.putU32(channelUid);
         req.putS32(priority); // priority 50
@@ -191,7 +191,7 @@ public class Connection extends Session {
     }
 
     public int openRecording(String recordingId, long position) {
-        Packet req = CreatePacket(Connection.XVDR_RECSTREAM_OPEN, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        Packet req = CreatePacket(Connection.RECSTREAM_OPEN, Connection.CHANNEL_REQUEST_RESPONSE);
         req.putString(recordingId);
 
         Packet resp = transmitMessage(req);
@@ -213,12 +213,12 @@ public class Connection extends Session {
     }
 
     public boolean closeStream() {
-        Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_CLOSE, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        Packet req = CreatePacket(Connection.CHANNELSTREAM_CLOSE, Connection.CHANNEL_REQUEST_RESPONSE);
         return (transmitMessage(req) != null);
     }
 
     public String getConfig(String key) {
-        Packet request = CreatePacket(XVDR_GET_CONFIG);
+        Packet request = CreatePacket(GET_CONFIG);
         request.putString(key);
 
         Packet response = transmitMessage(request);
@@ -231,7 +231,7 @@ public class Connection extends Session {
     }
 
     public boolean seek(long position) {
-        Packet req = CreatePacket(Connection.XVDR_CHANNELSTREAM_SEEK, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        Packet req = CreatePacket(Connection.CHANNELSTREAM_SEEK, Connection.CHANNEL_REQUEST_RESPONSE);
         req.putS64(position);
 
         Packet resp = transmitMessage(req);
@@ -245,7 +245,7 @@ public class Connection extends Session {
     }
 
     public int deleteRecording(int id) {
-        Packet req = CreatePacket(Connection.XVDR_RECORDINGS_DELETE);
+        Packet req = CreatePacket(Connection.RECORDINGS_DELETE);
         req.putString(Integer.toString(id, 16));
 
         Packet resp = transmitMessage(req);
@@ -258,7 +258,7 @@ public class Connection extends Session {
     }
 
     public int renameRecording(int id, String newName) {
-        Packet req = CreatePacket(Connection.XVDR_RECORDINGS_RENAME);
+        Packet req = CreatePacket(Connection.RECORDINGS_RENAME);
         req.putString(Integer.toString(id, 16));
         req.putString(newName);
 

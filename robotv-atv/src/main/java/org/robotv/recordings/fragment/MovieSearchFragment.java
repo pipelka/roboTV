@@ -33,7 +33,7 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
 
         @Override
         public void run() {
-            Packet req = mConnection.CreatePacket(Connection.XVDR_RECORDINGS_SEARCH, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+            Packet req = mConnection.CreatePacket(Connection.RECORDINGS_SEARCH, Connection.CHANNEL_REQUEST_RESPONSE);
             req.putString(query);
 
             final Packet resp = mConnection.transmitMessage(req);

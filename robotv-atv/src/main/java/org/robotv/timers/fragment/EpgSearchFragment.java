@@ -10,10 +10,7 @@ import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.ObjectAdapter;
-import androidx.leanback.widget.OnItemViewClickedListener;
-import androidx.leanback.widget.Presenter;
-import androidx.leanback.widget.Row;
-import androidx.leanback.widget.RowPresenter;
+
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,8 +92,8 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
             // search
             Packet req = connection.CreatePacket(
-                             Connection.XVDR_EPG_SEARCH,
-                             Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+                             Connection.EPG_SEARCH,
+                             Connection.CHANNEL_REQUEST_RESPONSE);
 
             req.putString(params[0]);
 

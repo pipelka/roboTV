@@ -1,7 +1,6 @@
 package org.robotv.tv;
 
 import android.media.tv.TvTrackInfo;
-import android.os.Build;
 import android.util.Log;
 
 import org.robotv.player.StreamBundle;
@@ -22,25 +21,17 @@ class TrackInfoMapper {
             TvTrackInfo.Builder builder = new TvTrackInfo.Builder(TvTrackInfo.TYPE_VIDEO, Integer.toString(stream.physicalId));
 
             if(stream.fpsScale != 0 && stream.fpsRate != 0) {
-                builder.setVideoFrameRate(stream.fpsRate / stream.fpsScale);
+                builder.setVideoFrameRate((float)stream.fpsRate / stream.fpsScale);
             }
 
             int stretchWidth = (int)((double) stream.width * stream.pixelAspectRatio);
             float pixelAspect = (float)stream.pixelAspectRatio;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                builder.setVideoWidth(stream.width);
-                builder.setVideoHeight(stream.height);
-                builder.setVideoPixelAspectRatio(pixelAspect);
-            }
-            else {
-                builder.setVideoWidth(stretchWidth);
-                builder.setVideoHeight(stream.height);
-            }
+            builder.setVideoWidth(stream.width);
+            builder.setVideoHeight(stream.height);
+            builder.setVideoPixelAspectRatio(pixelAspect);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                builder.setVideoActiveFormatDescription((byte)8); // full frame image
-            }
+            builder.setVideoActiveFormatDescription((byte)8); // full frame image
 
             Log.i(TAG, "native size: " + stream.width + "x" + stream.height);
             Log.i(TAG, "pixel aspect ratio: " + stream.pixelAspectRatio);

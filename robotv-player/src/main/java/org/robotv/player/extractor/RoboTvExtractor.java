@@ -133,7 +133,7 @@ public class RoboTvExtractor implements Extractor {
         boolean keyFrame = (scratch.getU16() == Connection.IFRAME);
 
         // check for format packet
-        if(messageId == Connection.XVDR_STREAM_CHANGE) {
+        if(messageId == Connection.STREAM_CHANGE) {
             Log.d(TAG, "stream change packet received");
             scratch.peek(input, 512);
             updateStreams(scratch);
@@ -146,7 +146,7 @@ public class RoboTvExtractor implements Extractor {
         }
 
         // exit if we didn't receive a stream packet
-        if(messageId != Connection.XVDR_STREAM_MUXPKT) {
+        if(messageId != Connection.STREAM_MUXPKT) {
             Log.e(TAG, "unknown message id: " + messageId + " - skipping packet");
             input.skip(1024*1024);
             return RESULT_CONTINUE;

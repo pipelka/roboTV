@@ -283,7 +283,7 @@ public class SyncUtils {
 
         // fetch
 
-        Packet request = connection.CreatePacket(Connection.XVDR_EPG_GETFORCHANNEL);
+        Packet request = connection.CreatePacket(Connection.EPG_GETFORCHANNEL);
         request.putU32(holder.channelUid);
         request.putU32(start);
         request.putU32(duration);
