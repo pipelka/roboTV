@@ -14,7 +14,7 @@ import org.robotv.robotv.R;
 public class EpgEventPresenter extends MoviePresenter {
 
     public EpgEventPresenter(Connection connection) {
-        super(connection);
+        super(connection, false);
     }
 
     @Override

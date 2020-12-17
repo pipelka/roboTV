@@ -25,12 +25,12 @@ public class EpgSearchActivity extends DataServiceActivity {
 
         fragment = (EpgSearchFragment) getFragmentManager().findFragmentById(R.id.container);
 
-        fragment.setSpeechRecognitionCallback(new SpeechRecognitionCallback() {
+        /*fragment.setSpeechRecognitionCallback(new SpeechRecognitionCallback() {
             @Override
             public void recognizeSpeech() {
                 startActivityForResult(fragment.getRecognizerIntent(), REQUEST_SPEECH);
             }
-        });
+        });*/
 
         setServiceListener(fragment);
     }

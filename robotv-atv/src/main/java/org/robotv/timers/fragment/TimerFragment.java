@@ -121,8 +121,6 @@ public class TimerFragment extends DetailsSupportFragment implements DataService
 
         setTitle(getString(R.string.timer_title));
 
-        setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));
-
         handler = new Handler();
 
         setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {

@@ -10,6 +10,7 @@ import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.ObjectAdapter;
+import androidx.leanback.widget.SearchOrbView;
 
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import org.robotv.msgexchange.Packet;
 import org.robotv.client.PacketAdapter;
 import org.robotv.dataservice.DataService;
+import org.robotv.recordings.util.Utils;
 import org.robotv.timers.activity.EpgSearchActivity;
 import org.robotv.client.model.Movie;
 import org.robotv.timers.presenter.EpgEventPresenter;
@@ -163,6 +165,12 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
         rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setTitle(getString(R.string.search_epg));
 
+        setSearchAffordanceColorsInListening(new SearchOrbView.Colors(
+                Utils.getColor(getContext(), R.color.recordings_search_button_color),
+                Utils.getColor(getContext(), R.color.primary_color_light),
+                Utils.getColor(getContext(), R.color.primary_color)
+        ));
+
         setSearchResultProvider(this);
 
         setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
@@ -197,12 +205,12 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
     @Override
     public boolean onQueryTextChange(String newQuery) {
-        if(!TextUtils.isEmpty(newQuery)) {
+        /*if(!TextUtils.isEmpty(newQuery)) {
             rowsAdapter.clear();
             delayedLoader.setSearchQuery(newQuery);
             handler.removeCallbacks(delayedLoader);
             handler.postDelayed(delayedLoader, SEARCH_DELAY_MS);
-        }
+        }*/
 
         return true;
     }
