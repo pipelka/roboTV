@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 1025.0714 576.52711"
+   height="576.5271mm"
+   width="1025.0714mm"
+   sodipodi:docname="robotv-logo-on-black.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   inkscape:export-filename="/home/pipelka/AndroidStudioProjects/roboTV/icons/robotv/png/robotv-logo-on-white.png"
+   inkscape:export-xdpi="47.580002"
+   inkscape:export-ydpi="47.580002">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1280"
+     inkscape:window-height="987"
+     id="namedview28"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.12195638"
+     inkscape:cx="1697.1357"
+     inkscape:cy="724.28831"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g4567"
+     inkscape:pagecheckerboard="true" />
+  <defs
+     id="defs2">
+    <linearGradient
+       id="linearGradient852">
+      <stop
+         id="stop848"
+         offset="0"
+         style="stop-color:#fefefe;stop-opacity:1" />
+      <stop
+         id="stop850"
+         offset="1"
+         style="stop-color:#838383;stop-opacity:0.54509807" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4562">
+      <stop
+         style="stop-color:#374171;stop-opacity:1"
+         offset="0"
+         id="stop4558" />
+      <stop
+         style="stop-color:#393c4b;stop-opacity:0.54509807"
+         offset="1"
+         id="stop4560" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4544">
+      <stop
+         id="stop4540"
+         offset="0"
+         style="stop-color:#23232f;stop-opacity:1" />
+      <stop
+         id="stop4542"
+         offset="1"
+         style="stop-color:#3949ab;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       gradientTransform="matrix(0.9941349,0,0,1.3379447,4.5111874,-96.371792)"
+       gradientUnits="userSpaceOnUse"
+       y2="272.95444"
+       x2="1138.1213"
+       y1="-470.90582"
+       x1="-4.1818185"
+       id="linearGradient4546"
+       xlink:href="#linearGradient4544" />
+    <radialGradient
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.70381376,-0.71038454,0.88325332,0.87508357,304.61679,521.49463)"
+       r="198.56245"
+       fy="-93.213501"
+       fx="750.49286"
+       cy="-93.213501"
+       cx="750.49286"
+       id="radialGradient4556"
+       xlink:href="#linearGradient4562" />
+    <radialGradient
+       r="198.56245"
+       fy="-93.213501"
+       fx="750.49286"
+       cy="-93.213501"
+       cx="750.49286"
+       gradientTransform="matrix(0.70381376,-0.71038454,0.88325332,0.87508357,297.96178,521.49464)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient4573"
+       xlink:href="#linearGradient4562" />
+    <filter
+       id="filter5257"
+       style="color-interpolation-filters:sRGB">
+      <feFlood
+         id="feFlood5247"
+         result="flood"
+         flood-color="rgb(0,0,0)"
+         flood-opacity="0.498039" />
+      <feComposite
+         id="feComposite5249"
+         result="composite1"
+         operator="in"
+         in2="SourceGraphic"
+         in="flood" />
+      <feGaussianBlur
+         id="feGaussianBlur5251"
+         result="blur"
+         stdDeviation="9.62567"
+         in="composite1" />
+      <feOffset
+         id="feOffset5253"
+         result="offset"
+         dy="2.9"
+         dx="2.1" />
+      <feComposite
+         id="feComposite5255"
+         result="composite2"
+         operator="over"
+         in2="offset"
+         in="SourceGraphic" />
+    </filter>
+  </defs>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-0.35390371,502.90158)"
+     id="layer1">
+    <rect
+       style="fill:none;fill-opacity:1;stroke:none;stroke-width:0.22901164;image-rendering:auto"
+       y="-502.90158"
+       x="0.35390371"
+       height="576.5271"
+       width="1025.0714"
+       id="rect3721" />
+    <text
+       transform="scale(1.0252327,0.97538832)"
+       id="text3715"
+       y="-157.27255"
+       x="122.63543"
+       style="font-style:normal;font-weight:normal;font-size:169.39916992px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.88228732;"
+       xml:space="preserve"><tspan
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.88228732;"
+         y="-157.27255"
+         x="122.63543"
+         id="tspan3713">robo</tspan></text>
+    <g
+       style="filter:url(#filter5257)"
+       transform="matrix(0.82865311,0,0,0.78836602,70.507899,-141.51364)"
+       id="g4567">
+      <rect
+         style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:14.73074341;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect4548"
+         width="393.42075"
+         height="301.48001"
+         x="547.12744"
+         y="-243.95351"
+         ry="56.794777" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:236.46768188px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.23160255;"
+         x="592.06207"
+         y="-7.0205688"
+         id="text3719"><tspan
+           id="tspan3717"
+           x="592.06207"
+           y="-7.0205688"
+           style="fill:#ffffff;fill-opacity:1;stroke:#020202;stroke-width:1.23160255;stroke-opacity:1;">TV</tspan></text>
+    </g>
+  </g>
+</svg>

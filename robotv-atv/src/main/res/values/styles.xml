@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="TransparentActivity" parent="Theme.Leanback.Browse">
+    <style name="Theme.roboTV.Opaque" parent="Theme.roboTV">
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@color/dim_background</item>
-        <!-- <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">false</item> -->
+        <item name="android:windowBackground">@color/default_background</item>
+    </style>
+
+    <style name="Theme.roboTV.Overlay" parent="Theme.roboTV">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/overlay_background</item>
     </style>
 
     <style name="IconActionCardViewStyle" parent="Widget.Leanback.ImageCardViewStyle">
         <item name="lbImageCardViewType">Title</item>
         <item name="infoAreaBackground">@color/primary_color</item>
-        <item name="cardBackground">@color/iconaction_color</item>
+        <item name="cardBackground">@color/primary_color</item>
     </style>
 
     <style name="IconActionCardTheme" parent="Theme.Leanback">
@@ -21,4 +22,23 @@
         <item name="imageCardViewInfoAreaStyle">@style/IconActionCardViewColoredInfoArea</item>
         <item name="imageCardViewTitleStyle">@style/IconActionCardViewColoredTitle</item> -->
     </style>
+
+    <style name="Theme.roboTV" parent="Theme.Leanback">
+        <!--<item name="android:windowBackground">@drawable/ic_robotv_background_gradient</item>-->
+        <item name="android:windowBackground">@color/default_background</item>
+        <item name="searchOrbViewStyle">@style/Theme.roboTV.SearchOrbViewStyle</item>
+
+        <!--<color name="lb_speech_orb_not_recording">#FFFFFF</color>
+        <color name="lb_speech_orb_not_recording_icon">#1b1b37</color>
+        <color name="lb_speech_orb_not_recording_pulsed">#1b1b37</color>
+        <color name="lb_speech_orb_recording">#ff4343</color>-->
+    </style>
+
+    <style name="Theme.roboTV.SearchOrbViewStyle">
+        <item name="searchOrbIcon">?attr/defaultSearchIcon</item>
+        <item name="searchOrbColor">@color/recordings_search_button_color</item>
+        <item name="searchOrbIconColor">@color/primary_color</item>
+        <item name="searchOrbBrightColor">@color/primary_color_light</item>
+    </style>
+
 </resources>

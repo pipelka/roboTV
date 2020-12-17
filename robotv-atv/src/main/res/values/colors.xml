@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_color">#3949ab</color>
+    <!--<color name="primary_color">#3949ab</color>
     <color name="recording_active_color">#1B5E20</color>
     <color name="recordings_search_button_color">#D50000</color>
     <color name="recordings_background">#616161</color>
     <color name="default_background">#3d3d3d</color>
     <color name="dim_background">#C0616161</color>
+    <color name="episode_header_color">#de1a237e</color>
+    <color name="iconaction_color">#1A237E</color>-->
+    <color name="primary_color">#1b1b37</color>
+    <color name="primary_color_light">#444261</color>
+    <color name="primary_color_dark">#000012</color>
+    <color name="secondary_color">#263238</color>
+    <color name="secondary_color_light">#4f5b62</color>
+    <color name="secondary_color_dark">#000a12</color>
+    <color name="recording_active_color">#1B5E20</color>
+    <color name="recordings_search_button_color">#FFFFFF</color>
+    <color name="recordings_search_button_bright_color">#E0E0E0</color>
+    <color name="recordings_search_button_icon_color">#000000</color>
+    <!--<color name="recordings_background">#000000</color>-->
+    <color name="default_background">#000a12</color>
+    <color name="overlay_background">#EE000000</color>
     <color name="episode_header_color">#de1a237e</color>
     <color name="iconaction_color">#1A237E</color>
 </resources>
