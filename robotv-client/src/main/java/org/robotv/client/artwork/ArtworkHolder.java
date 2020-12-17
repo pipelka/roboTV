@@ -1,37 +1,53 @@
 package org.robotv.client.artwork;
 
-public class ArtworkHolder {
+import android.text.TextUtils;
 
-    private final String mPosterUrl;
-    private final String mBackgroundUrl;
-    private String mTitle;
+import java.io.Serializable;
+
+public class ArtworkHolder implements Serializable {
+
+    private String posterUrl;
+    private String backgroundUrl;
+    protected String title;
 
     public ArtworkHolder(String posterUrl, String backgroundUrl) {
-        mPosterUrl = posterUrl;
-        mBackgroundUrl = backgroundUrl;
+        this.posterUrl = posterUrl;
+        this.backgroundUrl = backgroundUrl;
     }
 
     public String getPosterUrl() {
-        return mPosterUrl;
+        return posterUrl;
     }
 
     public String getBackgroundUrl() {
-        return mBackgroundUrl;
+        return backgroundUrl;
+    }
+
+    public void setPosterUrl(String url) {
+        this.posterUrl = url;
+    }
+
+    public void setBackgroundUrl(String url) {
+        this.backgroundUrl = url;
     }
 
     public boolean hasPoster() {
-        return !mPosterUrl.isEmpty();
+        return !TextUtils.isEmpty(posterUrl) && !posterUrl.equals("x");
     }
 
     public boolean hasBackground() {
-        return !mBackgroundUrl.isEmpty();
+        return !TextUtils.isEmpty(backgroundUrl) && !backgroundUrl.equals("x");
     }
 
     public void setTitle(String title) {
-        mTitle = title;
+        this.title = title;
     }
 
     public String getTitle() {
-        return mTitle;
+        return title;
+    }
+
+    public boolean hasArtwork() {
+        return hasPoster() || hasBackground();
     }
 }

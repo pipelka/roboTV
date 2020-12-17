@@ -3,6 +3,8 @@ package org.robotv.client.model;
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
+import org.robotv.client.artwork.ArtworkHolder;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -14,7 +16,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 
-public class Event implements Serializable {
+public class Event extends ArtworkHolder {
 
     public static class SeasonEpisodeHolder implements Serializable {
         public int season = 0;
@@ -38,7 +40,6 @@ public class Event implements Serializable {
     }
 
     private int contentId;
-    private String title;
     private String shortText;
     private String description;
     private final int duration;
@@ -171,7 +172,7 @@ public class Event implements Serializable {
         0x49
     };
 
-    private static int genreSoapMaxLength = 65 * 60; // 65 min
+    private final static int genreSoapMaxLength = 65 * 60; // 65 min
 
     public Event(Event event) {
         this(
@@ -182,7 +183,9 @@ public class Event implements Serializable {
             event.startTime,
             event.duration,
             event.eventId,
-            event.channelUid
+            event.channelUid,
+            event.posterUrl,
+            event.backgroundUrl
         );
 
         parentalRating = event.parentalRating;
@@ -201,8 +204,11 @@ public class Event implements Serializable {
     }
 
     public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec, int eventId, int channelUid) {
-        this.posterUrl = "x";
-        this.backgroundUrl = "x";
+        this(contentId, title, subTitle, plot, startTime, durationSec, eventId, channelUid, "x", "x");
+    }
+
+    public Event(int contentId, String title, String subTitle, String plot, long startTime, int durationSec, int eventId, int channelUid, String posterUrl, String backgroundUrl) {
+        super(posterUrl, backgroundUrl);
 
         this.contentId = guessGenreFromSubTitle(contentId, subTitle, durationSec);
         this.channelUid = channelUid;
@@ -254,10 +260,6 @@ public class Event implements Serializable {
 
     public void setShortText(String outline) {
         shortText = outline;
-    }
-
-    protected void setTitle(String title) {
-        this.title = title;
     }
 
     public int getGenre() {
@@ -504,26 +506,6 @@ public class Event implements Serializable {
 
     public void setVpsTime(long vpsTime) {
         this.vpsTime = vpsTime;
-    }
-
-    public String getPosterUrl() {
-        return posterUrl;
-    }
-
-    public void setPosterUrl(String cardImageUrl) {
-        this.posterUrl = cardImageUrl;
-    }
-
-    public String getBackgroundUrl() {
-        return backgroundUrl;
-    }
-
-    public void setBackgroundUrl(String backgroundImageUrl) {
-        this.backgroundUrl = backgroundImageUrl;
-    }
-
-    public boolean hasArtwork() {
-        return !backgroundUrl.equals("x") || !posterUrl.equals("x");
     }
 
     @Override
