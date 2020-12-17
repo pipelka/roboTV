@@ -11,8 +11,8 @@ import org.robotv.robotv.R;
 
 public class LatestCardPresenter extends MoviePresenter {
 
-    public LatestCardPresenter(Connection connection) {
-        super(connection);
+    public LatestCardPresenter(Connection connection, boolean changeBackground) {
+        super(connection, changeBackground);
     }
 
     @Override

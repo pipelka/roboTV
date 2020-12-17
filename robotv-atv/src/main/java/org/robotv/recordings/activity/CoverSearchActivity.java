@@ -3,6 +3,7 @@ package org.robotv.recordings.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.leanback.app.SearchFragment;
+import androidx.leanback.app.SearchSupportFragment;
 import androidx.leanback.widget.SpeechRecognitionCallback;
 
 import org.robotv.client.model.Movie;
@@ -17,7 +18,7 @@ public class CoverSearchActivity extends DataServiceActivity {
     public static final String EXTRA_MOVIE = "extra_movie";
     public static final int REQUEST_COVER = 101;
 
-    SearchFragment mFragment;
+    SearchSupportFragment mFragment;
     Movie mMovie;
 
     @Override
@@ -25,16 +26,11 @@ public class CoverSearchActivity extends DataServiceActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cover);
 
-        mFragment = (SearchFragment) getFragmentManager().findFragmentById(R.id.search);
-        mFragment.setSpeechRecognitionCallback(new SpeechRecognitionCallback() {
-            @Override
-            public void recognizeSpeech() {
-                startActivityForResult(mFragment.getRecognizerIntent(), REQUEST_SPEECH);
-            }
-        });
+        mFragment = (SearchSupportFragment) getSupportFragmentManager().findFragmentById(R.id.search);
+        //mFragment.setSpeechRecognitionCallback(() -> startActivityForResult(mFragment.getRecognizerIntent(), REQUEST_SPEECH));
 
         mMovie = (Movie) getIntent().getSerializableExtra(EXTRA_MOVIE);
-        mFragment.setSearchQuery(mMovie.getTitle(), false);
+        mFragment.setSearchQuery(mMovie.getTitle(), true);
 
         setResult(RESULT_CANCELED, null);
     }

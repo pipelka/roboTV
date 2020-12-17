@@ -9,6 +9,8 @@ import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
 
 import org.robotv.client.MovieController;
 import org.robotv.recordings.presenter.IconActionPresenter;
@@ -26,6 +28,8 @@ import java.util.Collection;
 import java.util.Comparator;
 
 public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
+
+    static private final String TAG = MovieCollectionAdapter.class.getName();
 
     static public final Comparator<Row> compareCategories = (lhs, rhs) -> {
         HeaderItem lhsHeader = lhs.getHeaderItem();
@@ -83,8 +87,13 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     public MovieCollectionAdapter(Context context, Connection connection) {
         super(compareCategories, new ListRowPresenter());
         mContext = context;
-        mCardPresenter = new MoviePresenter(connection);
-        mLatestCardPresenter = new LatestCardPresenter(connection);
+        mCardPresenter = new MoviePresenter(connection, true);
+        mCardPresenter.setOnLongClickListener((View v) -> {
+            Log.d(TAG, "lock click");
+            return true;
+        });
+
+        mLatestCardPresenter = new LatestCardPresenter(connection, true);
         timerPresenter = new TimerPresenter(connection);
         iconActionPresenter = new IconActionPresenter(250, 220);
 

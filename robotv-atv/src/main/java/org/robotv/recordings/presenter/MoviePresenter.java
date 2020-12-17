@@ -6,13 +6,18 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.load.DecodeFormat;
+
 import org.robotv.client.artwork.ArtworkFetcher;
 import org.robotv.client.Connection;
+import org.robotv.client.artwork.ArtworkHolder;
 import org.robotv.client.model.Movie;
+import org.robotv.recordings.model.MovieImageCardView;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.setup.SetupUtils;
@@ -23,26 +28,31 @@ import java.io.IOException;
 public class MoviePresenter extends ExecutorPresenter {
 
     protected final Connection connection;
+    protected final boolean changeBackground;
 
     final static public int WIDTH = 266;
     final static public int HEIGHT = 400;
 
-    public MoviePresenter(@NonNull Connection connection) {
+    View.OnLongClickListener longClickListener;
+
+    public MoviePresenter(@NonNull Connection connection, boolean changeBackground) {
         this.connection = connection;
+        this.changeBackground = changeBackground;
     }
 
     public static class ViewHolder extends Presenter.ViewHolder {
-        private final ImageCardView mCardView;
+        private final MovieImageCardView mCardView;
         private final Drawable mDrawableUnknown;
 
-        private void setArtwork(Movie movie) {
-            String url = movie.getPosterUrl();
+        private void setArtwork(ArtworkHolder artwork) {
+            String url = artwork.getPosterUrl();
 
             if(TextUtils.isEmpty(url)) {
-                url = movie.getBackgroundUrl();
+                url = artwork.getBackgroundUrl();
             }
 
             final String finalUrl = url;
+            mCardView.setBackgroundUrl(artwork.getBackgroundUrl());
             mCardView.post(() -> updateCardViewImage(finalUrl));
         }
 
@@ -59,7 +69,7 @@ public class MoviePresenter extends ExecutorPresenter {
 
         public ViewHolder(View view) {
             super(view);
-            mCardView = (ImageCardView) view;
+            mCardView = (MovieImageCardView) view;
             mDrawableUnknown = view.getContext().getDrawable(R.drawable.recording_unkown);
         }
 
@@ -75,6 +85,8 @@ public class MoviePresenter extends ExecutorPresenter {
 
 
             GlideApp.with(mCardView)
+                .asBitmap()
+                .format(DecodeFormat.PREFER_RGB_565)
                 .load(link)
                 .override(WIDTH, HEIGHT)
                 .centerCrop()
@@ -87,15 +99,22 @@ public class MoviePresenter extends ExecutorPresenter {
             String language = SetupUtils.getLanguage(context);
             final ArtworkFetcher artwork = new ArtworkFetcher(connection, language);
 
-            execute(() -> updateTask(artwork, movie, ViewHolder.this));
+            if(movie.hasArtwork()) {
+                setArtwork(movie);
+            }
+            else {
+                execute(() -> updateTask(artwork, movie, ViewHolder.this));
+            }
         }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        ImageCardView cardView = new ImageCardView(parent.getContext());
+        MovieImageCardView cardView = new MovieImageCardView(parent.getContext(), changeBackground);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
+        cardView.setOnLongClickListener(this.longClickListener);
+
         return new ViewHolder(cardView);
     }
 
@@ -131,4 +150,7 @@ public class MoviePresenter extends ExecutorPresenter {
     public void onViewAttachedToWindow(Presenter.ViewHolder viewHolder) {
     }
 
+    public void setOnLongClickListener(View.OnLongClickListener listener) {
+        this.longClickListener = listener;
+    }
 }

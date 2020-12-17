@@ -213,8 +213,8 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
 
     private void setAudioTrackActionColor(ColorAction action, long id) {
         action.setColor(
-            (id == action.getId()) ? Utils.getColor(getActivity(), R.color.primary_color) :
-            Utils.getColor(getActivity(), R.color.default_background)
+            (id == action.getId()) ? Utils.getColor(getActivity(), R.color.primary_color_light) :
+            Utils.getColor(getActivity(), R.color.primary_color)
         );
     }
 

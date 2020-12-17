@@ -8,13 +8,11 @@ import androidx.leanback.app.ProgressBarManager;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.SearchOrbView;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.robotv.client.model.Event;
 import org.robotv.recordings.activity.DetailsActivity;
 import org.robotv.recordings.activity.PlayerActivity;
 import org.robotv.recordings.activity.SearchActivity;
@@ -31,7 +29,6 @@ import org.robotv.dataservice.DataService;
 import org.robotv.client.MovieController;
 import org.robotv.dataservice.NotificationHandler;
 import org.robotv.setup.SetupUtils;
-import org.robotv.ui.GlideApp;
 
 import java.util.ArrayList;
 
@@ -42,20 +39,17 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     public static final String EXTRA_MOVIE = "extra_movie";
     public static final String EXTRA_SHOULD_AUTO_START = "extra_should_auto_start";
 
-    private BackgroundManager backgroundManager;
-    private BackgroundManagerTarget backgroundManagerTarget;
     private NotificationHandler notification;
     private DataService service;
+    private boolean create = false;
+    private BackgroundManager backgroundManager;
 
-    private int color_background;
-    private String backgroundUrl;
     private MovieCollectionAdapter loadingAdapter;
-
-    private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        create = true;
 
         prepareEntranceTransition();
         notification = new NotificationHandler(getActivity());
@@ -66,22 +60,21 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
 
         setupEventListeners();
         initUI();
+
+        backgroundManager = BackgroundManager.getInstance(getActivity());
+        backgroundManager.attach(getActivity().getWindow());
+        backgroundManager.setAutoReleaseOnStop(false);
+        BackgroundManagerTarget.setBackground(null, getActivity());
     }
 
-    private void updateBackground(String url) {
-        if(TextUtils.isEmpty(url) || !url.endsWith(".jpg")) {
-            backgroundManager.setColor(color_background);
-            backgroundManager.clearDrawable();
-            return;
-        }
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
-        backgroundUrl = url;
-
-        handler.removeCallbacksAndMessages(null);
-        handler.postDelayed(() -> {
-            GlideApp.with(this).load(url)
-                    .into(backgroundManagerTarget);
-        }, 500);
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     private void setupPreferences(ArrayObjectAdapter adapter) {
@@ -100,34 +93,21 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
         adapter.add(new ListRow(gridHeader, rowAdapter));
     }
 
-    private void setBackground() {
-        if(backgroundManager == null) {
-            backgroundManager = BackgroundManager.getInstance(getActivity());
-        }
-
-        if(!backgroundManager.isAttached()) {
-            backgroundManager.attach(getActivity().getWindow());
-        }
-
-        if(backgroundManagerTarget == null) {
-            backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
-        }
-
-        updateBackground(backgroundUrl);
-    }
-
     private void initUI() {
-        setTitle(getString(R.string.browse_title));
+        setTitle(getString(R.string.recordings));
 
         //Back button goes to the fast lane, rather than home screen
         setHeadersTransitionOnBackEnabled(true);
 
-        color_background = Utils.getColor(getActivity(), R.color.recordings_background);
+        //color_background = Utils.getColor(getActivity(), R.color.recordings_background);
         int color_brand = Utils.getColor(getActivity(), R.color.primary_color);
-
         setBrandColor(color_brand);
-        setSearchAffordanceColor(Utils.getColor(getActivity(), R.color.recordings_search_button_color));
-        setBackground();
+
+        /*setSearchAffordanceColors(new SearchOrbView.Colors(
+                Utils.getColor(getActivity(), R.color.recordings_search_button_color),
+                Utils.getColor(getActivity(), R.color.recordings_search_button_bright_color),
+                Utils.getColor(getActivity(), R.color.recordings_search_button_icon_color)
+        ));*/
     }
 
     private void setupEventListeners() {
@@ -161,16 +141,6 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
             }
         });
 
-        setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
-            if(item instanceof Event) {
-                Event event = (Event) item;
-                updateBackground(event.getBackgroundUrl());
-            }
-            else {
-                updateBackground(null);
-            }
-        });
-
         setOnSearchClickedListener(view -> {
             Intent intent = new Intent(getActivity(), SearchActivity.class);
             startActivity(intent);
@@ -197,7 +167,17 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     @Override
     public void onStart() {
         super.onStart();
-        updateBackground(backgroundUrl);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        backgroundManager.release();
+        super.onDestroy();
     }
 
     @Override
@@ -227,18 +207,25 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
                     adapter.loadMovies(collection);
                 }
 
-                updateBackground(backgroundUrl);
-                setupPreferences(adapter);
-
                 if(getAdapter() == null) {
                     setAdapter(adapter);
                 }
 
-                manager.disableProgressBar();
-                manager.hide();
+                if(create) {
+                    Log.d(TAG, "startEntranceTransition");
+                    manager.disableProgressBar();
+                    manager.hide();
+                    startEntranceTransition();
+                    create = false;
+                }
+                else {
+                    Object item = getSelectedRowViewHolder().getSelectedItem();
+                    if(item instanceof Movie) {
+                        Movie movie = (Movie)item;
+                        BackgroundManagerTarget.setBackground(movie.getBackgroundUrl(), getActivity());
+                    }
+                }
 
-                Log.d(TAG, "startEntranceTransition");
-                startEntranceTransition();
                 break;
         }
     }
@@ -248,8 +235,6 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
         Log.d(TAG, "onConnected");
         this.service = service;
 
-        prepareEntranceTransition();
-
         service.getMovieController().loadMovieCollection(this);
         loadTimers(service);
     }
@@ -257,6 +242,7 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     public MovieCollectionAdapter createAdapter() {
         if(loadingAdapter == null) {
             loadingAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
+            setupPreferences(loadingAdapter);
         }
 
         return loadingAdapter;

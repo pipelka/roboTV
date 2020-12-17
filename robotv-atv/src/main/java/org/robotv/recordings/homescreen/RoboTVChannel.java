@@ -58,13 +58,13 @@ public class RoboTVChannel {
             return;
         }
 
-        Channel.Builder builder = new Channel.Builder();
-
         Intent intent = new Intent(context, RecordingsActivity.class);
+
+        Channel.Builder builder = new Channel.Builder();
 
         builder
             .setType(TvContractCompat.Channels.TYPE_PREVIEW)
-            .setDisplayName(context.getString(R.string.robotv))
+            .setDisplayName(context.getString(R.string.recordings))
             .setSearchable(true)
             .setAppLinkIntentUri(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
 
@@ -76,7 +76,7 @@ public class RoboTVChannel {
         SetupUtils.setHomescreenChannelId(context, channelId);
 
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.channel_logo_robotv);
+                R.drawable.ic_robotv_channel_logo_light);
 
         ChannelLogoUtils.storeChannelLogo(context, channelId, icon);
         TvContractCompat.requestChannelBrowsable(context, channelId);
@@ -84,6 +84,35 @@ public class RoboTVChannel {
 
     public void update() {
         Log.d(TAG, "update");
+
+        long channelId = SetupUtils.getHomescreenChannelId(context);
+
+        Intent intent = new Intent(context, RecordingsActivity.class);
+
+        Channel.Builder builder = new Channel.Builder();
+
+        builder
+                .setType(TvContractCompat.Channels.TYPE_PREVIEW)
+                .setDisplayName(context.getString(R.string.recordings))
+                .setSearchable(true)
+                .setAppLinkIntentUri(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+
+        context.getContentResolver().update(
+                TvContractCompat.buildChannelUri(channelId),
+                builder.build().toContentValues(),
+                null,
+                null
+        );
+
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.ic_robotv_channel_logo_light);
+
+        ChannelLogoUtils.storeChannelLogo(context, channelId, icon);
+
+        if(channelId == -1) {
+            return;
+        }
+
         MovieController controller = new MovieController(connection);
         threadPool.execute(() -> runMovieUpdate(controller));
     }

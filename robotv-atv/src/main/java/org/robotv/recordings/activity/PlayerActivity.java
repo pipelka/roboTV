@@ -57,11 +57,11 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
             return;
         }
 
-        //DataService service = getService();
-        //MovieController controller = service.getMovieController();
         String recid = mSelectedMovie.getRecordingIdString();
 
-        long position = 0; //controller.getPlaybackPosition(recid);
+        DataService service = getService();
+        MovieController controller = service.getMovieController();
+        long position = controller.getPlaybackPosition(recid);
 
         mPlayer.open(Player.createRecordingUri(recid, position));
         mControls.togglePlayback(true);

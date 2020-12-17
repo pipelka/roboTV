@@ -12,6 +12,8 @@ import androidx.leanback.widget.OnItemViewClickedListener;
 import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
+import androidx.leanback.widget.SearchOrbView;
+
 import android.text.TextUtils;
 
 import org.robotv.msgexchange.Packet;
@@ -19,6 +21,7 @@ import org.robotv.recordings.activity.DetailsActivity;
 import org.robotv.client.model.Movie;
 import org.robotv.recordings.model.MovieCollectionAdapter;
 import org.robotv.client.PacketAdapter;
+import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.Connection;
 import org.robotv.setup.SetupUtils;
@@ -73,6 +76,18 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*setSearchAffordanceColors(new SearchOrbView.Colors(
+                Utils.getColor(getActivity(), R.color.recordings_search_button_color),
+                Utils.getColor(getActivity(), R.color.recordings_search_button_bright_color),
+                Utils.getColor(getActivity(), R.color.recordings_search_button_icon_color)
+        ));*/
+
+        setSearchAffordanceColorsInListening(new SearchOrbView.Colors(
+                Utils.getColor(getContext(), R.color.recordings_search_button_color),
+                Utils.getColor(getContext(), R.color.primary_color_light),
+                Utils.getColor(getContext(), R.color.primary_color)
+        ));
+
         setSearchResultProvider(this);
 
         setOnItemViewClickedListener(new OnItemViewClickedListener() {
@@ -106,13 +121,13 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
 
     @Override
     public boolean onQueryTextChange(String newQuery) {
-        mRowsAdapter.clear();
+        /*mRowsAdapter.clear();
 
         if(!TextUtils.isEmpty(newQuery)) {
             mDelayedLoad.setSearchQuery(newQuery);
             mHandler.removeCallbacks(mDelayedLoad);
             mHandler.postDelayed(mDelayedLoad, SEARCH_DELAY_MS);
-        }
+        }*/
 
         return true;
     }

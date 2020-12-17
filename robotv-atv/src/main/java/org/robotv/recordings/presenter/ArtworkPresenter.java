@@ -6,6 +6,7 @@ import androidx.leanback.widget.Presenter;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.robotv.recordings.model.MovieImageCardView;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.artwork.ArtworkHolder;
@@ -15,11 +16,11 @@ import org.robotv.ui.GlideApp;
 public class ArtworkPresenter extends Presenter {
 
     static class ViewHolder extends Presenter.ViewHolder {
-        private final ImageCardView mCardView;
+        private final MovieImageCardView mCardView;
 
         public ViewHolder(View view) {
             super(view);
-            mCardView = (ImageCardView) view;
+            mCardView = (MovieImageCardView) view;
         }
 
         ImageCardView getCardView() {
@@ -44,7 +45,7 @@ public class ArtworkPresenter extends Presenter {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        ImageCardView cardView = new ImageCardView(parent.getContext());
+        ImageCardView cardView = new MovieImageCardView(parent.getContext(), true);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
         return new ViewHolder(cardView);
@@ -55,12 +56,13 @@ public class ArtworkPresenter extends Presenter {
         ArtworkHolder holder = (ArtworkHolder) item;
         ViewHolder vh = (ViewHolder) viewHolder;
 
-        ImageCardView cardView = vh.getCardView();
+        MovieImageCardView cardView = (MovieImageCardView)vh.getCardView();
         Context context = cardView.getContext();
 
         cardView.setTitleText(holder.getTitle());
         cardView.setMainImageDimensions(MoviePresenter.WIDTH, MoviePresenter.HEIGHT);
         cardView.setInfoAreaBackgroundColor(Utils.getColor(context, R.color.primary_color));
+        cardView.setBackgroundUrl(holder.getBackgroundUrl());
 
         vh.updateCardViewImage(cardView.getContext(), holder.getPosterUrl());
     }
