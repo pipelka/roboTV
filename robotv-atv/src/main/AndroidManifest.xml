@@ -17,8 +17,9 @@
     <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Required for speech recognition. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -31,11 +32,16 @@
     <uses-feature
         android:name="android.software.live_tv"
         android:required="true" />
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
 
     <application android:label="@string/robotv_input"
             android:usesCleartextTraffic="true"
-            android:icon="@drawable/ic_live_tv_white_48dp"
-            android:theme="@style/Theme.Leanback" >
+            android:icon="@drawable/ic_robotv_icon_white"
+            android:theme="@style/Theme.roboTV"
+            android:allowBackup="false"
+            android:fullBackupContent="false">
         <!-- Launched by the TV app before it uses RoboTvInputService to set up channels for this
         input. -->
         <activity
@@ -48,7 +54,7 @@
 
         <activity
             android:name="org.robotv.recordings.activity.SearchActivity"
-            android:theme="@style/Theme.Leanback">
+            android:theme="@style/Theme.roboTV">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -56,7 +62,7 @@
 
         <activity
             android:name="org.robotv.recordings.activity.CoverSearchActivity"
-            android:theme="@style/Theme.Leanback">
+            android:theme="@style/Theme.roboTV">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -64,7 +70,7 @@
 
         <activity
             android:name="org.robotv.timers.activity.EpgSearchActivity"
-            android:theme="@style/Theme.Leanback">
+            android:theme="@style/Theme.roboTV.Opaque">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -72,7 +78,7 @@
 
         <activity
             android:name="org.robotv.timers.activity.TimerActivity"
-            android:theme="@style/TransparentActivity">
+            android:theme="@style/Theme.roboTV.Overlay">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -126,9 +132,9 @@
 
         <activity
             android:name="org.robotv.recordings.activity.RecordingsActivity"
-            android:banner="@drawable/banner_movies"
+            android:banner="@drawable/ic_robotv_banner_light"
             android:label="@string/robotv"
-            android:theme="@style/Theme.Leanback">
+            android:theme="@style/Theme.roboTV">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -138,8 +144,7 @@
 
         <activity
             android:name="org.robotv.recordings.activity.DetailsActivity"
-
-            android:theme="@style/Theme.Leanback">
+            android:theme="@style/Theme.roboTV">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -148,7 +153,7 @@
 
         <activity
             android:name="org.robotv.recordings.activity.PlayerActivity"
-            android:theme="@style/Theme.Leanback">
+            android:theme="@style/Theme.roboTV">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
