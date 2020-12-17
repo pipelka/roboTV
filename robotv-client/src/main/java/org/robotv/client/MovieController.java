@@ -98,7 +98,7 @@ public class MovieController {
         return loaderTask.loadSync();
     }
 
-    public Collection<Movie> getMovieCollection() {
+    public ArrayList<Movie> getMovieCollection() {
         return movieCollection;
     }
 
