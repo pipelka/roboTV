@@ -25,5 +25,6 @@ allprojects {
         javaVersion = JavaVersion.VERSION_1_8
         exoPlayerVersion='2.6.1'
         glideVersion='4.11.0'
+        leanbackVersion='1.1.0-beta01'
     }
 }
