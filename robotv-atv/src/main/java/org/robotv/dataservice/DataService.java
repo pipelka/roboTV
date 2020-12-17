@@ -164,7 +164,7 @@ public class DataService extends Service {
         }
 
 
-        scheduleSyncJob(false);
+        scheduleSyncJob(this,false);
         return START_STICKY;
     }
 
@@ -382,10 +382,15 @@ public class DataService extends Service {
         });
     }
 
-    public void scheduleSyncJob(boolean force) {
+    static public void cancelSyncJob(Context context) {
+        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.cancelAll();
+    }
+
+    static public void scheduleSyncJob(Context context, boolean force) {
         // schedule sync job
-        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        String inputId = SetupUtils.getInputId(this);
+        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        String inputId = SetupUtils.getInputId(context);
 
         if(inputId == null) {
             Log.e(TAG, "unable to schedule sync job (inputId == null)");
@@ -403,7 +408,7 @@ public class DataService extends Service {
         }
 
         JobInfo jobInfo = new JobInfo.Builder(SYNC_JOB_ID,
-                new ComponentName(this, SyncJobService.class))
+                new ComponentName(context, SyncJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPeriodic(1000 * 60 * 60 * 3) // 3 hours
                 .setPersisted(true)
