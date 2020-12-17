@@ -164,7 +164,7 @@ public class DataService extends Service {
         }
 
 
-        scheduleSyncJob(this,false);
+        //scheduleSyncJob(this,false);
         return START_STICKY;
     }
 

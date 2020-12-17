@@ -8,6 +8,7 @@ import androidx.leanback.app.ProgressBarManager;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.SearchOrbView;
 
 import android.text.TextUtils;
@@ -219,10 +220,14 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
                     create = false;
                 }
                 else {
-                    Object item = getSelectedRowViewHolder().getSelectedItem();
-                    if(item instanceof Movie) {
-                        Movie movie = (Movie)item;
-                        BackgroundManagerTarget.setBackground(movie.getBackgroundUrl(), getActivity());
+                    RowPresenter.ViewHolder holder = getSelectedRowViewHolder();
+
+                    if(holder != null) {
+                        Object item = holder.getSelectedItem();
+                        if(item instanceof Movie) {
+                            Movie movie = (Movie)item;
+                            BackgroundManagerTarget.setBackground(movie.getBackgroundUrl(), getActivity());
+                        }
                     }
                 }
 
