@@ -7,14 +7,13 @@ roboTV is a Android TV based frontend for VDR.
 Now you can use your Android TV Box (or your TV running Android) to stream LiveTV channels from your VDR backend (robotv-plugin must be installed).
 
 ## Screenshots
-|   |   |   |
-|---|---|---|
-|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/livetv-2020.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv-shortcuts.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/livetv-timeshift.jpg" width="200" />
-|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/epg-genre.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/multiaudio.jpg" width="200" />
-|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/homescreen.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-folders.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-all.jpg" width="200" />
-|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-details.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-details2.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-playback.jpg" width="200" />
-|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-series.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-series-detail.jpg" width="200" />|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/movies-timers.jpg" width="200" />
-|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/setup.jpg" width="200" />| | |
+|   |   |
+|---|---|
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/livetv-2020.jpg" width="400" /><br /><small>LiveTV</small>|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/livetv-epg-2020.jpg" width="400" /><br /><small>EPG</small>
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/livetv-timer-2020.jpg" width="400" /><br /><small>Schedule Recordings</small>|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/livetv-addtimer-2020.jpg" width="400" /><br /><small>Add Timer</small>
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/channel-recommendation-2020.jpg" width="400" /><br /><small>Recommendation Channel</small>|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/browsing-2020.jpg" width="400" /><br /><small>Browse Recordings</small>
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/browsing-details-2020.jpg" width="400" /><br /><small>Movie Details</small>|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/browsing-cover-2020.jpg" width="400" /><br /><small>Change Artwork</small>
+|<img src="https://raw.githubusercontent.com/pipelka/roboTV/master/media/screenshots/2020/browsing-search-2020.jpg" width="400" /><br /><small>Search Recordings</small>|
 
 ## System requirements
 
