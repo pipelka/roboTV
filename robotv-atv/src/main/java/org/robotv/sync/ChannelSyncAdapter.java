@@ -273,15 +273,20 @@ public class ChannelSyncAdapter {
 
         // fetch epg entries for each channel
         for(SortedMap.Entry<Integer, Uri> pair : existingChannels.entrySet()) {
+            Uri uri = pair.getValue();
 
             if(cancelled) {
                 return;
             }
 
+            if(uri == null) {
+                continue;
+            }
+
             Log.d(TAG, String.format("importing EPG of channel %d", pair.getKey()));
 
             syncChannelEPG(
-                    pair.getValue(),
+                    uri,
                     language,
                     true);
         }
