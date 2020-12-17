@@ -9,15 +9,15 @@ import java.util.Collection;
 
 public class RelatedContentExtractor {
 
-    private final Collection<Movie> collection;
+    private final ArrayList<Movie> collection;
 
-    public RelatedContentExtractor(Collection<Movie> collection) {
+    public RelatedContentExtractor(ArrayList<Movie> collection) {
         this.collection = collection;
     }
 
-    private final Collection<Movie> result = new ArrayList<>(50);
+    private final ArrayList<Movie> result = new ArrayList<>(50);
 
-    public Collection<Movie> getSeries(String title) {
+    public ArrayList<Movie> getSeries(String title) {
         if(collection == null || title == null) {
             return null;
         }
@@ -40,6 +40,10 @@ public class RelatedContentExtractor {
     }
 
     Collection<Movie> getRelatedMovies(Movie movie) {
+        if(collection == null) {
+            return result;
+        }
+
         for(Movie m : collection) {
             if (m.getRecordingId() == movie.getRecordingId()) {
                 continue;
