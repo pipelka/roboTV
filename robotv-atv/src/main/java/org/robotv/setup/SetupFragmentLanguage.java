@@ -3,7 +3,7 @@ package org.robotv.setup;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.leanback.app.GuidedStepFragment;
+import androidx.leanback.app.GuidedStepSupportFragment;
 import androidx.leanback.widget.GuidanceStylist;
 import androidx.leanback.widget.GuidedAction;
 
@@ -11,7 +11,7 @@ import org.robotv.robotv.R;
 
 import java.util.List;
 
-public class SetupFragmentLanguage extends GuidedStepFragment {
+public class SetupFragmentLanguage extends GuidedStepSupportFragment {
 
     private String[] mLanguageCode;
 

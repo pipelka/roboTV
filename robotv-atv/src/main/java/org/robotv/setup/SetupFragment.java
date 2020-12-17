@@ -1,12 +1,12 @@
 package org.robotv.setup;
 
-import android.app.FragmentManager;
 import android.graphics.drawable.Drawable;
 import android.media.AudioFormat;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.leanback.app.GuidedStepFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.leanback.app.GuidedStepSupportFragment;
 import androidx.leanback.widget.GuidanceStylist;
 import androidx.leanback.widget.GuidedAction;
 import android.text.TextUtils;
@@ -17,7 +17,7 @@ import org.robotv.robotv.R;
 
 import java.util.List;
 
-public class SetupFragment extends GuidedStepFragment {
+public class SetupFragment extends GuidedStepSupportFragment {
 
     static final String TAG = "SetupFragment";
 
@@ -41,7 +41,7 @@ public class SetupFragment extends GuidedStepFragment {
         String title = getString(R.string.setup_root_title);
         String breadcrumb = "";
         String description = getString(R.string.setup_root_desc);
-        Drawable icon = getActivity().getDrawable(R.drawable.ic_live_tv_white_48dp);
+        Drawable icon = getActivity().getDrawable(R.drawable.ic_robotv_icon_white);
 
         return new GuidanceStylist.Guidance(title, description, breadcrumb, icon);
     }
@@ -156,7 +156,7 @@ public class SetupFragment extends GuidedStepFragment {
                 break;
 
             case ACTION_LANGUAGE:
-                GuidedStepFragment.add(fm, new SetupFragmentLanguage());
+                GuidedStepSupportFragment.add(fm, new SetupFragmentLanguage());
                 break;
 
             case ACTION_PASSTHROUGH:

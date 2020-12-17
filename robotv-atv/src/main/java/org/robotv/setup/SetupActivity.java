@@ -1,10 +1,12 @@
 package org.robotv.setup;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.tv.TvInputInfo;
 import android.os.Bundle;
-import androidx.leanback.app.GuidedStepFragment;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.leanback.app.GuidedStepSupportFragment;
+
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,7 +16,7 @@ import org.robotv.dataservice.DataService;
 import org.robotv.sync.ChannelSyncAdapter;
 import org.robotv.client.Connection;
 
-public class SetupActivity extends Activity {
+public class SetupActivity extends FragmentActivity {
     private static final String TAG = "Setup";
 
     private String mInputId;
@@ -31,7 +33,7 @@ public class SetupActivity extends Activity {
         Log.i(TAG, "creating roboTV connection ...");
         mConnection = new Connection("AndroidTV Settings");
 
-        GuidedStepFragment.addAsRoot(this, new SetupFragment(), android.R.id.content);
+        GuidedStepSupportFragment.addAsRoot(this, new SetupFragment(), android.R.id.content);
     }
 
     String getInputId() {
@@ -51,36 +53,19 @@ public class SetupActivity extends Activity {
             return;
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                channelSync.setProgressCallback(progress);
-                channelSync.syncChannels(true);
-                mConnection.close();
+        DataService.cancelSyncJob(this);
 
-                new DataServiceClient(SetupActivity.this, new DataService.Listener() {
-                    @Override
-                    public void onConnected(DataService service) {
-                        service.scheduleSyncJob(true);
-                    }
+        new Thread(() -> {
+            channelSync.setProgressCallback(progress);
+            channelSync.syncChannels(true);
+            //channelSync.syncChannels(false);
+            mConnection.close();
 
-                    @Override
-                    public void onConnectionError(DataService service) {
-                    }
+            DataService.scheduleSyncJob(this, true);
 
-                    @Override
-                    public void onMovieUpdate(DataService service) {
-                    }
-
-                    @Override
-                    public void onTimersUpdated(DataService service) {
-                    }
-                });
-
-                // connect data service
-                Intent serviceIntent = new Intent(SetupActivity.this, DataService.class);
-                startService(serviceIntent);
-            }
+            // connect data service
+            Intent serviceIntent = new Intent(SetupActivity.this, DataService.class);
+            startService(serviceIntent);
         }).start();
 
     }
