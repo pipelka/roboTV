@@ -32,6 +32,11 @@ public class MovieCollectionLoaderTask {
     public void load(Listener listener) {
         executor.execute(() -> {
             ArrayList<Movie> list = loadSync();
+
+            if(list == null) {
+                listener.onCompleted(null);
+            }
+
             for(Movie movie : list) {
                 try {
                     artwork.fetchForEvent(movie);
