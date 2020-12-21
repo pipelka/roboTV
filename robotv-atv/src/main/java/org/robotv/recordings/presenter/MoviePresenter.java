@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
-import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,12 +27,18 @@ import org.robotv.ui.GlideApp;
 import java.io.IOException;
 public class MoviePresenter extends ExecutorPresenter {
 
+    private static final String TAG = MoviePresenter.class.getName();
+
     protected final Connection connection;
     protected final boolean changeBackground;
 
     final static public int WIDTH = 266;
     final static public int HEIGHT = 400;
-    private View.OnLongClickListener listener;
+    protected OnLongClickListener listener;
+
+    public interface OnLongClickListener {
+        boolean onLongClick(Movie movie);
+    }
 
     public MoviePresenter(@NonNull Connection connection, boolean changeBackground) {
         this.connection = connection;
@@ -55,7 +61,7 @@ public class MoviePresenter extends ExecutorPresenter {
             mCardView.post(() -> updateCardViewImage(finalUrl));
         }
 
-        private void updateTask(ArtworkFetcher artwork, Movie movie, ViewHolder view) {
+        private void updateTask(ArtworkFetcher artwork, Movie movie) {
             try {
                 artwork.fetchForEvent(movie);
             }
@@ -72,7 +78,7 @@ public class MoviePresenter extends ExecutorPresenter {
             mDrawableUnknown = view.getContext().getDrawable(R.drawable.recording_unkown);
         }
 
-        public ImageCardView getCardView() {
+        public MovieImageCardView getCardView() {
             return mCardView;
         }
 
@@ -102,7 +108,7 @@ public class MoviePresenter extends ExecutorPresenter {
                 setArtwork(movie);
             }
             else {
-                execute(() -> updateTask(artwork, movie, ViewHolder.this));
+                execute(() -> updateTask(artwork, movie));
             }
         }
     }
@@ -112,6 +118,8 @@ public class MoviePresenter extends ExecutorPresenter {
         MovieImageCardView cardView = new MovieImageCardView(parent.getContext(), changeBackground);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
+        cardView.setLongClickable(true);
+
         return new ViewHolder(cardView);
     }
 
@@ -119,10 +127,12 @@ public class MoviePresenter extends ExecutorPresenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
         Movie movie = (Movie) item;
         ViewHolder vh = (ViewHolder) viewHolder;
-        ImageCardView cardView = vh.getCardView();
+
+        MovieImageCardView cardView = vh.getCardView();
+        cardView.setTitleText(movie.getTitle());
+
         Context context = cardView.getContext();
         Resources resources = cardView.getResources();
-        cardView.setTitleText(movie.getTitle());
 
         if(movie.isSeriesHeader()) {
             int count = movie.getEpisodeCount();
@@ -135,19 +145,28 @@ public class MoviePresenter extends ExecutorPresenter {
 
         cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.primary_color));
         cardView.setMainImageDimensions(MoviePresenter.WIDTH, MoviePresenter.HEIGHT);
-
-        cardView.setOnLongClickListener(this.listener);
+        cardView.setOnLongClickListener(v -> this.onLongClick(movie));
 
         vh.update(movie, connection, context);
     }
 
-    public void setOnLongClickListener(View.OnLongClickListener listener) {
+    private boolean onLongClick(Movie movie) {
+        if(listener == null) {
+            return false;
+        }
+
+        return listener.onLongClick(movie);
+    }
+
+    public void setOnLongClickListener(OnLongClickListener listener) {
         this.listener = listener;
+
     }
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
-        viewHolder.view.setOnLongClickListener(this.listener);
+        ViewHolder vh = (ViewHolder) viewHolder;
+        vh.getCardView().setOnLongClickListener(null);
     }
 
     @Override
