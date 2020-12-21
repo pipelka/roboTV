@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.leanback.app.GuidedStepFragment;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.leanback.app.GuidedStepSupportFragment;
 import androidx.leanback.widget.GuidanceStylist;
 import android.text.TextUtils;
 
@@ -16,7 +18,7 @@ import org.robotv.client.MovieController;
 
 import static org.robotv.robotv.R.drawable.recording_unkown;
 
-public class MovieStepFragment extends GuidedStepFragment {
+public class MovieStepFragment extends GuidedStepSupportFragment {
 
     static public final String EXTRA_MOVIE = "extra_movie";
 
@@ -25,24 +27,10 @@ public class MovieStepFragment extends GuidedStepFragment {
     private DataService service;
     private int resourceId;
 
-    private void getArtwork(Activity activity, String url) {
-        try {
-            drawable = GlideApp.with(activity)
-                    .load(url)
-                    .error(recording_unkown)
-                    .submit(
-                            Utils.dp(R.integer.artwork_background_width, activity),
-                            Utils.dp(R.integer.artwork_background_height, activity)).get();
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-            drawable = activity.getDrawable(recording_unkown);
-        }
-    }
-
-    public void startGuidedStep(final Activity activity, final Movie movie, DataService service, final int resourceId) {
+    public void startGuidedStep(final FragmentActivity activity, final Movie movie, DataService service, final int resourceId) {
         this.service = service;
         this.resourceId = resourceId;
+        this.movie = movie;
 
         Bundle bundle = new Bundle();
         bundle.putSerializable(EXTRA_MOVIE, movie);
@@ -62,13 +50,13 @@ public class MovieStepFragment extends GuidedStepFragment {
 
             protected void onPostExecute(Void result) {
                 if(resourceId != android.R.id.content) {
-                    GuidedStepFragment.add(
-                            activity.getFragmentManager(),
+                    GuidedStepSupportFragment.add(
+                            activity.getSupportFragmentManager(),
                             MovieStepFragment.this,
                             resourceId);
                     return;
                 }
-                GuidedStepFragment.addAsRoot(
+                GuidedStepSupportFragment.addAsRoot(
                         activity,
                         MovieStepFragment.this,
                         resourceId);
@@ -76,6 +64,21 @@ public class MovieStepFragment extends GuidedStepFragment {
         };
 
         task.execute();
+    }
+
+    private void getArtwork(Activity activity, String url) {
+        try {
+            drawable = GlideApp.with(activity)
+                    .load(url)
+                    .error(recording_unkown)
+                    .submit(
+                            Utils.dp(R.integer.artwork_background_width, activity),
+                            Utils.dp(R.integer.artwork_background_height, activity)).get();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            drawable = activity.getDrawable(recording_unkown);
+        }
     }
 
     public Movie getMovie() {
