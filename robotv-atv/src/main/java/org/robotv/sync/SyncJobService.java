@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.robotv.client.Connection;
+import org.robotv.recordings.homescreen.RoboTVChannel;
 import org.robotv.setup.SetupUtils;
 
 public class SyncJobService extends JobService {
@@ -35,6 +36,10 @@ public class SyncJobService extends JobService {
 
             if(!isCancelled()) {
                 adapter.syncChannelIcons();
+            }
+
+            if(!isCancelled()) {
+                adapter.syncRecommendationChannel();
             }
 
             return !isCancelled();
