@@ -29,6 +29,7 @@ public class MovieFolderFragment extends MovieStepFragment {
         actions.add(new GuidedAction.Builder(getActivity())
                 .id(0)
                 .title(getString(R.string.cancel))
+                .icon(R.drawable.baseline_close_white_48dp)
                 .build());
 
         int i = 1;
@@ -45,11 +46,12 @@ public class MovieFolderFragment extends MovieStepFragment {
         String newFolder = getString(R.string.timer_new_folder);
 
         GuidedAction customFolder = new GuidedAction.Builder(getActivity())
-        .id(i)
-        .title(newFolder)
-        .description(getString(R.string.timer_add_create_new_folder))
-        .editable(true)
-        .build();
+            .id(i)
+            .title(newFolder)
+            .icon(R.drawable.ic_add_circle_outline_white_48dp)
+            .description(getString(R.string.timer_add_create_new_folder))
+            .editable(true)
+            .build();
 
         actions.add(customFolder);
 
@@ -62,8 +64,16 @@ public class MovieFolderFragment extends MovieStepFragment {
             return;
         }
 
-        moveMovie(action.getTitle().toString());
-        getActivity().finishAndRemoveTask();
+        showProgress();
+
+        new Thread(() -> {
+            moveMovie(action.getTitle().toString());
+            post(() -> {
+                hideProgress();
+                finishGuidedStepSupportFragments();
+            });
+
+        }).start();
     }
 
     private String mapName(String name) {
@@ -83,6 +93,7 @@ public class MovieFolderFragment extends MovieStepFragment {
 
         String newName = mapName(name);
         getMovieController().renameMovie(movie, newName);
+        getService().triggerMovieUpdate();
     }
 
 }
