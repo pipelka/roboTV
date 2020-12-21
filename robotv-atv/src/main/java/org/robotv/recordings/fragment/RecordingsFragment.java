@@ -2,13 +2,14 @@ package org.robotv.recordings.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.app.BackgroundManager;
 import androidx.leanback.app.BrowseSupportFragment;
 import androidx.leanback.app.ProgressBarManager;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
-import androidx.leanback.widget.SearchOrbView;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,6 +30,7 @@ import org.robotv.dataservice.DataService;
 import org.robotv.client.MovieController;
 import org.robotv.dataservice.NotificationHandler;
 import org.robotv.setup.SetupUtils;
+import org.robotv.ui.MovieStepFragment;
 
 import java.util.ArrayList;
 
@@ -239,9 +241,26 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
         loadTimers(service);
     }
 
+    static public boolean openDetailsMenu(FragmentActivity activity, DataService service, Movie movie, int resourceId) {
+        MovieStepFragment fragment = new MovieDetailsGuidedStep();
+        fragment.startGuidedStep(
+                activity,
+                movie,
+                service,
+                resourceId
+        );
+        return true;
+    }
+
+    static public boolean openDetailsMenu(FragmentActivity activity, DataService service, Movie movie) {
+        return openDetailsMenu(activity, service, movie, R.id.container);
+    }
+
     public MovieCollectionAdapter createAdapter() {
         if(loadingAdapter == null) {
             loadingAdapter = new MovieCollectionAdapter(getActivity(), service.getConnection());
+            loadingAdapter.setOnLongClickListener(movie -> RecordingsFragment.openDetailsMenu(getActivity(), service, movie));
+
             setupPreferences(loadingAdapter);
         }
 
@@ -259,7 +278,6 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
         }
 
         MovieCollectionAdapter adapter = createAdapter();
-        setupPreferences(adapter);
         setAdapter(adapter);
 
     }
