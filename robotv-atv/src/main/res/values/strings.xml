@@ -41,7 +41,7 @@
     <string name="loading">Loading…</string>
     <string name="setup_activity">Setup</string>
     <string name="watch">Watch</string>
-    <string name="change_cover">Cover</string>
+    <string name="change_poster">Change poster</string>
     <string name="move_folder">Folder</string>
     <string name="recordings">Recordings</string>
     <string name="player_error">player error</string>
@@ -127,4 +127,6 @@
     <string name="movie">Movie</string>
     <string name="recordings_channel_title">roboTV Recordings</string>
     <string name="robotv" translatable="false">roboTV</string>
+    <string name="edit_recording">Edit recording</string>
+    <string name="recording_deleted">Recording deleted</string>
 </resources>

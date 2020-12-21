@@ -3,7 +3,7 @@
     <string name="app_name">robo.TV</string>
     <string name="blocked_by_recording">Blockiert durch Aufnahme</string>
     <string name="browse_title">roboTV Filme</string>
-    <string name="change_cover">Cover</string>
+    <string name="change_poster">Poster ändern</string>
     <string name="channel_not_found">Kanal nicht gefunden</string>
     <string name="connect_unable">Verbindung zum Server fehlgeschlagen !</string>
     <string name="connection_lost">Verbindung abgebrochen</string>
@@ -110,4 +110,6 @@
     <string name="setup_tunneled_playback">Tunneled Videoplayback</string>
     <string name="movie">Film</string>
     <string name="recordings_channel_title">roboTV Aufnahmen</string>
+    <string name="edit_recording">Aufnahme bearbeiten</string>
+    <string name="recording_deleted">Aufnahme gelöscht</string>
 </resources>
