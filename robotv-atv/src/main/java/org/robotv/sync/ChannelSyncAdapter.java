@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.robotv.recordings.homescreen.RoboTVChannel;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.model.Channel;
@@ -58,6 +59,7 @@ public class ChannelSyncAdapter {
     private final OkHttpClient client;
     private ProgressCallback progressCallback = null;
     private boolean cancelled = false;
+
 
     public ChannelSyncAdapter(Connection connection, Context context, String inputId) {
         this.context = context;
@@ -172,6 +174,13 @@ public class ChannelSyncAdapter {
         }
 
         Log.i(TAG, "synced channels");
+    }
+
+    public void syncRecommendationChannel() {
+        RoboTVChannel recommendationChannel = new RoboTVChannel(context, connection);
+
+        recommendationChannel.create();
+        recommendationChannel.update();
     }
 
     void syncChannelIcons() {
