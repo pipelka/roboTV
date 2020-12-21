@@ -27,7 +27,6 @@ public class CoverSearchActivity extends DataServiceActivity {
         setContentView(R.layout.activity_cover);
 
         mFragment = (SearchSupportFragment) getSupportFragmentManager().findFragmentById(R.id.search);
-        //mFragment.setSpeechRecognitionCallback(() -> startActivityForResult(mFragment.getRecognizerIntent(), REQUEST_SPEECH));
 
         mMovie = (Movie) getIntent().getSerializableExtra(EXTRA_MOVIE);
         mFragment.setSearchQuery(mMovie.getTitle(), true);
