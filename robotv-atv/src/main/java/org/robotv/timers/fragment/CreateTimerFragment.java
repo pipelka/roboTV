@@ -127,16 +127,16 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
             case ACTION_ADD:
                 movie.setFolder(SetupUtils.getRecordingFolder());
                 createTimer(movie, false);
-                finishGuidedStepFragments();
+                finishGuidedStepSupportFragments();
                 break;
 
             case ACTION_ADD_SEARCH:
                 createTimer(movie, true);
-                finishGuidedStepFragments();
+                finishGuidedStepSupportFragments();
                 break;
 
             case ACTION_CANCEL:
-                finishGuidedStepFragments();
+                finishGuidedStepSupportFragments();
                 break;
         }
     }
