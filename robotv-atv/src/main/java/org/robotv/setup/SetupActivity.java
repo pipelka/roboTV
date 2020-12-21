@@ -58,7 +58,6 @@ public class SetupActivity extends FragmentActivity {
         new Thread(() -> {
             channelSync.setProgressCallback(progress);
             channelSync.syncChannels(true);
-            //channelSync.syncChannels(false);
             mConnection.close();
 
             DataService.scheduleSyncJob(this, true);
