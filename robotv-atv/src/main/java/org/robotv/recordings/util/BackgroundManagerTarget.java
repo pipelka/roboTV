@@ -50,6 +50,10 @@ public class BackgroundManagerTarget extends CustomTarget<Drawable> {
     }
 
     static public void setBackground(String url, Activity activity, Runnable runnable) {
+        if(activity.isDestroyed()) {
+            return;
+        }
+
         BackgroundManager manager = BackgroundManager.getInstance(activity);
         if(!manager.isAttached()) {
             manager.attach(activity.getWindow());
