@@ -1,13 +1,10 @@
 package org.robotv.recordings.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.FragmentActivity;
-import androidx.leanback.app.SearchFragment;
 import androidx.leanback.app.SearchSupportFragment;
-import androidx.leanback.widget.SpeechRecognitionCallback;
 
 import org.robotv.robotv.R;
 
@@ -22,14 +19,6 @@ public class SearchActivity extends FragmentActivity {
         setContentView(R.layout.activity_search);
 
         mFragment = (SearchSupportFragment) getSupportFragmentManager().findFragmentById(R.id.search);
-
-        /*mFragment.setSpeechRecognitionCallback(new SpeechRecognitionCallback() {
-            @Override
-            public void recognizeSpeech() {
-                startActivityForResult(mFragment.getRecognizerIntent(), REQUEST_SPEECH);
-            }
-        });*/
-
     }
 
     @Override
