@@ -175,13 +175,6 @@ public class RoboTVChannel {
             Log.d(TAG, "runMovieUpdate - channel not registered");
         }
 
-        String server = SetupUtils.getServer(context);
-
-        if(!connection.isOpen() && !connection.open(server)) {
-            Log.d(TAG, "unable to open connection to: " + server);
-            return;
-        }
-
         ArrayList<Movie> list = controller.load();
         updateFromCollection(list);
     }
