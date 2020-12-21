@@ -3,19 +3,17 @@ package org.robotv.recordings.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.leanback.app.SearchFragment;
+import androidx.leanback.app.SearchSupportFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ObjectAdapter;
-import androidx.leanback.widget.OnItemViewClickedListener;
-import androidx.leanback.widget.Presenter;
-import androidx.leanback.widget.Row;
-import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.SearchOrbView;
 
 import android.text.TextUtils;
 
+import org.robotv.dataservice.DataService;
+import org.robotv.dataservice.DataServiceClient;
 import org.robotv.msgexchange.Packet;
 import org.robotv.recordings.activity.DetailsActivity;
 import org.robotv.client.model.Movie;
@@ -26,9 +24,11 @@ import org.robotv.robotv.R;
 import org.robotv.client.Connection;
 import org.robotv.setup.SetupUtils;
 
-public class MovieSearchFragment extends SearchFragment implements SearchFragment.SearchResultProvider {
+public class MovieSearchFragment extends SearchSupportFragment implements SearchSupportFragment.SearchResultProvider {
 
     private static final int SEARCH_DELAY_MS = 300;
+
+    private DataServiceClient client;
 
     private class SearchRunnable implements Runnable {
 
@@ -41,22 +41,19 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
 
             final Packet resp = mConnection.transmitMessage(req);
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mRowsAdapter.clear();
+            getActivity().runOnUiThread(() -> {
+                mRowsAdapter.clear();
 
-                    // no results
-                    if (resp == null || resp.eop()) {
-                        HeaderItem header = new HeaderItem(getString(R.string.no_search_results, query));
-                        ListRow listRow = new ListRow(header, new ArrayObjectAdapter());
-                        mRowsAdapter.add(listRow);
-                    } else {
-                        // results
-                        while (!resp.eop()) {
-                            Movie movie = PacketAdapter.toMovie(resp);
-                            mRowsAdapter.add(movie);
-                        }
+                // no results
+                if (resp == null || resp.eop()) {
+                    HeaderItem header = new HeaderItem(getString(R.string.no_search_results, query));
+                    ListRow listRow = new ListRow(header, new ArrayObjectAdapter());
+                    mRowsAdapter.add(listRow);
+                } else {
+                    // results
+                    while (!resp.eop()) {
+                        Movie movie = PacketAdapter.toMovie(resp);
+                        mRowsAdapter.add(movie);
                     }
                 }
             });
@@ -76,12 +73,6 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*setSearchAffordanceColors(new SearchOrbView.Colors(
-                Utils.getColor(getActivity(), R.color.recordings_search_button_color),
-                Utils.getColor(getActivity(), R.color.recordings_search_button_bright_color),
-                Utils.getColor(getActivity(), R.color.recordings_search_button_icon_color)
-        ));*/
-
         setSearchAffordanceColorsInListening(new SearchOrbView.Colors(
                 Utils.getColor(getContext(), R.color.recordings_search_button_color),
                 Utils.getColor(getContext(), R.color.primary_color_light),
@@ -90,15 +81,12 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
 
         setSearchResultProvider(this);
 
-        setOnItemViewClickedListener(new OnItemViewClickedListener() {
-            @Override
-            public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
-                Movie movie = (Movie) item;
+        setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
+            Movie movie = (Movie) item;
 
-                Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(getActivity(), DetailsActivity.class);
+            intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
+            startActivity(intent);
         });
 
         mDelayedLoad = new SearchRunnable();
@@ -106,11 +94,37 @@ public class MovieSearchFragment extends SearchFragment implements SearchFragmen
 
         mConnection.open(SetupUtils.getServer(getActivity()));
         mRowsAdapter = new MovieCollectionAdapter(getActivity(), mConnection);
+
+        client = new DataServiceClient(getContext(), new DataService.Listener() {
+            @Override
+            public void onConnected(DataService service) {
+                mRowsAdapter.setOnLongClickListener(movie -> RecordingsFragment.openDetailsMenu(MovieSearchFragment.this.getActivity(), service, movie, R.id.search));
+            }
+
+            @Override
+            public void onConnectionError(DataService service) {
+            }
+
+            @Override
+            public void onMovieUpdate(DataService service) {
+            }
+
+            @Override
+            public void onTimersUpdated(DataService service) {
+            }
+        });
+
+        client.bind();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        if(client != null) {
+            client.unbind();
+        }
+
         mConnection.close();
     }
 
