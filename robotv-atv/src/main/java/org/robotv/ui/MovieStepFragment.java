@@ -11,7 +11,6 @@ import androidx.leanback.app.ProgressBarManager;
 import androidx.leanback.widget.GuidanceStylist;
 
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -37,10 +36,10 @@ public class MovieStepFragment extends GuidedStepSupportFragment {
     private ProgressBarManager progress;
     protected Activity activity;
 
-    Handler mHandler = new Handler(Looper.getMainLooper());
+    static Handler handler = new Handler(Looper.getMainLooper());
 
     public void post(Runnable runnable) {
-        mHandler.post(runnable);
+        handler.post(runnable);
     }
 
     public void startGuidedStep(final FragmentActivity activity, final Movie movie, DataService service, final int resourceId) {
