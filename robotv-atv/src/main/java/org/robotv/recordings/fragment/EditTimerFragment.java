@@ -1,8 +1,8 @@
 package org.robotv.recordings.fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.GuidanceStylist;
 import androidx.leanback.widget.GuidedAction;
 import android.text.TextUtils;
@@ -26,7 +26,7 @@ public class EditTimerFragment extends MovieStepFragment {
 
     private Timer timer;
 
-    public void startGuidedStep(final Activity activity, final Timer timer, DataService service, final int resourceId) {
+    public void startGuidedStep(final FragmentActivity activity, final Timer timer, DataService service, final int resourceId) {
         this.timer = timer;
 
         Movie movie = new Movie(timer);
