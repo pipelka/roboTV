@@ -19,7 +19,6 @@ import org.robotv.recordings.presenter.LatestCardPresenter;
 import org.robotv.recordings.presenter.TimerPresenter;
 import org.robotv.robotv.R;
 import org.robotv.client.Connection;
-import org.robotv.client.model.Event;
 import org.robotv.client.model.Movie;
 import org.robotv.client.model.Timer;
 
@@ -83,21 +82,35 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     private ArrayObjectAdapter mLatest;
     private ArrayObjectAdapter mTvShows;
     private final Context mContext;
+    private View.OnLongClickListener onLongClickListener;
 
     public MovieCollectionAdapter(Context context, Connection connection) {
         super(compareCategories, new ListRowPresenter());
         mContext = context;
         mCardPresenter = new MoviePresenter(connection, true);
-        mCardPresenter.setOnLongClickListener((View v) -> {
-            Log.d(TAG, "lock click");
-            return true;
-        });
+        mCardPresenter.setOnLongClickListener(this::onLongClickListener);
 
         mLatestCardPresenter = new LatestCardPresenter(connection, true);
+        mCardPresenter.setOnLongClickListener(this::onLongClickListener);
+
         timerPresenter = new TimerPresenter(connection);
         iconActionPresenter = new IconActionPresenter(250, 220);
 
         clear();
+    }
+
+    public void setOnLongClickListener(View.OnLongClickListener listener) {
+        this.onLongClickListener = listener;
+    }
+
+    private boolean onLongClickListener(View v) {
+        Log.d(TAG, "fired long click listener");
+
+        if(this.onLongClickListener != null) {
+            return this.onLongClickListener.onLongClick(v);
+        }
+
+        return false;
     }
 
     @Override
