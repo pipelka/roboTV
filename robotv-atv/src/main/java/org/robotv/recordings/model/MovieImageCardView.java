@@ -4,26 +4,15 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.bumptech.glide.load.MultiTransformation;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
-
 import org.robotv.recordings.util.BackgroundManagerTarget;
-import org.robotv.ui.GlideApp;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.leanback.app.BackgroundManager;
 import androidx.leanback.widget.ImageCardView;
-import jp.wasabeef.glide.transformations.gpu.*;
 
 @SuppressLint("ViewConstructor")
 public class MovieImageCardView extends ImageCardView {
@@ -38,8 +27,8 @@ public class MovieImageCardView extends ImageCardView {
 
     public MovieImageCardView(Context context, boolean changeBackground) {
         super(context);
-
         setLongClickable(true);
+
         final Activity activity = getActivity(context);
 
         this.changeBackground = changeBackground;
@@ -89,12 +78,6 @@ public class MovieImageCardView extends ImageCardView {
     }
 
     @Override
-    public boolean performLongClick() {
-        Log.d(TAG, "performLongClick");
-        return super.performLongClick();
-    }
-
-    @Override
     public boolean performClick() {
         if(!changeBackground) {
             return super.performClick();
@@ -105,6 +88,11 @@ public class MovieImageCardView extends ImageCardView {
     }
 
     private void setBackground(String url, boolean selected, Runnable callback) {
+        if((TextUtils.isEmpty(url) || url.equals("x")) && callback != null) {
+            callback.run();
+            return;
+        }
+
         BackgroundManagerTarget.setBackground(url, getActivity(getContext()), callback);
     }
 
