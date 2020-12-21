@@ -16,7 +16,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 
-import org.robotv.robotv.R;
 import org.robotv.ui.GlideApp;
 
 public class BackgroundManagerTarget extends CustomTarget<Drawable> {
