@@ -7,8 +7,16 @@ import android.os.Bundle;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.app.GuidedStepSupportFragment;
+import androidx.leanback.app.ProgressBarManager;
 import androidx.leanback.widget.GuidanceStylist;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.robotv.client.model.Movie;
 import org.robotv.recordings.util.Utils;
@@ -26,11 +34,20 @@ public class MovieStepFragment extends GuidedStepSupportFragment {
     private Drawable drawable;
     private DataService service;
     private int resourceId;
+    private ProgressBarManager progress;
+    protected Activity activity;
+
+    Handler mHandler = new Handler(Looper.getMainLooper());
+
+    public void post(Runnable runnable) {
+        mHandler.post(runnable);
+    }
 
     public void startGuidedStep(final FragmentActivity activity, final Movie movie, DataService service, final int resourceId) {
         this.service = service;
         this.resourceId = resourceId;
         this.movie = movie;
+        this.activity = activity;
 
         Bundle bundle = new Bundle();
         bundle.putSerializable(EXTRA_MOVIE, movie);
@@ -127,5 +144,24 @@ public class MovieStepFragment extends GuidedStepSupportFragment {
 
     protected Drawable getDrawable() {
         return drawable;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        progress = new ProgressBarManager();
+        progress.setRootView(container);
+
+        return view;
+    }
+
+    public void showProgress() {
+        progress.show();
+        progress.enableProgressBar();
+    }
+
+    public void hideProgress() {
+        progress.disableProgressBar();
+        progress.hide();
     }
 }
