@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.request.RequestOptions;
@@ -37,8 +38,8 @@ public class MovieImageCardView extends ImageCardView {
 
     public MovieImageCardView(Context context, boolean changeBackground) {
         super(context);
-        setLongClickable(true);
 
+        setLongClickable(true);
         final Activity activity = getActivity(context);
 
         this.changeBackground = changeBackground;
@@ -85,6 +86,12 @@ public class MovieImageCardView extends ImageCardView {
 
         handler.removeCallbacksAndMessages(null);
         handler.postDelayed(() -> setBackground(backgroundUrl, selected, null), 500);
+    }
+
+    @Override
+    public boolean performLongClick() {
+        Log.d(TAG, "performLongClick");
+        return super.performLongClick();
     }
 
     @Override

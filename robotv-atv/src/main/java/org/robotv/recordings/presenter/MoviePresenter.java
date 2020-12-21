@@ -32,8 +32,7 @@ public class MoviePresenter extends ExecutorPresenter {
 
     final static public int WIDTH = 266;
     final static public int HEIGHT = 400;
-
-    View.OnLongClickListener longClickListener;
+    private View.OnLongClickListener listener;
 
     public MoviePresenter(@NonNull Connection connection, boolean changeBackground) {
         this.connection = connection;
@@ -113,8 +112,6 @@ public class MoviePresenter extends ExecutorPresenter {
         MovieImageCardView cardView = new MovieImageCardView(parent.getContext(), changeBackground);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
-        cardView.setOnLongClickListener(this.longClickListener);
-
         return new ViewHolder(cardView);
     }
 
@@ -139,18 +136,21 @@ public class MoviePresenter extends ExecutorPresenter {
         cardView.setInfoAreaBackgroundColor(Utils.getColor(cardView.getContext(), R.color.primary_color));
         cardView.setMainImageDimensions(MoviePresenter.WIDTH, MoviePresenter.HEIGHT);
 
+        cardView.setOnLongClickListener(this.listener);
+
         vh.update(movie, connection, context);
+    }
+
+    public void setOnLongClickListener(View.OnLongClickListener listener) {
+        this.listener = listener;
     }
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
+        viewHolder.view.setOnLongClickListener(this.listener);
     }
 
     @Override
     public void onViewAttachedToWindow(Presenter.ViewHolder viewHolder) {
-    }
-
-    public void setOnLongClickListener(View.OnLongClickListener listener) {
-        this.longClickListener = listener;
     }
 }
