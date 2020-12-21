@@ -19,9 +19,7 @@ import androidx.leanback.widget.SparseArrayObjectAdapter;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
 import org.robotv.client.MovieController;
@@ -30,8 +28,6 @@ import org.robotv.recordings.activity.CoverSearchActivity;
 import org.robotv.recordings.activity.PlayerActivity;
 import org.robotv.client.model.Movie;
 import org.robotv.recordings.model.SortedArrayObjectAdapter;
-import org.robotv.recordings.presenter.ActionPresenterSelector;
-import org.robotv.recordings.presenter.ColorAction;
 import org.robotv.recordings.presenter.DetailsDescriptionPresenter;
 import org.robotv.recordings.presenter.LatestCardPresenter;
 import org.robotv.recordings.util.BackgroundManagerTarget;
@@ -40,7 +36,6 @@ import org.robotv.robotv.R;
 import org.robotv.client.model.Event;
 import org.robotv.dataservice.DataService;
 import org.robotv.ui.GlideApp;
-import org.robotv.ui.MovieStepFragment;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,24 +49,16 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
     public static final String EXTRA_SHOULD_AUTO_START = "extra_should_auto_start";
 
     private static final int ACTION_WATCH = 1;
-    private static final int ACTION_EDIT = 2;
-    private static final int ACTION_MOVE = 3;
-    private static final int ACTION_DELETE_EPISODE = 4;
-    private static final int ACTION_DELETE = 5;
 
     private Movie selectedMovie = null;
     private DataService service;
-    private MovieStepFragment actionFragment;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         setOnItemViewClickedListener((OnItemViewClickedListener) (itemViewHolder, item, rowViewHolder, row) -> {
-            if(item instanceof ColorAction) {
-                handleExtraActions((ColorAction) item);
-            }
-            else if(item instanceof Action) {
+            if(item instanceof Action) {
                 Action action = (Action) item;
                 Movie movie = (Movie) ((DetailsOverviewRow) row).getItem();
                 handleDetailActions(action, movie);
@@ -98,55 +85,8 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
     }
 
     private void handleDetailActions(Action action, Movie movie) {
-        switch((int)action.getId()) {
-            case ACTION_WATCH:
-                playbackMovie(movie);
-                break;
-
-            case ACTION_EDIT:
-                startCoverActivty();
-                break;
-
-            case ACTION_DELETE_EPISODE:
-                actionFragment = new DeleteMovieFragment();
-                actionFragment.startGuidedStep(
-                        getActivity(),
-                        movie,
-                        service,
-                        R.id.details_fragment);
-                break;
-        }
-    }
-
-    void startCoverActivty() {
-        Intent intent = new Intent(getActivity(), CoverSearchActivity.class);
-        intent.putExtra(EXTRA_MOVIE, selectedMovie);
-        startActivityForResult(intent, CoverSearchActivity.REQUEST_COVER);
-    }
-
-    void handleExtraActions(ColorAction action) {
-        switch((int)action.getId()) {
-            case ACTION_EDIT:
-                startCoverActivty();
-                break;
-
-            case ACTION_DELETE:
-                actionFragment = new DeleteMovieFragment();
-                actionFragment.startGuidedStep(
-                        getActivity(),
-                        selectedMovie,
-                        service,
-                        R.id.details_fragment);
-                break;
-
-            case ACTION_MOVE:
-                actionFragment = new MovieFolderFragment();
-                actionFragment.startGuidedStep(
-                        getActivity(),
-                        selectedMovie,
-                        service,
-                        R.id.details_fragment);
-                break;
+        if((int)action.getId() == ACTION_WATCH) {
+            playbackMovie(movie);
         }
     }
 
@@ -184,7 +124,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
             addDetailRow(adapter, selectedMovie);
         }
 
-        setExtraActions(adapter);
         loadRelatedContent(adapter);
 
         setAdapter(adapter);
@@ -256,11 +195,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
 
         Event.SeasonEpisodeHolder episode = movie.getSeasionEpisode();
 
-        /*row.setHeaderItem(new HeaderItem(
-                episode.valid() ? getString(R.string.episode_nr, episode.episode) :
-                getString(R.string.movie)));
-        row.setItem(movie);*/
-
         String url = movie.getPosterUrl();
 
         if(TextUtils.isEmpty(url)) {
@@ -292,28 +226,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
                 )
         );
 
-        actions.set(1,
-                new Action(
-                    ACTION_EDIT,
-                    "",
-                    getResources().getString(R.string.change_cover),
-                    getResources().getDrawable(R.drawable.ic_style_white_48dp, null)
-                )
-        );
-
-        if(movie.isTvShow()) {
-            actions.set(2,
-                    new Action(
-                            ACTION_DELETE_EPISODE,
-                            null,
-                            getResources().getString(R.string.delete),
-                            getResources().getDrawable(R.drawable.ic_delete_white_48dp, null)
-                    )
-            );
-        }
-
         row.setActionsAdapter(actions);
-
         adapter.add(row);
     }
 
@@ -349,43 +262,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
 
         HeaderItem header = new HeaderItem(0, getString(R.string.related_movies));
         adapter.add(new ListRow(header, listRowAdapter));
-    }
-
-    private void setExtraActions(ArrayObjectAdapter adapter) {
-        ActionPresenterSelector presenterSelector = new ActionPresenterSelector();
-        ArrayObjectAdapter actionAdapter = new ArrayObjectAdapter(presenterSelector);
-        /*actionAdapter.add(
-                new ColorAction(
-                        ACTION_EDIT,
-                        getResources().getString(R.string.change_cover),
-                        "",
-                        getResources().getDrawable(R.drawable.ic_style_white_48dp, null)
-                ).setColor(Utils.getColor(getActivity(), R.color.primary_color))
-        );*/
-
-        // disable moving to folder for series
-        if(!selectedMovie.isTvShow()) {
-            actionAdapter.add(
-                    new ColorAction(
-                            ACTION_MOVE,
-                            getResources().getString(R.string.move_folder),
-                            "",
-                            getResources().getDrawable(R.drawable.ic_folder_white_48dp, null)
-                    ).setColor(Utils.getColor(getActivity(), R.color.primary_color))
-            );
-            actionAdapter.add(
-                    new ColorAction(
-                            ACTION_DELETE,
-                            getResources().getString(R.string.delete),
-                            "",
-                            getResources().getDrawable(R.drawable.ic_delete_white_48dp, null)
-                    ).setColor(Utils.getColor(getActivity(), R.color.primary_color))
-            );
-        }
-
-        ListRow listRow = new ListRow(new HeaderItem(getString(R.string.movie_actions)), actionAdapter);
-
-        adapter.add(listRow);
     }
 
     @Override
@@ -426,5 +302,4 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
     @Override
     public void onTimersUpdated(DataService service) {
     }
-
 }
