@@ -1,36 +1,24 @@
 package org.robotv.recordings.homescreen;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import org.robotv.client.Connection;
 import org.robotv.client.MovieController;
-import org.robotv.client.artwork.ArtworkFetcher;
 import org.robotv.client.model.Movie;
-import org.robotv.recordings.activity.DetailsActivity;
 import org.robotv.recordings.activity.PlayerActivity;
 import org.robotv.recordings.activity.RecordingsActivity;
 import org.robotv.recordings.fragment.VideoDetailsFragment;
 import org.robotv.robotv.R;
 import org.robotv.setup.SetupUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,7 +26,6 @@ import androidx.tvprovider.media.tv.Channel;
 import androidx.tvprovider.media.tv.TvContractCompat;
 import androidx.tvprovider.media.tv.ChannelLogoUtils;
 import androidx.tvprovider.media.tv.PreviewProgram;
-import androidx.tvprovider.media.tv.WatchNextProgram;
 
 public class RoboTVChannel {
 
@@ -46,11 +33,11 @@ public class RoboTVChannel {
     static private final String TAG = RoboTVChannel.class.getName();
 
     private final Context context;
-    static private final Connection connection  = new Connection("RoboTVChannel");
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Connection connection;
 
-    public RoboTVChannel(Context context) {
+    public RoboTVChannel(Context context, Connection connection) {
         this.context = context;
+        this.connection = connection;
     }
 
     public void create() {
@@ -142,8 +129,6 @@ public class RoboTVChannel {
             intent.putExtra(VideoDetailsFragment.EXTRA_RECID, movie.getRecordingIdString());
             intent.putExtra(VideoDetailsFragment.EXTRA_SHOULD_AUTO_START, true);
 
-            Log.d(TAG, "Preview: " + movie.getTitle());
-
             PreviewProgram.Builder builder = new PreviewProgram.Builder();
 
             if(movie.isTvShow()) {
@@ -165,13 +150,9 @@ public class RoboTVChannel {
             }
             else {
                 builder.setChannelId(channelId)
-                        /*.setId(movie.getRecordingId())*/
                         .setType(TvContractCompat.PreviewPrograms.TYPE_MOVIE)
                         .setTitle(movie.getTitle())
-                        //.setDescription(movie.getShortText())
-                        //.setLongDescription(movie.getDescription())
                         .setDescription(movie.getDescription())
-                        //.setLastPlaybackPositionMillis(movie.la)
                         .setPosterArtUri(Uri.parse(movie.getPosterUrl()))
                         .setPosterArtAspectRatio(TvContractCompat.PreviewPrograms.ASPECT_RATIO_MOVIE_POSTER)
                         .setDurationMillis(movie.getDuration() * 1000)
@@ -181,8 +162,10 @@ public class RoboTVChannel {
             }
 
             final ContentValues contentValues = builder.build().toContentValues();
-            Uri programUri = context.getContentResolver().insert(TvContractCompat.PreviewPrograms.CONTENT_URI, contentValues);
+            context.getContentResolver().insert(TvContractCompat.PreviewPrograms.CONTENT_URI, contentValues);
         }
+
+        Log.d(TAG, "added " + count + " preview items");
     }
 
     private void runMovieUpdate(MovieController controller) {
