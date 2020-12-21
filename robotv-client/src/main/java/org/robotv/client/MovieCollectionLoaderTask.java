@@ -35,6 +35,7 @@ public class MovieCollectionLoaderTask {
 
             if(list == null) {
                 listener.onCompleted(null);
+                return;
             }
 
             for(Movie movie : list) {
