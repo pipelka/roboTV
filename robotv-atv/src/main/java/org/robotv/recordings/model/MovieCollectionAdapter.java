@@ -82,7 +82,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     private ArrayObjectAdapter mLatest;
     private ArrayObjectAdapter mTvShows;
     private final Context mContext;
-    private View.OnLongClickListener onLongClickListener;
+    private MoviePresenter.OnLongClickListener onLongClickListener;
 
     public MovieCollectionAdapter(Context context, Connection connection) {
         super(compareCategories, new ListRowPresenter());
@@ -91,7 +91,7 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         mCardPresenter.setOnLongClickListener(this::onLongClickListener);
 
         mLatestCardPresenter = new LatestCardPresenter(connection, true);
-        mCardPresenter.setOnLongClickListener(this::onLongClickListener);
+        mLatestCardPresenter.setOnLongClickListener(this::onLongClickListener);
 
         timerPresenter = new TimerPresenter(connection);
         iconActionPresenter = new IconActionPresenter(250, 220);
@@ -99,15 +99,15 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         clear();
     }
 
-    public void setOnLongClickListener(View.OnLongClickListener listener) {
+    public void setOnLongClickListener(MoviePresenter.OnLongClickListener listener) {
         this.onLongClickListener = listener;
     }
 
-    private boolean onLongClickListener(View v) {
+    private boolean onLongClickListener(Movie movie) {
         Log.d(TAG, "fired long click listener");
 
         if(this.onLongClickListener != null) {
-            return this.onLongClickListener.onLongClick(v);
+            return this.onLongClickListener.onLongClick(movie);
         }
 
         return false;
