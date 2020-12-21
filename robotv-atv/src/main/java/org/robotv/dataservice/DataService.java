@@ -25,6 +25,7 @@ import org.robotv.client.TimerController;
 import org.robotv.client.model.Timer;
 import org.robotv.recordings.homescreen.RoboTVChannel;
 import org.robotv.robotv.R;
+import org.robotv.setup.SetupActivity;
 import org.robotv.setup.SetupUtils;
 import org.robotv.sync.SyncJobService;
 
@@ -50,7 +51,7 @@ public class DataService extends Service {
     private MovieController movieController;
     private TimerController timerController;
 
-    private final RoboTVChannel channel;
+    private RoboTVChannel channel;
 
     private int connectionStatus = STATUS_Server_NotConnected;
     private String seriesFolder = null;
@@ -137,7 +138,6 @@ public class DataService extends Service {
     private final ArraySet<Listener> listeners = new ArraySet<>();
 
     public DataService() {
-        channel = new RoboTVChannel(this);
     }
 
     @Override
@@ -163,8 +163,6 @@ public class DataService extends Service {
             postOpen();
         }
 
-
-        scheduleSyncJob(this,false);
         return START_STICKY;
     }
 
@@ -189,6 +187,7 @@ public class DataService extends Service {
 
         movieController = new MovieController(connection);
         timerController = new TimerController(connection);
+        channel = new RoboTVChannel(this, connection);
     }
 
     @Override
@@ -269,6 +268,9 @@ public class DataService extends Service {
                 notification.notify(message, event.getTitle(), R.drawable.ic_movie_white_48dp);
             }
         });
+
+        // TODO - move to movie update handler
+        channel.update();
     }
 
     public String getSeriesFolder() {
@@ -410,7 +412,7 @@ public class DataService extends Service {
         JobInfo jobInfo = new JobInfo.Builder(SYNC_JOB_ID,
                 new ComponentName(context, SyncJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(1000 * 60 * 60 * 3) // 3 hours
+                .setPeriodic(1000 * 60 * 60) // 1 hour
                 .setPersisted(true)
                 .build();
 
