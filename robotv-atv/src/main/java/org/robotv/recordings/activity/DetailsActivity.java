@@ -13,7 +13,7 @@ public class DetailsActivity extends DataServiceActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        VideoDetailsFragment fragment = (VideoDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_fragment);
+        VideoDetailsFragment fragment = (VideoDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.container);
         setServiceListener(fragment);
     }
 

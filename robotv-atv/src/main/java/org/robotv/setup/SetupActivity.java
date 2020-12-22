@@ -10,7 +10,6 @@ import androidx.leanback.app.GuidedStepSupportFragment;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.robotv.dataservice.DataServiceClient;
 import org.robotv.robotv.R;
 import org.robotv.dataservice.DataService;
 import org.robotv.sync.ChannelSyncAdapter;
@@ -21,7 +20,6 @@ public class SetupActivity extends FragmentActivity {
 
     private String mInputId;
     private Connection mConnection;
-
     private ChannelSyncAdapter channelSync;
 
     @Override

@@ -2,15 +2,12 @@ package org.robotv.recordings.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import androidx.leanback.app.SearchSupportFragment;
+
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ObjectAdapter;
 import androidx.leanback.widget.SearchOrbView;
-
-import android.text.TextUtils;
 
 import org.robotv.dataservice.DataService;
 import org.robotv.dataservice.DataServiceClient;
@@ -23,51 +20,58 @@ import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
 import org.robotv.client.Connection;
 import org.robotv.setup.SetupUtils;
+import org.robotv.ui.SearchProgressFragment;
 
-public class MovieSearchFragment extends SearchSupportFragment implements SearchSupportFragment.SearchResultProvider {
+import java.util.ArrayList;
 
-    private static final int SEARCH_DELAY_MS = 300;
+public class MovieSearchFragment extends SearchProgressFragment {
 
-    private DataServiceClient client;
+    private static final String TAG = MovieSearchFragment.class.getName();
 
     private class SearchRunnable implements Runnable {
-
         private String query;
 
         @Override
         public void run() {
-            Packet req = mConnection.CreatePacket(Connection.RECORDINGS_SEARCH, Connection.CHANNEL_REQUEST_RESPONSE);
+            Packet req = connection.CreatePacket(Connection.RECORDINGS_SEARCH, Connection.CHANNEL_REQUEST_RESPONSE);
             req.putString(query);
 
-            final Packet resp = mConnection.transmitMessage(req);
+            final Packet resp = connection.transmitMessage(req);
+
+            ArrayList<Movie> list = new ArrayList<>();
+
+            if(resp != null && !resp.eop()) {
+                while (!resp.eop()) {
+                    Movie movie = PacketAdapter.toMovie(resp);
+                    list.add(movie);
+                }
+            }
 
             getActivity().runOnUiThread(() -> {
-                mRowsAdapter.clear();
-
                 // no results
-                if (resp == null || resp.eop()) {
+                if(list.size() == 0) {
                     HeaderItem header = new HeaderItem(getString(R.string.no_search_results, query));
                     ListRow listRow = new ListRow(header, new ArrayObjectAdapter());
-                    mRowsAdapter.add(listRow);
+                    rowsAdapter.clear();
+                    rowsAdapter.add(listRow);
                 } else {
-                    // results
-                    while (!resp.eop()) {
-                        Movie movie = PacketAdapter.toMovie(resp);
-                        mRowsAdapter.add(movie);
-                    }
+                    rowsAdapter.loadMovies(list);
                 }
+
+                showProgress(false);
             });
         }
 
-        void setSearchQuery(String newQuery) {
-            query = newQuery;
+        public void setSearchQuery(String query) {
+            this.query = query;
         }
     }
 
-    private MovieCollectionAdapter mRowsAdapter;
-    private Handler mHandler = new Handler();
-    private SearchRunnable mDelayedLoad;
-    private Connection mConnection;
+    private MovieCollectionAdapter rowsAdapter;
+    private final SearchRunnable searchRunnable = new SearchRunnable();
+    private Connection connection;
+    private DataServiceClient client;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,16 +93,15 @@ public class MovieSearchFragment extends SearchSupportFragment implements Search
             startActivity(intent);
         });
 
-        mDelayedLoad = new SearchRunnable();
-        mConnection = new Connection("roboTV search movies");
+        connection = new Connection("roboTV search movies");
+        rowsAdapter = new MovieCollectionAdapter(getActivity(), connection);
 
-        mConnection.open(SetupUtils.getServer(getActivity()));
-        mRowsAdapter = new MovieCollectionAdapter(getActivity(), mConnection);
+        connection.open(SetupUtils.getServer(getActivity()));
 
         client = new DataServiceClient(getContext(), new DataService.Listener() {
             @Override
             public void onConnected(DataService service) {
-                mRowsAdapter.setOnLongClickListener(movie -> RecordingsFragment.openDetailsMenu(MovieSearchFragment.this.getActivity(), service, movie, R.id.search));
+                rowsAdapter.setOnLongClickListener(movie -> RecordingsFragment.openDetailsMenu(MovieSearchFragment.this.getActivity(), service, movie, R.id.container));
             }
 
             @Override
@@ -107,6 +110,7 @@ public class MovieSearchFragment extends SearchSupportFragment implements Search
 
             @Override
             public void onMovieUpdate(DataService service) {
+                search();
             }
 
             @Override
@@ -125,37 +129,32 @@ public class MovieSearchFragment extends SearchSupportFragment implements Search
             client.unbind();
         }
 
-        mConnection.close();
+        connection.close();
     }
 
     @Override
     public ObjectAdapter getResultsAdapter() {
-        return mRowsAdapter;
+        return rowsAdapter;
     }
 
     @Override
     public boolean onQueryTextChange(String newQuery) {
-        /*mRowsAdapter.clear();
-
-        if(!TextUtils.isEmpty(newQuery)) {
-            mDelayedLoad.setSearchQuery(newQuery);
-            mHandler.removeCallbacks(mDelayedLoad);
-            mHandler.postDelayed(mDelayedLoad, SEARCH_DELAY_MS);
-        }*/
-
-        return true;
+        return false;
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        mRowsAdapter.clear();
-
-        if(!TextUtils.isEmpty(query)) {
-            mDelayedLoad.setSearchQuery(query);
-            mHandler.removeCallbacks(mDelayedLoad);
-            mHandler.postDelayed(mDelayedLoad, SEARCH_DELAY_MS);
+        if(!super.onQueryTextSubmit(query)){
+            return false;
         }
 
+        searchRunnable.setSearchQuery(query);
+        search();
+
         return true;
+    }
+
+    private void search() {
+        new Thread(searchRunnable).start();
     }
 }

@@ -1,9 +1,11 @@
 package org.robotv.recordings.homescreen;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -100,8 +102,26 @@ public class RoboTVChannel {
             return;
         }
 
+        // add recordings
         MovieController controller = new MovieController(connection);
         threadPool.execute(() -> runMovieUpdate(controller));
+    }
+
+    private void addEpgSearch(long channelId) {
+        // add epg search programm
+        Intent epgSearchIntent = new Intent(context, org.robotv.timers.activity.EpgSearchActivity.class);
+        PreviewProgram.Builder epgSearchBuilder = new PreviewProgram.Builder();
+
+        epgSearchBuilder.setChannelId(channelId)
+                .setType(TvContractCompat.PreviewPrograms.TYPE_EVENT)
+                .setTitle(context.getString(R.string.schedule_recording))
+                .setPosterArtUri(getUriToResource(context, R.drawable.ic_add_circle_outline_white_48dp))
+                .setPosterArtAspectRatio(TvContractCompat.PreviewPrograms.ASPECT_RATIO_MOVIE_POSTER)
+                .setIntent(epgSearchIntent)
+                .setSearchable(false);
+
+        final ContentValues contentValues = epgSearchBuilder.build().toContentValues();
+        context.getContentResolver().insert(TvContractCompat.PreviewPrograms.CONTENT_URI, contentValues);
     }
 
     public void updateFromCollection(ArrayList<Movie> list) {
@@ -116,6 +136,8 @@ public class RoboTVChannel {
         }
 
         context.getContentResolver().delete(TvContractCompat.PreviewPrograms.CONTENT_URI, null, null);
+
+        //addEpgSearch(channelId);
 
         list.sort(MovieController.compareTimestamps);
 
@@ -177,5 +199,31 @@ public class RoboTVChannel {
 
         ArrayList<Movie> list = controller.load();
         updateFromCollection(list);
+    }
+
+    /**
+     * get uri to any resource type
+     * @param context - context
+     * @param resId - resource id
+     * @throws Resources.NotFoundException if the given ID does not exist.
+     * @return - Uri to resource by given id
+     */
+    public static Uri getUriToResource(Context context,
+                                             int resId)
+            throws Resources.NotFoundException {
+        /** Return a Resources instance for your application's package. */
+        Resources res = context.getResources();
+        /**
+         * Creates a Uri which parses the given encoded URI string.
+         * @param uriString an RFC 2396-compliant, encoded URI
+         * @throws NullPointerException if uriString is null
+         * @return Uri for this given uri string
+         */
+        Uri resUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
+                "://" + res.getResourcePackageName(resId)
+                + '/' + res.getResourceTypeName(resId)
+                + '/' + res.getResourceEntryName(resId));
+        /** return uri */
+        return resUri;
     }
 }

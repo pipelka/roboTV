@@ -13,14 +13,12 @@ import org.robotv.ui.MovieStepFragment;
 
 public class TimerActivity extends DataServiceActivity {
 
-    private MovieStepFragment actionFragment;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
 
-        TimerFragment fragment = (TimerFragment) getSupportFragmentManager().findFragmentById(R.id.timer_fragment);
+        TimerFragment fragment = (TimerFragment) getSupportFragmentManager().findFragmentById(R.id.container);
         setServiceListener(fragment);
     }
 
@@ -39,12 +37,12 @@ public class TimerActivity extends DataServiceActivity {
             return;
         }
 
-        actionFragment = new CreateTimerFragment();
+        MovieStepFragment actionFragment = new CreateTimerFragment();
         actionFragment.startGuidedStep(
                 this,
                 event,
                 service,
-                R.id.timer_fragment
+                R.id.container
         );
     }
 

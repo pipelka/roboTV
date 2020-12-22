@@ -2,9 +2,9 @@ package org.robotv.recordings.model;
 
 public class IconAction {
 
-    private int actionId;
-    private int resourceId;
-    private String text;
+    private final int actionId;
+    private final int resourceId;
+    private final String text;
 
     public IconAction(int actionId, int resourceId, String text) {
         this.actionId = actionId;

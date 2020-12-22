@@ -10,7 +10,6 @@ import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 
 import org.robotv.client.MovieController;
 import org.robotv.recordings.presenter.IconActionPresenter;
@@ -104,8 +103,6 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     }
 
     private boolean onLongClickListener(Movie movie) {
-        Log.d(TAG, "fired long click listener");
-
         if(this.onLongClickListener != null) {
             return this.onLongClickListener.onLongClick(movie);
         }
@@ -116,6 +113,14 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
     @Override
     public void clear() {
         super.clear();
+
+        if(mLatest != null) {
+            mLatest.clear();
+        }
+
+        if(mTvShows != null) {
+            mTvShows.clear();
+        }
     }
 
     private Movie movieExists(ArrayObjectAdapter adapter, Movie movie) {

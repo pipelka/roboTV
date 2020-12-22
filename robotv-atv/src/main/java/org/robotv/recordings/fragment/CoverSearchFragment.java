@@ -5,22 +5,11 @@ import android.os.Handler;
 import android.os.HandlerThread;
 
 import androidx.leanback.app.BackgroundManager;
-import androidx.leanback.app.ProgressBarManager;
-import androidx.leanback.app.SearchFragment;
-import androidx.leanback.app.SearchSupportFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.ObjectAdapter;
-import androidx.leanback.widget.OnItemViewClickedListener;
-import androidx.leanback.widget.Presenter;
-import androidx.leanback.widget.Row;
-import androidx.leanback.widget.RowPresenter;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import org.robotv.recordings.activity.CoverSearchActivity;
 import org.robotv.recordings.presenter.ArtworkPresenter;
@@ -31,17 +20,15 @@ import org.robotv.client.artwork.ArtworkHolder;
 import org.robotv.client.artwork.provider.TheMovieDatabase;
 import org.robotv.client.artwork.provider.TheTvDb;
 import org.robotv.setup.SetupUtils;
-import org.robotv.ui.GlideApp;
+import org.robotv.ui.SearchProgressFragment;
 
 import java.util.List;
 
-public class CoverSearchFragment extends SearchSupportFragment implements SearchSupportFragment.SearchResultProvider {
+public class CoverSearchFragment extends SearchProgressFragment {
 
-    private static final int SEARCH_DELAY_MS = 300;
+    private static final int SEARCH_DELAY_MS = 2000;
     private TheMovieDatabase mMovieDb;
     private TheTvDb tvDb;
-
-    ProgressBarManager progress;
 
     private class SearchRunnable implements Runnable {
 
@@ -63,13 +50,10 @@ public class CoverSearchFragment extends SearchSupportFragment implements Search
                 HeaderItem header = new HeaderItem(title);
                 ListRow listRow = new ListRow(header, listRowAdapter);
 
-                mRowsAdapter.clear();
                 mRowsAdapter.add(listRow);
-
                 listRowAdapter.addAll(0, list);
 
-                progress.disableProgressBar();
-                progress.hide();
+                showProgress(false);
             });
         }
 
@@ -87,7 +71,6 @@ public class CoverSearchFragment extends SearchSupportFragment implements Search
         super.onCreate(savedInstanceState);
 
         final BackgroundManager backgroundManager = BackgroundManager.getInstance(getActivity());
-        final BackgroundManagerTarget backgroundManagerTarget = new BackgroundManagerTarget(backgroundManager);
 
         backgroundManager.attach(getActivity().getWindow());
         backgroundManager.setAutoReleaseOnStop(false);
@@ -113,15 +96,6 @@ public class CoverSearchFragment extends SearchSupportFragment implements Search
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        progress = new ProgressBarManager();
-        progress.setRootView((ViewGroup) view);
-
-        return view;
-    }
-
-    @Override
     public ObjectAdapter getResultsAdapter() {
         return mRowsAdapter;
     }
@@ -133,14 +107,13 @@ public class CoverSearchFragment extends SearchSupportFragment implements Search
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        if(!TextUtils.isEmpty(query)) {
-            progress.show();
-            progress.enableProgressBar();
-
-            mDelayedLoad.setSearchQuery(query);
-            mHandler.removeCallbacks(mDelayedLoad);
-            mHandler.postDelayed(mDelayedLoad, SEARCH_DELAY_MS);
+        if(!super.onQueryTextSubmit(query)) {
+            return false;
         }
+
+        mDelayedLoad.setSearchQuery(query);
+        mHandler.removeCallbacks(mDelayedLoad);
+        mHandler.postDelayed(mDelayedLoad, SEARCH_DELAY_MS);
 
         return true;
     }

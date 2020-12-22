@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class EpisodeTimer extends Timer {
 
-    private ArrayList<Timer> timers = new ArrayList<>();
+    private final ArrayList<Timer> timers = new ArrayList<>();
 
     public EpisodeTimer(Timer timer) {
         super(0, timer);

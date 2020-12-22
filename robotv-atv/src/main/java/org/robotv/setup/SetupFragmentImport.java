@@ -3,7 +3,6 @@ package org.robotv.setup;
 import android.app.Activity;
 import androidx.fragment.app.Fragment;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +16,12 @@ public class SetupFragmentImport extends Fragment implements ChannelSyncAdapter.
     private static final String TAG = SetupFragmentImport.class.getSimpleName();
 
     protected ProgressBar mProgressBar;
-    protected Handler mHandler;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_import, container, false);
         mProgressBar = view.findViewById(R.id.progressBar);
-        mHandler = new Handler();
 
         return view;
     }

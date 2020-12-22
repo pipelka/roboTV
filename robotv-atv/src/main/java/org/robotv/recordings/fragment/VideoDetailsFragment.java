@@ -248,7 +248,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
             return;
         }
 
-        Collection<Movie> collection = service.getMovieController().getRelatedContent(selectedMovie);
+        ArrayList<Movie> collection = service.getMovieController().getRelatedContent(selectedMovie);
 
         if(collection == null) {
             return;

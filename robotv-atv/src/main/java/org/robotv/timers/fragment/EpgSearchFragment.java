@@ -3,8 +3,6 @@ package org.robotv.timers.fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.leanback.app.ProgressBarManager;
-import androidx.leanback.app.SearchFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
@@ -12,14 +10,9 @@ import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.ObjectAdapter;
 import androidx.leanback.widget.SearchOrbView;
 
-import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
+import org.robotv.dataservice.DataService;
 import org.robotv.msgexchange.Packet;
 import org.robotv.client.PacketAdapter;
-import org.robotv.dataservice.DataService;
 import org.robotv.recordings.util.Utils;
 import org.robotv.timers.activity.EpgSearchActivity;
 import org.robotv.client.model.Movie;
@@ -27,13 +20,12 @@ import org.robotv.timers.presenter.EpgEventPresenter;
 import org.robotv.robotv.R;
 import org.robotv.client.model.Event;
 import org.robotv.client.Connection;
+import org.robotv.ui.SearchProgressFragment;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class EpgSearchFragment extends SearchFragment implements SearchFragment.SearchResultProvider, DataService.Listener  {
+public class EpgSearchFragment extends SearchProgressFragment implements DataService.Listener {
 
     private static final int SEARCH_DELAY_MS = 500;
 
@@ -83,9 +75,6 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
         @Override
         protected void onPreExecute() {
-            progress.show();
-            progress.enableProgressBar();
-
             rowsAdapter.clear();
         }
 
@@ -126,26 +115,19 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 adapter.add(movie);
             }
 
-            Collections.sort(resultRows, new Comparator<ListRow>() {
-                @Override
-                public int compare(ListRow a, ListRow b) {
-                    return a.getId() < b.getId() ? -1 : 1;
-                }
-            });
+            resultRows.sort((a, b) -> a.getId() < b.getId() ? -1 : 1);
 
             return resultRows;
         }
 
         @Override
         protected void onPostExecute(final List<ListRow> result) {
-            progress.disableProgressBar();
-            progress.hide();
-
             for(ListRow row : result) {
                 rowsAdapter.add(row);
             }
 
             rowsAdapter.notifyArrayItemRangeChanged(0, rowsAdapter.size());
+            showProgress(false);
         }
     }
 
@@ -154,7 +136,6 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     private DelayedTask delayedLoader;
     private Connection connection;
     private Handler handler;
-    ProgressBarManager progress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -171,8 +152,6 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
                 Utils.getColor(getContext(), R.color.primary_color)
         ));
 
-        setSearchResultProvider(this);
-
         setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
             Movie movie = (Movie) item;
 
@@ -185,17 +164,9 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        progress = new ProgressBarManager();
-        progress.setRootView((ViewGroup) view);
-
-        return view;
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
+        connection.close();
     }
 
     @Override
@@ -205,43 +176,42 @@ public class EpgSearchFragment extends SearchFragment implements SearchFragment.
 
     @Override
     public boolean onQueryTextChange(String newQuery) {
-        /*if(!TextUtils.isEmpty(newQuery)) {
-            rowsAdapter.clear();
-            delayedLoader.setSearchQuery(newQuery);
-            handler.removeCallbacks(delayedLoader);
-            handler.postDelayed(delayedLoader, SEARCH_DELAY_MS);
-        }*/
-
-        return true;
+        return false;
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        if(!TextUtils.isEmpty(query)) {
-            rowsAdapter.clear();
-            delayedLoader.setSearchQuery(query);
-            handler.removeCallbacks(delayedLoader);
-            handler.postDelayed(delayedLoader, SEARCH_DELAY_MS);
+        if(!super.onQueryTextSubmit(query)) {
+            return false;
         }
+
+        rowsAdapter.clear();
+        delayedLoader.setSearchQuery(query);
+        handler.removeCallbacks(delayedLoader);
+        handler.postDelayed(delayedLoader, SEARCH_DELAY_MS);
 
         return true;
     }
 
     @Override
     public void onConnected(DataService service) {
+        setSearchResultProvider(this);
         connection = service.getConnection();
     }
 
     @Override
     public void onConnectionError(DataService service) {
+
     }
 
     @Override
     public void onMovieUpdate(DataService service) {
+
     }
 
     @Override
     public void onTimersUpdated(DataService service) {
+
     }
 
 }

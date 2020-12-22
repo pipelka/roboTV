@@ -3,17 +3,17 @@ package org.robotv.recordings.model;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.Presenter;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
 
 public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {
 
-    private TreeSet<Object> mSortedItems;
+    private final TreeSet mSortedItems;
 
     public SortedArrayObjectAdapter(Comparator comparator, Presenter presenter) {
         super(presenter);
-        mSortedItems = new TreeSet<>(comparator);
+        mSortedItems = new TreeSet(comparator);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class SortedArrayObjectAdapter  extends ArrayObjectAdapter {
         super.add(item);
     }
 
-    public void addAll(Collection items) {
+    public void addAll(ArrayList<?> items) {
 
         for(Object item : items) {
             add(item);
