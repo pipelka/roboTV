@@ -12,7 +12,7 @@ import java.util.Collection;
 
 public class TimerController {
 
-    private static class TimerLoaderTask extends AsyncTask<Void, Void, Collection<Timer>> {
+    private static class TimerLoaderTask extends AsyncTask<Void, Void, ArrayList<Timer>> {
 
         final Connection connection;
         final LoaderCallback listener;
@@ -23,7 +23,7 @@ public class TimerController {
         }
 
         @Override
-        protected Collection<Timer> doInBackground(Void... params) {
+        protected ArrayList<Timer> doInBackground(Void... params) {
             Packet request = connection.CreatePacket(Connection.TIMER_GETLIST);
             Packet response = connection.transmitMessage(request);
 
@@ -32,7 +32,7 @@ public class TimerController {
             }
 
             int count = (int) response.getU32();
-            Collection<Timer> timers = new ArrayList<>(count);
+            ArrayList<Timer> timers = new ArrayList<>(count);
 
             while(!response.eop()) {
                 Timer timer = PacketAdapter.toTimer(response);
@@ -43,7 +43,7 @@ public class TimerController {
         }
 
         @Override
-        protected void onPostExecute(Collection<Timer> result) {
+        protected void onPostExecute(ArrayList<Timer> result) {
             if(listener != null) {
                 listener.onTimersUpdated(result);
             }
@@ -51,7 +51,7 @@ public class TimerController {
 
     }
 
-    private static class SearchTimerLoaderTask extends AsyncTask<Void, Void, Collection<Timer>> {
+    private static class SearchTimerLoaderTask extends AsyncTask<Void, Void, ArrayList<Timer>> {
 
         final Connection connection;
         final LoaderCallback listener;
@@ -61,7 +61,7 @@ public class TimerController {
             this.listener = listener;
         }
         @Override
-        protected Collection<Timer> doInBackground(Void... params) {
+        protected ArrayList<Timer> doInBackground(Void... params) {
             Packet request = connection.CreatePacket(Connection.SEARCHTIMER_GETLIST);
             Packet response = connection.transmitMessage(request);
 
@@ -78,7 +78,7 @@ public class TimerController {
                 return null;
             }
 
-            Collection<Timer> timers = new ArrayList<>(10);
+            ArrayList<Timer> timers = new ArrayList<>(10);
 
             while(!response.eop()) {
                 Timer timer = PacketAdapter.toSearchTimer(response);
@@ -89,7 +89,7 @@ public class TimerController {
         }
 
         @Override
-        protected void onPostExecute(Collection<Timer> result) {
+        protected void onPostExecute(ArrayList<Timer> result) {
             if(listener != null) {
                 listener.onTimersUpdated(result);
             }
@@ -98,7 +98,7 @@ public class TimerController {
     }
 
     public interface LoaderCallback {
-        void onTimersUpdated(Collection<Timer> timers);
+        void onTimersUpdated(ArrayList<Timer> timers);
     }
 
     private static final String TAG = "TimerController";
