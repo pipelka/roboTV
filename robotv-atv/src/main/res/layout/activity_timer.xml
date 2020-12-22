@@ -5,7 +5,7 @@
 
     <fragment
         android:name="org.robotv.timers.fragment.TimerFragment"
-        android:id="@+id/timer_fragment"
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
