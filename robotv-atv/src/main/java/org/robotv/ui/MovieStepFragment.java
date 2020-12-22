@@ -149,6 +149,7 @@ public class MovieStepFragment extends GuidedStepSupportFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         progress = new ProgressBarManager();
+        progress.setInitialDelay(0);
         progress.setRootView(container);
 
         return view;
