@@ -59,7 +59,7 @@ public class MovieController {
         return connection.deleteRecording(movie.getRecordingId());
     }
 
-    public Collection<Movie> getRelatedContent(Movie movie) {
+    public ArrayList<Movie> getRelatedContent(Movie movie) {
         RelatedContentExtractor contentExtractor = new RelatedContentExtractor(movieCollection);
         if(movie.isTvShow()) {
             return contentExtractor.getSeries(movie.getTitle());
