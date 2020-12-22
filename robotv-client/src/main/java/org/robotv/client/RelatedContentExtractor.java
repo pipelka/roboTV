@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import org.robotv.client.model.Movie;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -39,7 +40,7 @@ public class RelatedContentExtractor {
         return result;
     }
 
-    Collection<Movie> getRelatedMovies(Movie movie) {
+    ArrayList<Movie> getRelatedMovies(Movie movie) {
         if(collection == null) {
             return result;
         }
