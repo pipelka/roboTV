@@ -15,10 +15,10 @@ import java.util.List;
 
 public class CreateTimerFragment extends CreateTimerStepFragment {
 
-    static final int ACTION_FOLDER = 3;
-    static final int ACTION_ADD = 1;
+    static final int ACTION_CANCEL = 1;
+    static final int ACTION_FOLDER = 2;
+    static final int ACTION_ADD = 3;
     static final int ACTION_ADD_SEARCH = 4;
-    static final int ACTION_CANCEL = 2;
 
     private GuidedAction mActionFolder;
     private GuidedAction mActionAdd;
@@ -46,6 +46,7 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
         mActionFolder = new GuidedAction.Builder(getActivity())
                 .id(ACTION_FOLDER)
                 .title(getString(R.string.timer_add_select_folder))
+                .icon(R.drawable.ic_folder_white_48dp)
                 .build();
 
         updateFolder();
@@ -53,18 +54,21 @@ public class CreateTimerFragment extends CreateTimerStepFragment {
         mActionAdd = new GuidedAction.Builder(getActivity())
                 .id(ACTION_ADD)
                 .title(getString(R.string.timer_add_create))
+                .icon(R.drawable.ic_timer_white_48dp)
                 .hasNext(true)
                 .build();
 
         mActionSearch = new GuidedAction.Builder(getActivity())
                 .id(ACTION_ADD_SEARCH)
                 .title(getString(R.string.timer_add_all_episodes))
+                .icon(R.drawable.ic_timetable_white_48dp)
                 .hasNext(true)
                 .build();
 
         mActionCancel = new GuidedAction.Builder(getActivity())
                 .id(ACTION_CANCEL)
                 .title(getString(R.string.timer_add_cancel))
+                .icon(R.drawable.baseline_close_white_48dp)
                 .build();
 
         actions.add(mActionCancel);
