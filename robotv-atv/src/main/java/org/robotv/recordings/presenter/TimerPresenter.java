@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
 import android.text.TextUtils;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -40,7 +41,10 @@ public class TimerPresenter extends ExecutorPresenter {
         }
 
         cardView.post(() -> {
-            if(!TextUtils.isEmpty(timer.getLogoUrl())) {
+            if(timer.isSearchTimer()) {
+                cardView.setBadgeImage(cardView.getContext().getDrawable(R.drawable.ic_timetable_white_48dp));
+            }
+            else if(!TextUtils.isEmpty(timer.getLogoUrl())) {
                 GlideApp.with(cardView.getContext())
                         .load(timer.getLogoUrl())
                         .placeholder(R.drawable.recording_unkown)
@@ -61,6 +65,7 @@ public class TimerPresenter extends ExecutorPresenter {
 
             cardView.setMainImage(drawableUnknown);
 
+
             GlideApp.with(cardView.getContext())
                     .load(imageUrl)
                     .error(drawableUnknown)
@@ -74,6 +79,7 @@ public class TimerPresenter extends ExecutorPresenter {
                             cardView.setMainImage(resource);
                         }
                     });
+
         });
     }
 
@@ -96,6 +102,7 @@ public class TimerPresenter extends ExecutorPresenter {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
+        // CARD_TYPE_FLAG_ICON_LEFT
         ImageCardView cardView = new ImageCardView(parent.getContext());
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
@@ -143,6 +150,9 @@ public class TimerPresenter extends ExecutorPresenter {
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
+        ImageCardView cardView = (ImageCardView) viewHolder.view;
+        cardView.setBadgeImage(null);
+        cardView.setMainImage(null);
     }
 
     @Override
