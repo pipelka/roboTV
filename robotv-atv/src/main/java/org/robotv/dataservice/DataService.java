@@ -388,6 +388,10 @@ public class DataService extends Service {
         postOnMovieUpdate();
     }
 
+    public void triggerTimerUpdate() {
+        postOnTimersUpdate();
+    }
+
     static public void cancelSyncJob(Context context) {
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.cancelAll();
