@@ -187,7 +187,6 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public void onPlayerError(Exception e) {
-        mNotification.error(getResources().getString(R.string.player_error));
         Log.e(TAG, "onPlayerError");
         e.printStackTrace();
     }
