@@ -20,9 +20,10 @@ import java.util.TreeSet;
 
 public class EditTimerFragment extends MovieStepFragment {
 
-    static final int ACTION_DELETE = 0;
-    static final int ACTION_CANCEL = 1;
-    static final int ACTION_FOLDER = 2;
+    static final int ACTION_CANCEL = 0;
+    static final int ACTION_FOLDER = 1;
+    static final int ACTION_DELETE = 2;
+    static final int ACTION_DELETE_SEARCH = 3;
 
     private Timer timer;
 
@@ -67,8 +68,15 @@ public class EditTimerFragment extends MovieStepFragment {
         }
 
         actions.add(new GuidedAction.Builder(getActivity())
+                .id(ACTION_CANCEL)
+                .icon(R.drawable.baseline_close_white_48dp)
+                .title(getString(R.string.cancel))
+                .build());
+
+        actions.add(new GuidedAction.Builder(getActivity())
                 .id(ACTION_FOLDER)
                 .title(getString(R.string.timer_add_select_folder))
+                .icon(R.drawable.ic_folder_white_48dp)
                 .description(TextUtils.isEmpty(
                         timer.getFolder()) ? getActivity().getString(R.string.empty_folder) :
                         timer.getFolder())
@@ -76,14 +84,18 @@ public class EditTimerFragment extends MovieStepFragment {
                 .build());
 
         actions.add(new GuidedAction.Builder(getActivity())
-                .id(ACTION_CANCEL)
-                .title(getString(R.string.cancel))
-                .build());
-
-        actions.add(new GuidedAction.Builder(getActivity())
                 .id(ACTION_DELETE)
                 .title(getString(R.string.delete))
+                .icon(R.drawable.ic_delete_white_48dp)
                 .build());
+
+        if(timer.isSearchTimer()) {
+            actions.add(new GuidedAction.Builder(getActivity())
+                    .id(ACTION_DELETE_SEARCH)
+                    .title(getString(R.string.delete_search_timer))
+                    .icon(R.drawable.baseline_auto_delete_white_48)
+                    .build());
+        }
     }
 
     @Override
@@ -91,6 +103,10 @@ public class EditTimerFragment extends MovieStepFragment {
         switch((int)action.getId()) {
             case ACTION_DELETE:
                 deleteTimer();
+                getFragmentManager().popBackStack();
+                break;
+            case ACTION_DELETE_SEARCH:
+                deleteSearchTimer();
                 getFragmentManager().popBackStack();
                 break;
             case ACTION_CANCEL:
@@ -126,4 +142,13 @@ public class EditTimerFragment extends MovieStepFragment {
         }
     }
 
+    private void deleteSearchTimer() {
+        NotificationHandler notificationHandler = new NotificationHandler(getActivity());
+
+        if(!getService().getTimerController().deleteSearchTimer(timer.getSearchTimerId())) {
+            notificationHandler.error(getString(R.string.failed_delete_timer));
+        }
+
+        getService().triggerTimerUpdate();
+    }
 }
