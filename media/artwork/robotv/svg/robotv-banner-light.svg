@@ -14,7 +14,10 @@
    height="576.5271mm"
    width="1025.0714mm"
    sodipodi:docname="robotv-banner-light.svg"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   inkscape:export-filename="/home/pipelka/AndroidStudioProjects/roboTV/media/artwork/robotv/png/robotv-banner-light.png"
+   inkscape:export-xdpi="7.9299998"
+   inkscape:export-ydpi="7.9299998">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -32,13 +35,13 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.12195638"
-     inkscape:cx="3013.18"
-     inkscape:cy="839.08344"
+     inkscape:zoom="0.17247237"
+     inkscape:cx="1681.3146"
+     inkscape:cy="1178.6243"
      inkscape:window-x="48"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g4567" />
+     inkscape:current-layer="layer1" />
   <defs
      id="defs2">
     <linearGradient
@@ -170,20 +173,20 @@
     <text
        transform="scale(1.0252327,0.97538832)"
        id="text3715"
-       y="-157.27255"
-       x="122.63543"
-       style="font-style:normal;font-weight:normal;font-size:169.39916992px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.88228732"
+       y="-165.40678"
+       x="155.30359"
+       style="font-style:normal;font-weight:normal;font-size:146.58459473px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.76346141"
        xml:space="preserve"><tspan
-         style="fill:#000000;fill-opacity:1;stroke-width:0.88228732"
-         y="-157.27255"
-         x="122.63543"
+         style="fill:#000000;fill-opacity:1;stroke-width:0.76346141"
+         y="-165.40678"
+         x="155.30359"
          id="tspan3713">robo</tspan></text>
     <g
        style="filter:url(#filter5257)"
-       transform="matrix(0.82865311,0,0,0.78836602,70.507899,-141.51364)"
+       transform="matrix(0.71705064,0,0,0.68218939,150.27717,-151.04877)"
        id="g4567">
       <rect
-         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:14.73074341;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:18.9149456;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect4548"
          width="393.42075"
          height="301.48001"
@@ -192,14 +195,14 @@
          ry="56.794777" />
       <text
          xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:236.46768188px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#1c1c3a;fill-opacity:1;stroke:none;stroke-width:1.23160255;"
+         style="font-style:normal;font-weight:normal;font-size:236.46768188px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#1c1c3a;fill-opacity:1;stroke:none;stroke-width:1.23160255;stroke-opacity:1"
          x="592.06207"
          y="-7.0205688"
          id="text3719"><tspan
            id="tspan3717"
            x="592.06207"
            y="-7.0205688"
-           style="fill:#1c1c3a;fill-opacity:1;stroke:#020202;stroke-width:1.23160255;stroke-opacity:1;">TV</tspan></text>
+           style="fill:#1c1c3a;fill-opacity:1;stroke:none;stroke-width:1.23160255;stroke-opacity:1">TV</tspan></text>
     </g>
   </g>
 </svg>
