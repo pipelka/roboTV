@@ -198,6 +198,17 @@ public class RoboTVChannel {
         }
 
         ArrayList<Movie> list = controller.load();
+        ArtworkFetcher artworkFetcher = new ArtworkFetcher(connection, SetupUtils.getLanguage(context));
+
+        for(Movie m : list) {
+            try {
+                artworkFetcher.fetchForEvent(m);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         updateFromCollection(list);
     }
 
