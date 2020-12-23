@@ -17,7 +17,7 @@ public abstract class ArtworkProvider {
             return searchTv(event);
         }
         // search movies
-        else if(event.getGenre() == 0x10 || event.getGenre() == 0x70) {
+        else if(event.getGenre() == 0x10 || event.getGenre() == 0x70 || event.getContentId() == 0xF0) {
             return searchMovie(event);
         }
 
