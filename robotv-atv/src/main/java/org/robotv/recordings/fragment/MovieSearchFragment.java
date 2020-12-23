@@ -102,6 +102,7 @@ public class MovieSearchFragment extends SearchProgressFragment {
             @Override
             public void onConnected(DataService service) {
                 rowsAdapter.setOnLongClickListener(movie -> RecordingsFragment.openDetailsMenu(MovieSearchFragment.this.getActivity(), service, movie, R.id.container));
+                connection = service.getConnection();
             }
 
             @Override
@@ -128,8 +129,6 @@ public class MovieSearchFragment extends SearchProgressFragment {
         if(client != null) {
             client.unbind();
         }
-
-        connection.close();
     }
 
     @Override
