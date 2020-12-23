@@ -41,7 +41,7 @@ public class MovieDetailsGuidedStep extends MovieStepFragment {
                 .icon(R.drawable.ic_style_white_48dp)
                 .build());
 
-        if(!getMovie().isTvShow()) {
+        if(!getMovie().isTvShow() && !getMovie().isSeriesHeader()) {
             actions.add(new GuidedAction.Builder(getActivity())
                     .id(ACTION_FOLDER)
                     .title(getString(R.string.movie_move_to_folder))
@@ -51,12 +51,14 @@ public class MovieDetailsGuidedStep extends MovieStepFragment {
                     .build());
         }
 
-        actions.add(new GuidedAction.Builder(getActivity())
-                .id(ACTION_DELETE)
-                .title(getString(R.string.delete_movie))
-                .hasNext(true)
-                .icon(R.drawable.ic_delete_white_48dp)
-                .build());
+        if(!getMovie().isSeriesHeader()) {
+            actions.add(new GuidedAction.Builder(getActivity())
+                    .id(ACTION_DELETE)
+                    .title(getString(R.string.delete_movie))
+                    .hasNext(true)
+                    .icon(R.drawable.ic_delete_white_48dp)
+                    .build());
+        }
     }
 
     @Override
