@@ -20,7 +20,7 @@
     <color name="recordings_search_button_icon_color">#000000</color>
     <!--<color name="recordings_background">#000000</color>-->
     <color name="default_background">#000a12</color>
-    <color name="overlay_background">#EE000000</color>
+    <color name="overlay_background">#80000000</color>
     <color name="episode_header_color">#de1a237e</color>
     <color name="iconaction_color">#1A237E</color>
 </resources>

@@ -129,4 +129,5 @@
     <string name="robotv" translatable="false">roboTV</string>
     <string name="edit_recording">Edit recording</string>
     <string name="recording_deleted">Recording deleted</string>
+    <string name="delete_search_timer">Delete search timer</string>
 </resources>
