@@ -10,6 +10,7 @@ import androidx.leanback.app.ProgressBarManager;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.RowPresenter;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -55,6 +56,12 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
 
         prepareEntranceTransition();
         notification = new NotificationHandler(getActivity());
+
+        // missing setup -> start setup activity
+        if(TextUtils.isEmpty(SetupUtils.getServer(getActivity()))) {
+            startSetupActivity();
+            return;
+        }
 
         ProgressBarManager manager = getProgressBarManager();
         manager.enableProgressBar();
@@ -221,10 +228,16 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
                     create = false;
                 }
                 else {
-                    Object item = getSelectedRowViewHolder().getSelectedItem();
-                    if(item instanceof Movie) {
-                        Movie movie = (Movie)item;
-                        BackgroundManagerTarget.setBackground(movie.getBackgroundUrl(), getActivity());
+                    RowPresenter.ViewHolder holder = getSelectedRowViewHolder();
+
+                    if(holder != null) {
+                        Object item = holder.getSelectedItem();
+
+                        if(item instanceof Movie) {
+                            Movie movie = (Movie)item;
+                            BackgroundManagerTarget.setBackground(movie.getBackgroundUrl(), getActivity());
+                        }
+
                     }
                 }
 
@@ -270,16 +283,7 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     @Override
     public void onConnectionError(DataService service) {
         Log.d(TAG, "onConnectionError");
-
-        // missing setup -> start setup activity
-        if(TextUtils.isEmpty(SetupUtils.getServer(getActivity()))) {
-            startSetupActivity();
-            return;
-        }
-
-        MovieCollectionAdapter adapter = createAdapter();
-        setAdapter(adapter);
-
+        startSetupActivity();
     }
 
     @Override
