@@ -9,7 +9,6 @@ import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.robotv.client.MovieController;
 import org.robotv.recordings.presenter.IconActionPresenter;
@@ -294,72 +293,43 @@ public class MovieCollectionAdapter extends SortedArrayObjectAdapter {
         });
     }
 
-    public void loadTimers(Collection<Timer> timers) {
+    public void loadTimers(ArrayList<Timer> timers) {
         ArrayObjectAdapter timerAdapter = getTimerCategory();
 
-        if(timerAdapter == null || timers == null) {
+        if(timers == null) {
             return;
         }
 
-        ArrayList<EpisodeTimer> episodeTimers = new ArrayList<>();
-        ArrayList<Timer> newTimers = new ArrayList<>();
-
-        // prepare timers (categorize)
-        for(Timer timer : timers) {
-
-            if(timer.isSearchTimer()) {
-                boolean added = false;
-
-                for(EpisodeTimer episodeTimer: episodeTimers) {
-                    if(episodeTimer.add(timer)) {
-                        added = true;
-                        break;
-                    }
-                }
-
-                if(!added) {
-                    episodeTimers.add(new EpisodeTimer(timer));
-                }
-            }
-            else {
-                newTimers.add(timer);
-            }
+        if(timerAdapter.size() == 0) {
+            timerAdapter.add(new IconAction(
+                    100,
+                    R.drawable.ic_add_circle_outline_white_48dp,
+                    mContext.getString(R.string.schedule_recording)));
         }
 
-        // add episode timers
-        newTimers.addAll(episodeTimers);
+        timers.sort(MovieController.compareTimestampsReverse);
 
-        // remove items
-        int diff = timerAdapter.size() - newTimers.size();
+        int diff = (timerAdapter.size() - 1) - timers.size();
         if(diff > 0) {
-            timerAdapter.removeItems(timerAdapter.size() - diff, diff);
+            timerAdapter.removeItems(timers.size() + 1, diff);
         }
-
-        newTimers.sort(MovieController.compareTimestampsReverse);
 
         // add or replace timers
-        int index = 0;
-        for(Timer timer: newTimers) {
+        int index = 1;
+        for(Timer timer: timers) {
             if(timer == null) {
                 continue;
             }
 
             if(index < timerAdapter.size()) {
                 Timer t = (Timer) timerAdapter.get(index);
-                if(t != null && !t.equals(timer)) {
-                    timerAdapter.replace(index, timer);
-                }
+                timerAdapter.replace(index, timer);
             }
             else {
                 timerAdapter.add(timer);
             }
             index++;
         }
-
-        timerAdapter.add(new IconAction(
-                        100,
-                        R.drawable.ic_add_circle_outline_white_48dp,
-                        mContext.getString(R.string.schedule_recording)));
 
         updateRows();
     }
