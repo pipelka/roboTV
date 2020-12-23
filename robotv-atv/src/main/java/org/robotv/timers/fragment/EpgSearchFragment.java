@@ -166,7 +166,6 @@ public class EpgSearchFragment extends SearchProgressFragment implements DataSer
     @Override
     public void onDestroy() {
         super.onDestroy();
-        connection.close();
     }
 
     @Override
