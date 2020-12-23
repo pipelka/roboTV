@@ -24,6 +24,7 @@ public class TimerController {
 
         @Override
         protected ArrayList<Timer> doInBackground(Void... params) {
+            // fetch timers
             Packet request = connection.CreatePacket(Connection.TIMER_GETLIST);
             Packet response = connection.transmitMessage(request);
 
@@ -37,6 +38,50 @@ public class TimerController {
             while(!response.eop()) {
                 Timer timer = PacketAdapter.toTimer(response);
                 timers.add(timer);
+            }
+
+            // fetch search timers
+            request = connection.CreatePacket(Connection.SEARCHTIMER_GETLIST);
+            response = connection.transmitMessage(request);
+
+            if(response == null) {
+                return timers;
+            }
+
+            response.uncompress();
+
+            int status = (int) response.getU32();
+
+            if(status != 0) {
+                return timers;
+            }
+
+            ArrayList<Timer> searchTimers = new ArrayList<>(10);
+
+            while(!response.eop()) {
+                Timer timer = PacketAdapter.toSearchTimer(response);
+                Log.d(TAG, "search timer: " + timer.getSearchTimerId() + " - " + timer.getTitle());
+                searchTimers.add(timer);
+            }
+
+            // check search timer id in timers
+            for(Timer t: timers) {
+                if(!t.isSearchTimer()) {
+                    continue;
+                }
+
+                boolean found = false;
+
+                for(Timer s: searchTimers) {
+                    if(s.getSearchTimerId() == t.getSearchTimerId()) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found) {
+                    t.setSearchTimerId(-1);
+                }
             }
 
             return timers;
@@ -167,6 +212,15 @@ public class TimerController {
 
     public boolean deleteTimer(int id) {
         Packet request = connection.CreatePacket(Connection.TIMER_DELETE);
+        request.putU32(id);
+
+        Packet response = connection.transmitMessage(request);
+
+        return response != null && response.getU32() == Connection.STATUS_SUCCESS;
+    }
+
+    public boolean deleteSearchTimer(int id) {
+        Packet request = connection.CreatePacket(Connection.SEARCHTIMER_DELETE);
         request.putU32(id);
 
         Packet response = connection.transmitMessage(request);
