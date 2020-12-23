@@ -109,7 +109,7 @@ public class SyncUtils {
 
     static private final String TAG = SyncUtils.class.getName();
 
-    private static final SparseArray<String> canonicalGenre = new SparseArray<String>() {
+    public static final SparseArray<String> canonicalGenre = new SparseArray<String>() {
         {
             append(0x10, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
             append(0x11, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
@@ -174,6 +174,7 @@ public class SyncUtils {
             append(0xA5, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
             append(0xA6, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SHOPPING));
             append(0xA7, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
+            append(0xF0, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
         }
     };
 
