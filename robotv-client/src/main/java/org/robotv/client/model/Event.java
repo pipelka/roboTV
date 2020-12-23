@@ -256,6 +256,12 @@ public class Event extends ArtworkHolder {
         if(!isTvShow() && guessSoapFromDescription(this.description)) {
             this.contentId = 0x15;
         }
+
+        // user-defined (maybe movie) if duration > 70 min
+        if(durationSec > 70 * 60) {
+            this.contentId = 0xF0;
+
+        }
     }
 
     public void setShortText(String outline) {
