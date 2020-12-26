@@ -16,6 +16,7 @@ import com.bumptech.glide.load.DecodeFormat;
 import org.robotv.client.artwork.ArtworkFetcher;
 import org.robotv.client.Connection;
 import org.robotv.client.artwork.ArtworkHolder;
+import org.robotv.client.model.Event;
 import org.robotv.client.model.Movie;
 import org.robotv.recordings.model.MovieImageCardView;
 import org.robotv.recordings.util.Utils;
@@ -138,6 +139,11 @@ public class MoviePresenter extends ExecutorPresenter {
             int count = movie.getEpisodeCount();
             cardView.setContentText(
                     count + " " + resources.getString(count > 1 ? R.string.episodes : R.string.episode));
+        }
+        else if(movie.isTvShow()) {
+            Event.SeasonEpisodeHolder holder = movie.getSeasionEpisode();
+            cardView.setTitleText(movie.getShortText());
+            cardView.setContentText(resources.getString(R.string.season_episode, holder.season, holder.episode));
         }
         else {
             cardView.setContentText(movie.getShortText());
