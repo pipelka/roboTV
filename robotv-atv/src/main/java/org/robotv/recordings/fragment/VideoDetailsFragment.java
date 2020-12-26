@@ -30,6 +30,7 @@ import org.robotv.client.model.Movie;
 import org.robotv.recordings.model.SortedArrayObjectAdapter;
 import org.robotv.recordings.presenter.DetailsDescriptionPresenter;
 import org.robotv.recordings.presenter.LatestCardPresenter;
+import org.robotv.recordings.presenter.MoviePresenter;
 import org.robotv.recordings.util.BackgroundManagerTarget;
 import org.robotv.recordings.util.Utils;
 import org.robotv.robotv.R;
@@ -153,41 +154,22 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
             if(episode1.valid() && episode2.valid()) {
 
                 if(episode1.season == episode2.season) {
-                    return episode1.episode > episode2.episode ? -1 : 1;
+                    return episode1.episode < episode2.episode ? -1 : 1;
                 }
 
-                return episode1.season > episode2.season ? -1 : 1;
+                return episode1.season < episode2.season ? -1 : 1;
             }
 
-            return lhs.getStartTime() > rhs.getStartTime() ? -1 : 1;
+            return lhs.getStartTime() < rhs.getStartTime() ? -1 : 1;
         };
 
         episodes.sort(compareEpisodes);
+        ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new MoviePresenter(service.getConnection(), false));
 
-        int lastSeason = -1;
-        int currentSeason;
+        listRowAdapter.addAll(0, episodes);
 
-        Log.d(TAG, movie.toString());
-
-        for (Movie m : episodes) {
-            Log.d(TAG, m.toString());
-            currentSeason = m.getSeasionEpisode().season;
-
-            if(currentSeason != lastSeason) {
-                lastSeason = currentSeason;
-
-                /*if(currentSeason == 0) {
-                    adapter.add(new SectionRow(new HeaderItem(getString(R.string.episodes))));
-                }
-                else {
-                    adapter.add(new SectionRow(new HeaderItem(getString(R.string.season_nr, currentSeason))));
-                }*/
-                addDetailRow(adapter, m);
-            }
-            else {
-                addDetailRow(adapter, m);
-            }
-        }
+        HeaderItem header = new HeaderItem(0, getString(R.string.episodes));
+        adapter.add(new ListRow(header, listRowAdapter));
     }
 
     private void addDetailRow(ArrayObjectAdapter adapter, Movie movie) {
