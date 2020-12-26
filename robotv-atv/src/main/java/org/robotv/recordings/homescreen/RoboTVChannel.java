@@ -32,6 +32,7 @@ import androidx.tvprovider.media.tv.Channel;
 import androidx.tvprovider.media.tv.TvContractCompat;
 import androidx.tvprovider.media.tv.ChannelLogoUtils;
 import androidx.tvprovider.media.tv.PreviewProgram;
+import androidx.tvprovider.media.tv.WatchNextProgram;
 
 public class RoboTVChannel {
 
@@ -126,6 +127,41 @@ public class RoboTVChannel {
 
         final ContentValues contentValues = epgSearchBuilder.build().toContentValues();
         context.getContentResolver().insert(TvContractCompat.PreviewPrograms.CONTENT_URI, contentValues);
+    }
+
+    static public void addWatchNext(Context context, Movie movie, long position, long duration) {
+        removeWatchNext(context, movie);
+
+        WatchNextProgram.Builder builder = new WatchNextProgram.Builder();
+        builder.setType(TvContractCompat.WatchNextPrograms.TYPE_MOVIE)
+                .setId(movie.getRecordingId())
+                .setWatchNextType(TvContractCompat.WatchNextPrograms.WATCH_NEXT_TYPE_CONTINUE)
+                .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
+                .setTitle(movie.getTitle())
+                .setDescription(movie.getShortText())
+                .setPosterArtUri(Uri.parse(movie.getBackgroundUrl()))
+                .setIntent(getPlaybackIntent(context, movie))
+                .setLastPlaybackPositionMillis((int) position)
+                .setDurationMillis((int) duration)
+                .setInternalProviderId(movie.getRecordingIdString());
+
+        ContentValues contentValues = builder.build().toContentValues();
+        context.getContentResolver()
+                .insert(TvContractCompat.WatchNextPrograms.CONTENT_URI, contentValues);
+    }
+
+    static public void removeWatchNext(Context context, Movie movie) {
+        Uri uri = TvContractCompat.buildWatchNextProgramUri(movie.getRecordingId());
+        context.getContentResolver().delete(uri, null, null);
+    }
+
+    static public Intent getPlaybackIntent(Context context, Movie movie) {
+        Intent intent = new Intent(context, PlayerActivity.class);
+        intent.putExtra(VideoDetailsFragment.EXTRA_MOVIE, movie);
+        intent.putExtra(VideoDetailsFragment.EXTRA_RECID, movie.getRecordingIdString());
+        intent.putExtra(VideoDetailsFragment.EXTRA_SHOULD_AUTO_START, true);
+
+        return intent;
     }
 
     synchronized public void updateFromCollection(ArrayList<Movie> list) {
@@ -238,6 +274,11 @@ public class RoboTVChannel {
         }
 
         ArrayList<Movie> list = controller.load();
+
+        if(list == null) {
+            return;
+        }
+
         ArtworkFetcher artworkFetcher = new ArtworkFetcher(connection, SetupUtils.getLanguage(context));
 
         for(Movie m : list) {
@@ -259,22 +300,11 @@ public class RoboTVChannel {
      * @throws Resources.NotFoundException if the given ID does not exist.
      * @return - Uri to resource by given id
      */
-    public static Uri getUriToResource(Context context,
-                                             int resId)
-            throws Resources.NotFoundException {
-        /** Return a Resources instance for your application's package. */
+    public static Uri getUriToResource(Context context, int resId) throws Resources.NotFoundException {
         Resources res = context.getResources();
-        /**
-         * Creates a Uri which parses the given encoded URI string.
-         * @param uriString an RFC 2396-compliant, encoded URI
-         * @throws NullPointerException if uriString is null
-         * @return Uri for this given uri string
-         */
-        Uri resUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
                 "://" + res.getResourcePackageName(resId)
                 + '/' + res.getResourceTypeName(resId)
                 + '/' + res.getResourceEntryName(resId));
-        /** return uri */
-        return resUri;
     }
 }
