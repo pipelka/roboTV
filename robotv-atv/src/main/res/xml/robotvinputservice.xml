@@ -7,7 +7,5 @@
     android:setupActivity="org.robotv.setup.SetupActivity" />-->
 
 <tv-input xmlns:android="http://schemas.android.com/apk/res/android"
-    android:canRecord="true"
-    android:tunerCount="2"
     android:settingsActivity="org.robotv.setup.SettingsActivity"
     android:setupActivity="org.robotv.setup.SetupActivity" />
