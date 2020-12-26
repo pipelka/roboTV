@@ -321,6 +321,8 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
     public void playbackStateChanged() {
         mPlaybackControlsRow.setDuration((int) player.getDuration());
 
+        updatePlaybackPosition(false);
+
         if(mCurrentPlaybackState != PlaybackState.STATE_PLAYING) {
             play();
         }
@@ -328,7 +330,6 @@ public class PlaybackOverlayFragment extends androidx.leanback.app.PlaybackSuppo
             pause();
         }
 
-        updatePlaybackPosition(false);
     }
 
     private void notifyChanged(Action action) {

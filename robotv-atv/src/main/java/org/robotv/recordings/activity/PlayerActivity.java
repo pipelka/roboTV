@@ -92,13 +92,14 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
     public void updatePlaybackPosition(boolean force) {
         long now = System.currentTimeMillis();
+        long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
+        long duration = mPlayer.getDuration();
 
-        if(now - lastUpdateTimeStamp < 5000 && !force) {
+        if((now - lastUpdateTimeStamp < 5000 || lastPosition == 0) && !force) {
             return;
         }
 
         DataService service = getService();
-        long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
 
         if(service != null) {
             service.getMovieController().setPlaybackPosition(mSelectedMovie, lastPosition);
