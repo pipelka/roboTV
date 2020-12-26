@@ -13,13 +13,17 @@ import android.util.Log;
 
 import org.robotv.client.Connection;
 import org.robotv.client.MovieController;
+import org.robotv.client.artwork.ArtworkFetcher;
+import org.robotv.client.model.Event;
 import org.robotv.client.model.Movie;
+import org.robotv.player.Player;
 import org.robotv.recordings.activity.PlayerActivity;
 import org.robotv.recordings.activity.RecordingsActivity;
 import org.robotv.recordings.fragment.VideoDetailsFragment;
 import org.robotv.robotv.R;
 import org.robotv.setup.SetupUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -124,7 +128,7 @@ public class RoboTVChannel {
         context.getContentResolver().insert(TvContractCompat.PreviewPrograms.CONTENT_URI, contentValues);
     }
 
-    public void updateFromCollection(ArrayList<Movie> list) {
+    synchronized public void updateFromCollection(ArrayList<Movie> list) {
         if(list == null) {
             return;
         }
@@ -136,8 +140,6 @@ public class RoboTVChannel {
         }
 
         context.getContentResolver().delete(TvContractCompat.PreviewPrograms.CONTENT_URI, null, null);
-
-        //addEpgSearch(channelId);
 
         list.sort(MovieController.compareTimestamps);
 
@@ -155,7 +157,6 @@ public class RoboTVChannel {
 
             if(movie.isTvShow()) {
                 builder.setChannelId(channelId)
-                        /*.setId(movie.getRecordingId())*/
                         .setType(TvContractCompat.PreviewPrograms.TYPE_MOVIE)
                         .setTitle(movie.getTitle())
                         .setEpisodeTitle(movie.getShortText())
@@ -188,6 +189,45 @@ public class RoboTVChannel {
         }
 
         Log.d(TAG, "added " + count + " preview items");
+
+        //createRecordings(list);
+    }
+
+    private void createRecordings(ArrayList<Movie> list) {
+
+        context.getContentResolver().delete(TvContractCompat.RecordedPrograms.CONTENT_URI, null, null);
+        String inputId = SetupUtils.getInputId(context);
+
+        for(Movie movie: list) {
+            ContentValues values = new ContentValues();
+
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_INPUT_ID, inputId);
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_SEARCHABLE, 1);
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_BROADCAST_GENRE, TvContractCompat.Programs.Genres.encode(movie.getFolder()));
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_CANONICAL_GENRE, TvContractCompat.Programs.Genres.encode(movie.getFolder()));
+
+            if(movie.isTvShow()) {
+                Event.SeasonEpisodeHolder holder = movie.getSeasionEpisode();
+                values.put(TvContractCompat.RecordedPrograms.COLUMN_TITLE, movie.getTitle());
+                values.put(TvContractCompat.RecordedPrograms.COLUMN_EPISODE_TITLE, movie.getShortText());
+                values.put(TvContractCompat.RecordedPrograms.COLUMN_SEASON_DISPLAY_NUMBER, holder.season);
+                values.put(TvContractCompat.RecordedPrograms.COLUMN_EPISODE_DISPLAY_NUMBER, holder.episode);
+            }
+            else {
+                values.put(TvContractCompat.RecordedPrograms.COLUMN_TITLE, movie.getTitle());
+                values.put(TvContractCompat.RecordedPrograms.COLUMN_SHORT_DESCRIPTION, movie.getShortText());
+            }
+
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_LONG_DESCRIPTION, movie.getDescription());
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_POSTER_ART_URI, movie.getBackgroundUrl());
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_START_TIME_UTC_MILLIS, movie.getStartTime() * 1000);
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_END_TIME_UTC_MILLIS, (movie.getStartTime() * 1000) + movie.getDurationMs());
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_RECORDING_DURATION_MILLIS, movie.getDurationMs());
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_RECORDING_DATA_URI, Player.createRecordingUri(movie.getRecordingIdString(), 0).toString());
+            values.put(TvContractCompat.RecordedPrograms.COLUMN_INTERNAL_PROVIDER_DATA, movie.getRecordingId());
+
+            context.getContentResolver().insert(TvContractCompat.RecordedPrograms.CONTENT_URI, values);
+        }
     }
 
     private void runMovieUpdate(MovieController controller) {
