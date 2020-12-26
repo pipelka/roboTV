@@ -110,6 +110,11 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
         long durationWatched = Math.max(0, lastPosition - MARGIN_START);
         long durationWithoutMargin = Math.max(0, duration - (MARGIN_END + MARGIN_START));
+
+        if(durationWithoutMargin == 0) {
+            return false;
+        }
+
         long durationPercentage = (100 * durationWatched) / durationWithoutMargin;
 
         return durationWatched > 2 * 60 * 1000 || durationPercentage > 3;
