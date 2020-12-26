@@ -13,6 +13,7 @@ import org.robotv.player.StreamBundle;
 import org.robotv.recordings.fragment.PlaybackOverlayFragment;
 import org.robotv.recordings.fragment.VideoDetailsFragment;
 import org.robotv.client.model.Movie;
+import org.robotv.recordings.homescreen.RoboTVChannel;
 import org.robotv.robotv.R;
 import org.robotv.dataservice.DataService;
 import org.robotv.dataservice.NotificationHandler;
@@ -22,6 +23,12 @@ import org.robotv.ui.DataServiceActivity;
 public class PlayerActivity extends DataServiceActivity implements Player.Listener, DataService.Listener {
 
     public static final String TAG = "PlayerActivity";
+
+    // recording margin at start
+    private static final long MARGIN_START = 2 * 60 * 1000;
+
+    // recording margin at start
+    private static final long MARGIN_END = 10 * 60 * 1000;
 
     private Player mPlayer;
     private PlaybackOverlayFragment mControls;
@@ -74,13 +81,20 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        updatePlaybackPosition(true);
+        boolean finished = shouldRemoveWatchNext();
 
         stopPlayback();
 
         if(mPlayer != null) {
             mPlayer.release();
         }
+
+        if(finished) {
+            setPlaybackPosition(0);
+        }
+
+        super.onDestroy();
     }
 
     @Override
@@ -88,6 +102,28 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         if(playWhenReady && (playbackState == com.google.android.exoplayer2.Player.STATE_READY)) {
             mControls.startProgressAutomation();
         }
+    }
+
+    private boolean shouldUpdateWatchNext() {
+        long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
+        long duration = mPlayer.getDuration();
+
+        long durationWatched = Math.max(0, lastPosition - MARGIN_START);
+        long durationWithoutMargin = Math.max(0, duration - (MARGIN_END + MARGIN_START));
+        long durationPercentage = (100 * durationWatched) / durationWithoutMargin;
+
+        return durationWatched > 2 * 60 * 1000 || durationPercentage > 3;
+    }
+
+    private boolean shouldRemoveWatchNext() {
+        long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
+        long duration = mPlayer.getDuration();
+
+        long durationWatched = Math.max(0, lastPosition - MARGIN_START);
+        long durationWithoutMargin = Math.max(0, duration - (MARGIN_END + MARGIN_START));
+        long durationLeft = Math.max(0, durationWithoutMargin - durationWatched);
+
+        return durationLeft < 8;
     }
 
     public void updatePlaybackPosition(boolean force) {
@@ -99,13 +135,25 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
             return;
         }
 
+        if(shouldUpdateWatchNext()) {
+            RoboTVChannel.addWatchNext(this, mSelectedMovie, lastPosition, duration);
+        }
+
+        if(shouldRemoveWatchNext()) {
+            RoboTVChannel.removeWatchNext(this, mSelectedMovie);
+        }
+
+        setPlaybackPosition(lastPosition);
+    }
+
+    private void setPlaybackPosition(long position) {
         DataService service = getService();
 
         if(service != null) {
-            service.getMovieController().setPlaybackPosition(mSelectedMovie, lastPosition);
+            service.getMovieController().setPlaybackPosition(mSelectedMovie, position);
         }
 
-        lastUpdateTimeStamp = now;
+        lastUpdateTimeStamp = System.currentTimeMillis();
     }
 
     protected void stopPlayback() {
