@@ -69,7 +69,6 @@ public class DeleteMovieFragment extends MovieStepFragment {
 
                     case Connection.STATUS_SUCCESS:
                         notification.notify(activity.getString(R.string.recording_deleted));
-                        getService().triggerMovieUpdate();
                         break;
 
                     default:
