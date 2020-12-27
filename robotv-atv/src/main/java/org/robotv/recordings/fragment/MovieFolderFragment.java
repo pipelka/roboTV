@@ -93,7 +93,6 @@ public class MovieFolderFragment extends MovieStepFragment {
 
         String newName = mapName(name);
         getMovieController().renameMovie(movie, newName);
-        getService().triggerMovieUpdate();
     }
 
 }
