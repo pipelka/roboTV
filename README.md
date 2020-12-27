@@ -23,7 +23,7 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 * [vdr-epgsearch](http://www.vdr-wiki.de/wiki/index.php/Epgsearch-plugin) (recommended)
 
 The Xiaomi [Mi Box](https://www.mi.com/global/mibox) and the NVIDIA [Shield Android TV](https://shield.nvidia.com/android-tv) are used for development.
-A Sony Bravia TV (KD-43FX7596) with AndroidTV and a Chomecast with [Google TV](https://tv.google/) also uses RoboTV in our home.
+A Sony Bravia TV (KD-43FX7596) with AndroidTV and a Chromecast with [Google TV](https://tv.google/) also uses RoboTV in our home.
 
 ### Server Deployment
 
