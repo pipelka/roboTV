@@ -148,7 +148,5 @@ public class EditTimerFragment extends MovieStepFragment {
         if(!getService().getTimerController().deleteSearchTimer(timer.getSearchTimerId())) {
             notificationHandler.error(getString(R.string.failed_delete_timer));
         }
-
-        getService().triggerTimerUpdate();
     }
 }
