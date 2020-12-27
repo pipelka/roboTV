@@ -113,4 +113,6 @@
     <string name="edit_recording">Aufnahme bearbeiten</string>
     <string name="recording_deleted">Aufnahme gelöscht</string>
     <string name="delete_search_timer">Suchtimer löschen</string>
+    <string name="search_label">roboTV Aufzeichnungen</string>
+    <string name="search_settings_description">aufgezeichnete Filme</string>
 </resources>

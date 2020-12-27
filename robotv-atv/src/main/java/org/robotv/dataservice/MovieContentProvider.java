@@ -11,8 +11,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.BaseColumns;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -31,6 +29,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static android.os.ParcelFileDescriptor.MODE_READ_ONLY;
 
@@ -110,17 +111,15 @@ public class MovieContentProvider extends ContentProvider {
         Log.d(TAG, "query: " + uri.toString());
 
         // Use the UriMatcher to see what kind of query we have and format the db query accordingly
-        switch (sUriMatcher.match(uri)) {
-            case SEARCH_SUGGEST:
-                if (selectionArgs == null) {
-                    throw new IllegalArgumentException(
-                            "selectionArgs must be provided for the Uri: " + uri);
-                }
-                Log.d(TAG, "search suggest: " + selectionArgs[0] + " URI: " + uri);
-                return getSuggestions(selectionArgs[0]);
-            default:
-                throw new IllegalArgumentException("Unknown Uri: " + uri);
+        if (sUriMatcher.match(uri) == SEARCH_SUGGEST) {
+            if (selectionArgs == null) {
+                throw new IllegalArgumentException(
+                        "selectionArgs must be provided for the Uri: " + uri);
+            }
+            Log.d(TAG, "search suggest: " + selectionArgs[0] + " URI: " + uri);
+            return getSuggestions(selectionArgs[0]);
         }
+        throw new IllegalArgumentException("Unknown Uri: " + uri);
     }
 
     @Override
@@ -160,9 +159,8 @@ public class MovieContentProvider extends ContentProvider {
 
     @Override
     public String[] getStreamTypes(@NonNull Uri uri, @NonNull String mimeTypeFilter) {
-        switch (sUriMatcher.match(uri)) {
-            case MOVIE_IMAGE:
-                return new String[]{ "image/jpeg" };
+        if (sUriMatcher.match(uri) == MOVIE_IMAGE) {
+            return new String[]{"image/jpeg"};
         }
 
         return null;
@@ -196,7 +194,7 @@ public class MovieContentProvider extends ContentProvider {
         Connection connection = service.getConnection();
         ArtworkFetcher artworkFetcher = new ArtworkFetcher(connection, SetupUtils.getLanguage(context));
 
-        Packet req = connection.CreatePacket(Connection.XVDR_RECORDINGS_SEARCH, Connection.XVDR_CHANNEL_REQUEST_RESPONSE);
+        Packet req = connection.CreatePacket(Connection.RECORDINGS_SEARCH, Connection.CHANNEL_REQUEST_RESPONSE);
         req.putString(query);
 
         Packet resp = connection.transmitMessage(req);
