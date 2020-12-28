@@ -18,6 +18,10 @@ public class ArtworkUtils {
     }
 
     private static void setMovieArtwork(Connection connection, Movie movie) {
+        if(!movie.hasArtwork()) {
+            return;
+        }
+
         Packet p = connection.CreatePacket(Connection.RECORDINGS_SETURLS);
 
         p.putString(movie.getRecordingIdString());
