@@ -220,6 +220,9 @@ public class Event extends ArtworkHolder {
         if(!TextUtils.isEmpty(subTitle)) {
             this.shortText = subTitle.trim();
         }
+        else {
+            this.shortText = "";
+        }
 
         // trim & replace special chars
         plot = (plot == null) ? "" : plot;
