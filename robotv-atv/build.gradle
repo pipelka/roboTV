@@ -19,7 +19,7 @@ android {
         targetSdkVersion project.ext.targetSdkVersion
         versionCode 900
         versionName "0.9.0"
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
     buildTypes {
@@ -47,6 +47,9 @@ android {
 dependencies {
     implementation "androidx.leanback:leanback:${project.ext.leanbackVersion}"
     implementation "com.github.bumptech.glide:glide:${project.ext.glideVersion}"
+    testImplementation 'junit:junit:4.13.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     annotationProcessor "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
     implementation 'jp.wasabeef:glide-transformations:4.3.0'
     implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
