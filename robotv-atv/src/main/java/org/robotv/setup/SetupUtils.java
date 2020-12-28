@@ -3,12 +3,16 @@ package org.robotv.setup;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
+import android.util.Log;
 
 import org.robotv.robotv.R;
 
 import java.util.Locale;
 
 public class SetupUtils {
+
+    static private final String TAG = SetupUtils.class.getName();
 
     static private String mRecordingFolder = "";
 
@@ -26,7 +30,11 @@ public class SetupUtils {
 
     static public String getLanguage(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        return prefs.getString("language", "");
+
+        String defaultLang = Locale.getDefault().getISO3Language();
+        String lang = prefs.getString("language", defaultLang);
+
+        return TextUtils.isEmpty(lang) ? defaultLang : lang;
     }
 
     static public String getLanguageISO3(Context context) {
