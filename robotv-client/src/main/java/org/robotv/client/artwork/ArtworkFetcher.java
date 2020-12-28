@@ -68,7 +68,7 @@ public class ArtworkFetcher {
         for (ArtworkProvider provider : providers) {
             if ((o = provider.search(event)) != null) {
                 // skip registering the artwork if it comes from our server cache
-                //registerOnServer = (provider != providers[0]);
+                registerOnServer = (provider != providers[0]);
                 break;
             }
         }
@@ -86,24 +86,30 @@ public class ArtworkFetcher {
             if(event instanceof Movie) {
                 ArtworkUtils.setMovieArtwork(mConnection, (Movie)event, o);
             }
-
-            Packet req = mConnection.CreatePacket(Connection.ARTWORK_SET);
-            req.putString(event.getTitle());
-            req.putU32(event.getContentId());
-            req.putString(o.getPosterUrl().equals("x") ? "" : o.getPosterUrl());
-            req.putString(o.getBackgroundUrl().equals("x") ? "" : o.getBackgroundUrl());
-            req.putU32(0);
-
-            // update EPG entry
-            req.putU32(event.getChannelUid());
-            req.putU32(event.getEventId());
-
-            if (mConnection.transmitMessage(req) == null) {
+            else if(!putForEvent(event)) {
                 Log.d(TAG, "failed to register artwork for '" + event.getTitle() + "' in cache");
             }
         }
 
         return event.hasArtwork();
+    }
+
+    public boolean putForEvent(Event event) {
+        Log.d(TAG, "putForEvent: " + event.getPosterUrl());
+
+        Packet req = mConnection.CreatePacket(Connection.ARTWORK_SET);
+
+        req.putString(event.getTitle());
+        req.putU32(event.getContentId());
+        req.putString(event.getPosterUrl().equals("x") ? "" : event.getPosterUrl());
+        req.putString(event.getBackgroundUrl().equals("x") ? "" : event.getBackgroundUrl());
+        req.putU32(0);
+
+        // update EPG entry
+        req.putU32(event.getChannelUid());
+        req.putU32(event.getEventId());
+
+        return (mConnection.transmitMessage(req) != null);
     }
 
     private String getEpgImageTemplateUrl() {
