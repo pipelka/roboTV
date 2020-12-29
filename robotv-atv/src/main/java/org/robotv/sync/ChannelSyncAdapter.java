@@ -177,7 +177,7 @@ public class ChannelSyncAdapter {
     }
 
     public void syncRecommendationChannel() {
-        RoboTVChannel recommendationChannel = new RoboTVChannel(context, connection);
+        RoboTVChannel recommendationChannel = new RoboTVChannel(context);
 
         recommendationChannel.create();
         recommendationChannel.update();
