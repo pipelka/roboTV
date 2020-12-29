@@ -283,6 +283,7 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     @Override
     public void onConnectionError(DataService service) {
         Log.d(TAG, "onConnectionError");
+        loadingAdapter = null;
         startSetupActivity();
     }
 
