@@ -2,6 +2,7 @@ package org.robotv.recordings.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceView;
@@ -230,7 +231,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
             return;
         }
 
-        String recid;
+        String recid = null;
 
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -238,7 +239,8 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         if(action != null && action.equals("android.intent.action.VIEW")) {
             recid = intent.getDataString();
         }
-        else {
+
+        if(TextUtils.isEmpty(recid)) {
             recid = (String) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_RECID);
         }
 
