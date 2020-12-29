@@ -76,11 +76,8 @@ public class MovieContentProvider extends ContentProvider {
         sUriMatcher.addURI("org.robotv.dataservice", "search_suggest_query", SEARCH_SUGGEST);
     }
 
-    Connection connection;
-
     @Override
     public boolean onCreate() {
-        connection = new Connection("roboTV:contentprovider", SetupUtils.getLanguage(getContext()));
         return true;
     }
 
@@ -164,6 +161,8 @@ public class MovieContentProvider extends ContentProvider {
     private Cursor getSuggestions(String query) {
         MatrixCursor cursor = new MatrixCursor(columns);
         Context context = getContext();
+
+        Connection connection = new Connection("roboTV:contentprovider", SetupUtils.getLanguage(getContext()));
 
         if(!connection.open(SetupUtils.getServer(context))) {
             return null;
