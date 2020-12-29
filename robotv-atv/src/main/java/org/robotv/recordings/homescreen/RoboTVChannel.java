@@ -40,11 +40,9 @@ public class RoboTVChannel {
     static private final String TAG = RoboTVChannel.class.getName();
 
     private final Context context;
-    private final Connection connection;
 
-    public RoboTVChannel(Context context, Connection connection) {
+    public RoboTVChannel(Context context) {
         this.context = context;
-        this.connection = connection;
     }
 
     public void create() {
@@ -108,8 +106,7 @@ public class RoboTVChannel {
         }
 
         // add recordings
-        MovieController controller = new MovieController(connection);
-        threadPool.execute(() -> runMovieUpdate(controller));
+        threadPool.execute(this::runMovieUpdate);
     }
 
     private void addEpgSearch(long channelId) {
@@ -266,7 +263,15 @@ public class RoboTVChannel {
         }
     }
 
-    private void runMovieUpdate(MovieController controller) {
+    private void runMovieUpdate() {
+        Connection connection = new Connection("roboTV:recommend", SetupUtils.getLanguage(context));
+
+        if(!connection.open(SetupUtils.getServer(context))) {
+            return;
+        }
+
+        MovieController controller = new MovieController(connection);
+
         long channelId = SetupUtils.getHomescreenChannelId(context);
 
         if(channelId == -1) {
@@ -290,6 +295,7 @@ public class RoboTVChannel {
             }
         }
 
+        connection.close();
         updateFromCollection(list);
     }
 
