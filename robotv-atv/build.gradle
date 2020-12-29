@@ -17,8 +17,8 @@ android {
         applicationId "org.robotv.robotv"
         minSdkVersion project.ext.minSdkVersion
         targetSdkVersion project.ext.targetSdkVersion
-        versionCode 901
-        versionName "0.9.1"
+        versionCode 902
+        versionName "0.9.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
