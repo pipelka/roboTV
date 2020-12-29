@@ -148,13 +148,7 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
-            <!-- Points to searchable meta data. -->
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
         </activity>
 
         <activity
@@ -163,7 +157,13 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
+
+            <!-- Points to searchable meta data. -->
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
 
         <provider android:name="org.robotv.dataservice.MovieContentProvider"
