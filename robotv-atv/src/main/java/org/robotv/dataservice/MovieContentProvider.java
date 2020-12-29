@@ -68,9 +68,6 @@ public class MovieContentProvider extends ContentProvider {
         SearchManager.SUGGEST_COLUMN_SHORTCUT_ID
     };
 
-    DataServiceClient serviceClient;
-    DataService service;
-
     // Creates a UriMatcher object.
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -79,29 +76,11 @@ public class MovieContentProvider extends ContentProvider {
         sUriMatcher.addURI("org.robotv.dataservice", "search_suggest_query", SEARCH_SUGGEST);
     }
 
+    Connection connection;
+
     @Override
     public boolean onCreate() {
-        serviceClient = new DataServiceClient(getContext(), new DataService.Listener() {
-            @Override
-            public void onConnected(DataService service) {
-                MovieContentProvider.this.service = service;
-                Log.d(TAG, "dataservice connected.");
-            }
-
-            @Override
-            public void onConnectionError(DataService service) {
-            }
-
-            @Override
-            public void onMovieUpdate(DataService service) {
-            }
-
-            @Override
-            public void onTimersUpdated(DataService service) {
-
-            }
-        });
-        serviceClient.bind();
+        connection = new Connection("roboTV:contentprovider", SetupUtils.getLanguage(getContext()));
         return true;
     }
 
@@ -183,21 +162,21 @@ public class MovieContentProvider extends ContentProvider {
     }
 
     private Cursor getSuggestions(String query) {
-        if(service == null) {
-            Log.d(TAG, "service not connected !");
+        MatrixCursor cursor = new MatrixCursor(columns);
+        Context context = getContext();
+
+        if(!connection.open(SetupUtils.getServer(context))) {
             return null;
         }
 
-        MatrixCursor cursor = new MatrixCursor(columns);
-
-        Context context = getContext();
-        Connection connection = service.getConnection();
         ArtworkFetcher artworkFetcher = new ArtworkFetcher(connection, SetupUtils.getLanguage(context));
 
         Packet req = connection.CreatePacket(Connection.RECORDINGS_SEARCH, Connection.CHANNEL_REQUEST_RESPONSE);
         req.putString(query);
 
         Packet resp = connection.transmitMessage(req);
+
+        connection.close();
 
         // no results
         if(resp == null || resp.eop()) {
