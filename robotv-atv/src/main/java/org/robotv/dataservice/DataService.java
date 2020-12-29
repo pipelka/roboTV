@@ -148,6 +148,13 @@ public class DataService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "start service");
+        Log.d(TAG, "intend: " + intent.toString());
+        Log.d(TAG, "flags: " + flags);
+        Log.d(TAG, "startId: " + startId);
+
+        if(startId != 1) {
+            return START_STICKY;
+        }
 
         // check if the server has changed
         String server = SetupUtils.getServer(this);
@@ -187,7 +194,7 @@ public class DataService extends Service {
 
         movieController = new MovieController(connection);
         timerController = new TimerController(connection);
-        channel = new RoboTVChannel(this, connection);
+        channel = new RoboTVChannel(this);
     }
 
     @Override
