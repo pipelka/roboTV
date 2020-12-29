@@ -134,7 +134,9 @@ public class SetupFragment extends GuidedStepSupportFragment {
             langIndex = 0;
         }
 
-        mActionLanguage.setDescription(langArray[langIndex]);
+        if(langIndex != -1){
+            mActionLanguage.setDescription(langArray[langIndex]);
+        }
 
         boolean passthrough = SetupUtils.getPassthrough(getActivity());
         mActionPassthrough.setChecked(passthrough);
