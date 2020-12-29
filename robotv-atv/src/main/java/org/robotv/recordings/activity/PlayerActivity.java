@@ -1,5 +1,6 @@
 package org.robotv.recordings.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -229,7 +230,17 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
             return;
         }
 
-        String recid  = (String) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_RECID);
+        String recid;
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+
+        if(action != null && action.equals("android.intent.action.VIEW")) {
+            recid = intent.getDataString();
+        }
+        else {
+            recid = (String) getIntent().getSerializableExtra(VideoDetailsFragment.EXTRA_RECID);
+        }
 
         Log.d(TAG, "recid: " + recid);
         mSelectedMovie = service.getMovieController().getMovie(recid);
