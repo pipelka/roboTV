@@ -119,7 +119,7 @@ public class Connection extends Session {
         mEnableStatus = enableStatus;
 
         // set timeout to 5000ms
-        setTimeout(10000);
+        setTimeout(5000);
 
     }
 
