@@ -258,7 +258,7 @@ public class MovieContentProvider extends ContentProvider {
                 0,
                 movie.getDuration() * 1000L,
                 "android.intent.action.VIEW",
-                movie,
+                movie.getRecordingIdString(),
                 movie.getRecordingIdString(),
                 movie.getRecordingIdString()
         };
