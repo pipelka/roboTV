@@ -53,7 +53,7 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
     implementation 'jp.wasabeef:glide-transformations:4.3.0'
     implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
-    implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0@aar"
+    implementation "com.github.bumptech.glide:okhttp3-integration:${project.ext.glideVersion}"
     implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
     implementation 'androidx.tvprovider:tvprovider:1.0.0'
     implementation "com.google.android.exoplayer:exoplayer-core:${project.ext.exoPlayerVersion}"
