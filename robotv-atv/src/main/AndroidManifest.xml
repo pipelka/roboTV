@@ -109,7 +109,7 @@
 
         <service android:name="org.robotv.dataservice.DataService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
         </service>
 
         <service
