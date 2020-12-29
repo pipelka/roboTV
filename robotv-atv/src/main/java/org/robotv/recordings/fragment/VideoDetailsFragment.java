@@ -4,6 +4,31 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+
+import org.robotv.client.MovieController;
+import org.robotv.client.RelatedContentExtractor;
+import org.robotv.client.model.Event;
+import org.robotv.client.model.Movie;
+import org.robotv.dataservice.DataService;
+import org.robotv.recordings.activity.CoverSearchActivity;
+import org.robotv.recordings.activity.PlayerActivity;
+import org.robotv.recordings.model.SortedArrayObjectAdapter;
+import org.robotv.recordings.presenter.DetailsDescriptionPresenter;
+import org.robotv.recordings.presenter.LatestCardPresenter;
+import org.robotv.recordings.presenter.MoviePresenter;
+import org.robotv.recordings.util.BackgroundManagerTarget;
+import org.robotv.recordings.util.Utils;
+import org.robotv.robotv.R;
+import org.robotv.ui.GlideApp;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+
 import androidx.leanback.app.BackgroundManager;
 import androidx.leanback.app.DetailsSupportFragment;
 import androidx.leanback.widget.Action;
@@ -16,31 +41,6 @@ import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.OnItemViewClickedListener;
 import androidx.leanback.widget.SparseArrayObjectAdapter;
-import android.text.TextUtils;
-import android.util.Log;
-
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
-
-import org.robotv.client.MovieController;
-import org.robotv.client.RelatedContentExtractor;
-import org.robotv.recordings.activity.CoverSearchActivity;
-import org.robotv.recordings.activity.PlayerActivity;
-import org.robotv.client.model.Movie;
-import org.robotv.recordings.model.SortedArrayObjectAdapter;
-import org.robotv.recordings.presenter.DetailsDescriptionPresenter;
-import org.robotv.recordings.presenter.LatestCardPresenter;
-import org.robotv.recordings.presenter.MoviePresenter;
-import org.robotv.recordings.util.BackgroundManagerTarget;
-import org.robotv.recordings.util.Utils;
-import org.robotv.robotv.R;
-import org.robotv.client.model.Event;
-import org.robotv.dataservice.DataService;
-import org.robotv.ui.GlideApp;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 
 public class VideoDetailsFragment extends DetailsSupportFragment implements DataService.Listener {
 
@@ -174,8 +174,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Data
 
     private void addDetailRow(ArrayObjectAdapter adapter, Movie movie) {
         final DetailsOverviewRow row = new DetailsOverviewRow(movie);
-
-        Event.SeasonEpisodeHolder episode = movie.getSeasionEpisode();
 
         String url = movie.getPosterUrl();
 
