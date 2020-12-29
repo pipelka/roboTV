@@ -57,12 +57,6 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
         prepareEntranceTransition();
         notification = new NotificationHandler(getActivity());
 
-        // missing setup -> start setup activity
-        if(TextUtils.isEmpty(SetupUtils.getServer(getActivity()))) {
-            startSetupActivity();
-            return;
-        }
-
         ProgressBarManager manager = getProgressBarManager();
         manager.enableProgressBar();
         manager.show();
@@ -185,7 +179,10 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
 
     @Override
     public void onDestroy() {
-        backgroundManager.release();
+        if(backgroundManager != null) {
+            backgroundManager.release();
+        }
+
         super.onDestroy();
     }
 
@@ -283,7 +280,6 @@ public class RecordingsFragment extends BrowseSupportFragment implements DataSer
     @Override
     public void onConnectionError(DataService service) {
         Log.d(TAG, "onConnectionError");
-        loadingAdapter = null;
         startSetupActivity();
     }
 
