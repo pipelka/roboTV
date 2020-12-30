@@ -255,6 +255,11 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         Log.d(TAG, "recid: " + recid);
         mSelectedMovie = service.getMovieController().getMovie(recid);
 
+        if(mSelectedMovie == null) {
+            notificationHandler.error(getString(R.string.failed_to_fetch_movie_information));
+            return;
+        }
+
         SurfaceView mVideoView = findViewById(R.id.videoView);
         mPlayer.setSurface(mVideoView.getHolder().getSurface());
 
