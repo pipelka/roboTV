@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.RemoteException;
 import androidx.annotation.AnyRes;
@@ -36,6 +35,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import androidx.tvprovider.media.tv.TvContractCompat;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -81,7 +81,7 @@ public class ChannelSyncAdapter {
         // remove all channels (do a total resync)
         if(cleanup) {
             Log.i(TAG, "removing channels ...");
-            Uri uri = TvContract.buildChannelsUriForInput(this.inputId);
+            Uri uri = TvContractCompat.buildChannelsUriForInput(this.inputId);
             resolver.delete(uri, null, null);
         }
 
@@ -123,22 +123,22 @@ public class ChannelSyncAdapter {
 
             // channel entry
             ContentValues values = new ContentValues();
-            values.put(TvContract.Channels.COLUMN_INPUT_ID, inputId);
+            values.put(TvContractCompat.Channels.COLUMN_INPUT_ID, inputId);
 
-            values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, Integer.toString(entry.getNumber()));
-            values.put(TvContract.Channels.COLUMN_DISPLAY_NAME, entry.getName());
-            values.put(TvContract.Channels.COLUMN_SERVICE_ID, 0);
-            values.put(TvContract.Channels.COLUMN_TRANSPORT_STREAM_ID, 0);
-            values.put(TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID, entry.getUid());
-            values.put(TvContract.Channels.COLUMN_SERVICE_TYPE, entry.isRadio() ? TvContract.Channels.SERVICE_TYPE_AUDIO : TvContract.Channels.SERVICE_TYPE_AUDIO_VIDEO);
-            values.put(TvContract.Channels.COLUMN_TYPE, TvContract.Channels.TYPE_DVB_S2);
-            values.put(TvContract.Channels.COLUMN_SEARCHABLE, 1);
-            values.put(TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA, Integer.toString(entry.getUid()));
-            values.put(TvContract.Channels.COLUMN_APP_LINK_POSTER_ART_URI, getUriToResource(context, R.drawable.banner_timers).toString());
-            values.put(TvContract.Channels.COLUMN_APP_LINK_INTENT_URI, link);
-            values.put(TvContract.Channels.COLUMN_APP_LINK_TEXT, context.getString(R.string.timer_title));
-            values.put(TvContract.Channels.COLUMN_APP_LINK_COLOR, Utils.getColor(context, R.color.primary_color));
-            values.put(TvContract.Channels.COLUMN_APP_LINK_ICON_URI, "");
+            values.put(TvContractCompat.Channels.COLUMN_DISPLAY_NUMBER, Integer.toString(entry.getNumber()));
+            values.put(TvContractCompat.Channels.COLUMN_DISPLAY_NAME, entry.getName());
+            values.put(TvContractCompat.Channels.COLUMN_SERVICE_ID, 0);
+            values.put(TvContractCompat.Channels.COLUMN_TRANSPORT_STREAM_ID, 0);
+            values.put(TvContractCompat.Channels.COLUMN_ORIGINAL_NETWORK_ID, entry.getUid());
+            values.put(TvContractCompat.Channels.COLUMN_SERVICE_TYPE, entry.isRadio() ? TvContractCompat.Channels.SERVICE_TYPE_AUDIO : TvContractCompat.Channels.SERVICE_TYPE_AUDIO_VIDEO);
+            values.put(TvContractCompat.Channels.COLUMN_TYPE, TvContractCompat.Channels.TYPE_DVB_S2);
+            values.put(TvContractCompat.Channels.COLUMN_SEARCHABLE, 1);
+            values.put(TvContractCompat.Channels.COLUMN_INTERNAL_PROVIDER_DATA, Integer.toString(entry.getUid()));
+            values.put(TvContractCompat.Channels.COLUMN_APP_LINK_POSTER_ART_URI, getUriToResource(context, R.drawable.banner_timers).toString());
+            values.put(TvContractCompat.Channels.COLUMN_APP_LINK_INTENT_URI, link);
+            values.put(TvContractCompat.Channels.COLUMN_APP_LINK_TEXT, context.getString(R.string.timer_title));
+            values.put(TvContractCompat.Channels.COLUMN_APP_LINK_COLOR, Utils.getColor(context, R.color.primary_color));
+            values.put(TvContractCompat.Channels.COLUMN_APP_LINK_ICON_URI, "");
 
             // add/update channel
             Uri channelUri = existingChannels.get(entry.getNumber());
@@ -146,7 +146,7 @@ public class ChannelSyncAdapter {
             // insert new channel
             if(channelUri == null) {
                 Log.d(TAG, String.format("adding new channel %d - %s", entry.getNumber(), entry.getName()));
-                resolver.insert(TvContract.Channels.CONTENT_URI, values);
+                resolver.insert(TvContractCompat.Channels.CONTENT_URI, values);
             }
             // update existing channel
             else {
@@ -221,7 +221,7 @@ public class ChannelSyncAdapter {
             return;
         }
 
-        Uri channelLogoUri = TvContract.buildChannelLogoUri(channelUri);
+        Uri channelLogoUri = TvContractCompat.buildChannelLogoUri(channelUri);
 
         Log.d(TAG, String.format("fetching logo for channel %d: %s", holder.displayNumber, address));
 
@@ -317,18 +317,18 @@ public class ChannelSyncAdapter {
         // populate database
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
-        Uri uri = TvContract.buildProgramsUriForChannel(channelUri);
+        Uri uri = TvContractCompat.buildProgramsUriForChannel(channelUri);
 
         if(!append) {
             ops.add(ContentProviderOperation.newDelete(uri).build());
         }
 
         for(ContentValues values : programs) {
-            ops.add(ContentProviderOperation.newInsert(TvContract.Programs.CONTENT_URI).withValues(values).build());
+            ops.add(ContentProviderOperation.newInsert(TvContractCompat.Programs.CONTENT_URI).withValues(values).build());
         }
 
         try {
-            resolver.applyBatch(TvContract.AUTHORITY, ops);
+            resolver.applyBatch(TvContractCompat.AUTHORITY, ops);
         }
         catch(RemoteException | OperationApplicationException e) {
             Log.e(TAG, "Failed to update EPG for channel !", e);
@@ -339,14 +339,14 @@ public class ChannelSyncAdapter {
         // Create a map from original network ID to channel row ID for existing channels.
         existingChannels.clear();
 
-        Uri channelUri = TvContract.buildChannelsUriForInput(inputId);
-        String[] projection = {TvContract.Channels._ID, TvContract.Channels.COLUMN_DISPLAY_NUMBER};
+        Uri channelUri = TvContractCompat.buildChannelsUriForInput(inputId);
+        String[] projection = {TvContractCompat.Channels._ID, TvContractCompat.Channels.COLUMN_DISPLAY_NUMBER};
 
         try (Cursor cursor = resolver.query(channelUri, projection, null, null, null)) {
             while (cursor != null && cursor.moveToNext()) {
                 long channelId = cursor.getLong(0);
                 int number = Integer.parseInt(cursor.getString(1));
-                existingChannels.put(number, TvContract.buildChannelUri(channelId));
+                existingChannels.put(number, TvContractCompat.buildChannelUri(channelId));
             }
         }
     }
