@@ -52,7 +52,7 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         mPlayer = new Player(
             this,
             SetupUtils.getServer(this),                       // Server
-            SetupUtils.getLanguageISO3(this),                 // Language
+            SetupUtils.getLanguage(this),                     // Language
             this,                                      // Listener
             SetupUtils.getPassthrough(this),                  // AC3 passthrough
             SetupUtils.getTunneledVideoPlaybackEnabled(this)
