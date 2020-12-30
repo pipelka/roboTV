@@ -94,7 +94,7 @@ public class ChannelSyncAdapter {
         // update or insert channels
 
         Channels list = new Channels();
-        String language = SetupUtils.getLanguageISO3(context);
+        String language = SetupUtils.getLanguage(context);
 
         list.load(connection, language);
 
