@@ -22,7 +22,7 @@ allprojects {
         }
     }
     project.ext {
-        minSdkVersion=25
+        minSdkVersion=24
         compileSdkVersion=30
         ndkVersion='21.1.6352462'
         targetSdkVersion=28
