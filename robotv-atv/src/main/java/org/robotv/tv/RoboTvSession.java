@@ -67,7 +67,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         mPlayer = new Player(
             mContext,
             SetupUtils.getServer(mContext),                       // Server
-            SetupUtils.getLanguageISO3(mContext),                 // Language
+            SetupUtils.getLanguage(mContext),                     // Language
             this,                                          // Listener
             SetupUtils.getPassthrough(mContext),                  // AC3 passthrough
             SetupUtils.getTunneledVideoPlaybackEnabled(mContext)
