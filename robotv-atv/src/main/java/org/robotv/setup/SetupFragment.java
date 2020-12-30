@@ -3,11 +3,6 @@ package org.robotv.setup;
 import android.graphics.drawable.Drawable;
 import android.media.AudioFormat;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentManager;
-import androidx.leanback.app.GuidedStepSupportFragment;
-import androidx.leanback.widget.GuidanceStylist;
-import androidx.leanback.widget.GuidedAction;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer2.audio.AudioCapabilities;
@@ -15,6 +10,12 @@ import com.google.android.exoplayer2.audio.AudioCapabilities;
 import org.robotv.robotv.R;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
+import androidx.leanback.app.GuidedStepSupportFragment;
+import androidx.leanback.widget.GuidanceStylist;
+import androidx.leanback.widget.GuidedAction;
 
 public class SetupFragment extends GuidedStepSupportFragment {
 
@@ -24,13 +25,11 @@ public class SetupFragment extends GuidedStepSupportFragment {
     static final int ACTION_LANGUAGE = 2;
     static final int ACTION_IMPORT = 4;
     static final int ACTION_PASSTHROUGH = 6;
-    static final int ACTION_TIMESHIFT = 8;
     static final int ACTION_TUNNELEDPLAYBACK = 10;
 
     private GuidedAction mActionServer;
     private GuidedAction mActionLanguage;
     private GuidedAction mActionPassthrough;
-    private GuidedAction mActionTimeshift;
     private GuidedAction mActionTunneledPlayback;
 
     @NonNull
@@ -42,6 +41,11 @@ public class SetupFragment extends GuidedStepSupportFragment {
         Drawable icon = getActivity().getDrawable(R.drawable.ic_robotv_icon_white);
 
         return new GuidanceStylist.Guidance(title, description, breadcrumb, icon);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -78,12 +82,12 @@ public class SetupFragment extends GuidedStepSupportFragment {
                 .checked(SetupUtils.getPassthrough(getActivity()))
                 .build();
 
-        mActionTimeshift = new GuidedAction.Builder(getActivity())
+        /*mActionTimeshift = new GuidedAction.Builder(getActivity())
                 .id(ACTION_TIMESHIFT)
                 .title(getString(R.string.setup_root_timeshift_title))
                 .checkSetId(GuidedAction.CHECKBOX_CHECK_SET_ID)
                 .checked(SetupUtils.getTimeshiftEnabled(getActivity()))
-                .build();
+                .build();*/
 
         actions.add(mActionServer);
         actions.add(mActionLanguage);
@@ -95,8 +99,6 @@ public class SetupFragment extends GuidedStepSupportFragment {
         }
 
         actions.add(mActionTunneledPlayback);
-
-        actions.add(mActionTimeshift);
 
         SetupActivity activity = (SetupActivity) getActivity();
 
@@ -114,27 +116,13 @@ public class SetupFragment extends GuidedStepSupportFragment {
     public void onResume() {
         super.onResume();
 
-        // language
+        mActionLanguage.setDescription(SetupUtils.getDisplayLanguage(getContext()));
 
-        int langIndex = SetupUtils.getLanguageIndex(getActivity());
-        String[] langArray = getResources().getStringArray(R.array.languages_array);
-
-        if(langIndex > langArray.length - 1) {
-            langIndex = 0;
-        }
-
-        if(langIndex != -1){
-            mActionLanguage.setDescription(langArray[langIndex]);
-        }
-
-        boolean passthrough = SetupUtils.getPassthrough(getActivity());
+        boolean passthrough = SetupUtils.getPassthrough(getContext());
         mActionPassthrough.setChecked(passthrough);
 
-        boolean timeshift = SetupUtils.getTimeshiftEnabled(getActivity());
-        mActionTimeshift.setChecked(timeshift);
-
         mActionTunneledPlayback.setChecked(
-                SetupUtils.getTunneledVideoPlaybackEnabled(getActivity())
+            SetupUtils.getTunneledVideoPlaybackEnabled(getContext())
         );
     }
 
@@ -156,10 +144,6 @@ public class SetupFragment extends GuidedStepSupportFragment {
 
             case ACTION_TUNNELEDPLAYBACK:
                 SetupUtils.setTunneledVideoPlaybackEnabled(getActivity(), action.isChecked());
-                break;
-
-            case ACTION_TIMESHIFT:
-                SetupUtils.setTimeshiftEnabled(getActivity(), action.isChecked());
                 break;
 
             case ACTION_IMPORT:
