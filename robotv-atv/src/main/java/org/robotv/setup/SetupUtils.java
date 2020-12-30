@@ -6,9 +6,10 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.robotv.robotv.R;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.TreeMap;
 
 public class SetupUtils {
 
@@ -28,30 +29,56 @@ public class SetupUtils {
         e.apply();
     }
 
-    static public String getLanguage(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+    static public TreeMap<String, String> getLanguages() {
+        ArrayList<String> codeList = new ArrayList<>();
+        Locale[] locales = Locale.getAvailableLocales();
 
-        String defaultLang = Locale.getDefault().getLanguage();
-        String lang = prefs.getString("language", defaultLang);
+        // generate list of language codes
+        for(Locale locale: locales) {
+            String iso3 = locale.getISO3Language();
 
-        return TextUtils.isEmpty(lang) ? defaultLang : lang;
-    }
-
-    static public String getLanguageISO3(Context context) {
-        return new Locale(getLanguage(context)).getISO3Language();
-    }
-
-    static int getLanguageIndex(Context context) {
-        String[] array = context.getResources().getStringArray(R.array.iso639_code1);
-        String lang = getLanguage(context);
-
-        for(int i = 0; i < array.length; i++) {
-            if(array[i].equals(lang)) {
-                return i;
+            if(!codeList.contains(iso3)) {
+                codeList.add(iso3);
             }
         }
 
-        return -1;
+        // assemble list of locales
+        TreeMap<String, String> map = new TreeMap<>();
+
+        for(String iso3: codeList) {
+            Locale locale = new Locale(iso3);
+            map.put(locale.getDisplayLanguage(), locale.getISO3Language());
+        }
+
+        return map;
+    }
+
+    static public String getDisplayLanguage(Context context) {
+        TreeMap<String, String> list = getLanguages();
+        String language = getLanguage(context);
+
+        for(HashMap.Entry<String, String> entry : list.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if(value.equals(language)) {
+                return key;
+            }
+        }
+
+        return "";
+    }
+
+    static public String getLanguage(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+
+        String defaultLang = Locale.getDefault().getISO3Language();
+        String lang = prefs.getString("language", defaultLang);
+
+        lang = TextUtils.isEmpty(lang) ? defaultLang : lang;
+        Log.d(TAG, "getLanguage: " + lang);
+
+        return lang;
     }
 
     static void setLanguage(Context context, String language) {
@@ -79,18 +106,6 @@ public class SetupUtils {
 
     public static String getRecordingFolder() {
         return mRecordingFolder;
-    }
-
-    public static boolean getTimeshiftEnabled(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        return prefs.getBoolean("timeshift", true);
-    }
-
-    static void setTimeshiftEnabled(Context context, boolean timeshift) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        SharedPreferences.Editor e = prefs.edit();
-        e.putBoolean("timeshift", timeshift);
-        e.apply();
     }
 
     static void setInputId(Context context, String inputId) {
