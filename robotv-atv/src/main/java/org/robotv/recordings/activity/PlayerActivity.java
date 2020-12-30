@@ -1,6 +1,7 @@
 package org.robotv.recordings.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -107,6 +108,10 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     }
 
     private boolean shouldUpdateWatchNext() {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return false;
+        }
+
         long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
         long duration = mPlayer.getDuration();
 
@@ -123,6 +128,9 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
     }
 
     private boolean shouldRemoveWatchNext() {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return false;
+        }
         long lastPosition = mPlayer.getDurationSinceStart(); // duration since start in ms
         long duration = mPlayer.getDuration();
 
