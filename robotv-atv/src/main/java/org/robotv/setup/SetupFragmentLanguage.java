@@ -9,11 +9,11 @@ import androidx.leanback.widget.GuidedAction;
 
 import org.robotv.robotv.R;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 public class SetupFragmentLanguage extends GuidedStepSupportFragment {
-
-    private String[] mLanguageCode;
 
     @NonNull
     @Override
@@ -27,29 +27,32 @@ public class SetupFragmentLanguage extends GuidedStepSupportFragment {
 
     @Override
     public void onCreateActions(@NonNull List actions, Bundle savedInstanceState) {
-        int langIndex = SetupUtils.getLanguageIndex(getActivity());
-        String[] languages= getResources().getStringArray(R.array.languages_array);
-        mLanguageCode = getResources().getStringArray(R.array.iso639_code1);
-
-        if(langIndex > languages.length - 1) {
-            langIndex = 0;
-        }
+        TreeMap<String, String> list = SetupUtils.getLanguages();
+        String code = SetupUtils.getLanguage(getContext());
 
         int id = 0;
 
-        for(String language : languages) {
+        for(HashMap.Entry<String, String> entry : list.entrySet()) {
             actions.add(new GuidedAction.Builder()
                         .id(id)
-                        .title(language)
+                        .title(entry.getKey())
                         .checkSetId(1)
-                        .checked(id == langIndex)
+                        .checked(code.equals(entry.getValue()))
                         .build());
             id++;
         }
     }
 
     public void onGuidedActionClicked(GuidedAction action) {
-        SetupUtils.setLanguage(getActivity(), mLanguageCode[(int)action.getId()]);
+        TreeMap<String, String> list = SetupUtils.getLanguages();
+        int index = (int)action.getId();
+
+        String[] codes = list.values().toArray(new String[0]);
+
+        if(index >= 0) {
+            SetupUtils.setLanguage(getActivity(), codes[index]);
+        }
+
         getFragmentManager().popBackStack();
     }
 }
