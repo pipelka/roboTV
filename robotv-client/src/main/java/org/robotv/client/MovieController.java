@@ -78,18 +78,14 @@ public class MovieController {
         loaderTask.load(list -> {
             if(list == null) {
                 movieCollection = null;
-                handler.post(() -> {
-                    listener.onMovieCollectionUpdated(null, STATUS_Collection_Error);
-                });
+                handler.post(() -> listener.onMovieCollectionUpdated(null, STATUS_Collection_Error));
                 return;
             }
 
             Log.d(TAG, "finished loading (" + list.size() + " movies)");
 
             movieCollection = list;
-            handler.post(() -> {
-                listener.onMovieCollectionUpdated(movieCollection, STATUS_Collection_Ready);
-            });
+            handler.post(() -> listener.onMovieCollectionUpdated(movieCollection, STATUS_Collection_Ready));
         });
     }
 
