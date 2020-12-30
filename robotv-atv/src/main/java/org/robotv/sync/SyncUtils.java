@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.media.tv.TvContentRating;
-import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
@@ -19,6 +18,8 @@ import org.robotv.client.model.Event;
 
 import java.io.IOException;
 import java.util.List;
+
+import androidx.tvprovider.media.tv.TvContractCompat;
 
 /*
     DVB Content Genres
@@ -111,70 +112,70 @@ public class SyncUtils {
 
     public static final SparseArray<String> canonicalGenre = new SparseArray<String>() {
         {
-            append(0x10, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
-            append(0x11, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
-            append(0x12, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
-            append(0x13, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
-            append(0x14, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.COMEDY));
-            append(0x15, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
-            append(0x16, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
-            append(0x17, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.DRAMA));
-            append(0x20, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
-            append(0x21, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
-            append(0x22, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
-            append(0x23, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
-            append(0x30, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
-            append(0x31, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
-            append(0x32, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
-            append(0x33, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ENTERTAINMENT));
-            append(0x40, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x41, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x42, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x43, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x44, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x45, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x46, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x47, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x48, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x49, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x4A, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x4B, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SPORTS));
-            append(0x50, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
-            append(0x51, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.EDUCATION));
-            append(0x52, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
-            append(0x53, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
-            append(0x54, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.EDUCATION));
-            append(0x53, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.FAMILY_KIDS));
-            append(0x60, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
-            append(0x61, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
-            append(0x62, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
-            append(0x63, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
-            append(0x64, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MUSIC));
-            append(0x70, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
-            append(0x71, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
-            append(0x72, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
-            append(0x74, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
-            append(0x75, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
-            append(0x76, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
-            append(0x77, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
-            append(0x78, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
-            append(0x79, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.NEWS));
-            append(0x7A, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
-            append(0x81, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
-            append(0x90, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
-            //append(0x91, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ANIMAL_WILDLIFE));
-            append(0x92, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
-            append(0x93, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TECH_SCIENCE));
-            append(0x94, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TRAVEL));
-            append(0xA0, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
-            append(0xA1, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.TRAVEL));
-            append(0xA2, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.ARTS));
-            append(0xA3, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
-            append(0xA4, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
-            append(0xA5, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
-            append(0xA6, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.SHOPPING));
-            append(0xA7, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.LIFE_STYLE));
-            append(0xF0, TvContract.Programs.Genres.encode(TvContract.Programs.Genres.MOVIES));
+            append(0x10, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MOVIES));
+            append(0x11, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MOVIES));
+            append(0x12, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MOVIES));
+            append(0x13, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MOVIES));
+            append(0x14, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.COMEDY));
+            append(0x15, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ENTERTAINMENT));
+            append(0x16, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MOVIES));
+            append(0x17, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.DRAMA));
+            append(0x20, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.NEWS));
+            append(0x21, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.NEWS));
+            append(0x22, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.NEWS));
+            append(0x23, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.TECH_SCIENCE));
+            append(0x30, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ENTERTAINMENT));
+            append(0x31, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ENTERTAINMENT));
+            append(0x32, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ENTERTAINMENT));
+            append(0x33, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ENTERTAINMENT));
+            append(0x40, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x41, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x42, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x43, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x44, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x45, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x46, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x47, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x48, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x49, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x4A, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x4B, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SPORTS));
+            append(0x50, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.FAMILY_KIDS));
+            append(0x51, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.EDUCATION));
+            append(0x52, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.FAMILY_KIDS));
+            append(0x53, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.FAMILY_KIDS));
+            append(0x54, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.EDUCATION));
+            append(0x53, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.FAMILY_KIDS));
+            append(0x60, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MUSIC));
+            append(0x61, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MUSIC));
+            append(0x62, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MUSIC));
+            append(0x63, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MUSIC));
+            append(0x64, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MUSIC));
+            append(0x70, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ARTS));
+            append(0x71, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ARTS));
+            append(0x72, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ARTS));
+            append(0x74, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ARTS));
+            append(0x75, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ARTS));
+            append(0x76, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MOVIES));
+            append(0x77, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MOVIES));
+            append(0x78, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.NEWS));
+            append(0x79, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.NEWS));
+            append(0x7A, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ARTS));
+            append(0x81, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.TECH_SCIENCE));
+            append(0x90, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.TECH_SCIENCE));
+            //append(0x91, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ANIMAL_WILDLIFE));
+            append(0x92, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.TECH_SCIENCE));
+            append(0x93, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.TECH_SCIENCE));
+            append(0x94, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.TRAVEL));
+            append(0xA0, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.LIFE_STYLE));
+            append(0xA1, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.TRAVEL));
+            append(0xA2, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.ARTS));
+            append(0xA3, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.LIFE_STYLE));
+            append(0xA4, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.LIFE_STYLE));
+            append(0xA5, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.LIFE_STYLE));
+            append(0xA6, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.SHOPPING));
+            append(0xA7, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.LIFE_STYLE));
+            append(0xF0, TvContractCompat.Programs.Genres.encode(TvContractCompat.Programs.Genres.MOVIES));
         }
     };
 
@@ -192,18 +193,15 @@ public class SyncUtils {
         }
 
         String[] projection = {
-                TvContract.Channels._ID,
-                TvContract.Channels.COLUMN_ORIGINAL_NETWORK_ID,
-                TvContract.Channels.COLUMN_DISPLAY_NUMBER,
-                TvContract.Channels.COLUMN_DISPLAY_NAME
+                TvContractCompat.Channels._ID,
+                TvContractCompat.Channels.COLUMN_ORIGINAL_NETWORK_ID,
+                TvContractCompat.Channels.COLUMN_DISPLAY_NUMBER,
+                TvContractCompat.Channels.COLUMN_DISPLAY_NAME
         };
 
-        Cursor cursor = null;
+        try (Cursor cursor = resolver.query(channelUri, projection, null, null, null)) {
 
-        try {
-            cursor = resolver.query(channelUri, projection, null, null, null);
-
-            while(cursor != null && cursor.moveToNext()) {
+            while (cursor != null && cursor.moveToNext()) {
                 holder.channelId = cursor.getLong(0);
                 holder.channelUid = cursor.getInt(1);
                 holder.displayNumber = cursor.getInt(2);
@@ -212,41 +210,27 @@ public class SyncUtils {
             }
 
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }
-        finally {
-            if(cursor != null) {
-                cursor.close();
-            }
         }
     }
 
     private static long getLastProgramEndTimeMillis(ContentResolver resolver, Uri channelUri) {
-        Uri uri = TvContract.buildProgramsUriForChannel(channelUri);
-        String[] projection = {TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS};
-        Cursor cursor = null;
+        Uri uri = TvContractCompat.buildProgramsUriForChannel(channelUri);
+        String[] projection = {TvContractCompat.Programs.COLUMN_END_TIME_UTC_MILLIS};
 
-        try {
+        try (Cursor cursor = resolver.query(uri, projection, null, null, null)) {
             // TvProvider returns programs chronological order by default.
-            cursor = resolver.query(uri, projection, null, null, null);
 
-            if(cursor == null || cursor.getCount() == 0) {
+            if (cursor == null || cursor.getCount() == 0) {
                 return 0;
             }
 
             cursor.moveToLast();
             return cursor.getLong(0);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             Log.w(TAG, "Unable to get last program end time for " + channelUri, e);
-        }
-        finally {
-            if(cursor != null) {
-                cursor.close();
-            }
         }
 
         return 0;
@@ -309,37 +293,37 @@ public class SyncUtils {
             }
 
             ContentValues values = new ContentValues();
-            values.put(TvContract.Programs.COLUMN_CHANNEL_ID, holder.channelId);
-            values.put(TvContract.Programs.COLUMN_TITLE, event.getTitle());
+            values.put(TvContractCompat.Programs.COLUMN_CHANNEL_ID, holder.channelId);
+            values.put(TvContractCompat.Programs.COLUMN_TITLE, event.getTitle());
 
             if(!TextUtils.isEmpty(event.getShortText())) {
-                values.put(TvContract.Programs.COLUMN_EPISODE_TITLE, event.getShortText());
+                values.put(TvContractCompat.Programs.COLUMN_EPISODE_TITLE, event.getShortText());
             }
 
             String description = event.getDescription();
             if(!TextUtils.isEmpty(description)) {
                 if(description.length() <= 256) {
-                    values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description);
+                    values.put(TvContractCompat.Programs.COLUMN_SHORT_DESCRIPTION, description);
                 }
                 else {
-                    values.put(TvContract.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, 256) + "...");
+                    values.put(TvContractCompat.Programs.COLUMN_SHORT_DESCRIPTION, description.substring(0, 256) + "...");
                 }
             }
 
-            values.put(TvContract.Programs.COLUMN_START_TIME_UTC_MILLIS, event.getStartTime() * 1000);
-            values.put(TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS, event.getEndTime() * 1000);
-            values.put(TvContract.Programs.COLUMN_CANONICAL_GENRE, canonicalGenre.get(event.getContentId()));
+            values.put(TvContractCompat.Programs.COLUMN_START_TIME_UTC_MILLIS, event.getStartTime() * 1000);
+            values.put(TvContractCompat.Programs.COLUMN_END_TIME_UTC_MILLIS, event.getEndTime() * 1000);
+            values.put(TvContractCompat.Programs.COLUMN_CANONICAL_GENRE, canonicalGenre.get(event.getContentId()));
 
             Event.SeasonEpisodeHolder seasonEpisode = event.getSeasionEpisode();
 
             if(seasonEpisode.valid()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    values.put(TvContract.Programs.COLUMN_SEASON_DISPLAY_NUMBER, seasonEpisode.season);
-                    values.put(TvContract.Programs.COLUMN_EPISODE_DISPLAY_NUMBER, seasonEpisode.episode);
+                    values.put(TvContractCompat.Programs.COLUMN_SEASON_DISPLAY_NUMBER, seasonEpisode.season);
+                    values.put(TvContractCompat.Programs.COLUMN_EPISODE_DISPLAY_NUMBER, seasonEpisode.episode);
                 }
                 else {
-                    values.put(TvContract.Programs.COLUMN_SEASON_NUMBER, seasonEpisode.season);
-                    values.put(TvContract.Programs.COLUMN_EPISODE_NUMBER, seasonEpisode.episode);
+                    values.put(TvContractCompat.Programs.COLUMN_SEASON_NUMBER, seasonEpisode.season);
+                    values.put(TvContractCompat.Programs.COLUMN_EPISODE_NUMBER, seasonEpisode.episode);
                 }
             }
 
@@ -348,17 +332,17 @@ public class SyncUtils {
 
             if(parentalRating >= 4 && parentalRating <= 18) {
                 TvContentRating rating = TvContentRating.createRating("com.android.tv", "DVB", "DVB_" + parentalRating);
-                values.put(TvContract.Programs.COLUMN_CONTENT_RATING, rating.flattenToString());
+                values.put(TvContractCompat.Programs.COLUMN_CONTENT_RATING, rating.flattenToString());
             }
 
             // store eventId in FLAG1
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_FLAG1, event.getEventId());
+                values.put(TvContractCompat.Programs.COLUMN_INTERNAL_PROVIDER_FLAG1, event.getEventId());
             }
 
             // store VPS time in FLAG2
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                values.put(TvContract.Programs.COLUMN_INTERNAL_PROVIDER_FLAG2, event.getVpsTime());
+                values.put(TvContractCompat.Programs.COLUMN_INTERNAL_PROVIDER_FLAG2, event.getVpsTime());
             }
 
             // artwork
@@ -367,7 +351,7 @@ public class SyncUtils {
             try {
                 if(artwork.fetchForEvent(event)) {
                     String url = event.getBackgroundUrl();
-                    values.put(TvContract.Programs.COLUMN_POSTER_ART_URI, (!TextUtils.isEmpty(url) && !url.equals("x")) ? url : "");
+                    values.put(TvContractCompat.Programs.COLUMN_POSTER_ART_URI, (!TextUtils.isEmpty(url) && !url.equals("x")) ? url : "");
                 }
             }
             catch(IOException e) {
