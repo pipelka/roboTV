@@ -34,7 +34,7 @@ https://github.com/pipelka/vdr-plugin-robotv
 
 1. Download [Android Studio](https://developer.android.com/studio/index.html)
 2. Set the SDK in Android Studio (Project Structure) or "local.properties".
-4. ./gradlew assembleDebug
+4. Build in Android Studio or do a `./gradlew assembleDebug` on the command line
 
 # Current Features
 
