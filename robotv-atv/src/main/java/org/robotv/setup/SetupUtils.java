@@ -93,18 +93,6 @@ public class SetupUtils {
         e.apply();
     }
 
-    static boolean getShieldWorkaroundEnabled(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        return prefs.getBoolean("shieldworkaround", true);
-    }
-
-    static void setShieldWorkaroundEnabled(Context context, boolean enabled) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        SharedPreferences.Editor e = prefs.edit();
-        e.putBoolean("shieldworkaround", enabled);
-        e.apply();
-    }
-
     static void setInputId(Context context, String inputId) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         SharedPreferences.Editor e = prefs.edit();
