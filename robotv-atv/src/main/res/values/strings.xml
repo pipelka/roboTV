@@ -3,7 +3,6 @@
     <string name="robotv_input" translatable="false">roboTV</string>
     <string name="robotv_input_label" translatable="false">roboTV</string>
     <string name="connect_unable">Unable to connect to server !</string>
-
     <string name="setup_root_server_desc">roboTV server address</string>
     <string name="setup_root_language_title">Audio language</string>
     <string name="setup_root_refreshrate_title">TV refresh rate</string>
@@ -16,7 +15,6 @@
     <string name="setup_refreshrate_title">TV refresh rate</string>
     <string name="setup_refreshrate_desc">For a smooth TV playback the refresh rate of your TV should match your content. In Europe this is usually 50Hz. In the US and UK 60Hz.</string>
     <string name="setup_import_title">Refreshing channels …</string>
-
     <string name="browse_title">roboTV Movies</string>
     <string name="related_movies">Related Videos</string>
     <string name="ok">OK</string>
@@ -48,13 +46,10 @@
     <string name="setup_root_speakerconfig_stereo">Stereo</string>
     <string name="setup_speakerconfig_desc">Define your loadspeaker layout.</string>
     <string name="setup_root_speakerconfig_disabled">Disabled for passthrough</string>
-
     <string name="search_results">Search results for \'%1$s\'</string>
     <string name="no_search_results">No search results found for \'%1$s\'</string>
-
     <string name="receivers_busy">All receivers busy</string>
     <string name="blocked_by_recording">Channel blocked by recording</string>
-
     <string name="service_connected">roboTV service connected</string>
     <string name="timer_add_desc" translatable="false">%1$s%2$s - %3$s</string>
     <string name="timer_add_create">Create Timer</string>
@@ -114,4 +109,5 @@
     <string name="delete_search_timer">Delete search timer</string>
     <string name="search_label">roboTV Movies</string>
     <string name="search_settings_description">Recorded movies provided by roboTV</string>
+    <string name="failed_to_fetch_movie_information">Failed to fetch movie information from the server</string>
 </resources>
