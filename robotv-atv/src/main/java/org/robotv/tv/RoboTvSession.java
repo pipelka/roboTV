@@ -4,12 +4,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.res.Resources;
 import android.media.PlaybackParams;
-import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
 import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 
@@ -25,6 +25,8 @@ import org.robotv.sync.SyncUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.tvprovider.media.tv.TvContractCompat;
 
 class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
@@ -59,7 +61,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         mContext = context;
         mContentResolver =  mContext.getContentResolver();
         mNotification = new NotificationHandler(mContext);
-        mHandler = new Handler();
+        mHandler = new Handler(Looper.getMainLooper());
 
         // player init
         mPlayer = new Player(
@@ -241,20 +243,20 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         int height = format.height;
 
         if(height == 720) {
-            values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_720P);
+            values.put(TvContractCompat.Channels.COLUMN_VIDEO_FORMAT, TvContractCompat.Channels.VIDEO_FORMAT_720P);
         }
 
         if(height > 720 && height <= 1080) {
-            values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_1080I);
+            values.put(TvContractCompat.Channels.COLUMN_VIDEO_FORMAT, TvContractCompat.Channels.VIDEO_FORMAT_1080I);
         }
         else if(height == 2160) {
-            values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_2160P);
+            values.put(TvContractCompat.Channels.COLUMN_VIDEO_FORMAT, TvContractCompat.Channels.VIDEO_FORMAT_2160P);
         }
         else if(height == 4320) {
-            values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_4320P);
+            values.put(TvContractCompat.Channels.COLUMN_VIDEO_FORMAT, TvContractCompat.Channels.VIDEO_FORMAT_4320P);
         }
         else {
-            values.put(TvContract.Channels.COLUMN_VIDEO_FORMAT, TvContract.Channels.VIDEO_FORMAT_576I);
+            values.put(TvContractCompat.Channels.COLUMN_VIDEO_FORMAT, TvContractCompat.Channels.VIDEO_FORMAT_576I);
         }
 
         if(mContentResolver.update(mCurrentChannelUri, values, null, null) != 1) {
