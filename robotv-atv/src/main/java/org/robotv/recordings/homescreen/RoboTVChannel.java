@@ -64,6 +64,10 @@ public class RoboTVChannel {
             TvContractCompat.Channels.CONTENT_URI, builder.build().toContentValues()
         );
 
+        if(channelUri == null) {
+            return;
+        }
+
         long channelId = ContentUris.parseId(channelUri);
         SetupUtils.setHomescreenChannelId(context, channelId);
 
@@ -78,6 +82,10 @@ public class RoboTVChannel {
         Log.d(TAG, "update");
 
         long channelId = SetupUtils.getHomescreenChannelId(context);
+
+        if(channelId == -1) {
+            return;
+        }
 
         Intent intent = new Intent(context, RecordingsActivity.class);
 
