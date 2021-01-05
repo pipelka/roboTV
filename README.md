@@ -17,7 +17,7 @@ Now you can use your Android TV Box (or your TV running Android) to stream LiveT
 
 ## System requirements
 
-* [Android TV](https://www.android.com/tv/) (minimum API Level 29 Android TV 9 Pie)
+* [Android TV](https://www.android.com/tv/) (minimum API Level 24 Android TV 7.0 Nougat)
 * [VDR 2.4](http://www.vdr-wiki.de/)
 * [vdr-plugin-robotv](https://github.com/pipelka/vdr-plugin-robotv)
 * [vdr-epgsearch](http://www.vdr-wiki.de/wiki/index.php/Epgsearch-plugin) (recommended)
