@@ -253,10 +253,15 @@ public class PlayerActivity extends DataServiceActivity implements Player.Listen
         }
 
         Log.d(TAG, "recid: " + recid);
-        mSelectedMovie = service.getMovieController().getMovie(recid);
+        MovieController controller = service.getMovieController();
+
+        if(controller != null) {
+            mSelectedMovie = controller.getMovie(recid);
+        }
 
         if(mSelectedMovie == null) {
             notificationHandler.error(getString(R.string.failed_to_fetch_movie_information));
+            finish();
             return;
         }
 
