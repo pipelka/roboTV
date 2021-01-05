@@ -75,10 +75,7 @@ public class SetupUtils {
         String defaultLang = Locale.getDefault().getISO3Language();
         String lang = prefs.getString("language", defaultLang);
 
-        lang = TextUtils.isEmpty(lang) ? defaultLang : lang;
-        Log.d(TAG, "getLanguage: " + lang);
-
-        return lang;
+        return TextUtils.isEmpty(lang) ? defaultLang : lang;
     }
 
     static void setLanguage(Context context, String language) {
