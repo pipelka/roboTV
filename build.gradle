@@ -18,15 +18,15 @@ allprojects {
         }
         maven {
             name 'glide-snapshot'
-            url 'http://oss.sonatype.org/content/repositories/snapshots'
+            url 'https://oss.sonatype.org/content/repositories/snapshots'
         }
     }
     project.ext {
         minSdkVersion=24
         compileSdkVersion=30
-        ndkVersion='21.1.6352462'
+        ndkVersion='22.0.7026061'
         targetSdkVersion=29
-        javaVersion = JavaVersion.VERSION_1_8
+        javaVersion=JavaVersion.VERSION_1_8
         exoPlayerVersion='2.6.1'
         glideVersion='4.12.0-SNAPSHOT'
         leanbackVersion='1.1.0-beta01'
