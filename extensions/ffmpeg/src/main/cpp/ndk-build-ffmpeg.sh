@@ -122,6 +122,7 @@ find . -name "*.o" | xargs rm
 # x86
 
 NDK_ABIARCH=i686-linux-android
+NDK_VERSION=22
 
 ./configure \
     --cross-prefix=$CROSS_PREFIX \
@@ -134,10 +135,10 @@ NDK_ABIARCH=i686-linux-android
     --sysroot="${SYSROOT}" \
     --extra-cflags="-march=atom -msse3 -ffast-math -mfpmath=sse -O3" \
     --extra-ldflags="" \
-    --cc="${CROSS_PREFIX}i686-linux-android21-clang" \
-    --cxx="${CROSS_PREFIX}i686-linux-android21-clang++" \
+    --cc="${CROSS_PREFIX}${NDK_ABIARCH}${NDK_VERSION}-clang" \
+    --cxx="${CROSS_PREFIX}${NDK_ABIARCH}${NDK_VERSION}-clang++" \
     --nm="${CROSS_PREFIX}${NDK_ABIARCH}-nm" \
-    --ld="${CROSS_PREFIX}i686-linux-android21-clang" \
+    --ld="${CROSS_PREFIX}${NDK_ABIARCH}${NDK_VERSION}-clang" \
     --ar="${CROSS_PREFIX}${NDK_ABIARCH}-ar" \
     --strip="${CROSS_PREFIX}${NDK_ABIARCH}-strip" \
     --extra-ldexeflags=-pie \
