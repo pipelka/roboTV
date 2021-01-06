@@ -1,5 +1,6 @@
 .gradle/
 .idea/
+bin/
 app/app.iml
 app/build/
 build/
