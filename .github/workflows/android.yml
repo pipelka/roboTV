@@ -21,15 +21,14 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle (debug)
       run: |
-        export DEBUG_VERSION=`git describe`
         ./gradlew assembleDebug
-        cp -f ./robotv-atv/build/outputs/apk/debug/robotv-debug.apk robotv-debug-${DEBUG_VERSION}.apk 
+        cp -f ./robotv-atv/build/outputs/apk/debug/robotv-debug.apk robotv-debug-${GITHUB_SHA}.apk 
         ./gradlew bundleDebug
-        cp -f ./robotv-atv/build/outputs/bundle/debug/robotv-debug.aab robotv-debug-${DEBUG_VERSION}.aab
+        cp -f ./robotv-atv/build/outputs/bundle/debug/robotv-debug.aab robotv-debug-${GITHUB_SHA}.aab
     - name: Archive binaries (debug)
       uses: actions/upload-artifact@v2
       with:
         name: debug-binaries
         path: |
-          robotv-debug-*.apk
-          robotv-debug-*.aab
+          robotv-debug-${GITHUB_SHA}.apk
+          robotv-debug-${GITHUB_SHA}.aab
