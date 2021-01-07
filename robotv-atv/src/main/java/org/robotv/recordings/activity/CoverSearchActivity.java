@@ -36,6 +36,7 @@ public class CoverSearchActivity extends DataServiceActivity {
 
         if(service != null) {
             service.getMovieController().setMovieArtwork(mMovie, holder);
+            service.updateRecommendationChannel();
         }
 
         if(holder != null) {
