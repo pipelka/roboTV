@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+androidGitVersion {
+    codeFormat 'MNNPPBB'
+    commitHashLength = 8
+    untrackedIsDirty = false
+}
+
 android {
     compileSdkVersion project.ext.compileSdkVersion
     ndkVersion project.ext.ndkVersion
@@ -17,8 +23,8 @@ android {
         applicationId "org.robotv.robotv"
         minSdkVersion project.ext.minSdkVersion
         targetSdkVersion project.ext.targetSdkVersion
-        versionCode 90401
-        versionName "0.9.4"
+        versionName androidGitVersion.name()
+        versionCode androidGitVersion.code()
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 

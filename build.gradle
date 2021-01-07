@@ -9,6 +9,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.gladed.androidgitversion' version '0.4.14'
+}
+
 allprojects {
     repositories {
         jcenter()
