@@ -194,6 +194,11 @@ public class DataService extends Service {
         channel = new RoboTVChannel(this);
     }
 
+    public void updateRecommendationChannel() {
+        channel.create();
+        channel.update();
+    }
+
     @Override
     public void onDestroy() {
         connectionStatus = STATUS_Server_NotConnected;
@@ -229,8 +234,7 @@ public class DataService extends Service {
             return false;
         }
 
-        channel.create();
-        channel.update();
+        updateRecommendationChannel();
 
         postOnConnected();
 
