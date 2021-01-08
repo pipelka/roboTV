@@ -6,6 +6,10 @@
 roboTV is a Android TV based frontend for VDR.
 Now you can use your Android TV Box (or your TV running Android) to stream LiveTV channels from your VDR backend (robotv-plugin must be installed).
 
+<a href='https://play.google.com/store/apps/details?id=org.robotv.robotv'>
+<img width="240" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' />
+</a>
+
 ## Screenshots
 |     |     |
 | --- | --- |
