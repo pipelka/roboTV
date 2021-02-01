@@ -12,6 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: olegtarasov/get-tag@v2.1
       id: tagName
     - name: set up JDK 1.8
