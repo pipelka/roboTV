@@ -13,7 +13,7 @@ cd `dirname $0`/..
 
 ./gradlew cleanBuildCache clean bundleRelease
 
-VERSION=`git describe`
+VERSION=`git describe --tags`
 AABDIR=distribution/bin
 AAB=robotv-${VERSION}.aab
 AABFILE=${AABDIR}/${AAB}

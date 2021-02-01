@@ -13,7 +13,7 @@ cd `dirname $0`/..
 
 ./gradlew cleanBuildCache clean assembleRelease
 
-VERSION=`git describe`
+VERSION=`git describe --tags`
 APKDIR=distribution/bin
 APK=robotv-${VERSION}.apk
 APKFILE=${APKDIR}/${APK}
