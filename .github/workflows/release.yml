@@ -13,9 +13,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: set up JDK 1.8
+      id: vars
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle (release)
@@ -32,8 +34,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.event.ref }}
-        release_name: Version ${{ github.event.ref }}
+        tag_name: ${{ steps.vars.outputs.tag }}
+        release_name: Version ${{ steps.vars.outputs.tag }}
         draft: false
         prerelease: false
         body_path: distribution/whatsnew/whatsnew-en-US
@@ -43,14 +45,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: distribution/bin/robotv-${{ github.event.ref }}.apk
-        asset_name: robotv-${{ github.event.ref }}.apk
+        asset_path: distribution/bin/robotv-${{ steps.vars.outputs.tag }}.apk
+        asset_name: robotv-${{ steps.vars.outputs.tag }}.apk
         asset_content_type: application/vnd.android.package-archive
     - name: Publish Play Store
       uses: r0adkll/upload-google-play@v1
       with:
         serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
         packageName: org.robotv.robotv
-        releaseFiles: distribution/bin/robotv-${{ github.event.ref }}.aab
+        releaseFiles: distribution/bin/robotv-${{ steps.vars.outputs.tag }}.aab
         track: beta
         whatsNewDirectory: distribution/whatsnew
