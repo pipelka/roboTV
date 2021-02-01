@@ -202,6 +202,7 @@ public class DataService extends Service {
     @Override
     public void onDestroy() {
         connectionStatus = STATUS_Server_NotConnected;
+        wasConnected = false;
         connection.close();
         handlerThread.interrupt();
     }
