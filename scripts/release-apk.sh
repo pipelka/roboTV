@@ -14,11 +14,13 @@ cd `dirname $0`/..
 ./gradlew cleanBuildCache clean assembleRelease
 
 VERSION=`git describe`
+APKDIR=distribution/bin
 APK=robotv-${VERSION}.apk
+APKFILE=${APKDIR}/${APK}
 
-mkdir -p bin
-cp -f ./robotv-atv/build/outputs/apk/release/robotv-release.apk ${APK}
+mkdir -p ${APKDIR}
+cp -f ./robotv-atv/build/outputs/apk/release/robotv-release.apk ${APKFILE}
 
 echo
 echo "Release APK:"
-echo `pwd`/bin/${APK}
+echo `pwd`/${APKFILE}
