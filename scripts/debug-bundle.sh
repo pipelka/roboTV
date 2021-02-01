@@ -11,16 +11,14 @@ cd `dirname $0`/..
 
 # set appropriately before running this this script
 
-./gradlew cleanBuildCache clean bundleRelease
+./gradlew cleanBuildCache clean bundleDebug
 
 VERSION=`git describe`
-AABDIR=distribution/bin
-AAB=robotv-${VERSION}.aab
-AABFILE=${AABDIR}/${AAB}
+AAB=robotv-debug-${VERSION}.aab
 
-mkdir -p ${AABDIR}
-cp -f ./robotv-atv/build/outputs/bundle/release/robotv-release.aab ${AABFILE}
+mkdir -p bin
+cp -f ./robotv-atv/build/outputs/bundle/debug/robotv-debug.aab ./bin/${AAB}
 
 echo
-echo "Release Bundle:"
-echo `pwd`/${AABFILE}
+echo "Debug Bundle:"
+echo `pwd`/bin/${AAB}

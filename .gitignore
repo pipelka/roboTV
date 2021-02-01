@@ -1,6 +1,6 @@
 .gradle/
 .idea/
-bin/
+distribution/bin/
 app/app.iml
 app/build/
 build/
