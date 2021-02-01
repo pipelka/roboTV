@@ -4,9 +4,11 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioFormat;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.exoplayer2.audio.AudioCapabilities;
 
+import org.robotv.dataservice.DataServiceClient;
 import org.robotv.robotv.R;
 
 import java.util.List;
@@ -131,7 +133,10 @@ public class SetupFragment extends GuidedStepSupportFragment {
 
         switch((int)action.getId()) {
             case ACTION_SERVER:
-                SetupUtils.setServer(getActivity(), mActionServer.getTitle().toString());
+                String server = mActionServer.getTitle().toString();
+                SetupUtils.setServer(getActivity(), server);
+                restartDataService();
+                Log.d(TAG, "server: " + server);
                 break;
 
             case ACTION_LANGUAGE:
@@ -159,5 +164,10 @@ public class SetupFragment extends GuidedStepSupportFragment {
 
         SetupActivity activity = (SetupActivity) getActivity();
         activity.registerChannels(progress);
+    }
+
+    private void restartDataService() {
+        DataServiceClient client = new DataServiceClient(getContext());
+        client.reconnect();
     }
 }
