@@ -41,9 +41,9 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     private final NotificationHandler mNotification;
 
     private class TuneRunnable implements Runnable {
-        private final Uri mChannelUri;
+        private Uri mChannelUri;
 
-        TuneRunnable(Uri channelUri) {
+        void setChannelUri(Uri channelUri) {
             mChannelUri = channelUri;
         }
 
@@ -53,13 +53,15 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         }
     }
 
+    private final TuneRunnable mTune = new TuneRunnable();
+
     private final ContentResolver mContentResolver;
 
-    RoboTvSession(TvInputService context/*, String inputId*/) {
+    RoboTvSession(TvInputService context) {
         super(context);
-
         mContext = context;
         mContentResolver =  mContext.getContentResolver();
+
         mNotification = new NotificationHandler(mContext);
         mHandler = new Handler(Looper.getMainLooper());
 
@@ -68,7 +70,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
             mContext,
             SetupUtils.getServer(mContext),                       // Server
             SetupUtils.getLanguage(mContext),                     // Language
-            this,                                          // Listener
+            this,                                         // Listener
             SetupUtils.getPassthrough(mContext),                  // AC3 passthrough
             SetupUtils.getTunneledVideoPlaybackEnabled(mContext)
         );
@@ -112,13 +114,23 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     @Override
     public boolean onTune(final Uri channelUri) {
-        tune(channelUri);
+        Log.d(TAG, "postTune: " + channelUri.toString());
+        postTune(channelUri, 0);
         return true;
     }
 
-    private void scheduleRetune() {
-        // post re-tune request
-        mHandler.postDelayed(new TuneRunnable(mCurrentChannelUri), 10000);
+    private void postTune(final Uri channelUri, long delayMillis) {
+        notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+
+        // remove pending tune request
+        mHandler.removeCallbacks(mTune);
+
+        if(channelUri != null) {
+            mTune.setChannelUri(channelUri);
+        }
+
+        // post new tune request
+        mHandler.postDelayed(mTune, delayMillis);
     }
 
     @Override
@@ -199,7 +211,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL);
         mNotification.error(getResources().getString(R.string.connection_lost));
 
-        scheduleRetune();
+        postTune(null, 10 * 1000);
     }
 
     @Override
@@ -284,7 +296,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
                 break;
 
             case Connection.STATUS_CONNECTION_FAILED:
-                scheduleRetune();
+                postTune(null, 10 * 1000);
                 break;
 
             default:
@@ -301,7 +313,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         Log.i(TAG, "onTune: " + channelUri);
 
-        // create channel placeholder
+        // create chennl placeholder
         SyncUtils.ChannelHolder holder = new SyncUtils.ChannelHolder();
 
         // get information (id's) of the channel
@@ -317,7 +329,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
         Uri uri = Player.createLiveUri(holder.channelUid);
 
         // start playback
-        mPlayer.open(uri);
+        mPlayer.openSync(uri);
         mPlayer.play();
 
         Log.i(TAG, "successfully switched channel");
