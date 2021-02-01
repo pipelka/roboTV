@@ -45,6 +45,7 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: distribution/bin/robotv-${{ github.event.ref }}.apk
         asset_name: robotv-${{ github.event.ref }}.apk
+        asset_content_type: application/vnd.android.package-archive
     - name: Publish Play Store
       uses: r0adkll/upload-google-play@v1
       with:
