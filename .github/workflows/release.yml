@@ -12,6 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: olegtarasov/get-tag@v2.1
+      id: tagName
     - name: set up JDK 1.8
       uses: actions/setup-java@v1
       with:
@@ -32,8 +34,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.event.release.tag_name }}
-        release_name: Version ${{ github.event.release.tag_name }}
+        tag_name: ${{ steps.tagName.outputs.tag }}
+        release_name: Version ${{ steps.tagName.outputs.tag }}
         draft: false
         prerelease: false
         body_path: distribution/whatsnew/whatsnew-en-US
@@ -43,14 +45,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: distribution/bin/robotv-${{ github.event.release.tag_name }}.apk
-        asset_name: robotv-${{ github.event.release.tag_name }}.apk
+        asset_path: distribution/bin/robotv-${{ steps.tagName.outputs.tag }}.apk
+        asset_name: robotv-${{ steps.tagName.outputs.tag }}.apk
         asset_content_type: application/vnd.android.package-archive
     - name: Publish Play Store
       uses: r0adkll/upload-google-play@v1
       with:
         serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
         packageName: org.robotv.robotv
-        releaseFiles: distribution/bin/robotv-${{ github.event.release.tag_name }}.aab
+        releaseFiles: distribution/bin/robotv-${{ steps.tagName.outputs.tag }}.aab
         track: beta
         whatsNewDirectory: distribution/whatsnew
