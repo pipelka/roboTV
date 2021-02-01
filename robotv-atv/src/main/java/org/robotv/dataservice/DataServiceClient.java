@@ -19,7 +19,9 @@ public class DataServiceClient {
             DataService.Binder binder = (DataService.Binder) serviceBinder;
             service = binder.getService();
 
-            service.registerListener(listener);
+            if(listener != null) {
+                service.registerListener(listener);
+            }
         }
 
         @Override
@@ -33,6 +35,11 @@ public class DataServiceClient {
         this.listener = listener;
     }
 
+    public DataServiceClient(Context context) {
+        this.context = context;
+        this.listener = null;
+    }
+
     public void bind() {
         Intent serviceIntent = new Intent(context, DataService.class);
         context.startService(serviceIntent);
@@ -40,11 +47,17 @@ public class DataServiceClient {
     }
 
     public void unbind() {
-        if(service != null) {
+        if(service != null && listener != null) {
             service.unregisterListener(listener);
         }
 
         context.unbindService(connection);
+    }
+
+    public void reconnect() {
+        Intent serviceIntent = new Intent(context, DataService.class);
+        context.stopService(serviceIntent);
+        context.startService(serviceIntent);
     }
 
     public DataService getService() {
