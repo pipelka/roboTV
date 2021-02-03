@@ -1,2 +1,9 @@
+0.9.6
+
+- removed work-arounds causing problems on the NVIDIA Shield
+- retune live channel on stalled streams
+
+0.9.5
+
 - update the recommendation channel after changing movie artwork
 - bug fixes
