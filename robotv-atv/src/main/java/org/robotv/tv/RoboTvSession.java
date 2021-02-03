@@ -32,13 +32,14 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
     private static final String TAG = "TVSession";
 
-    private Uri mCurrentChannelUri;
-
     private final Player mPlayer;
     private final TvInputService mContext;
 
     private final Handler mHandler;
     private final NotificationHandler mNotification;
+
+    private Uri mCurrentChannelUri;
+    private boolean playbackStarted = false;
 
     private class TuneRunnable implements Runnable {
         private Uri mChannelUri;
@@ -190,10 +191,15 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if(playWhenReady && playbackState == com.google.android.exoplayer2.Player.STATE_BUFFERING) {
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
+            if(playbackStarted) {
+                postTune(null, 5000);
+            }
         }
 
         if(playWhenReady && playbackState == com.google.android.exoplayer2.Player.STATE_READY) {
             notifyVideoAvailable();
+            playbackStarted = true;
+            mHandler.removeCallbacks(mTune);
         }
     }
 
@@ -203,6 +209,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
     public void onPlayerError(Exception e) {
         Log.e(TAG, "onPlayerError");
         e.printStackTrace();
+        postTune(null, 500);
     }
 
     @Override
@@ -324,6 +331,7 @@ class RoboTvSession extends TvInputService.Session implements Player.Listener {
 
         // set current channel uri
         mCurrentChannelUri = channelUri;
+        playbackStarted = false;
 
         // create roboTV live channel uri
         Uri uri = Player.createLiveUri(holder.channelUid);
