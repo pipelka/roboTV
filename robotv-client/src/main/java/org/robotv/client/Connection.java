@@ -155,6 +155,13 @@ public class Connection extends Session {
         }
 
         int protocolVersion = resp.getProtocolVersion();
+
+        if(protocolVersion < PROTOCOLVERSION) {
+            Log.i(TAG, "Server protocolversion mismatch! (Server: " + protocolVersion + " / Client: " + PROTOCOLVERSION);
+            Log.i(TAG, "The vdr server plugin needs to be updated !");
+            return false;
+        }
+
         long vdrTime = resp.getU32();
         long vdrTimeOffset = resp.getS32();
         String server = resp.getString();
